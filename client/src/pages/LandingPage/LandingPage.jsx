@@ -14,7 +14,7 @@ const LandingPage = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-sky-50/10 bgX-cream relative overflow-hidden">
+        <div className="min-h-screen bg-sky-50 relative overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-12 relative">
                 {/* Navigation */}
                 <nav className="flex justify-between items-center mb-16 sm:mb-32">
@@ -85,13 +85,16 @@ const LandingPage = () => {
                             Express yourself through images, words, or both.
                         </p>
                         <div>
-                            <button className="px-6 sm:px-8 py-3 bg-[#5789ba] text-white rounded-xl hover:bg-sky-700 transition-all duration-300 inline-flex items-center group">
-                                Start Exploring
-                                <ArrowRight
-                                    size={16}
-                                    className="ml-2 transform group-hover:translate-x-1 transition-transform"
-                                />
-                            </button>
+                            <a href="/login" className="no-underline">
+                                <button className="px-6 sm:px-8 py-3 bg-[#5789ba] text-white rounded-xl hover:bg-sky-700 transition-all duration-300 inline-flex items-center group">
+                                    Start Exploring
+                                    {/* Login */}
+                                    <ArrowRight
+                                        size={16}
+                                        className="ml-2 transform group-hover:translate-x-1 transition-transform"
+                                    />
+                                </button>
+                            </a>
                         </div>
                     </div>
                     <div className="relative mx-auto lg:right-0 w-2/3 sm:w-1/2 lg:w-2/3 pointer-events-none">

@@ -6,7 +6,7 @@ const Header = ({ filters, navLinks }) => {
     const [selectedFilter, setSelectedFilter] = useState("all");
 
     return (
-        <header className="fixed top-0 w-full bg-white/0 backdrop-blur-sm z-50 border-b border-gray-100">
+        <header className="fixed top-0 w-full bg-white/20 backdrop-blur-md z-50 border-b border-gray-100">
             <div className="max-w-[1400px] mx-auto px-6 py-6">
                 <div className="flex flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
                     <h1 className="text-2xl font-stardom font-semibold tracking-tight">
@@ -37,7 +37,7 @@ const Header = ({ filters, navLinks }) => {
                             <React.Fragment key={index}>
                                 <a
                                     href={link.href}
-                                    className="text-stone-600 hover:text-stone-800 hover:bg-cream-dark/50 box-content px-3 py-1 rounded-lg transition-all text-sm"
+                                    className="text-stone-600 hover:text-stone-800 hover:bg-stone-300/50 box-content px-3 py-1 rounded-lg transition-all text-sm"
                                 >
                                     {link.name}
                                 </a>
@@ -62,7 +62,7 @@ const Header = ({ filters, navLinks }) => {
                     </button>
                 </div>
                 <div
-                    className={`md:hidden absolute left-0 right-0 bg-cream backdrop-blur-sm border-b border-stone-200/50 transition-all duration-300 ease-in-out ${
+                    className={`md:hidden absolute left-0 right-0 bg-white backdrop-blur-md border-b border-stone-200/50 transition-all duration-300 ease-in-out ${
                         isMenuOpen
                             ? "opacity-100 translate-y-0"
                             : "opacity-0 -translate-y-2 pointer-events-none"

@@ -14,7 +14,7 @@ const Header = () => {
     ];
 
     return (
-        <header className="fixed w-full top-0 z-50 bg-cream/0 backdrop-blur-sm">
+        <header className="fixed w-full top-0 z-50 bg-white/20 backdrop-blur-md">
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
                 <nav className="flex items-center justify-between h-16 sm:h-20">
                     {/* Logo */}
@@ -31,7 +31,7 @@ const Header = () => {
                             <React.Fragment key={index}>
                                 <a
                                     href={link.href}
-                                    className="text-stone-600 hover:text-stone-800 hover:bg-cream-dark/50 box-content px-3 py-1 rounded-lg transition-all text-sm"
+                                    className="text-stone-600 hover:text-stone-800 hover:bg-stone-300/50 box-content px-3 py-1 rounded-lg transition-all text-sm"
                                 >
                                     {link.name}
                                 </a>
@@ -58,7 +58,7 @@ const Header = () => {
 
                 {/* Mobile Menu */}
                 <div
-                    className={`md:hidden absolute left-0 right-0 bg-cream backdrop-blur-sm border-b border-stone-200/50 transition-all duration-300 ease-in-out ${
+                    className={`md:hidden absolute left-0 right-0 bg-white backdrop-blur-md border-b border-stone-200/50 transition-all duration-300 ease-in-out ${
                         isMenuOpen
                             ? "opacity-100 translate-y-0"
                             : "opacity-0 -translate-y-2 pointer-events-none"

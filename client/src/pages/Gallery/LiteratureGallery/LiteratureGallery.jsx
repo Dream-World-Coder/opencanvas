@@ -4,7 +4,7 @@ import stories from "./Stories";
 import Footer from "../Components/GalleryFooter";
 import Header from "../Components/GalleryHeader";
 
-const LiteraryGallery = () => {
+const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
     const [scrollY, setScrollY] = useState(0);
     const [hoveredId, setHoveredId] = useState(null);
 
@@ -26,7 +26,7 @@ const LiteraryGallery = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-stone-50 pt-8">
+        <div className={`min-h-screen ${bgClr} pt-8`}>
             <Header filters={filters} navLinks={navLinks} />
 
             {/* Top / Hero */}

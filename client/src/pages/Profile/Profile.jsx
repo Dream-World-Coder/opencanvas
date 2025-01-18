@@ -14,7 +14,7 @@ import posts from "./posts";
 import collections from "./collections";
 import createOptions from "./createOptions";
 
-const CreativeProfile = () => {
+const Profile = ({ bgClr = "bg-cream-light" }) => {
     const [viewMode, setViewMode] = useState("grid");
     const [activeTab, setActiveTab] = useState("all");
     const [createMenuOpen, setCreateMenuOpen] = useState(false);
@@ -27,7 +27,7 @@ const CreativeProfile = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-white font-sans">
+        <div className={`min-h-screen ${bgClr} font-sans`}>
             {/* Navigation */}
             <nav className="fixed top-0 w-full bg-white z-50 border-b border-gray-100">
                 <div className="max-w-[1400px] mx-auto flex justify-between items-center px-8 py-6">
@@ -314,4 +314,4 @@ const CreativeProfile = () => {
     );
 };
 
-export default CreativeProfile;
+export default Profile;

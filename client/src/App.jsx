@@ -1,48 +1,62 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
-import CreativeProfile from "./pages/Profile/Profile";
-import PhotoGalleryPage from "./pages/Gallery/PhotoGallery/PhotoGallery";
-// import PhotoGalleryPage2 from "./pages/Gallery/PhotoGallery/PhotoGallery2";
-import LiteratureGalleryPage from "./pages/Gallery/LiteratureGallery/LiteratureGallery";
-import Gallery2 from "./pages/Gallery/LiteratureGallery/old-literaturegallery";
-import WritingPad from "./pages/create-post/WritingPad";
-import PoemPad from "./pages/create-post/PoemPad";
-import StoryPad from "./pages/create-post/StoryPad";
+
 import LandingPage from "./pages/LandingPage/LandingPage";
 import LoginPage from "./pages/Auth/Login";
+import Profile from "./pages/Profile/Profile";
 import AboutPage from "./pages/About/About";
 import ContactPage from "./pages/Contact/Contact";
 
+import WritingPad from "./pages/create-post/WritingPad";
+import PoemPad from "./pages/create-post/PoemPad";
+import StoryPad from "./pages/create-post/StoryPad";
+
+import PhotoGalleryPage from "./pages/Gallery/PhotoGallery/PhotoGallery";
+// import PhotoGalleryPage2 from "./pages/Gallery/PhotoGallery/PhotoGallery2";
+import LiteratureGallery from "./pages/Gallery/LiteratureGallery/LiteratureGallery";
+// import Gallery2 from "./pages/Gallery/LiteratureGallery/old-literaturegallery";
+
+import Thanks from "./pages/Others/Thanks";
+import NotFoundPage from "./pages/Others/404";
+
 function App() {
+    // { bgClr = "bg-cream-light" }
+
     return (
         <Router>
-            <div>
-                {/* Navbar */}
-                <Routes>
-                    <Route path="/" element={<LandingPage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route
-                        path="/gallery/photos"
-                        element={<PhotoGalleryPage />}
-                    />
-                    {/* <Route
-                        path="/gallery/photos2"
-                        element={<PhotoGalleryPage2 />}
-                    /> */}
-                    <Route
-                        path="/gallery/literature"
-                        element={<LiteratureGalleryPage />}
-                    />
-                    <Route path="/gallery/writing2" element={<Gallery2 />} />
-                    <Route path="/profile" element={<CreativeProfile />} />
-                    <Route path="/about" element={<AboutPage />} />
-                    <Route path="/contact" element={<ContactPage />} />
-                    <Route path="/new/poem" element={<PoemPad />} />
-                    <Route path="/new/story" element={<StoryPad />} />
-                    <Route path="/new-post/writing" element={<WritingPad />} />
-                    {/* <Route path="/new-post/picture" element={<CreativeProfile />} /> */}
-                </Routes>
-            </div>
+            <Routes>
+                {/* basic */}
+                <Route path="/" element={<LandingPage />} />
+                <Route
+                    path="/login"
+                    element={<LoginPage bgClr="bg-cream-light" />}
+                />
+                <Route path="/profile" element={<Profile bgClr="bg-white" />} />
+                <Route path="/about" element={<AboutPage bgClr="bg-white" />} />
+                <Route
+                    path="/contact"
+                    element={<ContactPage bgClr="bg-white" />}
+                />
+
+                {/* gallery */}
+                <Route
+                    path="/gallery/photos"
+                    element={<PhotoGalleryPage bgClr="bg-white" />}
+                />
+                <Route
+                    path="/gallery/literature"
+                    element={<LiteratureGallery bgClr="bg-white" />}
+                />
+
+                {/* new post */}
+                <Route path="/new/poem" element={<PoemPad />} />
+                <Route path="/new/story" element={<StoryPad />} />
+                <Route path="/new-post/writing" element={<WritingPad />} />
+
+                {/* others */}
+                <Route path="/thanks" element={<Thanks bgClr="bg-white" />} />
+                <Route path="*" element={<NotFoundPage bgClr="bg-white" />} />
+            </Routes>
         </Router>
     );
 }

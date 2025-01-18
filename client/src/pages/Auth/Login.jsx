@@ -13,9 +13,11 @@ const FlowerIcon = () => (
     </svg>
 );
 
-const LoginPage = () => {
+const LoginPage = ({ bgClr = "bg-cream-light" }) => {
     return (
-        <div className="min-h-screen bg-[#FAF7F5] flex items-center justify-center p-4">
+        <div
+            className={`min-h-screen ${bgClr} flex items-center justify-center p-4`}
+        >
             <Card className="w-full max-w-md p-12 space-y-8 relative overflow-hidden">
                 <div className="absolute top-0 right-0 -mr-18 -mt-18 opacity-10">
                     <FlowerIcon />

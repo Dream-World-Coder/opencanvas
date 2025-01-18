@@ -2,7 +2,7 @@ import { Palette } from "lucide-react";
 import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Header/Header";
 
-const AboutPage = () => {
+const AboutPage = ({ bgClr = "bg-cream-light" }) => {
     const featureData = [
         {
             heading: "Express",
@@ -19,7 +19,7 @@ const AboutPage = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-cream relative overflow-hidden pt-8">
+        <div className={`min-h-screen ${bgClr} relative overflow-hidden pt-8`}>
             <Header />
 
             {/* Main Content */}

@@ -8,7 +8,7 @@ import galleryItems from "./Photos";
 // not too many photoes in a page, use max 2 or 4 per page, with description underneath
 // current is overwhelming, that does not fit the theme
 
-const GalleryPage = () => {
+const GalleryPage = ({ bgClr = "bg-cream-light" }) => {
     const [layout, setLayout] = useState("masonry");
     const [selectedFilter, setSelectedFilter] = useState("all");
     const [hoveredItem, setHoveredItem] = useState(null);
@@ -70,7 +70,7 @@ const GalleryPage = () => {
     const MobileMenu = () => (
         <div
             className={`
-            fixed inset-0 bg-white z-50 transform transition-transform duration-300 ease-in-out
+            fixed inset-0 ${bgClr} z-50 transform transition-transform duration-300 ease-in-out
             ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
         `}
         >

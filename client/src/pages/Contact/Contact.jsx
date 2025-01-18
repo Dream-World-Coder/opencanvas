@@ -4,8 +4,13 @@ import GitHubIcon from "../../components/CustomIcons/Github";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 
-const ContactPage = () => {
+const ContactPage = ({ bgClr = "bg-cream-light" }) => {
     const connectLinks = [
+        {
+            name: "OpenCanvas",
+            href: "#",
+            icon: "",
+        },
         {
             name: "GitHub",
             href: "https://github.com/Dream-World-Coder",
@@ -22,11 +27,11 @@ const ContactPage = () => {
             href: "https://myopencanvas.pages.dev",
             icon: BookOpen,
         },
-        // { name: "Email", href: "mailto@lumifeed101@gmail.com", icon: Mail },
+        { name: "Email", href: "mailto@blog.opencanvas@gmail.com", icon: Mail },
     ];
 
     return (
-        <div className="min-h-screen bg-cream pt-8">
+        <div className={`min-h-screen ${bgClr} pt-8`}>
             <Header />
 
             <main className="max-w-2xl mx-auto px-6 py-16">
@@ -51,7 +56,14 @@ const ContactPage = () => {
                                     target="_blank"
                                     className="flex items-center justify-center gap-3 text-stone-600 hover:text-stone-900 transition-colors"
                                 >
-                                    <item.icon className="w-4 h-4" />
+                                    {index === 0 && (
+                                        <span className="w-4 h-4 font-stardom block transform translate-y-[-3px]">
+                                            OC
+                                        </span>
+                                    )}
+                                    {index !== 0 && (
+                                        <item.icon className="w-4 h-4" />
+                                    )}
                                     <span className="font-serif text-lg">
                                         {item.name}
                                     </span>
@@ -66,16 +78,34 @@ const ContactPage = () => {
                     <h2 className="font-serif text-2xl text-stone-800 text-center mb-12">
                         Feel free to suggest any thoughts
                     </h2>
-                    <form className="space-y-8">
+                    <form
+                        action="https://api.web3forms.com/submit"
+                        method="post"
+                        className="space-y-8"
+                    >
+                        <input
+                            type="hidden"
+                            name="access_key"
+                            value="0d68234c-653f-49f3-b87d-5f09b35e72c3"
+                        />
+                        <input
+                            type="hidden"
+                            name="redirect"
+                            value="https://www.opencanvas.blog/thanks"
+                        />
                         <div>
                             <input
+                                required
                                 type="text"
                                 placeholder="Your name"
+                                name="name"
                                 className="w-full bg-transparent border-b border-stone-200 py-2 font-serif text-lg placeholder:text-stone-400 focus:outline-none focus:border-stone-400 transition-colors"
                             />
                         </div>
                         <div>
                             <input
+                                required
+                                name="email"
                                 type="email"
                                 placeholder="Your email"
                                 className="w-full bg-transparent border-b border-stone-200 py-2 font-serif text-lg placeholder:text-stone-400 focus:outline-none focus:border-stone-400 transition-colors"
@@ -83,11 +113,19 @@ const ContactPage = () => {
                         </div>
                         <div>
                             <textarea
+                                required
+                                name="message"
                                 placeholder="Your message"
-                                rows={1}
+                                rows={2}
                                 className="w-full bg-transparent border-b border-stone-200 py-2 font-serif text-lg placeholder:text-stone-400 focus:outline-none focus:border-stone-400 transition-colors resize-none"
                             />
                         </div>
+                        <input
+                            type="checkbox"
+                            name="botcheck"
+                            className="hidden"
+                            style={{ display: "none" }}
+                        />
                         <div className="text-center pt-8">
                             <button
                                 type="submit"
