@@ -1,0 +1,92 @@
+{
+    "data": [
+        {
+            "id": 1,
+            "type": "photography",
+            "src": "https://picsum.photos/800?random=1",
+            "title": "Urban Symmetry",
+            "artist": "Sarah Winters",
+            "likes": 234,
+            "comments": 12,
+            "featured": true,
+            "size": "large"
+        },
+        {
+            "id": 2,
+            "src": "https://picsum.photos/800?random=2",
+            "type": "art",
+            "title": "Abstract Dreams",
+            "artist": "James Lee",
+            "likes": 156,
+            "comments": 8,
+            "featured": true,
+            "size": "tall"
+        },
+        {
+            "id": 3,
+            "src": "https://picsum.photos/800?random=3",
+            "type": "digital",
+            "title": "Neon Nights",
+            "artist": "Elena Costa",
+            "likes": 189,
+            "comments": 15,
+            "featured": true,
+            "size": "tall"
+        },
+        {
+            "id": 4,
+            "src": "https://picsum.photos/800?random=4",
+            "type": "photography",
+            "title": "Natural Patterns",
+            "artist": "Mark Rivers",
+            "likes": 267,
+            "comments": 23,
+            "featured": true,
+            "size": "large"
+        },
+        {
+            "id": 5,
+            "src": "https://picsum.photos/800?random=5",
+            "type": "collections",
+            "title": "City Life",
+            "artist": "Sarah Winters",
+            "likes": 345,
+            "comments": 19,
+            "featured": true,
+            "size": "wide"
+        },
+        {
+            "id": 6,
+            "src": "https://picsum.photos/800?random=6",
+            "type": "art",
+            "title": "Color Theory",
+            "artist": "Ana White",
+            "likes": 198,
+            "comments": 27,
+            "featured": true,
+            "size": "large"
+        },
+        {
+            "id": 7,
+            "src": "https://picsum.photos/800?random=7",
+            "type": "photography",
+            "title": "Geometric Patterns",
+            "artist": "Lisa Chen",
+            "likes": 178,
+            "comments": 14,
+            "size": "wide",
+            "featured": true
+        },
+        {
+            "id": 8,
+            "src": "https://picsum.photos/800?random=8",
+            "type": "digital",
+            "title": "Digital Waves",
+            "artist": "Mike Peterson",
+            "likes": 145,
+            "comments": 9,
+            "size": "default",
+            "featured": true
+        }
+    ]
+}

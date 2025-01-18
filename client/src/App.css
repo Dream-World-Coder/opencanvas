@@ -1,0 +1,12 @@
+@font-face {
+    font-family: scribe;
+    src: url("/fonts/military-scribe.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 400;
+}
+@font-face {
+    font-family: stardom;
+    src: url("/fonts/Stardom.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 400;
+}
