@@ -14,6 +14,10 @@ opencanvas is an open-canvas -- so technical blogs, maths etc are also welcome, 
 
 ---
 
+also easily create e-books as your collection grows
+
+---
+
 so /gallery --> home page -- mixture also based on interests will be added later
 /gallery/pic --> in header
 /gallery/text --> in header
@@ -29,19 +33,19 @@ saved items \*[or will add it for all]
 settings
 
 ---
-
+<!-- 
 implement Medium fonts and spacing in lumifeed and here
 +++projects & gallery modifications
 in lumifeed make /article page like medium
 line-height: 32px;
 font 20
-letter spacing -0.003em
+letter spacing -0.003em -->
 
 <!-- mobile -->
-
+<!-- 
 lh: 28px;
 font 18px
 https://glyph.medium.com/font/b156742/0-3j_4g_53_6bu_6c4_6c8_6c9_6cc_6cd_6ci_6cm/source-serif-pro-700-normal.woff
 https://glyph.medium.com/font/8e059b2/0-3j_4g_53_6bu_6c4_6c8_6c9_6cc_6cd_6ci_6cm/source-serif-pro-400-normal.woff
 
-https://lumifeed.netlify.app/article
+https://lumifeed.netlify.app/article -->
