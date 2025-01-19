@@ -3,12 +3,13 @@ const stories = [
         id: 1,
         title: "The Silent Hours",
         excerpt:
-            "In those moments between dusk and darkness, when the world grows quiet and memories surface like stars in the evening sky...",
+            "In those moments between dusk and darkness,\n Suscipit earum accusamus quibusdam?\nIn those moments between dusk and darkness\nIn those moments between dusk and darkness.",
         type: "Prose",
         date: "Winter, 2024",
         likes: 156,
         saves: 42,
         author: "Eleanor Wells",
+        // gradient: "from-sky-200 to-sky-50",
     },
     {
         id: 2,

@@ -16,6 +16,7 @@
     "@mui/material": "^6.3.1",
     "concurrently": "^9.1.2",
     "framer-motion": "^11.18.0",
+    "lenis": "^1.1.19",
     "lucide-react": "^0.471.1",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",

@@ -26,25 +26,26 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
     }, []);
 
     return (
-        <div className={`min-h-screen ${bgClr} pt-8`}>
+        <div className={`min-h-screen ${bgClr} pt-24`}>
             <Header filters={filters} navLinks={navLinks} />
 
             {/* Top / Hero */}
             <div
-                className="relative h-72 overflow-hidden bg-gradient-to-b from-stone-100 to-stone-50"
+                className={`relative h-72 overflow-hidden bg-inherit`}
                 style={{
                     transform: `translateY(${scrollY * 0.2}px)`,
                 }}
             >
                 <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center px-6">
-                        <h1 className="text-3xl font-serif text-stone-800 mb-3 tracking-wide">
+                        <h1 className="text-3xl text-stone-800 mb-3 tracking-wide font-[scribe]">
                             Literary Collection
                         </h1>
-                        <div className="h-px w-24 mx-auto bg-gradient-to-r from-transparent via-stone-400 to-transparent mb-3"></div>
-                        <p className="text-sm text-stone-600 tracking-wide font-light">
+                        <div className="h-px w-[100%] mx-auto bg-gradient-to-r from-transparent via-stone-500/40 to-transparent mb-3"></div>
+                        <p className="text-sm text-stone-600 tracking-wide font-light font-stardom">
                             A gathering of thoughts, verses, and tales
                         </p>
+                        <div className="h-px w-[100%] mx-auto bg-gradient-to-r from-transparent via-stone-500/40 to-transparent mt-3"></div>
                     </div>
                 </div>
             </div>
@@ -62,11 +63,12 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
                         >
                             <div
                                 className={`bg-gradient-to-br ${story.gradient} p-8 border-b border-stone-200
-                                          hover:border-stone-300 transition-all duration-500
-                                          hover:shadow-lg hover:shadow-stone-100/50 rounded-sm`}
+                                    hover:border-stone-300 transition-all duration-500
+                                    hover:shadow-lg hover:shadow-stone-100/50 rounded`}
                             >
                                 <header className="mb-6">
                                     <div className="flex justify-between items-center mb-4">
+                                        {/*  rounded-full border border-stone-500/30 box-content px-2 py-1 */}
                                         <span className="text-xs tracking-widest text-stone-500 uppercase font-stardom">
                                             {story.type}
                                         </span>
@@ -89,8 +91,10 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
                                 </header>
 
                                 <div className="mb-6">
-                                    <p className="text-sm leading-relaxed text-stone-700 whitespace-pre-line font-light">
-                                        {story.excerpt}
+                                    <p className="text-md leading-relaxed text-stone-700 whitespace-pre-line font-light">
+                                        {story.excerpt.length > 150
+                                            ? `${story.excerpt.slice(0, 150)}...`
+                                            : story.excerpt}
                                     </p>
                                 </div>
 

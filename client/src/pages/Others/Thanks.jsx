@@ -8,7 +8,7 @@ const Thanks = ({ bgClr = "bg-cream-light" }) => {
             <div
                 className={`relative size-full min-h-dvh ${bgClr} flex flex-col items-center justify-center text-lg gap-6`}
             >
-                <div className="text-center font-semibold font-[scribe] text-6xl text-stone-600/80">
+                <div className="text-center font-semibold font-[scribe] text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-stone-600/80">
                     &quot;Thank you for contacting,
                     <br />
                     I&apos;ll get in touch as soon as possible.&quot;
