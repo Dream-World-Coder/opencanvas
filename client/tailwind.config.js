@@ -12,6 +12,10 @@ export default {
             },
             fontFamily: {
                 stardom: ["stardom", "sans-serif"],
+                scribe: ["scribe", "sans-serif"],
+                boska: ["Boska-Regular", "sans-serif"],
+                boskaBold: ["Boska-Bold", "sans-serif"],
+                boskaLight: ["Boska-Light", "sans-serif"],
             },
         },
     },

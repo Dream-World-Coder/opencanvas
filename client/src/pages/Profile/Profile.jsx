@@ -9,6 +9,9 @@ import {
     Camera,
     Heart,
     MessageCircle,
+    ChevronUp,
+    Menu,
+    X,
 } from "lucide-react";
 import posts from "./posts";
 import collections from "./collections";
@@ -18,12 +21,19 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
     const [viewMode, setViewMode] = useState("grid");
     const [activeTab, setActiveTab] = useState("all");
     const [createMenuOpen, setCreateMenuOpen] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const navLinks = [
         { href: "/gallery/photos", label: "Gallery" },
         { href: "/gallery/literature", label: "Stories" },
         { href: "/about", label: "About" },
         { href: "/contact", label: "Contact" },
+    ];
+
+    const userStats = [
+        { name: "COLLECTIONS", amount: "12" },
+        { name: "TOTAL WORKS", amount: "68" },
+        { name: "FOLLOWING", amount: "143" },
     ];
 
     return (
@@ -33,7 +43,7 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
                 <div className="max-w-[1400px] mx-auto flex justify-between items-center px-8 py-6">
                     <a
                         href="/"
-                        className="text-2xl font-bold tracking-tighter font-[stardom]"
+                        className="text-2xl bg-lime-400 tracking-tighter font-[stardom] font-thin rounded-sm box-content p-1"
                     >
                         opencanvas
                     </a>
@@ -42,7 +52,7 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
                             <a
                                 key={index}
                                 href={link.href}
-                                className="hover:opacity-70 hover:bg-stone-100 px-3 py-1 box-content rounded-md"
+                                className="hover:opacity-70 hover:bg-lime-300 px-3 py-1 box-content rounded-md"
                             >
                                 {link.label}
                             </a>
@@ -54,11 +64,15 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
                                 onClick={() =>
                                     setCreateMenuOpen(!createMenuOpen)
                                 }
-                                className="flex items-center space-x-2 bg-black text-white px-4 py-2 rounded-full hover:bg-black/90 transition-colors"
+                                className="flex items-center space-x-2 bg-black text-white px-4 py-2 rounded-full hover:bg-stone-800/90 transition-colors"
                             >
-                                <Plus className="w-4 h-4" />
                                 <span>Create</span>
-                                <ChevronDown className="w-4 h-4" />
+                                {!createMenuOpen && (
+                                    <ChevronDown className="w-4 h-4" />
+                                )}
+                                {createMenuOpen && (
+                                    <ChevronUp className="w-4 h-4" />
+                                )}
                             </button>
 
                             {/* Create Menu Dropdown */}
@@ -67,7 +81,7 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
                                     {createOptions.map((option) => (
                                         <a
                                             key={option.id}
-                                            className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+                                            className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
                                             onClick={() => {
                                                 setCreateMenuOpen(false);
                                                 // Handle creation...
@@ -79,14 +93,55 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
                                             >
                                                 <option.icon className="w-4 h-4 text-white" />
                                             </div>
-                                            <span>{option.label}</span>
+                                            <span className="flex items-center justify-center gap-3">
+                                                {option.label}{" "}
+                                                <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700" />
+                                            </span>
                                         </a>
                                     ))}
                                 </div>
                             )}
                         </div>
                     </div>
+                    {/* Mobile Menu Button */}
+                    <button
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        className="md:hidden p-2 hover:bg-gray-100 rounded-lg"
+                    >
+                        {mobileMenuOpen ? (
+                            <X className="w-6 h-6" />
+                        ) : (
+                            <Menu className="w-6 h-6" />
+                        )}
+                    </button>
                 </div>
+                {/* mobile menu */}
+                {mobileMenuOpen && (
+                    <div className="md:hidden bg-white border-t border-gray-100">
+                        <div className="px-4 py-2 space-y-1">
+                            {navLinks.map((link, index) => (
+                                <a
+                                    key={index}
+                                    href={link.href}
+                                    className="block px-4 py-2 hover:bg-lime-300 rounded-md"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                >
+                                    {link.label}
+                                </a>
+                            ))}
+                            {/* Mobile Create Button */}
+                            <button
+                                onClick={() =>
+                                    setCreateMenuOpen(!createMenuOpen)
+                                }
+                                className="w-full mt-4 flex items-center justify-center space-x-2 bg-black text-white px-4 py-2 rounded-full hover:bg-stone-800/90 transition-colors"
+                            >
+                                <span>Create</span>
+                                <Plus className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+                )}
             </nav>
 
             {/* Profile Header */}
@@ -95,11 +150,11 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
                     <div className="grid md:grid-cols-[1.6fr,1fr] gap-16 mb-24">
                         {/* Left Column with Profile Pic */}
                         <div className="space-y-8">
-                            <div className="flex items-start space-x-8">
+                            <div className="flex items-center space-x-8">
                                 <div className="relative group">
                                     <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100">
                                         <img
-                                            src="https://picsum.photos/id/24/96"
+                                            src="https://picsum.photos/24/96"
                                             alt="Profile"
                                             className="w-full h-full object-cover"
                                         />
@@ -109,48 +164,45 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
                                     </button>
                                 </div>
                                 <div className="flex-1">
-                                    <h1 className="text-6xl md:text-7xl font-bold leading-[0.95] tracking-tighter">
-                                        SARAH WINTERS.
-                                        <br />
-                                        {/* VISUAL ARTIST. */}
-                                        <span className="text-4xl md:text-5xl italic">
-                                            VISUAL ARTIST.
+                                    <h1 className="text-5xl md:text-7xl font-boska leading-[0.95] tracking-tighter">
+                                        SARAH WINTERS
+                                        <span className="block text-3xl md:text-5xl italic">
+                                            VISUAL ARTIST
                                         </span>
                                     </h1>
                                 </div>
                             </div>
-                            <p className="text-gray-600 max-w-xl">
-                                Capturing moments, crafting stories, and
+                            <p className="text-stone-700 font-boskaLight text-xl leading-tight tracking-normal max-w-xl">
+                                &quot;Capturing moments, crafting stories, and
                                 creating visual poetry. Based in Amsterdam,
-                                working worldwide.
+                                working worldwide.&quot;
                             </p>
                         </div>
 
                         {/* Right Column - Quick Stats */}
-                        <div className="space-y-6 pt-4">
-                            <div className="flex justify-between items-center border-b border-gray-100 py-3">
-                                <span className="text-gray-400">
-                                    COLLECTIONS
-                                </span>
-                                <span>16</span>
-                            </div>
-                            <div className="flex justify-between items-center border-b border-gray-100 py-3">
-                                <span className="text-gray-400">
-                                    TOTAL WORKS
-                                </span>
-                                <span>143</span>
-                            </div>
-                            <div className="flex justify-between items-center border-b border-gray-100 py-3">
-                                <span className="text-gray-400">FOLLOWING</span>
-                                <span>2.4K</span>
-                            </div>
+                        <div className="space-y-3 pt-4">
+                            {userStats.map((item, index) => (
+                                <div
+                                    key={index}
+                                    className="flex justify-between items-center border-b border-gray-100 py-3"
+                                >
+                                    <span className="text-gray-400 text-sm">
+                                        {item.name}
+                                    </span>
+                                    <span className="box-content px-3 py-1 bg-lime-200/60 rounded-2xl">
+                                        {item.amount}
+                                    </span>
+                                </div>
+                            ))}
                         </div>
                     </div>
 
                     {/* Collections Carousel */}
                     <div className="mb-24">
-                        <h2 className="text-2xl font-bold tracking-tight mb-8">
-                            Featured Collections
+                        <h2 className="text-2xl font-semibold tracking-tight mb-8">
+                            <span className="bg-inherit hover:bg-lime-100 rounded-md box-content px-2 py-1">
+                                Featured Collections
+                            </span>
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             {collections.map((collection) => (

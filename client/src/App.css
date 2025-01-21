@@ -10,3 +10,15 @@
     font-style: normal;
     font-weight: 400;
 }
+@font-face {
+    font-family: Boska-Bold;
+    src: url("/fonts/Boska-Bold.woff2") format("woff2");
+}
+@font-face {
+    font-family: Boska-Light;
+    src: url("/fonts/Boska-Light.woff2") format("woff2");
+}
+@font-face {
+    font-family: Boska-Regular;
+    src: url("/fonts/Boska-Regular.woff2") format("woff2");
+}
