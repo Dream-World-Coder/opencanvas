@@ -20,7 +20,7 @@ const Header = () => {
                     {/* Logo */}
                     <a
                         href="/"
-                        className="font-[stardom] text-xl sm:text-2xl text-stone-800 hover:text-stone-600 transition-colors"
+                        className="font-[stardom] tracking-tighter bg-lime-400 text-xl sm:text-2xl text-stone-950  font-thin rounded-md box-content p-1"
                     >
                         OpenCanvas
                     </a>
@@ -31,12 +31,12 @@ const Header = () => {
                             <React.Fragment key={index}>
                                 <a
                                     href={link.href}
-                                    className="text-stone-600 hover:text-stone-800 hover:bg-stone-300/50 box-content px-3 py-1 rounded-lg transition-all text-sm"
+                                    className="text-stone-600 hover:text-stone-800 hover:bg-lime-300/50 box-content px-3 py-1 rounded-lg transition-all text-sm"
                                 >
                                     {link.name}
                                 </a>
                                 {index !== navLinks.length - 1 && (
-                                    <span className="text-stone-300">•</span>
+                                    <span className="text-lime-300">•</span>
                                 )}
                             </React.Fragment>
                         ))}

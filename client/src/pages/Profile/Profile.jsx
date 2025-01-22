@@ -43,7 +43,7 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
                 <div className="max-w-[1400px] mx-auto flex justify-between items-center px-8 py-6">
                     <a
                         href="/"
-                        className="text-2xl bg-lime-400 tracking-tighter font-[stardom] font-thin rounded-sm box-content p-1"
+                        className="text-2xl text-stone-950 bg-lime-400 tracking-tighter font-[stardom] font-thin rounded-md box-content p-1"
                     >
                         opencanvas
                     </a>

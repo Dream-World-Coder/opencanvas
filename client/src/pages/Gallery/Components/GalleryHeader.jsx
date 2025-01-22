@@ -37,12 +37,12 @@ const Header = ({ filters, navLinks }) => {
                             <React.Fragment key={index}>
                                 <a
                                     href={link.href}
-                                    className="text-stone-600 hover:text-stone-800 hover:bg-stone-300/50 box-content px-3 py-1 rounded-lg transition-all text-sm"
+                                    className="text-stone-600 hover:text-stone-800 hover:bg-lime-300/50 box-content px-3 py-1 rounded-lg transition-all text-sm"
                                 >
                                     {link.name}
                                 </a>
                                 {index !== navLinks.length - 1 && (
-                                    <span className="text-stone-300">•</span>
+                                    <span className="text-lime-300">•</span>
                                 )}
                             </React.Fragment>
                         ))}
@@ -62,11 +62,12 @@ const Header = ({ filters, navLinks }) => {
                     </button>
                 </div>
                 <div
-                    className={`md:hidden absolute left-0 right-0 bg-white backdrop-blur-md border-b border-stone-200/50 transition-all duration-300 ease-in-out ${
-                        isMenuOpen
-                            ? "opacity-100 translate-y-0"
-                            : "opacity-0 -translate-y-2 pointer-events-none"
-                    }`}
+                    className={`md:hidden absolute left-0 right-0 bg-white backdrop-blur-md
+                        border-b border-stone-200/50 transition-all duration-300 ease-in-out ${
+                            isMenuOpen
+                                ? "opacity-100 translate-y-0"
+                                : "opacity-0 -translate-y-2 pointer-events-none"
+                        }`}
                 >
                     <div className="px-4 py-6 space-y-6">
                         {/* Mobile Nav Links */}

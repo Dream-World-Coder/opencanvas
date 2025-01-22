@@ -22,3 +22,7 @@
     font-family: Boska-Regular;
     src: url("/fonts/Boska-Regular.woff2") format("woff2");
 }
+@font-face {
+    font-family: Zodiak;
+    src: url("/fonts/Zodiak-Light.woff2") format("woff2");
+}

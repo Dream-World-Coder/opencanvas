@@ -26,13 +26,13 @@ const AboutPage = ({ bgClr = "bg-cream-light" }) => {
             <div className="max-w-4xl mx-auto px-4 py-24 relative z-10 border- border-gray-500">
                 {/* Hero Section */}
                 <div className="text-center space-y-6 mb-16">
-                    <h1 className="font-serif text-6xl sm:text-7xl text-stone-800 leading-tight pb-20 border- border-gray-500">
+                    <h1 className="font-boskaBold text-6xl sm:text-7xl text-stone-800 leading-tight pb-20">
                         A Place for
-                        <span className="block font-[scribe] text-[#5789ba]">
+                        <span className="block font-[scribe] text-lime-600 transform translate-y-[-4px]">
                             Dreamers
                         </span>
                     </h1>
-                    <p className="text-xl sm:text-lg font-serif text-stone-600 leading-tight max6-w-2xl mx-auto">
+                    <p className="text-lg sm:text-xl font-zodiak text-stone-800 leading-tight tracking-normal max-w-2xl mx-auto">
                         OpenCanvas is an open - canvas for you to fill. Its a
                         platform for art lovers. Any type of art like drawing,
                         photography, writing, narrating etc you can publish in
@@ -45,14 +45,19 @@ const AboutPage = ({ bgClr = "bg-cream-light" }) => {
                 </div>
 
                 {/* Features Section */}
-                <div className="space-y-16 pl-6">
+                <div className="space-y-16 pl-6 max-w-2xl mx-auto">
                     {featureData.map((item, index) => (
-                        <div key={index} className="space-y-2">
-                            <h2 className="font-serif text-2xl sm:text-3xl text-stone-800 italic underline underline-offset-1">
-                                •{item.heading}
+                        <div key={index} className="space-y-2 group">
+                            <h2
+                                className="font-boska text-2xl sm:text-3xl text-stone-700 italic
+                                underline decoration-1 decoration-stone-700"
+                            >
+                                <span className="box-content p-1 pt-0 group-hover:bg-lime-100 rounded-md">
+                                    &gt;{item.heading}
+                                </span>
                             </h2>
-                            <div className="flex justify-between pr-[10%] md:pr-[30%]">
-                                <p className="text-lg font-serif text-stone-600 leading-tight max-w-md pl-4">
+                            <div className="flex justify-between pr-[10%] md:pr-[20%]">
+                                <p className="font-zodiak text-lg md:text-xl text-stone-800 leading-tight max-w-md pl-4">
                                     {item.data}
                                 </p>
                                 <span className="block font-[scribe] text-7xl text-stone-600/60">
@@ -66,7 +71,7 @@ const AboutPage = ({ bgClr = "bg-cream-light" }) => {
                 {/* Call to Action */}
                 <div className="mt-32 text-center">
                     <div className="inline-flex flex-col items-center space-y-2">
-                        <Palette className="w-8 h-8 text-stone-600 font-thin" />
+                        <Palette className="w-8 h-8 text-stone-700 font-thin fill-lime-200/50" />
                         <p className="font-[scribe] text-3xl sm:text-4xl text-stone-800 italic">
                             Your canvas awaits
                         </p>
