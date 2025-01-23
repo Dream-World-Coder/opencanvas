@@ -43,9 +43,9 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
                 <div className="max-w-[1400px] mx-auto flex justify-between items-center px-8 py-6">
                     <a
                         href="/"
-                        className="text-2xl text-stone-950 bg-lime-400 tracking-tighter font-[stardom] font-thin rounded-md box-content p-1"
+                        className="text-md md:text-2xl text-stone-950 bg-lime-400 tracking-normal font-stardom font-bold md:font-thin rounded-md box-content p-1"
                     >
-                        opencanvas
+                        OpenCanvas
                     </a>
                     <div className="hidden md:flex items-center space-x-5 text-[15px]">
                         {navLinks.map((link, index) => (
@@ -154,7 +154,7 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
                                 <div className="relative group">
                                     <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100">
                                         <img
-                                            src="https://picsum.photos/24/96"
+                                            src="https://picsum.photos/96"
                                             alt="Profile"
                                             className="w-full h-full object-cover"
                                         />
@@ -164,18 +164,26 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
                                     </button>
                                 </div>
                                 <div className="flex-1">
-                                    <h1 className="text-5xl md:text-7xl font-boska leading-[0.95] tracking-tighter">
-                                        SARAH WINTERS
-                                        <span className="block text-3xl md:text-5xl italic">
-                                            VISUAL ARTIST
+                                    <h1
+                                        className="text-5xl md:text-7xl font-boska leading-[0.95] tracking-tighter
+                                        pointer-events-none md:pointer-events-auto uppercase"
+                                    >
+                                        Mr. Lorem
+                                        <span className="block text-2xl md:text-5xl font-bold md:font-normal tracking-normal md:tracking-tighter italic capitalize leading-[1.7rem]">
+                                            visual artist and photographer
+                                            {/* set max len 32 */}
                                         </span>
                                     </h1>
                                 </div>
                             </div>
-                            <p className="text-stone-700 font-boskaLight text-xl leading-tight tracking-normal max-w-xl">
-                                &quot;Capturing moments, crafting stories, and
+                            <p
+                                className="text-stone-700 font-boskaLight font-bold md:font-normal
+                                text-lg md:text-2xl leading-tight tracking-normal
+                                max-w-xl pointer-events-none md:pointer-events-auto"
+                            >
+                                &quot; Capturing moments, crafting stories, and
                                 creating visual poetry. Based in Amsterdam,
-                                working worldwide.&quot;
+                                working worldwide. &quot;
                             </p>
                         </div>
 
@@ -184,14 +192,12 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
                             {userStats.map((item, index) => (
                                 <div
                                     key={index}
-                                    className="flex justify-between items-center border-b border-gray-100 py-3"
+                                    className="flex justify-between items-center border-b border-gray-200 py-3 pr-4"
                                 >
-                                    <span className="text-gray-400 text-sm">
+                                    <span className="text-gray-500 text-sm md:text-md">
                                         {item.name}
                                     </span>
-                                    <span className="box-content px-3 py-1 bg-lime-200/60 rounded-2xl">
-                                        {item.amount}
-                                    </span>
+                                    <span>{item.amount}</span>
                                 </div>
                             ))}
                         </div>
@@ -258,7 +264,7 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
                                 Stories
                             </button>
                         </div>
-                        <div className="flex space-x-4">
+                        <div className="hidden md:flex space-x-4">
                             <button
                                 onClick={() => setViewMode("grid")}
                                 className={`p-2 ${viewMode === "grid" ? "bg-black text-white" : "text-gray-400"}`}

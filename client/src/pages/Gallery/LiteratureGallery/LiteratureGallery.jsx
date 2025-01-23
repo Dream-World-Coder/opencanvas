@@ -38,11 +38,11 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
             >
                 <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center px-6">
-                        <h1 className="text-3xl text-stone-800 mb-3 tracking-wide font-[scribe]">
+                        <h1 className="text-3xl text-stone-800 mb-3 tracking-wide font-scribe pointer-events-none md:pointer-events-auto">
                             Literary Collection
                         </h1>
                         <div className="h-px w-[100%] mx-auto bg-gradient-to-r from-transparent via-stone-500/40 to-transparent mb-3"></div>
-                        <p className="text-sm text-stone-600 tracking-wide font-light font-stardom">
+                        <p className="text-sm text-stone-600 tracking-wide font-light font-stardom pointer-events-none md:pointer-events-auto">
                             A gathering of thoughts, verses, and tales
                         </p>
                         <div className="h-px w-[100%] mx-auto bg-gradient-to-r from-transparent via-stone-500/40 to-transparent mt-3"></div>

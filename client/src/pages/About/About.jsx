@@ -25,14 +25,18 @@ const AboutPage = ({ bgClr = "bg-cream-light" }) => {
             {/* Main Content */}
             <div className="max-w-4xl mx-auto px-4 py-24 relative z-10 border- border-gray-500">
                 {/* Hero Section */}
-                <div className="text-center space-y-6 mb-16">
-                    <h1 className="font-boskaBold text-6xl sm:text-7xl text-stone-800 leading-tight pb-20">
+                <div className="text-center space-y-6 mb-16 pointer-events-none md:pointer-events-auto">
+                    <h1 className="font-boskaBold text-6xl sm:text-7xl text-stone-800 leading-tight pb-2 md:pb-20">
                         A Place for
-                        <span className="block font-[scribe] text-lime-600 transform translate-y-[-4px]">
+                        <span className="block font-scribe text-lime-600 transform translate-y-[-18px] md:translate-y-[-4px]">
                             Dreamers
                         </span>
                     </h1>
-                    <p className="text-lg sm:text-xl font-zodiak text-stone-800 leading-tight tracking-normal max-w-2xl mx-auto">
+                    <p
+                        className="text-lg sm:text-xl font-zodiak text-stone-700 md:text-stone-800
+                        pointer-events-none md:pointer-events-auto font-bold md:font-normal
+                        leading-tight tracking-normal max-w-2xl mx-auto"
+                    >
                         OpenCanvas is an open - canvas for you to fill. Its a
                         platform for art lovers. Any type of art like drawing,
                         photography, writing, narrating etc you can publish in
@@ -45,22 +49,22 @@ const AboutPage = ({ bgClr = "bg-cream-light" }) => {
                 </div>
 
                 {/* Features Section */}
-                <div className="space-y-16 pl-6 max-w-2xl mx-auto">
+                <div className="space-y-16 pl-6 max-w-2xl mx-auto font-bold md:font-normal">
                     {featureData.map((item, index) => (
                         <div key={index} className="space-y-2 group">
                             <h2
                                 className="font-boska text-2xl sm:text-3xl text-stone-700 italic
-                                underline decoration-1 decoration-stone-700"
+                                underline decoration-1 decoration-stone-700 pointer-events-none md:pointer-events-auto"
                             >
                                 <span className="box-content p-1 pt-0 group-hover:bg-lime-100 rounded-md">
-                                    &gt;{item.heading}
+                                    &gt; {item.heading}
                                 </span>
                             </h2>
-                            <div className="flex justify-between pr-[10%] md:pr-[20%]">
-                                <p className="font-zodiak text-lg md:text-xl text-stone-800 leading-tight max-w-md pl-4">
+                            <div className="flex justify-between pr-[15%] md:pr-[20%] pointer-events-none md:pointer-events-auto">
+                                <p className="font-zodiak text-lg md:text-xl text-stone-700 md:text-stone-800 leading-tight max-w-md pl-4">
                                     {item.data}
                                 </p>
-                                <span className="block font-[scribe] text-7xl text-stone-600/60">
+                                <span className="block font-scribe text-7xl text-stone-600/30 font-normal">
                                     {item.heading[0]}
                                 </span>
                             </div>
@@ -72,7 +76,7 @@ const AboutPage = ({ bgClr = "bg-cream-light" }) => {
                 <div className="mt-32 text-center">
                     <div className="inline-flex flex-col items-center space-y-2">
                         <Palette className="w-8 h-8 text-stone-700 font-thin fill-lime-200/50" />
-                        <p className="font-[scribe] text-3xl sm:text-4xl text-stone-800 italic">
+                        <p className="font-scribe text-3xl sm:text-4xl text-stone-800 italic pointer-events-none md:pointer-events-auto">
                             Your canvas awaits
                         </p>
                     </div>

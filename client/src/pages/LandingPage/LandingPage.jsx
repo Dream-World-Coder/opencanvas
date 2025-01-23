@@ -19,7 +19,7 @@ const LandingPage = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-12 relative">
                 {/* Navigation */}
                 <nav className="flex justify-between items-center mb-16 sm:mb-32">
-                    <h1 className="font-[stardom] text-xl sm:text-2xl text-stone-800">
+                    <h1 className="font-stardom font-bold md:font-normal text-md sm:text-2xl text-stone-800">
                         OpenCanvas
                     </h1>
 
@@ -73,10 +73,13 @@ const LandingPage = () => {
                 {/* Main Content */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center justify-between mb-16 sm:mb-32">
                     <div className="space-y-6 sm:space-y-8 text-center lg:text-left">
-                        <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl leading-tight text-stone-800 pointer-events-none">
+                        <h2 className="font-serif text-thin text-4xl sm:text-5xl lg:text-6xl leading-tight text-stone-800 pointer-events-none">
                             An Open Canvas
                             <span className="block italic text-stone-600">
-                                for <span className="font-[scribe]">you</span>{" "}
+                                for{" "}
+                                <span className="font-scribe text-5xl md:text-6xl">
+                                    you
+                                </span>{" "}
                                 to fill
                             </span>
                         </h2>
