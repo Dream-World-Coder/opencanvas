@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+src/assets/icons/o*.svg
+src/assets/icons/O*.svg
