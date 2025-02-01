@@ -1,5 +1,5 @@
 import Header from "../../components/Header/Header";
-import Footer from "../Gallery/Components/GalleryFooter";
+import Footer from "../Galleries/Components/GalleryFooter";
 import { ChevronLeft } from "lucide-react";
 
 const NotFoundPage = ({ bgClr = "bg-cream-light" }) => {

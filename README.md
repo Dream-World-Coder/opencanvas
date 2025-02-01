@@ -33,19 +33,3 @@ saved items \*[or will add it for all]
 settings
 
 ---
-<!-- 
-implement Medium fonts and spacing in lumifeed and here
-+++projects & gallery modifications
-in lumifeed make /article page like medium
-line-height: 32px;
-font 20
-letter spacing -0.003em -->
-
-<!-- mobile -->
-<!-- 
-lh: 28px;
-font 18px
-https://glyph.medium.com/font/b156742/0-3j_4g_53_6bu_6c4_6c8_6c9_6cc_6cd_6ci_6cm/source-serif-pro-700-normal.woff
-https://glyph.medium.com/font/8e059b2/0-3j_4g_53_6bu_6c4_6c8_6c9_6cc_6cd_6ci_6cm/source-serif-pro-400-normal.woff
-
-https://lumifeed.netlify.app/article -->

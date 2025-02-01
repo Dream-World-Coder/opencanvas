@@ -9,14 +9,14 @@ import Profile from "./pages/Profile/Profile";
 import AboutPage from "./pages/About/About";
 import ContactPage from "./pages/Contact/Contact";
 
-import WritingPad from "./pages/create-post/WritingPad";
-import PoemPad from "./pages/create-post/PoemPad";
-import StoryPad from "./pages/create-post/StoryPad";
+import WritingPad from "./pages/CreatePosts/WritingPad";
+import PoemPad from "./pages/CreatePosts/WritePoem";
+import StoryPad from "./pages/CreatePosts/WriteStory";
 
-import PhotoGalleryPage from "./pages/Gallery/PhotoGallery/PhotoGallery";
-// import PhotoGalleryPage2 from "./pages/Gallery/PhotoGallery/PhotoGallery2";
-import LiteratureGallery from "./pages/Gallery/LiteratureGallery/LiteratureGallery";
-// import Gallery2 from "./pages/Gallery/LiteratureGallery/old-literaturegallery";
+import PhotoGalleryPage from "./pages/Galleries/PhotoGallery/PhotoGallery";
+// import PhotoGalleryPage2 from "./pages/Galleries/PhotoGallery/PhotoGallery2";
+import LiteratureGallery from "./pages/Galleries/LiteratureGallery/LiteratureGallery";
+// import Gallery2 from "./pages/Galleries/LiteratureGallery/old-literaturegallery";
 
 import Thanks from "./pages/Others/Thanks";
 import NotFoundPage from "./pages/Others/404";

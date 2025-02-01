@@ -4,6 +4,7 @@ import GitHubIcon from "../../components/CustomIcons/Github";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import OpenCanvasIcon from "../../components/CustomIcons/OpenCanvas";
+import PropTypes from "prop-types";
 
 const ContactPage = ({ bgClr = "bg-cream-light" }) => {
     const connectLinks = [
@@ -146,6 +147,10 @@ const ContactPage = ({ bgClr = "bg-cream-light" }) => {
             <Footer />
         </div>
     );
+};
+
+ContactPage.propTypes = {
+    bgClr: PropTypes.string,
 };
 
 export default ContactPage;

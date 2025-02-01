@@ -1,5 +1,5 @@
 import Header from "../../components/Header/Header";
-import Footer from "../Gallery/Components/GalleryFooter";
+import Footer from "../Galleries/Components/GalleryFooter";
 
 const Thanks = ({ bgClr = "bg-cream-light" }) => {
     return (
@@ -20,3 +20,39 @@ const Thanks = ({ bgClr = "bg-cream-light" }) => {
 };
 
 export default Thanks;
+
+/*
+
+<div className="text-4xl mb-8 underline decoration-2 decoration-stone-600">
+    Meeting at Night
+</div>
+The grey sea and the long black land;
+<br />
+And the yellow half-moon large and low;
+<br />
+And the startled little waves that leap
+<br />
+In fiery ringlets from their sleep,
+<br />
+As I gain the cove with pushing prow,
+<br />
+And quench its speed i’ the slushy sand.
+<br />
+<br />
+Then a mile of warm sea-scented beach;
+<br />
+Three fields to cross till a farm appears;
+<br />
+A tap at the pane, the quick sharp scratch
+<br />
+And blue spurt of a lighted match,
+<br />
+And a voice less loud, through its joys and fears,
+<br />
+Than the two hearts beating each to each!
+<br />
+<div className="flex items-center justify-end mt-4">
+    {" "}
+    by Robert Browning
+</div>
+*/

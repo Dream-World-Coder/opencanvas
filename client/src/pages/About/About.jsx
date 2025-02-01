@@ -1,6 +1,7 @@
 import { Palette } from "lucide-react";
 import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Header/Header";
+import PropTypes from "prop-types";
 
 const AboutPage = ({ bgClr = "bg-cream-light" }) => {
     const featureData = [
@@ -87,6 +88,10 @@ const AboutPage = ({ bgClr = "bg-cream-light" }) => {
             <Footer />
         </div>
     );
+};
+
+AboutPage.propTypes = {
+    bgClr: PropTypes.string,
 };
 
 export default AboutPage;
