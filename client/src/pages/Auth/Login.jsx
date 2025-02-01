@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FlowerIcon } from "./Flower";
 import PropTypes from "prop-types";
+import { LoginForm } from "@/components/ui/login-form";
 
 const LoginPage = ({ bgClr = "bg-cream-light" }) => {
     return (
@@ -18,7 +19,11 @@ const LoginPage = ({ bgClr = "bg-cream-light" }) => {
 
                 <div className="space-y-4 text-center relative">
                     <h2 className="text-2xl font-[stardom] font-medium text-gray-400">
-                        OpenCanvas
+                        {/* OpenCanvas */}
+                        <span className="font-['Six_Caps'] text-2xl tracking-wide">
+                            <span className="font-[Smooch]">my</span>
+                            opencanvas
+                        </span>{" "}
                     </h2>
                     <h1 className="text-4xl font-serif">Welcome Back</h1>
                 </div>
@@ -32,7 +37,7 @@ const LoginPage = ({ bgClr = "bg-cream-light" }) => {
                         <span className="w-12 h-px bg-gray-300"></span>
                     </div>
 
-                    <div className="space-y-0">
+                    <div className="space-y-2">
                         <Button
                             className="w-full flex items-center justify-center space-x-3 bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 p-6"
                             variant="outline"
@@ -62,12 +67,13 @@ const LoginPage = ({ bgClr = "bg-cream-light" }) => {
                             variant="outline"
                         >
                             <svg
-                                height="48"
-                                viewBox="0 0 17 48"
-                                width="17"
                                 xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
                             >
-                                <path d="m15.5752 19.0792a4.2055 4.2055 0 0 0 -2.01 3.5376 4.0931 4.0931 0 0 0 2.4908 3.7542 9.7779 9.7779 0 0 1 -1.2755 2.6351c-.7941 1.1431-1.6244 2.2862-2.8878 2.2862s-1.5883-.734-3.0443-.734c-1.42 0-1.9252.7581-3.08.7581s-1.9611-1.0589-2.8876-2.3584a11.3987 11.3987 0 0 1 -1.9373-6.1487c0-3.61 2.3464-5.523 4.6566-5.523 1.2274 0 2.25.8062 3.02.8062.734 0 1.8771-.8543 3.2729-.8543a4.3778 4.3778 0 0 1 3.6822 1.841zm-6.8586-2.0456a1.3865 1.3865 0 0 1 -.2527-.024 1.6557 1.6557 0 0 1 -.0361-.337 4.0341 4.0341 0 0 1 1.0228-2.5148 4.1571 4.1571 0 0 1 2.7314-1.4078 1.7815 1.7815 0 0 1 .0361.373 4.1487 4.1487 0 0 1 -.9867 2.587 3.6039 3.6039 0 0 1 -2.5148 1.3236z"></path>
+                                <path
+                                    d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"
+                                    fill="currentColor"
+                                />
                             </svg>
                             <span className="text-lg">Apple</span>
                         </Button>
@@ -88,7 +94,11 @@ const LoginPage = ({ bgClr = "bg-cream-light" }) => {
 
                     <div className="text-sm text-gray-500">
                         New to{" "}
-                        <span className="font-[stardom]">OpenCanvas</span>?{" "}
+                        {/* <span className="font-[stardom]">OpenCanvas</span>?{" "} */}
+                        <span className="font-['Six_Caps'] tracking-wide">
+                            <span className="font-[Smooch]">my</span>
+                            opencanvas
+                        </span>{" "}
                         <a href="#" className="text-gray-800 hover:underline">
                             Create an account
                         </a>
@@ -104,3 +114,13 @@ LoginPage.propTypes = {
 };
 
 export default LoginPage;
+
+// export default function LoginPage() {
+//     return (
+//         <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
+//             <div className="w-full max-w-sm md:max-w-3xl">
+//                 <LoginForm />
+//             </div>
+//         </div>
+//     );
+// }

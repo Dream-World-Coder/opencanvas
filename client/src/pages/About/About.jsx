@@ -38,7 +38,7 @@ const AboutPage = ({ bgClr = "bg-cream-light" }) => {
                         pointer-events-none md:pointer-events-auto font-bold md:font-normal
                         leading-tight tracking-normal max-w-2xl mx-auto"
                     >
-                        OpenCanvas is an open - canvas for you to fill. Its a
+                        myOpenCanvas is an open - canvas for you to fill. Its a
                         platform for art lovers. Any type of art like drawing,
                         photography, writing, narrating etc you can publish in
                         here also describe the philosopy and emotion of your

@@ -45,7 +45,11 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
                         href="/"
                         className="text-md md:text-2xl text-stone-950 bg-lime-400 tracking-normal font-stardom font-bold md:font-thin rounded-md box-content p-1"
                     >
-                        OpenCanvas
+                        {/* OpenCanvas */}
+                        <span className="font-['Six_Caps'] text-2xl tracking-wide">
+                            <span className="font-[Smooch] text-lg">my</span>
+                            opencanvas
+                        </span>{" "}
                     </a>
                     <div className="hidden md:flex items-center space-x-5 text-[15px]">
                         {navLinks.map((link, index) => (

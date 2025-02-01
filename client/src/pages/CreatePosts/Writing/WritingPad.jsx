@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
     ArrowLeft,
     Save,
@@ -28,53 +28,204 @@ import PropTypes from "prop-types";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import MarkdownPreview from "./WritingComponents";
 
-// hooks
-import {
-    title,
-    setTitle,
-    content,
-    setContent,
-    wordCount,
-    setWordCount,
-    isDark,
-    setIsDark,
-    isSaved,
-    setIsSaved,
-    isPreview,
-    setIsPreview,
-    isFullscreen,
-    setIsFullscreen,
-    selectedText,
-    setSelectedText,
-    showUnsavedAlert,
-    setShowUnsavedAlert,
-    textAlignment,
-    setTextAlignment,
-    undoStack,
-    setUndoStack,
-    redoStack,
-    setRedoStack,
-    syncStatus,
-    setSyncStatus,
-    lastSynced,
-    setLastSynced,
-
-    // functions
-    handleFormat,
-    addToUndoStack,
-    handleContentChange,
-    handleUndo,
-    handleRedo,
-    handleShare,
-    saveDraftLocally,
-    syncWithBackend,
-    syncPendingChanges,
-    handleSave,
-} from "./writingHooks";
-
 //** data.txt:
 // ADD TEXT SIZE CHANGE AND FONT STYLES IN THE 3 DOTS
 const WritingPad = ({ artType = "story", postId = null }) => {
+    const [title, setTitle] = useState("");
+    const [content, setContent] = useState("");
+    const [wordCount, setWordCount] = useState(0);
+    const [isDark, setIsDark] = useState(false);
+    const [isSaved, setIsSaved] = useState(true);
+    const [isPreview, setIsPreview] = useState(false);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const [selectedText, setSelectedText] = useState("");
+    const [showUnsavedAlert, setShowUnsavedAlert] = useState(false);
+    const [textAlignment, setTextAlignment] = useState("left");
+    const [undoStack, setUndoStack] = useState([]);
+    const [redoStack, setRedoStack] = useState([]);
+    const [syncStatus, setSyncStatus] = useState("synced"); // 'synced', 'saving', 'offline'
+    const [lastSynced, setLastSynced] = useState(null);
+
+    // Handle text formatting
+    const handleFormat = (format) => {
+        const textarea = document.querySelector("textarea");
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const selectedText = content.substring(start, end);
+
+        let newText = content;
+        switch (format) {
+            case "bold":
+                newText =
+                    content.substring(0, start) +
+                    `**${selectedText}**` +
+                    content.substring(end);
+                break;
+            case "italic":
+                newText =
+                    content.substring(0, start) +
+                    `*${selectedText}*` +
+                    content.substring(end);
+                break;
+            case "quote":
+                newText =
+                    content.substring(0, start) +
+                    `> ${selectedText}` +
+                    content.substring(end);
+                break;
+        }
+
+        addToUndoStack(content);
+        setContent(newText);
+    };
+
+    // Handle content changes with undo/redo functionality
+    const addToUndoStack = (previousContent) => {
+        setUndoStack([...undoStack, previousContent]);
+        setRedoStack([]);
+    };
+
+    const handleContentChange = (e) => {
+        const newContent = e.target.value;
+        addToUndoStack(content);
+        setContent(newContent);
+        setWordCount(newContent.trim().split(/\s+/).filter(Boolean).length);
+        setIsSaved(false);
+    };
+
+    // Undo/Redo functions
+    const handleUndo = () => {
+        if (undoStack.length > 0) {
+            const previousContent = undoStack[undoStack.length - 1];
+            setRedoStack([...redoStack, content]);
+            setContent(previousContent);
+            setUndoStack(undoStack.slice(0, -1));
+        }
+    };
+
+    const handleRedo = () => {
+        if (redoStack.length > 0) {
+            const nextContent = redoStack[redoStack.length - 1];
+            setUndoStack([...undoStack, content]);
+            setContent(nextContent);
+            setRedoStack(redoStack.slice(0, -1));
+        }
+    };
+
+    // Share functionality
+    const handleShare = async () => {
+        if (!isSaved) {
+            setShowUnsavedAlert(true);
+            return;
+        }
+
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: title,
+                    text: content,
+                });
+            } catch (error) {
+                console.log("Error sharing:", error);
+            }
+        }
+    };
+
+    // Save draft locally
+    const saveDraftLocally = () => {
+        const draft = {
+            id: postId || crypto.randomUUID(),
+            title,
+            content,
+            lastSaved: new Date().toISOString(),
+            syncedWithServer: false,
+        };
+
+        localStorage.setItem(`draft-${draft.id}`, JSON.stringify(draft));
+        setIsSaved(true);
+    };
+
+    // Sync with backend
+    const syncWithBackend = async () => {
+        if (!navigator.onLine) {
+            setSyncStatus("offline");
+            return;
+        }
+
+        setSyncStatus("saving");
+
+        try {
+            const response = await fetch(`/api/posts/${postId || ""}`, {
+                method: postId ? "PUT" : "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    title,
+                    content,
+                    type: artType,
+                }),
+            });
+
+            if (response.ok) {
+                const savedPost = await response.json();
+                if (!postId) {
+                    // If this was a new post, update URL with new post ID
+                    window.history.replaceState(
+                        {},
+                        "",
+                        `/edit/${savedPost.id}`,
+                    );
+                }
+                setSyncStatus("synced");
+                setLastSynced(new Date());
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error("Error saving to backend:", error);
+            setSyncStatus("offline");
+            return false;
+        }
+    };
+
+    // Sync pending changes when coming back online
+    const syncPendingChanges = async () => {
+        const draftKeys = Object.keys(localStorage).filter((key) =>
+            key.startsWith("draft-"),
+        );
+
+        for (const key of draftKeys) {
+            const draft = JSON.parse(localStorage.getItem(key));
+            if (!draft.syncedWithServer) {
+                try {
+                    const response = await fetch(`/api/posts/${draft.id}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(draft),
+                    });
+
+                    if (response.ok) {
+                        localStorage.removeItem(key);
+                    }
+                } catch (error) {
+                    console.error("Error syncing draft:", error);
+                }
+            }
+        }
+    };
+
+    // Save functionality
+    const handleSave = async () => {
+        saveDraftLocally();
+        if (navigator.onLine) {
+            await syncWithBackend();
+        }
+        setShowUnsavedAlert(false);
+    };
+
     // Autosave functionality
     useEffect(() => {
         const autosaveInterval = setInterval(() => {

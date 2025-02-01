@@ -9,7 +9,7 @@ import Profile from "./pages/Profile/Profile";
 import AboutPage from "./pages/About/About";
 import ContactPage from "./pages/Contact/Contact";
 
-import WritingPad from "./pages/CreatePosts/WritingPad";
+import WritingPad from "./pages/CreatePosts/Writing/WritingPad";
 import PoemPad from "./pages/CreatePosts/WritePoem";
 import StoryPad from "./pages/CreatePosts/WriteStory";
 

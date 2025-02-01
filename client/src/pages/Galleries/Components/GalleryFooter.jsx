@@ -6,8 +6,12 @@ const Footer = () => {
             <div className="max-w-[1400px] mx-auto px-8 py-6 flex justify-between items-center">
                 <div className="text-sm text-gray-400">
                     Copyright &copy; 2025{" "}
-                    <span className="font-stardom">OpenCanvas.</span> All rights
-                    reserved.
+                    {/* <span className="font-stardom">OpenCanvas.</span> */}
+                    <span className="font-['Six_Caps'] text-lg tracking-wide">
+                        <span className="font-[Smooch] text-base">my</span>
+                        opencanvas
+                    </span>{" "}
+                    All rights reserved.
                 </div>
                 <button
                     onClick={() => {
