@@ -27,3 +27,8 @@
     font-family: Zodiak;
     src: url("/fonts/Zodiak-Light.woff2") format("woff2");
 }
+@media screen and (min-width: 1400px) {
+    .desktop-xl {
+        padding-top: 24%;
+    }
+}

@@ -36,7 +36,6 @@ export const SlidingButton = ({ href, children }) => {
                  before:translate-x-[-100%]
                  before:transition-transform
                  before:duration-300
-                 before:ease-[cubic-bezier(0.4,0,0.2,1)]
                  hover:before:translate-x-0
                  before:z-[-1]"
         >

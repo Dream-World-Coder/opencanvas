@@ -20,10 +20,8 @@ const Header = () => {
                     {/* Logo */}
                     <a
                         href="/"
-                        className="
-                        font-stardom tracking-tight
-                        bg-lime-400 font-bold
-                        md:font-thin text-md sm:text-2xl text-stone-950
+                        className="tracking-tight
+                        bg-lime-400 font-thin text-base sm:text-2xl text-stone-950
                         rounded-md box-content p-1"
                     >
                         {/* OpenCanvas */}

@@ -43,9 +43,9 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
                 <div className="max-w-[1400px] mx-auto flex justify-between items-center px-8 py-6">
                     <a
                         href="/"
-                        className="text-md md:text-2xl text-stone-950 bg-lime-400 tracking-normal font-stardom font-bold md:font-thin rounded-md box-content p-1"
+                        className="text-md md:text-2xl text-stone-950 bg-lime-400 tracking-normal font-thin rounded-md box-content p-1"
                     >
-                        {/* OpenCanvas */}
+                        {/* OpenCanvas: font-stardom font-bold md:font-thin */}
                         <span className="font-['Six_Caps'] text-2xl tracking-wide">
                             <span className="font-[Smooch] text-lg">my</span>
                             opencanvas
