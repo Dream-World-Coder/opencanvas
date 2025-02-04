@@ -48,8 +48,9 @@ import MarkdownPreview from "./WritingComponents";
 // move functions and import them to make this file small
 // AT CURRENT: list, heading, line, table : markdown knowledge needed
 // currently center alignment is useless,cuz both rendered same way, so removing them
+// some padding at the buttom of textarea, that is getting covered by footer
 
-const WritingPad = ({ artType = "story", postId = null }) => {
+const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [wordCount, setWordCount] = useState(0);

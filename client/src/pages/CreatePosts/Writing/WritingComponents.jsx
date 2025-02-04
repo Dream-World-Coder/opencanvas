@@ -137,3 +137,9 @@ const MarkdownPreview = ({ title, content, isVisible = true }) => {
 };
 
 export default MarkdownPreview;
+
+MarkdownPreview.propTypes = {
+    title: PropTypes.any,
+    content: PropTypes.any,
+    isVisible: PropTypes.bool,
+};

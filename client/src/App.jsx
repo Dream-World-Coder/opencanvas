@@ -71,7 +71,7 @@ function App() {
                 {/* new post */}
                 <Route path="/new/poem" element={<PoemPad />} />
                 <Route path="/new/story" element={<StoryPad />} />
-                <Route path="/new-post/writing" element={<WritingPad />} />
+                <Route path="/markdown2pdf" element={<WritingPad />} />
 
                 {/* others */}
                 <Route path="/thanks" element={<Thanks bgClr="bg-white" />} />
