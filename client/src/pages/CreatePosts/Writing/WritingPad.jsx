@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import {
     ArrowLeft,
     Save,
-    Share2,
+    FileUp,
     Image,
     Bold,
     Code,
@@ -29,7 +29,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import MarkdownPreview from "./WritingComponents";
 
 //** data.txt:
-// ADD TEXT SIZE CHANGE AND FONT STYLES IN THE 3 DOTS
+// Add table functionality also
+
 const WritingPad = ({ artType = "story", postId = null }) => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
@@ -91,6 +92,8 @@ const WritingPad = ({ artType = "story", postId = null }) => {
         setContent(newContent);
         setWordCount(newContent.trim().split(/\s+/).filter(Boolean).length);
         setIsSaved(false);
+        e.target.style.height = "auto";
+        e.target.style.height = e.target.scrollHeight + "px"; // Set new height based on content
     };
 
     // Undo/Redo functions
@@ -112,23 +115,10 @@ const WritingPad = ({ artType = "story", postId = null }) => {
         }
     };
 
-    // Share functionality
-    const handleShare = async () => {
-        if (!isSaved) {
-            setShowUnsavedAlert(true);
-            return;
-        }
-
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: title,
-                    text: content,
-                });
-            } catch (error) {
-                console.log("Error sharing:", error);
-            }
-        }
+    // export to pdf functionality
+    const handleExport = async () => {
+        // this function activates when export to pdf button is clicked
+        // find the div
     };
 
     // Save draft locally
@@ -153,6 +143,13 @@ const WritingPad = ({ artType = "story", postId = null }) => {
         }
 
         setSyncStatus("saving");
+
+        // tmp api handling
+        setTimeout(() => {
+            setSyncStatus("synced");
+            setLastSynced(new Date());
+            return;
+        }, 500);
 
         try {
             const response = await fetch(`/api/posts/${postId || ""}`, {
@@ -191,6 +188,13 @@ const WritingPad = ({ artType = "story", postId = null }) => {
 
     // Sync pending changes when coming back online
     const syncPendingChanges = async () => {
+        // tmp api handling
+        setTimeout(() => {
+            setSyncStatus("synced");
+            setLastSynced(new Date());
+            return;
+        }, 500);
+
         const draftKeys = Object.keys(localStorage).filter((key) =>
             key.startsWith("draft-"),
         );
@@ -219,7 +223,8 @@ const WritingPad = ({ artType = "story", postId = null }) => {
 
     // Save functionality
     const handleSave = async () => {
-        saveDraftLocally();
+        // not saving it for now, will implement whenbackend is ready
+        // saveDraftLocally();
         if (navigator.onLine) {
             await syncWithBackend();
         }
@@ -348,33 +353,8 @@ const WritingPad = ({ artType = "story", postId = null }) => {
 
     return (
         <div
-            className={`min-h-screen bg-white transition-all duration-300 ${isDark ? "invert" : ""}`}
+            className={`min-h-screen bg-white transition-all duration-300 relative h-fit ${isDark ? "invert" : ""}`}
         >
-            {/* Add sync status indicator */}
-            <div className="fixed top-10 right-10 flex items-center space-x-2 text-sm size-auto z-50">
-                {syncStatus === "offline" ? (
-                    <>
-                        <WifiOff className="w-4 h-4 text-yellow-500" />
-                        <span className="text-yellow-500">Offline</span>
-                    </>
-                ) : syncStatus === "saving" ? (
-                    <>
-                        <Wifi className="w-4 h-4 text-blue-500" />
-                        <span className="text-blue-500">Saving...</span>
-                    </>
-                ) : (
-                    <>
-                        <Wifi className="w-4 h-4 text-green-500" />
-                        <span className="text-green-500">
-                            Synced{" "}
-                            {lastSynced
-                                ? `at ${lastSynced.toLocaleTimeString()}`
-                                : ""}
-                        </span>
-                    </>
-                )}
-            </div>
-
             {/* Top Bar */}
             <div className="fixed top-0 left-0 right-0 bg-white border-b border-gray-100 z-10">
                 <div className="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
@@ -398,10 +378,14 @@ const WritingPad = ({ artType = "story", postId = null }) => {
                         </div>
                     </div>
 
+                    {/* options */}
                     <div className="flex items-center space-x-4">
+                        {/* word count */}
                         <span className="text-sm text-gray-400">
                             {wordCount} words
                         </span>
+
+                        {/* save btn */}
                         <button
                             className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm ${
                                 isSaved
@@ -413,6 +397,8 @@ const WritingPad = ({ artType = "story", postId = null }) => {
                             <Save className="w-4 h-4" />
                             <span>{isSaved ? "Saved" : "Save"}</span>
                         </button>
+
+                        {/* preview */}
                         <button
                             className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm border border-gray-300 ${
                                 isPreview
@@ -423,15 +409,57 @@ const WritingPad = ({ artType = "story", postId = null }) => {
                                 setIsPreview(!isPreview);
                             }}
                         >
-                            {/* <Edit className="w-4 h-4" /> */}
-                            <span>{isPreview ? "Preview" : "Editing"}</span>
+                            {isPreview ? (
+                                <>
+                                    <Eye className="w-4 h-4" />
+                                    <span>Preview</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Edit className="w-4 h-4" />
+                                    <span>Editing</span>
+                                </>
+                            )}
                         </button>
+
+                        {/* sync btn */}
+                        <button className="flex items-center space-x-2 text-sm size-auto z-50">
+                            {syncStatus === "offline" ? (
+                                <>
+                                    <WifiOff className="w-4 h-4 text-yellow-500" />
+                                    <span className="text-yellow-500">
+                                        Offline
+                                    </span>
+                                </>
+                            ) : syncStatus === "saving" ? (
+                                <>
+                                    <Wifi className="w-4 h-4 text-blue-500" />
+                                    <span className="text-blue-500">
+                                        Saving...
+                                    </span>
+                                </>
+                            ) : (
+                                <>
+                                    <Wifi className="w-4 h-4 text-green-600" />
+                                    <span className="text-green-600">
+                                        Synced{" "}
+                                        {lastSynced
+                                            ? `at ${lastSynced.toLocaleTimeString()}`
+                                            : ""}
+                                    </span>
+                                </>
+                            )}
+                        </button>
+
+                        {/* export btn */}
                         <button
-                            onClick={handleShare}
+                            onClick={handleExport}
                             className="hover:opacity-70 transition-opacity"
                         >
-                            <Share2 className="w-5 h-5" />
+                            <FileUp className="w-5 h-5" />
                         </button>
+
+                        {/* dark mode button */}
                         <button
                             onClick={() => {
                                 setIsDark(!isDark);
@@ -444,23 +472,12 @@ const WritingPad = ({ artType = "story", postId = null }) => {
                                 <Moon className="w-5 h-5" />
                             )}
                         </button>
+
+                        {/* addtional more button */}
                         <button className="hover:opacity-70 transition-opacity">
                             <MoreHorizontal className="w-5 h-5" />
                         </button>
                     </div>
-                </div>
-
-                {/* preview div */}
-                <div
-                    className={`w-2/3 h-2/3 mx-auto prose
-                        rounded text-lg transition-all
-                        origin-top duration-400 ${isPreview ? "scaleXX-y-[100%]" : "scaleXX-y-0 hidden"}`}
-                >
-                    <MarkdownPreview
-                        title={title}
-                        content={content}
-                        isVisible={isPreview}
-                    />
                 </div>
             </div>
 
@@ -505,9 +522,11 @@ const WritingPad = ({ artType = "story", postId = null }) => {
             )}
 
             {/* Writing Area */}
-            <div className={`pt-20 pb-24 ${isFullscreen ? "px-0" : "px-6"}`}>
+            <div
+                className={`pt-20 pb-24 ${isFullscreen ? "px-0" : "px-6"} relative h-fit`}
+            >
                 <div
-                    className={`${isFullscreen ? "max-w-7xl p-6" : "max-w-4xl"} mx-auto`}
+                    className={`${isFullscreen ? "max-w-7xl p-6" : "max-w-4xl"} mx-auto relative h-fit`}
                 >
                     {/* Formatting Tools */}
                     <div className="mb-8 flex items-center justify-between">
@@ -595,7 +614,7 @@ const WritingPad = ({ artType = "story", postId = null }) => {
                             setIsSaved(false);
                         }}
                         placeholder="Title"
-                        className="w-full text-4xl font-bold mb-8 focus:outline-none"
+                        className="w-full h-auto text-4xl font-bold mb-8 focus:outline-none"
                     />
 
                     {/* Content Textarea */}
@@ -610,6 +629,18 @@ const WritingPad = ({ artType = "story", postId = null }) => {
                                     : "text-left"
                             }`}
                     />
+                    {/* preview div */}
+                    <div
+                        className={`w-[100%] h-2/3 mx-auto prose absolute top-0 left-0
+                            rounded text-lg transition-all
+                            origin-top duration-400 ${isPreview ? "" : "hidden"}`}
+                    >
+                        <MarkdownPreview
+                            title={title}
+                            content={content}
+                            isVisible={isPreview}
+                        />
+                    </div>
                 </div>
             </div>
 
