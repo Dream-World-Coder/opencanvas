@@ -1,8 +1,8 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
     ArrowLeft,
     Save,
-    FileUp,
+    FileDown,
     Image,
     Bold,
     Code,
@@ -21,15 +21,33 @@ import {
     Eye,
     Edit,
     X,
+    Strikethrough,
+    Underline,
+    Link,
+    Minus,
+    Heading,
+    List,
+    Highlighter,
 } from "lucide-react";
 import PropTypes from "prop-types";
+import html2pdf from "html2pdf.js";
 
 // components
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import MarkdownPreview from "./WritingComponents";
 
 //** data.txt:
-// Add table functionality also
+// Add table functionality,
+// list() & heading --> dropdown needed
+// add formatting effects also in the undo redo stack
+// image
+// map () => mappable things
+// responsive
+// better pdfs
+// format tools position fixed
+// move functions and import them to make this file small
+// AT CURRENT: list, heading, line, table : markdown knowledge needed
+// currently center alignment is useless,cuz both rendered same way, so removing them
 
 const WritingPad = ({ artType = "story", postId = null }) => {
     const [title, setTitle] = useState("");
@@ -66,6 +84,66 @@ const WritingPad = ({ artType = "story", postId = null }) => {
                 newText =
                     content.substring(0, start) +
                     `*${selectedText}*` +
+                    content.substring(end);
+                break;
+            case "highlight":
+                newText =
+                    content.substring(0, start) +
+                    `<mark>${selectedText}</mark>` +
+                    content.substring(end);
+                break;
+            case "list":
+                newText =
+                    content.substring(0, start) +
+                    `- ${selectedText}` +
+                    content.substring(end);
+                break;
+            case "heading":
+                newText =
+                    content.substring(0, start) +
+                    `# ${selectedText}` +
+                    content.substring(end);
+                break;
+            case "line":
+                newText =
+                    content.substring(0, start) +
+                    `---\n${selectedText}` +
+                    content.substring(end);
+                break;
+            case "code":
+                newText =
+                    content.substring(0, start) +
+                    `\`\`\`c\n${selectedText}\n\`\`\`` +
+                    content.substring(end);
+                break;
+            case "link":
+                newText =
+                    content.substring(0, start) +
+                    `[${selectedText}](http://example.com)` +
+                    content.substring(end);
+                break;
+            case "image":
+                newText =
+                    content.substring(0, start) +
+                    `[${selectedText}](http://example.com)` +
+                    content.substring(end);
+                break;
+            case "underline":
+                newText =
+                    content.substring(0, start) +
+                    `<span style="text-decoration: underline;">${selectedText}</span>` +
+                    content.substring(end);
+                break;
+            case "strikethrough":
+                newText =
+                    content.substring(0, start) +
+                    `~~${selectedText}~~` +
+                    content.substring(end);
+                break;
+            case "subscript":
+                newText =
+                    content.substring(0, start) +
+                    `~${selectedText}~` +
                     content.substring(end);
                 break;
             case "quote":
@@ -116,9 +194,37 @@ const WritingPad = ({ artType = "story", postId = null }) => {
     };
 
     // export to pdf functionality
+    // this function activates when export to pdf button is clicked
+    // find the div#export
+    // now copy this node, i am using tailwind css so all its styles are defined in the html itself, so get the css
+    // now make the pdf from the html and download it in user's device,
     const handleExport = async () => {
-        // this function activates when export to pdf button is clicked
-        // find the div
+        try {
+            const element = document.getElementById("export");
+
+            // Configuration options for html2pdf
+            const options = {
+                margin: 0.5,
+                filename: "myopencanvas-document-export.pdf",
+                image: { type: "jpeg", quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                },
+                jsPDF: {
+                    unit: "in",
+                    format: "letter",
+                    orientation: "portrait",
+                },
+            };
+
+            // Generate and download PDF
+            await html2pdf().set(options).from(element).save();
+        } catch (error) {
+            console.error("PDF export failed:", error);
+            alert("PDF export failed:", error);
+            // toast.error();
+        }
     };
 
     // Save draft locally
@@ -151,39 +257,39 @@ const WritingPad = ({ artType = "story", postId = null }) => {
             return;
         }, 500);
 
-        try {
-            const response = await fetch(`/api/posts/${postId || ""}`, {
-                method: postId ? "PUT" : "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    title,
-                    content,
-                    type: artType,
-                }),
-            });
+        // try {
+        //     const response = await fetch(`/api/posts/${postId || ""}`, {
+        //         method: postId ? "PUT" : "POST",
+        //         headers: {
+        //             "Content-Type": "application/json",
+        //         },
+        //         body: JSON.stringify({
+        //             title,
+        //             content,
+        //             type: artType,
+        //         }),
+        //     });
 
-            if (response.ok) {
-                const savedPost = await response.json();
-                if (!postId) {
-                    // If this was a new post, update URL with new post ID
-                    window.history.replaceState(
-                        {},
-                        "",
-                        `/edit/${savedPost.id}`,
-                    );
-                }
-                setSyncStatus("synced");
-                setLastSynced(new Date());
-                return true;
-            }
-            return false;
-        } catch (error) {
-            console.error("Error saving to backend:", error);
-            setSyncStatus("offline");
-            return false;
-        }
+        //     if (response.ok) {
+        //         const savedPost = await response.json();
+        //         if (!postId) {
+        //             // If this was a new post, update URL with new post ID
+        //             window.history.replaceState(
+        //                 {},
+        //                 "",
+        //                 `/edit/${savedPost.id}`,
+        //             );
+        //         }
+        //         setSyncStatus("synced");
+        //         setLastSynced(new Date());
+        //         return true;
+        //     }
+        //     return false;
+        // } catch (error) {
+        //     console.error("Error saving to backend:", error);
+        //     setSyncStatus("offline");
+        //     return false;
+        // }
     };
 
     // Sync pending changes when coming back online
@@ -195,30 +301,30 @@ const WritingPad = ({ artType = "story", postId = null }) => {
             return;
         }, 500);
 
-        const draftKeys = Object.keys(localStorage).filter((key) =>
-            key.startsWith("draft-"),
-        );
+        // const draftKeys = Object.keys(localStorage).filter((key) =>
+        //     key.startsWith("draft-"),
+        // );
 
-        for (const key of draftKeys) {
-            const draft = JSON.parse(localStorage.getItem(key));
-            if (!draft.syncedWithServer) {
-                try {
-                    const response = await fetch(`/api/posts/${draft.id}`, {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(draft),
-                    });
+        // for (const key of draftKeys) {
+        //     const draft = JSON.parse(localStorage.getItem(key));
+        //     if (!draft.syncedWithServer) {
+        //         try {
+        //             const response = await fetch(`/api/posts/${draft.id}`, {
+        //                 method: "PUT",
+        //                 headers: {
+        //                     "Content-Type": "application/json",
+        //                 },
+        //                 body: JSON.stringify(draft),
+        //             });
 
-                    if (response.ok) {
-                        localStorage.removeItem(key);
-                    }
-                } catch (error) {
-                    console.error("Error syncing draft:", error);
-                }
-            }
-        }
+        //             if (response.ok) {
+        //                 localStorage.removeItem(key);
+        //             }
+        //         } catch (error) {
+        //             console.error("Error syncing draft:", error);
+        //         }
+        //     }
+        // }
     };
 
     // Save functionality
@@ -456,7 +562,7 @@ const WritingPad = ({ artType = "story", postId = null }) => {
                             onClick={handleExport}
                             className="hover:opacity-70 transition-opacity"
                         >
-                            <FileUp className="w-5 h-5" />
+                            <FileDown className="w-5 h-5" />
                         </button>
 
                         {/* dark mode button */}
@@ -544,6 +650,24 @@ const WritingPad = ({ artType = "story", postId = null }) => {
                                 <Italic className="w-4 h-4" />
                             </button>
                             <button
+                                onClick={() => handleFormat("underline")}
+                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
+                            >
+                                <Underline className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={() => handleFormat("strikethrough")}
+                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
+                            >
+                                <Strikethrough className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={() => handleFormat("highlight")}
+                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
+                            >
+                                <Highlighter className="w-4 h-4" />
+                            </button>
+                            {/* <button
                                 onClick={() => setTextAlignment("left")}
                                 className={`p-2 hover:bg-gray-50 rounded-lg transition-colors ${
                                     textAlignment === "left"
@@ -562,7 +686,7 @@ const WritingPad = ({ artType = "story", postId = null }) => {
                                 }`}
                             >
                                 <AlignCenter className="w-4 h-4" />
-                            </button>
+                            </button> */}
                             <button
                                 onClick={() => handleFormat("quote")}
                                 className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
@@ -570,12 +694,40 @@ const WritingPad = ({ artType = "story", postId = null }) => {
                                 <Quote className="w-4 h-4" />
                             </button>
                             <button
-                                onClick={() => handleFormat("quote")}
+                                onClick={() => handleFormat("code")}
                                 className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
                             >
                                 <Code className="w-4 h-4" />
                             </button>
-                            <button className="p-2 hover:bg-gray-50 rounded-lg transition-colors">
+                            {/*
+                            <button
+                                onClick={() => handleFormat("list")}
+                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
+                            >
+                                <List className="w-4 h-4" />
+                            </button>
+                                <button
+                                onClick={() => handleFormat("heading")}
+                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
+                            >
+                                <Heading className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={() => handleFormat("line")}
+                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
+                            >
+                                <Minus className="w-4 h-4" />
+                            </button> */}
+                            <button
+                                onClick={() => handleFormat("link")}
+                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
+                            >
+                                <Link className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={() => handleFormat("image")}
+                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
+                            >
                                 <Image className="w-4 h-4" />
                             </button>
                         </div>
@@ -623,6 +775,7 @@ const WritingPad = ({ artType = "story", postId = null }) => {
                         onChange={handleContentChange}
                         placeholder="Fill your canvas..."
                         className={`w-full min-h-[60vh] resize-none focus:outline-none text-lg
+                            ${isPreview ? "opacity-0" : "opacity-100"}
                             ${
                                 textAlignment === "center"
                                     ? "text-center"
@@ -663,3 +816,8 @@ const WritingPad = ({ artType = "story", postId = null }) => {
 };
 
 export default WritingPad;
+
+WritingPad.propTypes = {
+    artType: PropTypes.string,
+    postId: PropTypes.any,
+};
