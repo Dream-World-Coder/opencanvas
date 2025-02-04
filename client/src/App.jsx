@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import Lenis from "lenis";
+// import { useEffect } from "react";
+// import Lenis from "lenis";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 
@@ -23,24 +23,24 @@ import NotFoundPage from "./pages/Others/404";
 
 function App() {
     // { bgClr = "bg-cream-light" }
-    useEffect(() => {
-        const lenis = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            smooth: true,
-        });
+    // useEffect(() => {
+    //     const lenis = new Lenis({
+    //         duration: 1.2,
+    //         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    //         smooth: true,
+    //     });
 
-        function raf(time) {
-            lenis.raf(time);
-            requestAnimationFrame(raf);
-        }
+    //     function raf(time) {
+    //         lenis.raf(time);
+    //         requestAnimationFrame(raf);
+    //     }
 
-        requestAnimationFrame(raf);
+    //     requestAnimationFrame(raf);
 
-        return () => {
-            lenis.destroy();
-        };
-    }, []);
+    //     return () => {
+    //         lenis.destroy();
+    //     };
+    // }, []);
 
     return (
         <Router>
