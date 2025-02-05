@@ -14,14 +14,15 @@ import PoemPad from "./pages/CreatePosts/WritePoem";
 import StoryPad from "./pages/CreatePosts/WriteStory";
 
 import PhotoGalleryPage from "./pages/Galleries/PhotoGallery/PhotoGallery";
-// import PhotoGalleryPage2 from "./pages/Galleries/PhotoGallery/PhotoGallery2";
 import LiteratureGallery from "./pages/Galleries/LiteratureGallery/LiteratureGallery";
-// import Gallery2 from "./pages/Galleries/LiteratureGallery/old-literaturegallery";
 
 import Thanks from "./pages/Others/Thanks";
 import NotFoundPage from "./pages/Others/404";
+import LoadingPage from "./pages/Others/LoadingPage";
 
-function App() {
+// ADD loading page when transitioning
+
+export default function App() {
     // { bgClr = "bg-cream-light" }
     useEffect(() => {
         const lenis = new Lenis({
@@ -51,34 +52,59 @@ function App() {
                     path="/login"
                     element={<LoginPage bgClr="bg-cream-light" />}
                 />
-                <Route path="/profile" element={<Profile bgClr="bg-white" />} />
-                <Route path="/about" element={<AboutPage bgClr="bg-white" />} />
+                <Route
+                    path="/profile"
+                    element={<Profile bgClr="bg-white" />}
+                    // loader={<LoadingPage />}
+                />
+                <Route
+                    path="/about"
+                    element={<AboutPage bgClr="bg-white" />}
+                    // loader={<LoadingPage />}
+                />
                 <Route
                     path="/contact"
                     element={<ContactPage bgClr="bg-white" />}
+                    // loader={<LoadingPage />}
                 />
 
                 {/* gallery */}
                 <Route
                     path="/gallery/photos"
                     element={<PhotoGalleryPage bgClr="bg-white" />}
+                    // loader={<LoadingPage />}
                 />
                 <Route
                     path="/gallery/literature"
                     element={<LiteratureGallery bgClr="bg-white" />}
+                    // loader={<LoadingPage />}
                 />
 
                 {/* new post */}
-                <Route path="/new/poem" element={<PoemPad />} />
-                <Route path="/new/story" element={<StoryPad />} />
-                <Route path="/markdown2pdf" element={<WritingPad />} />
+                <Route
+                    path="/new/poem"
+                    element={<PoemPad />}
+                    // loader={<LoadingPage />}
+                />
+                <Route
+                    path="/new/story"
+                    element={<StoryPad />}
+                    // loader={<LoadingPage />}
+                />
+                <Route
+                    path="/markdown2pdf"
+                    element={<WritingPad />}
+                    // loader={<LoadingPage />}
+                />
 
                 {/* others */}
                 <Route path="/thanks" element={<Thanks bgClr="bg-white" />} />
+                <Route
+                    path="/loading"
+                    element={<LoadingPage bgClr="bg-white" />}
+                />
                 <Route path="*" element={<NotFoundPage bgClr="bg-white" />} />
             </Routes>
         </Router>
     );
 }
-
-export default App;

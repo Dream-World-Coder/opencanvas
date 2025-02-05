@@ -37,7 +37,6 @@ import html2pdf from "html2pdf.js";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { MarkdownPreview, ImageUploadButton } from "./WritingComponents";
 
-//** data.txt:
 // Add table functionality,
 // list() & heading --> dropdown needed
 // add formatting effects also in the undo redo stack
