@@ -28,13 +28,14 @@ import {
     Heading,
     List,
     Highlighter,
+    FilePlus,
 } from "lucide-react";
 import PropTypes from "prop-types";
 import html2pdf from "html2pdf.js";
 
 // components
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import MarkdownPreview from "./WritingComponents";
+import { MarkdownPreview, ImageUploadButton } from "./WritingComponents";
 
 //** data.txt:
 // Add table functionality,
@@ -75,78 +76,93 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
 
         let newText = content;
         switch (format) {
+            case "handleImageInset":
+                break;
+
             case "bold":
                 newText =
                     content.substring(0, start) +
                     `**${selectedText}**` +
                     content.substring(end);
                 break;
+
             case "italic":
                 newText =
                     content.substring(0, start) +
                     `*${selectedText}*` +
                     content.substring(end);
                 break;
+
             case "highlight":
                 newText =
                     content.substring(0, start) +
                     `<mark>${selectedText}</mark>` +
                     content.substring(end);
                 break;
+
             case "list":
                 newText =
                     content.substring(0, start) +
                     `- ${selectedText}` +
                     content.substring(end);
                 break;
+
             case "heading":
                 newText =
                     content.substring(0, start) +
                     `# ${selectedText}` +
                     content.substring(end);
                 break;
+
             case "line":
                 newText =
                     content.substring(0, start) +
                     `---\n${selectedText}` +
                     content.substring(end);
                 break;
+
             case "code":
                 newText =
                     content.substring(0, start) +
                     `\`\`\`c\n${selectedText}\n\`\`\`` +
                     content.substring(end);
                 break;
+
             case "link":
                 newText =
                     content.substring(0, start) +
                     `[${selectedText}](http://example.com)` +
                     content.substring(end);
                 break;
-            case "image":
-                newText =
-                    content.substring(0, start) +
-                    `[${selectedText}](http://example.com)` +
-                    content.substring(end);
-                break;
+
             case "underline":
                 newText =
                     content.substring(0, start) +
                     `<span style="text-decoration: underline;">${selectedText}</span>` +
                     content.substring(end);
                 break;
+
             case "strikethrough":
                 newText =
                     content.substring(0, start) +
                     `~~${selectedText}~~` +
                     content.substring(end);
                 break;
+
             case "subscript":
                 newText =
                     content.substring(0, start) +
                     `~${selectedText}~` +
                     content.substring(end);
                 break;
+
+            case "pageBreak":
+                newText =
+                    content.substring(0, start) +
+                    `<span className=html2pdf__page-break></span>\n${selectedText}` +
+                    content.substring(end);
+                break;
+
             case "quote":
                 newText =
                     content.substring(0, start) +
@@ -230,16 +246,15 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
 
     // Save draft locally
     const saveDraftLocally = () => {
-        const draft = {
-            id: postId || crypto.randomUUID(),
-            title,
-            content,
-            lastSaved: new Date().toISOString(),
-            syncedWithServer: false,
-        };
-
-        localStorage.setItem(`draft-${draft.id}`, JSON.stringify(draft));
-        setIsSaved(true);
+        // const draft = {
+        //     id: postId || crypto.randomUUID(),
+        //     title,
+        //     content,
+        //     lastSaved: new Date().toISOString(),
+        //     syncedWithServer: false,
+        // };
+        // localStorage.setItem(`draft-${draft.id}`, JSON.stringify(draft));
+        // setIsSaved(true);
     };
 
     // Sync with backend
@@ -256,7 +271,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             setSyncStatus("synced");
             setLastSynced(new Date());
             return;
-        }, 500);
+        }, 200);
 
         // try {
         //     const response = await fetch(`/api/posts/${postId || ""}`, {
@@ -300,7 +315,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             setSyncStatus("synced");
             setLastSynced(new Date());
             return;
-        }, 500);
+        }, 200);
 
         // const draftKeys = Object.keys(localStorage).filter((key) =>
         //     key.startsWith("draft-"),
@@ -668,6 +683,12 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                             >
                                 <Highlighter className="w-4 h-4" />
                             </button>
+                            <button
+                                onClick={() => handleFormat("pageBreak")}
+                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
+                            >
+                                <FilePlus className="w-4 h-4" />
+                            </button>
                             {/* <button
                                 onClick={() => setTextAlignment("left")}
                                 className={`p-2 hover:bg-gray-50 rounded-lg transition-colors ${
@@ -725,12 +746,38 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                             >
                                 <Link className="w-4 h-4" />
                             </button>
-                            <button
-                                onClick={() => handleFormat("image")}
+                            {/* <button
+                                onClick={() => handleFormat("handleImageInset")}
                                 className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
                             >
                                 <Image className="w-4 h-4" />
-                            </button>
+                            </button> */}
+                            {/* <ImageUploadButton
+                                onImageInsert={(markdownImageText) => {
+                                    const textarea =
+                                        document.querySelector("textarea");
+                                    const start = textarea.selectionStart;
+                                    const content = textarea.value;
+                                    const newContent =
+                                        content.substring(0, start) +
+                                        markdownImageText +
+                                        content.substring(start);
+                                    // Update your content state here
+                                    setContent(newContent);
+                                }}
+                            /> */}
+                            <ImageUploadButton
+                                onImageInsert={(markdownImageText) => {
+                                    const textarea =
+                                        document.querySelector("textarea");
+                                    const start = textarea.selectionStart;
+                                    const newContent =
+                                        content.substring(0, start) +
+                                        markdownImageText +
+                                        content.substring(start);
+                                    setContent(newContent);
+                                }}
+                            />
                         </div>
                         <div className="flex items-center space-x-2">
                             <button

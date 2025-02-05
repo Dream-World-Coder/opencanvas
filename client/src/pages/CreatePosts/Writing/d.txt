@@ -1,6 +1,126 @@
 ## Subhajit Gorai
 ### 2023ITB071
 ### C.O.A Lab: Assignment 2
+
+const imageStorage = {
+    store: (filename, base64Data) => {
+        const images = JSON.parse(
+            localStorage.getItem("markdown-images") || "{}",
+        );
+        images[filename] = base64Data;
+        localStorage.setItem("markdown-images", JSON.stringify(images));
+    },
+
+    get: (filename) => {
+        const images = JSON.parse(
+            localStorage.getItem("markdown-images") || "{}",
+        );
+        return images[filename];
+    },
+
+    // Helper to replace image references in markdown with actual base64 data
+    processMarkdown: (markdown) => {
+        return markdown.replace(
+            /!\[(.*?)\]\(local:(.*?)\)/g,
+            (match, alt, filename) => {
+                const base64Data = imageStorage.get(filename);
+                return base64Data ? `![${alt}](${base64Data})` : match;
+            },
+        );
+    },
+};
+
+export const ImageUploadButton = ({ onImageInsert }) => {
+    const fileInputRef = useRef(null);
+    const [preview, setPreview] = React.useState(null);
+    const [dialogOpen, setDialogOpen] = React.useState(false);
+
+    const handleImageSelect = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            // Create object URL for preview
+            const objectUrl = URL.createObjectURL(file);
+            setPreview(objectUrl);
+
+            // Convert to base64 for storage
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const base64Data = e.target.result;
+                // Generate a filename based on timestamp
+                const filename = `image-${Date.now()}-${file.name}`;
+
+                // Store the image
+                imageStorage.store(filename, base64Data);
+
+                // Insert markdown with local reference
+                onImageInsert(`![${file.name}](local:${filename})`);
+
+                // Clean up
+                URL.revokeObjectURL(objectUrl);
+                setPreview(null);
+                setDialogOpen(false);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleButtonClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    return (
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                    <Image className="w-4 h-4" />
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Insert Image</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                    <Card className="border-2 border-dashed">
+                        <CardContent className="flex flex-col items-center justify-center p-6">
+                            {preview ? (
+                                <img
+                                    src={preview}
+                                    alt="Preview"
+                                    className="max-w-full max-h-48 object-contain mb-4"
+                                />
+                            ) : (
+                                <div className="text-center">
+                                    <Image className="mx-auto w-12 h-12 text-gray-400 mb-4" />
+                                    <p className="text-sm text-gray-600">
+                                        Click to upload or drag and drop
+                                    </p>
+                                </div>
+                            )}
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageSelect}
+                                className="hidden"
+                            />
+                            <Button
+                                onClick={handleButtonClick}
+                                variant="outline"
+                                className="mt-4"
+                            >
+                                Select Image
+                            </Button>
+                        </CardContent>
+                    </Card>
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
+};
 ---
 > ### 1.Design behavioral model for the basic logic gates(AND, OR,NOT).
 

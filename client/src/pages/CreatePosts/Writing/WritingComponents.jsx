@@ -1,9 +1,22 @@
+import React, { useRef } from "react";
+import { Image } from "lucide-react";
+import PropTypes from "prop-types";
+//
 import { Card, CardContent } from "@/components/ui/card";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+//
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
 import rehypeRaw from "rehype-raw";
-import PropTypes from "prop-types";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { prism } from "react-syntax-highlighter/dist/esm/styles/prism";
 
@@ -11,7 +24,138 @@ import { prism } from "react-syntax-highlighter/dist/esm/styles/prism";
 //     <div style={{ position: "relative", height: size }} />
 // );
 
-const MarkdownPreview = ({ title, content, isVisible = true }) => {
+// Image storage utility
+const imageStorage = {
+    store: (filename, base64Data) => {
+        const images = JSON.parse(
+            localStorage.getItem("markdown-images") || "{}",
+        );
+        images[filename] = base64Data;
+        localStorage.setItem("markdown-images", JSON.stringify(images));
+    },
+
+    get: (filename) => {
+        const images = JSON.parse(
+            localStorage.getItem("markdown-images") || "{}",
+        );
+        return images[filename];
+    },
+};
+
+// Custom image component for ReactMarkdown
+const MarkdownImage = ({ src, alt, ...props }) => {
+    // Check if this is a local image
+    if (src.startsWith("local:")) {
+        const filename = src.replace("local:", "");
+        const base64Data = imageStorage.get(filename);
+        if (base64Data) {
+            return <img src={base64Data} alt={alt} {...props} />;
+        }
+    }
+    // Fallback to regular image
+    return <img src={src} alt={alt} {...props} />;
+};
+
+export const ImageUploadButton = ({ onImageInsert }) => {
+    const fileInputRef = useRef(null);
+    const [preview, setPreview] = React.useState(null);
+    const [dialogOpen, setDialogOpen] = React.useState(false);
+
+    const handleImageSelect = (event) => {
+        /*
+        const file = event.target.files[0];
+        if (file) {
+            // Create object URL for preview
+            const objectUrl = URL.createObjectURL(file);
+            setPreview(objectUrl);
+
+            // Convert to base64 for storage
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const base64Data = e.target.result;
+                // Generate a filename based on timestamp
+                const filename = `image-${Date.now()}-${file.name}`;
+
+                // Store the image
+                imageStorage.store(filename, base64Data);
+
+                // Insert markdown with local reference
+                onImageInsert(`![${file.name}](local:${filename})`);
+
+                // Clean up
+                URL.revokeObjectURL(objectUrl);
+                setPreview(null);
+                setDialogOpen(false);
+            };
+            reader.readAsDataURL(file);
+        }
+        */
+    };
+
+    const handleButtonClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    return (
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                    <Image className="w-4 h-4" />
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Insert Image</DialogTitle>
+                </DialogHeader>
+                <DialogDescription></DialogDescription>
+                <div className="space-y-4">
+                    <Card className="border-2 border-dashed">
+                        <CardContent className="flex flex-col items-center justify-center p-6">
+                            {preview ? (
+                                <img
+                                    src={preview}
+                                    alt="Preview"
+                                    className="max-w-full max-h-48 object-contain mb-4"
+                                />
+                            ) : (
+                                <div className="text-center">
+                                    <Image className="mx-auto w-12 h-12 text-gray-400 mb-4" />
+                                    <p className="text-sm text-gray-600">
+                                        Click to upload or drag and drop
+                                    </p>
+                                </div>
+                            )}
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageSelect}
+                                className="hidden"
+                            />
+                            <Button
+                                onClick={handleButtonClick}
+                                variant="outline"
+                                className="mt-4"
+                            >
+                                Select Image
+                            </Button>
+                        </CardContent>
+                    </Card>
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
+};
+
+ImageUploadButton.propTypes = {
+    onImageInsert: PropTypes.func,
+};
+
+export const MarkdownPreview = ({ title, content, isVisible = true }) => {
     if (!isVisible) return null;
 
     return (
@@ -31,6 +175,7 @@ const MarkdownPreview = ({ title, content, isVisible = true }) => {
                         rehypePlugins={[rehypeRaw]}
                         components={{
                             // gap: ({ size }) => <Gap size={size} />,
+                            // img: MarkdownImage,
                             code({
                                 node,
                                 inline,
@@ -135,8 +280,6 @@ const MarkdownPreview = ({ title, content, isVisible = true }) => {
         </Card>
     );
 };
-
-export default MarkdownPreview;
 
 MarkdownPreview.propTypes = {
     title: PropTypes.any,
