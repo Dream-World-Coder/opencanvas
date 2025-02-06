@@ -160,10 +160,13 @@ export const ImageUploadButton = ({ onImageInsert }) => {
             const formData = new FormData();
             formData.append("image", file);
 
-            const response = await fetch("/api/uploadImage", {
-                method: "POST",
-                body: formData,
-            });
+            const response = await fetch(
+                "https://encryptease.pythonanywhere.com/api/uploadImage",
+                {
+                    method: "POST",
+                    body: formData,
+                },
+            );
 
             const data = await response.json();
 
