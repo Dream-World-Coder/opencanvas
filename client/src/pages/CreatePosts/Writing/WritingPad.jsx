@@ -21,6 +21,7 @@ import html2pdf from "html2pdf.js";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
     MarkdownPreview,
+    LinkInsertButton,
     ImageUploadButton,
     formattingButtons,
 } from "./WritingComponents";
@@ -76,6 +77,20 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                     content.substring(end);
                 break;
 
+            case "underline":
+                newText =
+                    content.substring(0, start) +
+                    `<span style="text-decoration: underline;">${selectedText}</span>` +
+                    content.substring(end);
+                break;
+
+            case "strikethrough":
+                newText =
+                    content.substring(0, start) +
+                    `~~${selectedText}~~` +
+                    content.substring(end);
+                break;
+
             case "highlight":
                 newText =
                     content.substring(0, start) +
@@ -83,17 +98,10 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                     content.substring(end);
                 break;
 
-            case "list":
+            case "quote":
                 newText =
                     content.substring(0, start) +
-                    `- ${selectedText}` +
-                    content.substring(end);
-                break;
-
-            case "heading":
-                newText =
-                    content.substring(0, start) +
-                    `# ${selectedText}` +
+                    `> ${selectedText}` +
                     content.substring(end);
                 break;
 
@@ -118,20 +126,6 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                     content.substring(end);
                 break;
 
-            case "underline":
-                newText =
-                    content.substring(0, start) +
-                    `<span style="text-decoration: underline;">${selectedText}</span>` +
-                    content.substring(end);
-                break;
-
-            case "strikethrough":
-                newText =
-                    content.substring(0, start) +
-                    `~~${selectedText}~~` +
-                    content.substring(end);
-                break;
-
             case "subscript":
                 newText =
                     content.substring(0, start) +
@@ -146,10 +140,17 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                     content.substring(end);
                 break;
 
-            case "quote":
+            case "list":
                 newText =
                     content.substring(0, start) +
-                    `> ${selectedText}` +
+                    `- ${selectedText}` +
+                    content.substring(end);
+                break;
+
+            case "heading":
+                newText =
+                    content.substring(0, start) +
+                    `# ${selectedText}` +
                     content.substring(end);
                 break;
         }
@@ -608,6 +609,18 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                     <Icon className="size-3 md:size-4" />
                                 </button>
                             ))}
+                            <LinkInsertButton
+                                onLinkInsert={(markdownImageText) => {
+                                    const textarea =
+                                        document.querySelector("textarea");
+                                    const start = textarea.selectionStart;
+                                    const newContent =
+                                        content.substring(0, start) +
+                                        markdownImageText +
+                                        content.substring(start);
+                                    setContent(newContent);
+                                }}
+                            />
                             <ImageUploadButton
                                 onImageInsert={(markdownImageText) => {
                                     const textarea =

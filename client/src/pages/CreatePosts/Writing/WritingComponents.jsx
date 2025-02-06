@@ -27,6 +27,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 //
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -55,65 +57,12 @@ export const formattingButtons = [
     { format: "pageBreak", icon: FilePlus },
     { format: "quote", icon: Quote },
     { format: "code", icon: Code },
-    { format: "link", icon: Link },
+    // { format: "link", icon: Link },
     // { format: "list", icon: List },
     // { format: "heading", icon: Heading },
     // { format: "line", icon: Minus },
     // { format: "handleImageInset", icon: Image },
 ];
-
-/**
- *
- *
- *
- *
- *
- *
- */
-
-// const Gap = ({ size = "10px" }) => (
-//     <div style={{ position: "relative", height: size }} />
-// );
-
-// Image storage utility
-const imageStorage = {
-    store: (filename, base64Data) => {
-        const images = JSON.parse(
-            localStorage.getItem("markdown-images") || "{}",
-        );
-        images[filename] = base64Data;
-        localStorage.setItem("markdown-images", JSON.stringify(images));
-    },
-
-    get: (filename) => {
-        const images = JSON.parse(
-            localStorage.getItem("markdown-images") || "{}",
-        );
-        return images[filename];
-    },
-};
-
-/**
- *
- *
- *
- *
- *
- *
- */
-// Custom image component for ReactMarkdown
-const MarkdownImage = ({ src, alt, ...props }) => {
-    // Check if this is a local image
-    if (src.startsWith("local:")) {
-        const filename = src.replace("local:", "");
-        const base64Data = imageStorage.get(filename);
-        if (base64Data) {
-            return <img src={base64Data} alt={alt} {...props} />;
-        }
-    }
-    // Fallback to regular image
-    return <img src={src} alt={alt} {...props} />;
-};
 
 /**
  *
@@ -262,6 +211,104 @@ ImageUploadButton.propTypes = {
  *
  *
  *
+ */
+export const LinkInsertButton = ({ onLinkInsert }) => {
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [linkText, setLinkText] = useState("");
+    const [linkUrl, setLinkUrl] = useState("");
+    const [error, setError] = useState("");
+
+    const handleInsert = () => {
+        // Basic validation
+        if (!linkText.trim() || !linkUrl.trim()) {
+            setError("Both link text and URL are required");
+            return;
+        }
+
+        // Basic URL validation
+        try {
+            new URL(linkUrl);
+        } catch {
+            setError("Please enter a valid URL");
+            return;
+        }
+
+        // Insert markdown link
+        onLinkInsert(`[${linkText}](${linkUrl})`);
+
+        // Reset and close
+        setLinkText("");
+        setLinkUrl("");
+        setError("");
+        setDialogOpen(false);
+    };
+
+    return (
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="p-1 md:p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                >
+                    <Link className="size-3 md:size-4" />
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Insert Link</DialogTitle>
+                </DialogHeader>
+                {error && (
+                    <Alert variant="destructive">
+                        <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                )}
+                <div className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="linkText">Link Text</Label>
+                        <Input
+                            id="linkText"
+                            value={linkText}
+                            onChange={(e) => setLinkText(e.target.value)}
+                            placeholder="Display text for the link"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="linkUrl">URL</Label>
+                        <Input
+                            id="linkUrl"
+                            value={linkUrl}
+                            onChange={(e) => setLinkUrl(e.target.value)}
+                            placeholder="https://example.com"
+                        />
+                    </div>
+                    <div className="flex justify-end space-x-2">
+                        <Button
+                            variant="outline"
+                            onClick={() => {
+                                setDialogOpen(false);
+                                setError("");
+                                setLinkText("");
+                                setLinkUrl("");
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button onClick={handleInsert}>Insert Link</Button>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
+};
+LinkInsertButton.propTypes = {
+    onLinkInsert: PropTypes.func,
+};
+/**
+ *
+ *
+ *
+ *
  *
  *
  */
@@ -284,8 +331,6 @@ export const MarkdownPreview = ({ title, content, isVisible = true }) => {
                         remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
                         rehypePlugins={[rehypeRaw, rehypeKatex]}
                         components={{
-                            // gap: ({ size }) => <Gap size={size} />,
-                            // img: MarkdownImage,
                             code({
                                 node,
                                 inline,
