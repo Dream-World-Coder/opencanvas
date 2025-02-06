@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
     Image,
     Bold,
@@ -122,44 +122,166 @@ const MarkdownImage = ({ src, alt, ...props }) => {
  *
  *
  */
+// export const ImageUploadButton = ({ onImageInsert }) => {
+//     const fileInputRef = useRef(null);
+//     const [preview, setPreview] = React.useState(null);
+//     const [dialogOpen, setDialogOpen] = React.useState(false);
+
+//     const handleImageSelect = async (event) => {
+//         const file = event.target.files[0];
+//         if (!file) return;
+
+//         // Create object URL for preview
+//         const objectUrl = URL.createObjectURL(file);
+//         setPreview(objectUrl);
+
+//         // Prepare FormData
+//         const formData = new FormData();
+//         formData.append("image", file);
+
+//         try {
+//             // Upload image to Flask API
+//             const response = await fetch("/api/uploadImage", {
+//                 method: "POST",
+//                 body: formData,
+//             });
+
+//             const data = await response.json();
+//             if (response.ok) {
+//                 // Insert the Imgur markdown link
+//                 onImageInsert(data.markdown_link);
+//             } else {
+//                 console.error("Upload failed:", data.error);
+//             }
+//         } catch (error) {
+//             console.error("Error uploading image:", error);
+//         } finally {
+//             // Clean up
+//             URL.revokeObjectURL(objectUrl);
+//             setPreview(null);
+//             setDialogOpen(false);
+//         }
+//     };
+
+//     const handleButtonClick = () => {
+//         fileInputRef.current?.click();
+//     };
+
+//     return (
+//         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+//             <DialogTrigger asChild>
+//                 <Button
+//                     variant="ghost"
+//                     size="icon"
+//                     className="p-1 md:p-2 hover:bg-gray-200 rounded-lg transition-colors"
+//                 >
+//                     <Image className="size-3 md:size-4" />
+//                 </Button>
+//             </DialogTrigger>
+//             <DialogContent className="sm:max-w-md">
+//                 <DialogHeader>
+//                     <DialogTitle>Insert Image</DialogTitle>
+//                 </DialogHeader>
+//                 <DialogDescription></DialogDescription>
+//                 <div className="space-y-4">
+//                     <Card className="border-2 border-dashed">
+//                         <CardContent className="flex flex-col items-center justify-center p-6">
+//                             {preview ? (
+//                                 <img
+//                                     src={preview}
+//                                     alt="Preview"
+//                                     className="max-w-full max-h-48 object-contain mb-4"
+//                                 />
+//                             ) : (
+//                                 <div className="text-center">
+//                                     <Image className="mx-auto w-12 h-12 text-gray-400 mb-4" />
+//                                     <p className="text-sm text-gray-600">
+//                                         Click to upload or drag and drop
+//                                     </p>
+//                                 </div>
+//                             )}
+//                             <input
+//                                 ref={fileInputRef}
+//                                 type="file"
+//                                 accept="image/*"
+//                                 onChange={handleImageSelect}
+//                                 className="hidden"
+//                             />
+//                             <Button
+//                                 onClick={handleButtonClick}
+//                                 variant="outline"
+//                                 className="mt-4"
+//                             >
+//                                 Select Image
+//                             </Button>
+//                         </CardContent>
+//                     </Card>
+//                 </div>
+//             </DialogContent>
+//         </Dialog>
+//     );
+// };
+
 export const ImageUploadButton = ({ onImageInsert }) => {
     const fileInputRef = useRef(null);
-    const [preview, setPreview] = React.useState(null);
-    const [dialogOpen, setDialogOpen] = React.useState(false);
+    const [preview, setPreview] = useState(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [error, setError] = useState(null);
+    const [isUploading, setIsUploading] = useState(false);
 
-    const handleImageSelect = (event) => {
-        /*
-        const file = event.target.files[0];
-        if (file) {
-            // Create object URL for preview
-            const objectUrl = URL.createObjectURL(file);
-            setPreview(objectUrl);
+    const validateFile = (file) => {
+        const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+        const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif"];
 
-            // Convert to base64 for storage
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const base64Data = e.target.result;
-                // Generate a filename based on timestamp
-                const filename = `image-${Date.now()}-${file.name}`;
-
-                // Store the image
-                imageStorage.store(filename, base64Data);
-
-                // Insert markdown with local reference
-                onImageInsert(`![${file.name}](local:${filename})`);
-
-                // Clean up
-                URL.revokeObjectURL(objectUrl);
-                setPreview(null);
-                setDialogOpen(false);
-            };
-            reader.readAsDataURL(file);
+        if (!ALLOWED_TYPES.includes(file.type)) {
+            throw new Error(
+                "Invalid file type. Please upload a JPG, PNG, or GIF.",
+            );
         }
-        */
+
+        if (file.size > MAX_SIZE) {
+            throw new Error("File size exceeds 10MB limit.");
+        }
     };
 
-    const handleButtonClick = () => {
-        fileInputRef.current?.click();
+    const handleImageSelect = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        try {
+            validateFile(file);
+            setError(null);
+
+            const objectUrl = URL.createObjectURL(file);
+            setPreview(objectUrl);
+            setIsUploading(true);
+
+            const formData = new FormData();
+            formData.append("image", file);
+
+            const response = await fetch("/api/uploadImage", {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "Upload failed");
+            }
+
+            onImageInsert(data.markdown_link);
+            setDialogOpen(false);
+        } catch (error) {
+            setError(error.message);
+            console.error("Upload error:", error);
+        } finally {
+            setIsUploading(false);
+            if (preview) {
+                URL.revokeObjectURL(preview);
+            }
+            setPreview(null);
+        }
     };
 
     return (
@@ -176,8 +298,17 @@ export const ImageUploadButton = ({ onImageInsert }) => {
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>Insert Image</DialogTitle>
+                    <DialogDescription>
+                        Upload an image (JPG, PNG, or GIF, max 10MB)
+                    </DialogDescription>
                 </DialogHeader>
-                <DialogDescription></DialogDescription>
+
+                {error && (
+                    <Alert variant="destructive">
+                        <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                )}
+
                 <div className="space-y-4">
                     <Card className="border-2 border-dashed">
                         <CardContent className="flex flex-col items-center justify-center p-6">
@@ -203,11 +334,12 @@ export const ImageUploadButton = ({ onImageInsert }) => {
                                 className="hidden"
                             />
                             <Button
-                                onClick={handleButtonClick}
+                                onClick={() => fileInputRef.current?.click()}
                                 variant="outline"
                                 className="mt-4"
+                                disabled={isUploading}
                             >
-                                Select Image
+                                {isUploading ? "Uploading..." : "Select Image"}
                             </Button>
                         </CardContent>
                     </Card>

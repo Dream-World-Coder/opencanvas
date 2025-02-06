@@ -30,6 +30,7 @@ import {
  * ----------------------------------------------------------------------------------------------------------------
  * [content]: useEffect to change hight automatically, many not work,
  * supports latex && easy to use + image upload, <br/> for gapping
+ * $$ latex $$ , not brackets
  */
 
 const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
@@ -691,7 +692,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             )}
 
             {/* Writing Area */}
-            <div className={`pt-[8.25rem] pb-24 px-6 relative h-fit`}>
+            <div className={`pt-[8.25rem] pb-24 mb-32 px-6 relative h-fit`}>
                 <div className={`max-w-4xl mx-auto relative h-fit`}>
                     {/* Title Input */}
                     <input
@@ -714,6 +715,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                         className={`w-full min-h-[60vh] resize-none focus:outline-none text-lg text-left
                             ${isPreview ? "opacity-0" : "opacity-100"}`}
                     />
+
                     {/* preview div */}
                     <div
                         className={`w-[100%] h-2/3 mx-auto prose absolute top-0 left-0
