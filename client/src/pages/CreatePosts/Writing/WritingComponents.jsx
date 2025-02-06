@@ -1,5 +1,19 @@
 import React, { useRef } from "react";
-import { Image } from "lucide-react";
+import {
+    Image,
+    Bold,
+    Italic,
+    Underline,
+    Strikethrough,
+    Highlighter,
+    FilePlus,
+    Quote,
+    Code,
+    Link,
+    List,
+    Heading,
+    Minus,
+} from "lucide-react";
 import PropTypes from "prop-types";
 //
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,6 +33,39 @@ import remarkBreaks from "remark-breaks";
 import rehypeRaw from "rehype-raw";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { prism } from "react-syntax-highlighter/dist/esm/styles/prism";
+
+/**
+ *
+ *
+ *
+ *
+ *
+ *
+ */
+export const formattingButtons = [
+    { format: "bold", icon: Bold },
+    { format: "italic", icon: Italic },
+    { format: "underline", icon: Underline },
+    { format: "strikethrough", icon: Strikethrough },
+    { format: "highlight", icon: Highlighter },
+    { format: "pageBreak", icon: FilePlus },
+    { format: "quote", icon: Quote },
+    { format: "code", icon: Code },
+    { format: "link", icon: Link },
+    // { format: "list", icon: List },
+    // { format: "heading", icon: Heading },
+    // { format: "line", icon: Minus },
+    // { format: "handleImageInset", icon: Image },
+];
+
+/**
+ *
+ *
+ *
+ *
+ *
+ *
+ */
 
 // const Gap = ({ size = "10px" }) => (
 //     <div style={{ position: "relative", height: size }} />
@@ -42,6 +89,14 @@ const imageStorage = {
     },
 };
 
+/**
+ *
+ *
+ *
+ *
+ *
+ *
+ */
 // Custom image component for ReactMarkdown
 const MarkdownImage = ({ src, alt, ...props }) => {
     // Check if this is a local image
@@ -56,6 +111,14 @@ const MarkdownImage = ({ src, alt, ...props }) => {
     return <img src={src} alt={alt} {...props} />;
 };
 
+/**
+ *
+ *
+ *
+ *
+ *
+ *
+ */
 export const ImageUploadButton = ({ onImageInsert }) => {
     const fileInputRef = useRef(null);
     const [preview, setPreview] = React.useState(null);
@@ -155,6 +218,14 @@ ImageUploadButton.propTypes = {
     onImageInsert: PropTypes.func,
 };
 
+/**
+ *
+ *
+ *
+ *
+ *
+ *
+ */
 export const MarkdownPreview = ({ title, content, isVisible = true }) => {
     if (!isVisible) return null;
 

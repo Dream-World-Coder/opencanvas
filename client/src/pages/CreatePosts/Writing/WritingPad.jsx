@@ -3,13 +3,6 @@ import {
     ArrowLeft,
     Save,
     FileDown,
-    Image,
-    Bold,
-    Code,
-    Italic,
-    AlignLeft,
-    AlignCenter,
-    Quote,
     Sun,
     Moon,
     Undo,
@@ -21,29 +14,22 @@ import {
     Eye,
     Edit,
     X,
-    Strikethrough,
-    Underline,
-    Link,
-    Minus,
-    Heading,
-    List,
-    Highlighter,
-    FilePlus,
 } from "lucide-react";
 import PropTypes from "prop-types";
 
-import html2pdf from "html2pdf.js";
-
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { MarkdownPreview, ImageUploadButton } from "./WritingComponents";
+import {
+    MarkdownPreview,
+    ImageUploadButton,
+    formattingButtons,
+} from "./WritingComponents";
+
+import { handleExport } from "./Hooks";
 
 /**
  * Add table functionality,
- * list() & heading --> dropdown needed
+ * list & heading --> dropdown needed
  * add formatting effects also in the undo redo stack
- * image add
- * map () => mappable things
- * responsive
  * better pdfs
  * format tools position fixed
  * move functions and import them to make this file small
@@ -67,22 +53,6 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
     const [redoStack, setRedoStack] = useState([]);
     const [syncStatus, setSyncStatus] = useState("synced"); // 'synced', 'saving', 'offline'
     const [lastSynced, setLastSynced] = useState(null);
-
-    const formattingButtons = [
-        { format: "bold", icon: Bold },
-        { format: "italic", icon: Italic },
-        { format: "underline", icon: Underline },
-        { format: "strikethrough", icon: Strikethrough },
-        { format: "highlight", icon: Highlighter },
-        { format: "pageBreak", icon: FilePlus },
-        { format: "quote", icon: Quote },
-        { format: "code", icon: Code },
-        { format: "link", icon: Link },
-        // { format: "list", icon: List },
-        // { format: "heading", icon: Heading },
-        // { format: "line", icon: Minus },
-        // { format: "handleImageInset", icon: Image },
-    ];
 
     /**
      * Handle text formatting
@@ -230,54 +200,17 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
         }
     };
 
-    /**
-     * export to pdf functionality
-     * activates when export to pdf button is clicked
-     * finds the div#export -> so the preview must be on when exporting
-     * and makes pdf from the html using: html2pdf, jsPDF & html2canvas
-     */
-    const handleExport = async () => {
-        try {
-            const element = document.getElementById("export");
-
-            // Configuration options for html2pdf
-            const options = {
-                margin: 0.5,
-                filename: `${window.crypto.randomUUID()}-myOpenCanvas.pdf`,
-                image: { type: "jpeg", quality: 0.98 },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                },
-                jsPDF: {
-                    unit: "in",
-                    format: "letter",
-                    orientation: "portrait",
-                },
-            };
-
-            // Generate and download PDF
-            await html2pdf().set(options).from(element).save();
-        } catch (error) {
-            console.error("PDF export failed:", error);
-            alert(
-                "PDF export failed, Set Preview Mode on when exporting.",
-                error,
-            );
-            // toast.error();
-        }
-    };
-
     const saveDraftLocally = () => {
-        // const draft = {
-        //     id: postId || crypto.randomUUID(),
-        //     title,
-        //     content,
-        //     lastSaved: new Date().toISOString(),
-        //     syncedWithServer: false,
-        // };
+        const draft = {
+            id: postId || crypto.randomUUID(),
+            title,
+            content,
+            lastSaved: new Date().toISOString(),
+            syncedWithServer: false,
+        };
         // localStorage.setItem(`draft-${draft.id}`, JSON.stringify(draft));
-        // setIsSaved(true);
+        localStorage.setItem(`blogPost`, JSON.stringify(draft));
+        setIsSaved(true);
     };
 
     const syncWithBackend = async () => {
@@ -295,39 +228,41 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             return;
         }, 200);
 
-        // try {
-        //     const response = await fetch(`/api/posts/${postId || ""}`, {
-        //         method: postId ? "PUT" : "POST",
-        //         headers: {
-        //             "Content-Type": "application/json",
-        //         },
-        //         body: JSON.stringify({
-        //             title,
-        //             content,
-        //             type: artType,
-        //         }),
-        //     });
+        /*
+        try {
+            const response = await fetch(`/api/posts/${postId || ""}`, {
+                method: postId ? "PUT" : "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    title,
+                    content,
+                    type: artType,
+                }),
+            });
 
-        //     if (response.ok) {
-        //         const savedPost = await response.json();
-        //         if (!postId) {
-        //             // If this was a new post, update URL with new post ID
-        //             window.history.replaceState(
-        //                 {},
-        //                 "",
-        //                 `/edit/${savedPost.id}`,
-        //             );
-        //         }
-        //         setSyncStatus("synced");
-        //         setLastSynced(new Date());
-        //         return true;
-        //     }
-        //     return false;
-        // } catch (error) {
-        //     console.error("Error saving to backend:", error);
-        //     setSyncStatus("offline");
-        //     return false;
-        // }
+            if (response.ok) {
+                const savedPost = await response.json();
+                if (!postId) {
+                    // If this was a new post, update URL with new post ID
+                    window.history.replaceState(
+                        {},
+                        "",
+                        `/edit/${savedPost.id}`,
+                    );
+                }
+                setSyncStatus("synced");
+                setLastSynced(new Date());
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error("Error saving to backend:", error);
+            setSyncStatus("offline");
+            return false;
+        }
+        */
     };
 
     /**
@@ -341,30 +276,32 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             return;
         }, 200);
 
-        // const draftKeys = Object.keys(localStorage).filter((key) =>
-        //     key.startsWith("draft-"),
-        // );
+        /*
+        const draftKeys = Object.keys(localStorage).filter((key) =>
+            key.startsWith("draft-"),
+        );
 
-        // for (const key of draftKeys) {
-        //     const draft = JSON.parse(localStorage.getItem(key));
-        //     if (!draft.syncedWithServer) {
-        //         try {
-        //             const response = await fetch(`/api/posts/${draft.id}`, {
-        //                 method: "PUT",
-        //                 headers: {
-        //                     "Content-Type": "application/json",
-        //                 },
-        //                 body: JSON.stringify(draft),
-        //             });
+        for (const key of draftKeys) {
+            const draft = JSON.parse(localStorage.getItem(key));
+            if (!draft.syncedWithServer) {
+                try {
+                    const response = await fetch(`/api/posts/${draft.id}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(draft),
+                    });
 
-        //             if (response.ok) {
-        //                 localStorage.removeItem(key);
-        //             }
-        //         } catch (error) {
-        //             console.error("Error syncing draft:", error);
-        //         }
-        //     }
-        // }
+                    if (response.ok) {
+                        localStorage.removeItem(key);
+                    }
+                } catch (error) {
+                    console.error("Error syncing draft:", error);
+                }
+            }
+        }
+        */
     };
 
     const handleSave = async () => {
@@ -445,9 +382,9 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             }
         };
 
-        // not needed now, backend not ready
+        // not needed now, backend not ready, so:
         // loadPost();
-        // instead there is a simple version
+        // instead there is a simple version:
         const savedPost = localStorage.getItem("blogPost");
         if (savedPost) {
             const { title: savedTitle, content: savedContent } =
