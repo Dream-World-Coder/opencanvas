@@ -31,6 +31,9 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
 import rehypeRaw from "rehype-raw";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { prism } from "react-syntax-highlighter/dist/esm/styles/prism";
 
@@ -165,9 +168,9 @@ export const ImageUploadButton = ({ onImageInsert }) => {
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
+                    className="p-1 md:p-2 hover:bg-gray-200 rounded-lg transition-colors"
                 >
-                    <Image className="w-4 h-4" />
+                    <Image className="size-3 md:size-4" />
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
@@ -242,8 +245,8 @@ export const MarkdownPreview = ({ title, content, isVisible = true }) => {
 
                     {/* Markdown Content */}
                     <ReactMarkdown
-                        remarkPlugins={[remarkGfm, remarkBreaks]}
-                        rehypePlugins={[rehypeRaw]}
+                        remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
+                        rehypePlugins={[rehypeRaw, rehypeKatex]}
                         components={{
                             // gap: ({ size }) => <Gap size={size} />,
                             // img: MarkdownImage,
@@ -337,6 +340,34 @@ export const MarkdownPreview = ({ title, content, isVisible = true }) => {
                             ),
                             li: ({ children }) => (
                                 <li className="ml-5">{children}</li>
+                            ),
+                            table: ({ children }) => (
+                                <div className="overflow-x-auto">
+                                    <table className="border border-gray-400 bg-white dark:bg-gray-800 w-full">
+                                        {children}
+                                    </table>
+                                </div>
+                            ),
+                            thead: ({ children }) => (
+                                <thead className="bg-gray-200 dark:bg-gray-700">
+                                    {children}
+                                </thead>
+                            ),
+                            tbody: ({ children }) => <tbody>{children}</tbody>,
+                            tr: ({ children }) => (
+                                <tr className="border border-gray-300 dark:border-gray-600">
+                                    {children}
+                                </tr>
+                            ),
+                            th: ({ children }) => (
+                                <th className="border border-gray-400 px-4 py-2 bg-gray-100 dark:bg-gray-600">
+                                    {children}
+                                </th>
+                            ),
+                            td: ({ children }) => (
+                                <td className="border border-gray-300 px-4 py-2">
+                                    {children}
+                                </td>
                             ),
                         }}
                         className="prose-base prose-p:my-4 prose-headings:font-semibold prose-a:text-blue-600

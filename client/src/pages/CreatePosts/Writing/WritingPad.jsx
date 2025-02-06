@@ -28,6 +28,8 @@ import {
 /**
  * -------- This file lacks some experimental features, check out this file instead: ./backup/WritingPad-recent.jsx
  * ----------------------------------------------------------------------------------------------------------------
+ * [content]: useEffect to change hight automatically, many not work,
+ * supports latex && easy to use + image upload, <br/> for gapping
  */
 
 const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
@@ -206,7 +208,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             const options = {
                 margin: 0.5,
                 filename: `${window.crypto.randomUUID()}-myOpenCanvas.pdf`,
-                image: { type: "jpeg", quality: 0.98 },
+                image: { type: "jpeg", quality: 1.0 },
                 html2canvas: {
                     scale: 2,
                     useCORS: true,
@@ -469,126 +471,181 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
         >
             {/* Top Bar */}
             <div className="fixed top-0 left-0 right-0 bg-white border-b border-gray-100 z-10">
-                <div className="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
-                    <div className="flex items-center space-x-4">
-                        <button
-                            onClick={() => {
-                                if (!isSaved) {
-                                    setShowUnsavedAlert(true);
-                                    return;
-                                }
-                                window.history.back();
-                            }}
-                            className="hover:opacity-70 transition-opacity"
-                        >
-                            <ArrowLeft className="w-5 h-5" />
-                        </button>
-                        <div className="flex items-center space-x-2">
-                            <button className="px-3 py-1 rounded-full text-sm bg-black text-white hover:text-green-300">
-                                {artType}
+                <div className="max-w-4xl mx-auto">
+                    <div className="px-6 py-4 flex justify-between items-center">
+                        <div className="flex items-center space-x-1 md:space-x-4">
+                            <button
+                                onClick={() => {
+                                    if (!isSaved) {
+                                        setShowUnsavedAlert(true);
+                                        return;
+                                    }
+                                    window.history.back();
+                                }}
+                                className="hover:opacity-70 transition-opacity"
+                            >
+                                <ArrowLeft className="w-5 h-5" />
+                            </button>
+                            <div className="hidden md:flex items-center space-x-2">
+                                <button className="px-3 py-1 rounded-full text-sm bg-black text-white hover:text-green-300">
+                                    {artType}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* options */}
+                        <div className="flex items-center space-x-3 md:space-x-4">
+                            {/* word count */}
+                            <span className="hidden md:inline text-sm text-gray-400">
+                                {wordCount} words
+                            </span>
+
+                            {/* save btn */}
+                            <button
+                                className={`flex items-center space-x-1 px-1 md:px-3 py-1 rounded-full text-sm ${
+                                    isSaved
+                                        ? "text-gray-400"
+                                        : "bg-black text-white"
+                                }`}
+                                onClick={handleSave}
+                            >
+                                <Save className="size-3 md:size-4" />
+                                <span>{isSaved ? "Saved" : "Save"}</span>
+                            </button>
+
+                            {/* preview */}
+                            <button
+                                className={`flex items-center space-x-1 px-1 md:px-3 py-1 rounded-full text-sm border border-gray-300 ${
+                                    isPreview
+                                        ? "text-gray-700 bg-gray-300"
+                                        : "text-gray-700"
+                                }`}
+                                onClick={() => {
+                                    setIsPreview(!isPreview);
+                                }}
+                            >
+                                {isPreview ? (
+                                    <>
+                                        <Eye className="size-3 md:size-4" />
+                                        <span>Preview</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Edit className="size-3 md:size-4" />
+                                        <span>Editing</span>
+                                    </>
+                                )}
+                            </button>
+
+                            {/* sync btn */}
+                            <button className="hidden md:flex items-center space-x-2 text-sm size-auto z-50">
+                                {syncStatus === "offline" ? (
+                                    <>
+                                        <WifiOff className="size-3 md:size-4 text-yellow-500" />
+                                        <span className="text-yellow-500">
+                                            Offline
+                                        </span>
+                                    </>
+                                ) : syncStatus === "saving" ? (
+                                    <>
+                                        <Wifi className="size-3 md:size-4 text-blue-500" />
+                                        <span className="text-blue-500">
+                                            Saving...
+                                        </span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Wifi className="size-3 md:size-4 text-green-600" />
+                                        <span className="text-green-600">
+                                            Synced{" "}
+                                            {lastSynced
+                                                ? `at ${lastSynced.toLocaleTimeString()}`
+                                                : ""}
+                                        </span>
+                                    </>
+                                )}
+                            </button>
+
+                            {/* export btn */}
+                            <button
+                                onClick={handleExport}
+                                className={`hover:opacity-70 transition-opacity ${loading ? "opacity-20" : ""}`}
+                            >
+                                <FileDown className="size-4 md:size-5" />
+                            </button>
+
+                            {/* dark mode button */}
+                            <button
+                                onClick={() => {
+                                    setIsDark(!isDark);
+                                }}
+                                className="hover:opacity-70 transition-opacity"
+                            >
+                                {isDark ? (
+                                    <Sun className="size-4 md:size-5" />
+                                ) : (
+                                    <Moon className="size-4 md:size-5" />
+                                )}
+                            </button>
+
+                            {/* addtional more button */}
+                            <button className="hover:opacity-70 transition-opacity">
+                                <MoreHorizontal className="size-3 md:size-5" />
                             </button>
                         </div>
                     </div>
 
-                    {/* options */}
-                    <div className="flex items-center space-x-4">
-                        {/* word count */}
-                        <span className="text-sm text-gray-400">
-                            {wordCount} words
-                        </span>
+                    {/* Formatting Tools */}
+                    <div className="mb-2 flex items-center justify-between rounded-md bg-gray-50">
+                        <div className="flex items-center space-x-1 md:space-x-4">
+                            {formattingButtons.map(({ format, icon: Icon }) => (
+                                <button
+                                    key={format}
+                                    onClick={() => handleFormat(format)}
+                                    className="p-1 md:p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                                >
+                                    <Icon className="size-3 md:size-4" />
+                                </button>
+                            ))}
+                            <ImageUploadButton
+                                onImageInsert={(markdownImageText) => {
+                                    const textarea =
+                                        document.querySelector("textarea");
+                                    const start = textarea.selectionStart;
+                                    const newContent =
+                                        content.substring(0, start) +
+                                        markdownImageText +
+                                        content.substring(start);
+                                    setContent(newContent);
+                                }}
+                            />
+                        </div>
 
-                        {/* save btn */}
-                        <button
-                            className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm ${
-                                isSaved
-                                    ? "text-gray-400"
-                                    : "bg-black text-white"
-                            }`}
-                            onClick={handleSave}
-                        >
-                            <Save className="w-4 h-4" />
-                            <span>{isSaved ? "Saved" : "Save"}</span>
-                        </button>
-
-                        {/* preview */}
-                        <button
-                            className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm border border-gray-300 ${
-                                isPreview
-                                    ? "text-gray-700 bg-gray-300"
-                                    : "text-gray-700"
-                            }`}
-                            onClick={() => {
-                                setIsPreview(!isPreview);
-                            }}
-                        >
-                            {isPreview ? (
-                                <>
-                                    <Eye className="w-4 h-4" />
-                                    <span>Preview</span>
-                                </>
-                            ) : (
-                                <>
-                                    <Edit className="w-4 h-4" />
-                                    <span>Editing</span>
-                                </>
-                            )}
-                        </button>
-
-                        {/* sync btn */}
-                        <button className="flex items-center space-x-2 text-sm size-auto z-50">
-                            {syncStatus === "offline" ? (
-                                <>
-                                    <WifiOff className="w-4 h-4 text-yellow-500" />
-                                    <span className="text-yellow-500">
-                                        Offline
-                                    </span>
-                                </>
-                            ) : syncStatus === "saving" ? (
-                                <>
-                                    <Wifi className="w-4 h-4 text-blue-500" />
-                                    <span className="text-blue-500">
-                                        Saving...
-                                    </span>
-                                </>
-                            ) : (
-                                <>
-                                    <Wifi className="w-4 h-4 text-green-600" />
-                                    <span className="text-green-600">
-                                        Synced{" "}
-                                        {lastSynced
-                                            ? `at ${lastSynced.toLocaleTimeString()}`
-                                            : ""}
-                                    </span>
-                                </>
-                            )}
-                        </button>
-
-                        {/* export btn */}
-                        <button
-                            onClick={handleExport}
-                            className={`hover:opacity-70 transition-opacity ${loading ? "opacity-20" : ""}`}
-                        >
-                            <FileDown className="w-5 h-5" />
-                        </button>
-
-                        {/* dark mode button */}
-                        <button
-                            onClick={() => {
-                                setIsDark(!isDark);
-                            }}
-                            className="hover:opacity-70 transition-opacity"
-                        >
-                            {isDark ? (
-                                <Sun className="w-5 h-5" />
-                            ) : (
-                                <Moon className="w-5 h-5" />
-                            )}
-                        </button>
-
-                        {/* addtional more button */}
-                        <button className="hover:opacity-70 transition-opacity">
-                            <MoreHorizontal className="w-5 h-5" />
-                        </button>
+                        {/* undo/redo */}
+                        <div className="flex items-center space-x-2">
+                            <button
+                                onClick={handleUndo}
+                                disabled={undoStack.length === 0}
+                                className={`p-2 rounded-lg transition-colors ${
+                                    undoStack.length === 0
+                                        ? "opacity-50"
+                                        : "hover:bg-gray-200"
+                                }`}
+                            >
+                                <Undo className="size-3 md:size-4" />
+                            </button>
+                            <button
+                                onClick={handleRedo}
+                                disabled={redoStack.length === 0}
+                                className={`p-2 rounded-lg transition-colors ${
+                                    redoStack.length === 0
+                                        ? "opacity-50"
+                                        : "hover:bg-gray-200"
+                                }`}
+                            >
+                                <Redo className="size-3 md:size-4" />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -634,61 +691,8 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             )}
 
             {/* Writing Area */}
-            <div className={`pt-20 pb-24 px-6 relative h-fit`}>
+            <div className={`pt-[8.25rem] pb-24 px-6 relative h-fit`}>
                 <div className={`max-w-4xl mx-auto relative h-fit`}>
-                    {/* Formatting Tools */}
-                    <div className="mb-8 flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                            {formattingButtons.map(({ format, icon: Icon }) => (
-                                <button
-                                    key={format}
-                                    onClick={() => handleFormat(format)}
-                                    className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
-                                >
-                                    <Icon className="w-4 h-4" />
-                                </button>
-                            ))}
-                            <ImageUploadButton
-                                onImageInsert={(markdownImageText) => {
-                                    const textarea =
-                                        document.querySelector("textarea");
-                                    const start = textarea.selectionStart;
-                                    const newContent =
-                                        content.substring(0, start) +
-                                        markdownImageText +
-                                        content.substring(start);
-                                    setContent(newContent);
-                                }}
-                            />
-                        </div>
-
-                        {/* undo/redo */}
-                        <div className="flex items-center space-x-2">
-                            <button
-                                onClick={handleUndo}
-                                disabled={undoStack.length === 0}
-                                className={`p-2 rounded-lg transition-colors ${
-                                    undoStack.length === 0
-                                        ? "opacity-50"
-                                        : "hover:bg-gray-50"
-                                }`}
-                            >
-                                <Undo className="w-4 h-4" />
-                            </button>
-                            <button
-                                onClick={handleRedo}
-                                disabled={redoStack.length === 0}
-                                className={`p-2 rounded-lg transition-colors ${
-                                    redoStack.length === 0
-                                        ? "opacity-50"
-                                        : "hover:bg-gray-50"
-                                }`}
-                            >
-                                <Redo className="w-4 h-4" />
-                            </button>
-                        </div>
-                    </div>
-
                     {/* Title Input */}
                     <input
                         type="text"
