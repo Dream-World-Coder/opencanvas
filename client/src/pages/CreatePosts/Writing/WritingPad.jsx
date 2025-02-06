@@ -31,24 +31,26 @@ import {
     FilePlus,
 } from "lucide-react";
 import PropTypes from "prop-types";
+
 import html2pdf from "html2pdf.js";
 
-// components
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { MarkdownPreview, ImageUploadButton } from "./WritingComponents";
 
-// Add table functionality,
-// list() & heading --> dropdown needed
-// add formatting effects also in the undo redo stack
-// image
-// map () => mappable things
-// responsive
-// better pdfs
-// format tools position fixed
-// move functions and import them to make this file small
-// AT CURRENT: list, heading, line, table : markdown knowledge needed
-// currently center alignment is useless,cuz both rendered same way, so removing them
-// some padding at the buttom of textarea, that is getting covered by footer
+/**
+ * Add table functionality,
+ * list() & heading --> dropdown needed
+ * add formatting effects also in the undo redo stack
+ * image add
+ * map () => mappable things
+ * responsive
+ * better pdfs
+ * format tools position fixed
+ * move functions and import them to make this file small
+ * AT CURRENT: list, heading, line, table : markdown knowledge needed
+ * currently center alignment is useless,cuz both rendered same way, so removing them
+ * some padding at the buttom of textarea, that is getting covered by footer
+ */
 
 const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
     const [title, setTitle] = useState("");
@@ -66,7 +68,25 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
     const [syncStatus, setSyncStatus] = useState("synced"); // 'synced', 'saving', 'offline'
     const [lastSynced, setLastSynced] = useState(null);
 
-    // Handle text formatting
+    const formattingButtons = [
+        { format: "bold", icon: Bold },
+        { format: "italic", icon: Italic },
+        { format: "underline", icon: Underline },
+        { format: "strikethrough", icon: Strikethrough },
+        { format: "highlight", icon: Highlighter },
+        { format: "pageBreak", icon: FilePlus },
+        { format: "quote", icon: Quote },
+        { format: "code", icon: Code },
+        { format: "link", icon: Link },
+        // { format: "list", icon: List },
+        // { format: "heading", icon: Heading },
+        // { format: "line", icon: Minus },
+        // { format: "handleImageInset", icon: Image },
+    ];
+
+    /**
+     * Handle text formatting
+     */
     const handleFormat = (format) => {
         const textarea = document.querySelector("textarea");
         const start = textarea.selectionStart;
@@ -174,7 +194,9 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
         setContent(newText);
     };
 
-    // Handle content changes with undo/redo functionality
+    /**
+     * Handle content changes with undo/redo functionality
+     */
     const addToUndoStack = (previousContent) => {
         setUndoStack([...undoStack, previousContent]);
         setRedoStack([]);
@@ -190,7 +212,6 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
         e.target.style.height = e.target.scrollHeight + "px"; // Set new height based on content
     };
 
-    // Undo/Redo functions
     const handleUndo = () => {
         if (undoStack.length > 0) {
             const previousContent = undoStack[undoStack.length - 1];
@@ -209,11 +230,12 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
         }
     };
 
-    // export to pdf functionality
-    // this function activates when export to pdf button is clicked
-    // find the div#export
-    // now copy this node, i am using tailwind css so all its styles are defined in the html itself, so get the css
-    // now make the pdf from the html and download it in user's device,
+    /**
+     * export to pdf functionality
+     * activates when export to pdf button is clicked
+     * finds the div#export -> so the preview must be on when exporting
+     * and makes pdf from the html using: html2pdf, jsPDF & html2canvas
+     */
     const handleExport = async () => {
         try {
             const element = document.getElementById("export");
@@ -221,7 +243,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             // Configuration options for html2pdf
             const options = {
                 margin: 0.5,
-                filename: "myopencanvas-document-export.pdf",
+                filename: `${window.crypto.randomUUID()}-myOpenCanvas.pdf`,
                 image: { type: "jpeg", quality: 0.98 },
                 html2canvas: {
                     scale: 2,
@@ -238,12 +260,14 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             await html2pdf().set(options).from(element).save();
         } catch (error) {
             console.error("PDF export failed:", error);
-            alert("PDF export failed:", error);
+            alert(
+                "PDF export failed, Set Preview Mode on when exporting.",
+                error,
+            );
             // toast.error();
         }
     };
 
-    // Save draft locally
     const saveDraftLocally = () => {
         // const draft = {
         //     id: postId || crypto.randomUUID(),
@@ -256,7 +280,6 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
         // setIsSaved(true);
     };
 
-    // Sync with backend
     const syncWithBackend = async () => {
         if (!navigator.onLine) {
             setSyncStatus("offline");
@@ -307,7 +330,9 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
         // }
     };
 
-    // Sync pending changes when coming back online
+    /**
+     * Sync pending changes when coming back online
+     */
     const syncPendingChanges = async () => {
         // tmp api handling
         setTimeout(() => {
@@ -342,42 +367,17 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
         // }
     };
 
-    // Save functionality
     const handleSave = async () => {
-        // not saving it for now, will implement whenbackend is ready
-        // saveDraftLocally();
+        saveDraftLocally();
         if (navigator.onLine) {
             await syncWithBackend();
         }
         setShowUnsavedAlert(false);
     };
 
-    // Autosave functionality
-    useEffect(() => {
-        const autosaveInterval = setInterval(() => {
-            if (!isSaved) {
-                handleSave();
-            }
-        }, 30000);
-
-        return () => clearInterval(autosaveInterval);
-    }, [isSaved, content, title]);
-
-    // Load saved content
-    useEffect(() => {
-        const savedPost = localStorage.getItem("blogPost");
-        if (savedPost) {
-            const { title: savedTitle, content: savedContent } =
-                JSON.parse(savedPost);
-            setTitle(savedTitle);
-            setContent(savedContent);
-            setWordCount(
-                savedContent.trim().split(/\s+/).filter(Boolean).length,
-            );
-        }
-    }, []);
-
-    // Warn before leaving with unsaved changes
+    /**
+     * Warn before leaving with unsaved changes
+     */
     useEffect(() => {
         const handleBeforeUnload = (e) => {
             if (!isSaved) {
@@ -392,7 +392,9 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             window.removeEventListener("beforeunload", handleBeforeUnload);
     }, [isSaved]);
 
-    // Network status monitoring
+    /**
+     * Network status monitoring
+     */
     useEffect(() => {
         const handleOnline = () => {
             setSyncStatus("synced");
@@ -412,13 +414,17 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
         };
     }, []);
 
-    // Load existing post or draft
+    /**
+     * Load existing post or draft
+     */
     useEffect(() => {
         const loadPost = async () => {
             if (postId) {
                 try {
                     // Try loading from backend first
-                    const response = await fetch(`/api/posts/${postId}`);
+                    const response = await fetch(
+                        `localhost:5050/posts/${postId}`,
+                    );
                     if (response.ok) {
                         const post = await response.json();
                         setTitle(post.title);
@@ -439,10 +445,24 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             }
         };
 
-        loadPost();
+        // not needed now, backend not ready
+        // loadPost();
+        // instead there is a simple version
+        const savedPost = localStorage.getItem("blogPost");
+        if (savedPost) {
+            const { title: savedTitle, content: savedContent } =
+                JSON.parse(savedPost);
+            setTitle(savedTitle);
+            setContent(savedContent);
+            setWordCount(
+                savedContent.trim().split(/\s+/).filter(Boolean).length,
+            );
+        }
     }, [postId]);
 
-    // Autosave functionality
+    /**
+     * Autosave
+     */
     useEffect(() => {
         let autosaveInterval;
 
@@ -652,42 +672,17 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                     {/* Formatting Tools */}
                     <div className="mb-8 flex items-center justify-between">
                         <div className="flex items-center space-x-4">
-                            <button
-                                onClick={() => handleFormat("bold")}
-                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
-                            >
-                                <Bold className="w-4 h-4" />
-                            </button>
-                            <button
-                                onClick={() => handleFormat("italic")}
-                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
-                            >
-                                <Italic className="w-4 h-4" />
-                            </button>
-                            <button
-                                onClick={() => handleFormat("underline")}
-                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
-                            >
-                                <Underline className="w-4 h-4" />
-                            </button>
-                            <button
-                                onClick={() => handleFormat("strikethrough")}
-                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
-                            >
-                                <Strikethrough className="w-4 h-4" />
-                            </button>
-                            <button
-                                onClick={() => handleFormat("highlight")}
-                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
-                            >
-                                <Highlighter className="w-4 h-4" />
-                            </button>
-                            <button
-                                onClick={() => handleFormat("pageBreak")}
-                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
-                            >
-                                <FilePlus className="w-4 h-4" />
-                            </button>
+                            {formattingButtons.map(({ format, icon: Icon }) => (
+                                <button
+                                    key={format}
+                                    onClick={() => handleFormat(format)}
+                                    className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
+                                >
+                                    <Icon className="w-4 h-4" />
+                                </button>
+                            ))}
+
+                            {/* TEXT ALIGNMENT BUTTON AND IMAGE UPLOAD */}
                             {/* <button
                                 onClick={() => setTextAlignment("left")}
                                 className={`p-2 hover:bg-gray-50 rounded-lg transition-colors ${
@@ -707,49 +702,6 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                 }`}
                             >
                                 <AlignCenter className="w-4 h-4" />
-                            </button> */}
-                            <button
-                                onClick={() => handleFormat("quote")}
-                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
-                            >
-                                <Quote className="w-4 h-4" />
-                            </button>
-                            <button
-                                onClick={() => handleFormat("code")}
-                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
-                            >
-                                <Code className="w-4 h-4" />
-                            </button>
-                            {/*
-                            <button
-                                onClick={() => handleFormat("list")}
-                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
-                            >
-                                <List className="w-4 h-4" />
-                            </button>
-                                <button
-                                onClick={() => handleFormat("heading")}
-                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
-                            >
-                                <Heading className="w-4 h-4" />
-                            </button>
-                            <button
-                                onClick={() => handleFormat("line")}
-                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
-                            >
-                                <Minus className="w-4 h-4" />
-                            </button> */}
-                            <button
-                                onClick={() => handleFormat("link")}
-                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
-                            >
-                                <Link className="w-4 h-4" />
-                            </button>
-                            {/* <button
-                                onClick={() => handleFormat("handleImageInset")}
-                                className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
-                            >
-                                <Image className="w-4 h-4" />
                             </button> */}
                             {/* <ImageUploadButton
                                 onImageInsert={(markdownImageText) => {
@@ -778,6 +730,8 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                 }}
                             />
                         </div>
+
+                        {/* undo/redo */}
                         <div className="flex items-center space-x-2">
                             <button
                                 onClick={handleUndo}

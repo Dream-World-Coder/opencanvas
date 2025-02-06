@@ -27,3 +27,6 @@ dist-ssr
 
 src/assets/icons/o*.svg
 src/assets/icons/O*.svg
+
+
+_api_v1/
