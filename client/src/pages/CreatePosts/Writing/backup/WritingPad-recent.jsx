@@ -16,7 +16,6 @@ import {
     X,
 } from "lucide-react";
 import PropTypes from "prop-types";
-import html2pdf from "html2pdf.js";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
@@ -25,9 +24,18 @@ import {
     formattingButtons,
 } from "./WritingComponents";
 
+import { handleExport } from "./Hooks";
+
 /**
- * -------- This file lacks some experimental features, check out this file instead: ./backup/WritingPad-recent.jsx
- * ----------------------------------------------------------------------------------------------------------------
+ * Add table functionality,
+ * list & heading --> dropdown needed
+ * add formatting effects also in the undo redo stack
+ * better pdfs
+ * format tools position fixed
+ * move functions and import them to make this file small
+ * AT CURRENT: list, heading, line, table : markdown knowledge needed
+ * currently center alignment is useless,cuz both rendered same way, so removing them
+ * instead of bottom bar, show the 'last edited' and 'enter fullscreen' option in the header '...' button
  */
 
 const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
@@ -37,9 +45,10 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
     const [isDark, setIsDark] = useState(false);
     const [isSaved, setIsSaved] = useState(true);
     const [isPreview, setIsPreview] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [isFullscreen, setIsFullscreen] = useState(false);
     const [selectedText, setSelectedText] = useState("");
     const [showUnsavedAlert, setShowUnsavedAlert] = useState(false);
+    const [textAlignment, setTextAlignment] = useState("left");
     const [undoStack, setUndoStack] = useState([]);
     const [redoStack, setRedoStack] = useState([]);
     const [syncStatus, setSyncStatus] = useState("synced"); // 'synced', 'saving', 'offline'
@@ -163,9 +172,6 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
         setRedoStack([]);
     };
 
-    /**
-     * Handle Text area's content change
-     */
     const handleContentChange = (e) => {
         const newContent = e.target.value;
         addToUndoStack(content);
@@ -191,44 +197,6 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             setUndoStack([...undoStack, content]);
             setContent(nextContent);
             setRedoStack(redoStack.slice(0, -1));
-        }
-    };
-
-    const handleExport = async () => {
-        try {
-            setLoading(true);
-            await setIsPreview(true);
-            await setTimeout(() => {}, 300);
-            // waiting a bit for the html to be compiled, no need ig, cuz i have used await
-            const element = document.getElementById("export");
-
-            // Configuration options for html2pdf
-            const options = {
-                margin: 0.5,
-                filename: `${window.crypto.randomUUID()}-myOpenCanvas.pdf`,
-                image: { type: "jpeg", quality: 0.98 },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                },
-                jsPDF: {
-                    unit: "in",
-                    format: "letter",
-                    orientation: "portrait",
-                },
-            };
-
-            // Generate and download PDF
-            await html2pdf().set(options).from(element).save();
-        } catch (error) {
-            console.error("PDF export failed:", error);
-            alert(
-                "PDF export failed, Set Preview Mode on when exporting.",
-                error,
-            );
-            // toast.error();
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -427,8 +395,6 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                 savedContent.trim().split(/\s+/).filter(Boolean).length,
             );
         }
-        // let writingArea = document.querySelector("#writing_area");
-        // writingArea.style.height = writingArea.scrollHeight + "px";
     }, [postId]);
 
     /**
@@ -566,7 +532,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                         {/* export btn */}
                         <button
                             onClick={handleExport}
-                            className={`hover:opacity-70 transition-opacity ${loading ? "opacity-20" : ""}`}
+                            className="hover:opacity-70 transition-opacity"
                         >
                             <FileDown className="w-5 h-5" />
                         </button>
@@ -634,8 +600,12 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             )}
 
             {/* Writing Area */}
-            <div className={`pt-20 pb-24 px-6 relative h-fit`}>
-                <div className={`max-w-4xl mx-auto relative h-fit`}>
+            <div
+                className={`pt-20 pb-24 ${isFullscreen ? "px-0" : "px-6"} relative h-fit`}
+            >
+                <div
+                    className={`${isFullscreen ? "max-w-7xl p-6" : "max-w-4xl"} mx-auto relative h-fit`}
+                >
                     {/* Formatting Tools */}
                     <div className="mb-8 flex items-center justify-between">
                         <div className="flex items-center space-x-4">
@@ -648,6 +618,42 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                     <Icon className="w-4 h-4" />
                                 </button>
                             ))}
+
+                            {/* TEXT ALIGNMENT BUTTON AND IMAGE UPLOAD */}
+                            {/* <button
+                                onClick={() => setTextAlignment("left")}
+                                className={`p-2 hover:bg-gray-50 rounded-lg transition-colors ${
+                                    textAlignment === "left"
+                                        ? "bg-gray-100"
+                                        : ""
+                                }`}
+                            >
+                                <AlignLeft className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={() => setTextAlignment("center")}
+                                className={`p-2 hover:bg-gray-50 rounded-lg transition-colors ${
+                                    textAlignment === "center"
+                                        ? "bg-gray-100"
+                                        : ""
+                                }`}
+                            >
+                                <AlignCenter className="w-4 h-4" />
+                            </button> */}
+                            {/* <ImageUploadButton
+                                onImageInsert={(markdownImageText) => {
+                                    const textarea =
+                                        document.querySelector("textarea");
+                                    const start = textarea.selectionStart;
+                                    const content = textarea.value;
+                                    const newContent =
+                                        content.substring(0, start) +
+                                        markdownImageText +
+                                        content.substring(start);
+                                    // Update your content state here
+                                    setContent(newContent);
+                                }}
+                            /> */}
                             <ImageUploadButton
                                 onImageInsert={(markdownImageText) => {
                                     const textarea =
@@ -703,12 +709,16 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
 
                     {/* Content Textarea */}
                     <textarea
-                        // id="writing_area" //not working
                         value={content}
                         onChange={handleContentChange}
                         placeholder="Fill your canvas..."
-                        className={`w-full min-h-[60vh] resize-none focus:outline-none text-lg text-left
-                            ${isPreview ? "opacity-0" : "opacity-100"}`}
+                        className={`w-full min-h-[60vh] resize-none focus:outline-none text-lg
+                            ${isPreview ? "opacity-0" : "opacity-100"}
+                            ${
+                                textAlignment === "center"
+                                    ? "text-center"
+                                    : "text-left"
+                            }`}
                     />
                     {/* preview div */}
                     <div

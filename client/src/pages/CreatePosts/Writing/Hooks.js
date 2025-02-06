@@ -21,6 +21,7 @@ export default Hooks;
  * and makes pdf from the html using: html2pdf, jsPDF & html2canvas
  */
 
+/*
 import html2pdf from "html2pdf.js";
 
 export const handleExport = async () => {
@@ -51,3 +52,4 @@ export const handleExport = async () => {
         // toast.error();
     }
 };
+*/

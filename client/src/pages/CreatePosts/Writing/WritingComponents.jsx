@@ -357,3 +357,26 @@ MarkdownPreview.propTypes = {
     content: PropTypes.any,
     isVisible: PropTypes.bool,
 };
+
+/*
+ *
+ *
+ *
+ *
+ */
+/*
+// Bottom Bar
+<div className="fixed bottom-0 left-0 right-0 bg-white/10 backdrop-blur-sm border-t border-gray-100">
+    <div className="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div className="text-sm text-gray-400">
+            Last edited {new Date().toLocaleTimeString()}
+        </div>
+        <button
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            className="text-sm text-gray-600 hover:text-black transition-colors"
+        >
+            {isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+        </button>
+    </div>
+</div>
+*/
