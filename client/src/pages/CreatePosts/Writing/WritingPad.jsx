@@ -469,10 +469,14 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
 
     return (
         <div
-            className={`min-h-screen bg-white transition-all duration-300 relative h-fit ${isDark ? "invert" : ""}`}
+            className={`min-h-screen transition-all duration-300 relative h-fit
+                ${isDark ? "bg-black text-white" : "bg-white text-black"}`}
         >
             {/* Top Bar */}
-            <div className="fixed top-0 left-0 right-0 bg-white border-b border-gray-100 z-10">
+            <div
+                className={`fixed top-0 left-0 right-0 border-b z-10 transition-all duration-300
+                    ${isDark ? "bg-black border-gray-800" : "bg-white border-gray-100"}`}
+            >
                 <div className="max-w-4xl mx-auto">
                     <div className="px-6 py-4 flex justify-between items-center">
                         <div className="flex items-center space-x-1 md:space-x-4">
@@ -489,7 +493,9 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                 <ArrowLeft className="w-5 h-5" />
                             </button>
                             <div className="hidden md:flex items-center space-x-2">
-                                <button className="px-3 py-1 rounded-full text-sm bg-black text-white hover:text-green-300">
+                                <button
+                                    className={`px-3 py-1 rounded-full text-sm ${isDark ? "bg-white text-black" : "bg-black text-white"} hover:text-green-300`}
+                                >
                                     {artType}
                                 </button>
                             </div>
@@ -517,11 +523,13 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
 
                             {/* preview */}
                             <button
-                                className={`flex items-center space-x-1 px-1 md:px-3 py-1 rounded-full text-sm border border-gray-300 ${
-                                    isPreview
-                                        ? "text-gray-700 bg-gray-300"
-                                        : "text-gray-700"
-                                }`}
+                                className={`flex items-center space-x-1 px-1 md:px-3 py-1 rounded-full text-sm border
+                                    ${isDark ? "border-gray-700" : "border-gray-300"}
+                                    ${
+                                        isPreview
+                                            ? `${isDark ? "text-gray-200 bg-gray-700" : "text-gray-700 bg-gray-300"}`
+                                            : `${isDark ? "text-gray-200" : "text-gray-700"}`
+                                    }`}
                                 onClick={() => {
                                     setIsPreview(!isPreview);
                                 }}
@@ -598,13 +606,15 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                     </div>
 
                     {/* Formatting Tools */}
-                    <div className="mb-2 flex items-center justify-between rounded-md bg-gray-50">
+                    <div
+                        className={`mb-2 flex items-center justify-between rounded-md ${isDark ? "bg-gray-800" : "bg-gray-50"}`}
+                    >
                         <div className="flex items-center space-x-1 md:space-x-4">
                             {formattingButtons.map(({ format, icon: Icon }) => (
                                 <button
                                     key={format}
                                     onClick={() => handleFormat(format)}
-                                    className="p-1 md:p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                                    className={`p-1 md:p-2 ${isDark ? "hover:bg-gray-500" : "hover:bg-gray-200"} rounded-lg transition-colors`}
                                 >
                                     <Icon className="size-3 md:size-4" />
                                 </button>
@@ -643,7 +653,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                 className={`p-2 rounded-lg transition-colors ${
                                     undoStack.length === 0
                                         ? "opacity-50"
-                                        : "hover:bg-gray-200"
+                                        : `${isDark ? "hover:bg-gray-700" : "hover:bg-gray-200"}`
                                 }`}
                             >
                                 <Undo className="size-3 md:size-4" />
@@ -654,7 +664,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                 className={`p-2 rounded-lg transition-colors ${
                                     redoStack.length === 0
                                         ? "opacity-50"
-                                        : "hover:bg-gray-200"
+                                        : `${isDark ? "hover:bg-gray-700" : "hover:bg-gray-200"}`
                                 }`}
                             >
                                 <Redo className="size-3 md:size-4" />
@@ -705,7 +715,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             )}
 
             {/* Writing Area */}
-            <div className={`pt-[8.25rem] pb-24 mb-32 px-6 relative h-fit`}>
+            <div className={`pt-[8.25rem] pb-[200px] px-6 relative h-fit`}>
                 <div className={`max-w-4xl mx-auto relative h-fit`}>
                     {/* Title Input */}
                     <input
@@ -716,7 +726,8 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                             setIsSaved(false);
                         }}
                         placeholder="Title"
-                        className="w-full h-auto text-4xl font-bold mb-8 focus:outline-none"
+                        className={`w-full h-auto text-4xl font-bold mb-8 focus:outline-none transition-all duration-300
+                            ${isDark ? "bg-black" : "bg-white"}`}
                     />
 
                     {/* Content Textarea */}
@@ -725,7 +736,8 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                         value={content}
                         onChange={handleContentChange}
                         placeholder="Fill your canvas..."
-                        className={`w-full min-h-[60vh] resize-none focus:outline-none text-lg text-left
+                        className={`w-full min-h-[60vh] resize-none focus:outline-none text-lg text-left transition-all duration-300
+                            ${isDark ? "bg-black" : "bg-white"}
                             ${isPreview ? "opacity-0" : "opacity-100"}`}
                     />
 
@@ -733,7 +745,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                     <div
                         className={`w-[100%] h-2/3 mx-auto prose absolute top-0 left-0
                             rounded text-lg transition-all
-                            origin-top duration-400 ${isPreview ? "" : "hidden"}`}
+                            origin-top duration-300 ${isPreview ? "" : "hidden"} ${isDark ? "invert" : ""}`}
                     >
                         <MarkdownPreview
                             title={title}
