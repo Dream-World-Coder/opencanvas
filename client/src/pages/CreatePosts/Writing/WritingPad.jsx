@@ -47,6 +47,14 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
     const [syncStatus, setSyncStatus] = useState("synced"); // 'synced', 'saving', 'offline'
     const [lastSynced, setLastSynced] = useState(null);
 
+    useEffect(() => {
+        if (isDark) {
+            document.body.style.backgroundColor = "#222";
+        } else {
+            document.body.style.backgroundColor = "#fff";
+        }
+    }, [isDark]);
+
     /**
      * Handle text formatting
      */
@@ -760,14 +768,14 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                         placeholder="Fill your canvas..."
                         className={`w-full min-h-screen h-auto resize-none focus:outline-none text-lg text-left transition-all duration-0
                             ${isDark ? "bg-[#222]" : "bg-white"}
-                            ${isPreview ? "opacity-0 hidden" : "opacity-100 block"}`}
+                            ${isPreview ? "opacity-0 max-h-screen" : "opacity-100 max-h-auto"}`}
                     />
 
                     {/* preview div */}
                     <div
-                        className={`w-[100%] h-2/3 mx-auto prose absolute top-0 left-0
-                            rounded text-lg transition-all
-                            origin-top duration-0 ${isPreview ? "" : "hidden"} ${isDark ? "invert" : ""}`}
+                        className={`w-[100%] h-auto mx-auto prose absolute top-0 left-0
+                            rounded text-lg transition-all duration-0
+                            ${isPreview ? "" : "hidden"} ${isDark ? "invert" : ""}`}
                     >
                         <MarkdownPreview
                             title={title}
