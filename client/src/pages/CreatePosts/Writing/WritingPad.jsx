@@ -16,6 +16,7 @@ import {
     X,
 } from "lucide-react";
 import PropTypes from "prop-types";
+// import Lenis from "lenis";
 import html2pdf from "html2pdf.js";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -48,6 +49,20 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
     const [redoStack, setRedoStack] = useState([]);
     const [syncStatus, setSyncStatus] = useState("synced"); // 'synced', 'saving', 'offline'
     const [lastSynced, setLastSynced] = useState(null);
+
+    /**
+     * Lenis stopping
+     */
+    /*
+    useEffect(() => {
+        const lenis = new Lenis();
+        lenis.stop(); // Stop Lenis when this component is mounted
+
+        return () => {
+            lenis.start(); // Restart Lenis when this component unmounts
+        };
+    }, []);
+    */
 
     /**
      * Handle text formatting
@@ -176,7 +191,6 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
         setContent(newContent);
         setWordCount(newContent.trim().split(/\s+/).filter(Boolean).length);
         setIsSaved(false);
-        e.target.style.height = "auto";
         e.target.style.height = e.target.scrollHeight + "px"; // Set new height based on content
     };
 
@@ -390,6 +404,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
     /**
      * Load existing post or draft
      */
+    /*
     useEffect(() => {
         const loadPost = async () => {
             if (postId) {
@@ -417,23 +432,47 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                 }
             }
         };
-
-        // not needed now, backend not ready, so:
-        // loadPost();
-        // instead there is a simple version:
-        const savedPost = localStorage.getItem("blogPost");
-        if (savedPost) {
-            const { title: savedTitle, content: savedContent } =
-                JSON.parse(savedPost);
-            setTitle(savedTitle);
-            setContent(savedContent);
-            setWordCount(
-                savedContent.trim().split(/\s+/).filter(Boolean).length,
-            );
-        }
-        // let writingArea = document.querySelector("#writing_area");
-        // writingArea.style.height = writingArea.scrollHeight + "px";
+        loadPost();
     }, [postId]);
+    */
+    // not needed now, backend not ready, so:
+    // loadPost();
+    // instead there is a simple version:
+    useEffect(() => {
+        const loadSaved = async () => {
+            try {
+                const savedPost = localStorage.getItem("blogPost");
+                if (savedPost) {
+                    const { title: savedTitle, content: savedContent } =
+                        JSON.parse(savedPost);
+                    setTitle(savedTitle);
+                    setContent(savedContent);
+                    setWordCount(
+                        savedContent.trim().split(/\s+/).filter(Boolean).length,
+                    );
+                }
+
+                // Wait for React state updates to complete
+                await new Promise((resolve) => setTimeout(resolve, 300));
+
+                // Get textarea value
+                const txtArea = document.getElementById("txtArea");
+                if (!txtArea) return;
+
+                let v1 = txtArea.value;
+                // console.log(v1);
+
+                // Modify textarea value asynchronously
+                await new Promise((resolve) => setTimeout(resolve, 200)); // Ensures line-by-line execution
+                txtArea.value = v1; // Repeats value 5 times
+                txtArea.style.height = txtArea.scrollHeight + "px"; // it was not working if i didn't use async
+            } catch (error) {
+                console.error("Error loading saved blog post:", error);
+            }
+        };
+
+        loadSaved();
+    }, []);
 
     /**
      * Autosave
@@ -732,11 +771,11 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
 
                     {/* Content Textarea */}
                     <textarea
-                        // id="writing_area" //not working
+                        id="txtArea"
                         value={content}
                         onChange={handleContentChange}
                         placeholder="Fill your canvas..."
-                        className={`w-full min-h-[60vh] resize-none focus:outline-none text-lg text-left transition-all duration-0
+                        className={`w-full min-h-screen h-auto resize-none focus:outline-none text-lg text-left transition-all duration-0
                             ${isDark ? "bg-black" : "bg-white"}
                             ${isPreview ? "opacity-0" : "opacity-100"}`}
                     />

@@ -1,1 +1,33 @@
 change ser urls from opencanvas.blog -> myopencanvas.in
+Theme options: yellow, white, black
+download & export formats: txt+pdf
+mermaid diagrams
+optimisations to load faster
+better pdf quality and page breaks
+
+Dropcaps and [less imp]:image direction & orientation
+
+save in folder/collections so that it can substitute notes app
+
+2 font families: serif & normal
+
+Mobile Responsive
+
+Keyboard shortcuts for differnt formats,
+
+beginner totorial
+
+Electron app
+
+:page breaks will be easy: find the page length of html2pdf module and add
+<span className=html2pdf__page-break></span>
+need to check scale up/down s though, --> adding pages creates complexity in image handling, so no need to use it in web version
+
+ADD loading page when transitioning
+
+
+-- drop cap
+-- hidden when preview
+-- mermaid
+-- [x] scroll fix
+-- dropdown on export button -- claude

@@ -20,10 +20,7 @@ import Thanks from "./pages/Others/Thanks";
 import NotFoundPage from "./pages/Others/404";
 import LoadingPage from "./pages/Others/LoadingPage";
 
-// ADD loading page when transitioning
-
 export default function App() {
-    // { bgClr = "bg-cream-light" }
     useEffect(() => {
         const lenis = new Lenis({
             duration: 0.1,

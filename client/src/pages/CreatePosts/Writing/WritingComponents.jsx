@@ -19,6 +19,7 @@ import {
     ChevronLeft,
     ChevronRight,
     Search,
+    Text,
 } from "lucide-react";
 import PropTypes from "prop-types";
 // ***************************************************
