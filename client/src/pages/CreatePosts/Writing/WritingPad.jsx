@@ -155,7 +155,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             case "line":
                 newText =
                     content.substring(0, start) +
-                    `---\n${selectedText}` +
+                    `\n---\n${selectedText}` +
                     content.substring(end);
                 break;
 
@@ -183,7 +183,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             case "pageBreak":
                 newText =
                     content.substring(0, start) +
-                    `<span className=html2pdf__page-break></span>\n${selectedText}` +
+                    `${selectedText}\n<span className=html2pdf__page-break></span>` +
                     content.substring(end);
                 break;
 
@@ -197,7 +197,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             case "heading":
                 newText =
                     content.substring(0, start) +
-                    `# ${selectedText}` +
+                    `## ${selectedText}` +
                     content.substring(end);
                 break;
         }
