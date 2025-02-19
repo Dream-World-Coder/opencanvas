@@ -85,6 +85,8 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
         const end = textarea.selectionEnd;
         const selectedText = content.substring(start, end);
 
+        if (!selectedText) return;
+
         let newText = content;
         switch (format) {
             case "handleImageInset":
