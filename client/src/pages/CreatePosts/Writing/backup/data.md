@@ -1,8 +1,11 @@
-## Subhajit Gorai
+<p style="font-weight: 500; font-size: 1.5rem;">
+    <span style="font-size: 1.5rem;">Name: Subhajit Gorai</span> <br/><br/>
+    <span style="font-size: 1.5rem;">Enrolment No: 2023ITB071</span> <br/><br/>
+    <span style="font-size: 1.5rem;">Computer Organisation & Architecture Lab</span> <br/><br/>
+    <span style="font-size: 1.5rem;">Assignment 2</span> <br/><br/>
+</p>
 
-### 2023ITB071
-
-### C.O.A Lab: Assignment 2
+<br/>
 
 ---
 
@@ -93,6 +96,11 @@ begin
 end tb;
 ```
 
+<span style="text-decoration: underline;">EPWave</span>
+![Image](https://i.imgur.com/phYdRF3.png)
+
+<span className=html2pdf__page-break></span>
+
 - ### <mark>AND Gate</mark>
 
 <span style="text-decoration: underline;">design code</span>
@@ -134,49 +142,53 @@ architecture tb of testbench is
 -- DUT component
 component and_gate is
 port(
- a: in std_logic;
- b: in std_logic;
- q: out std_logic);
+  a: in std_logic;
+  b: in std_logic;
+  q: out std_logic);
 end component;
 
 signal a_in, b_in, q_out: std_logic;
 
 begin
 
- -- Connect DUT
- DUT: and_gate port map(a_in, b_in, q_out);
+  -- Connect DUT
+  DUT: and_gate port map(a_in, b_in, q_out);
 
- process
- begin
- a_in <= '0';
- b_in <= '0';
- wait for 1 ns;
- assert(q_out='0') report "Fail 0/0" severity error;
+  process
+  begin
+    a_in <= '0';
+    b_in <= '0';
+    wait for 1 ns;
+    assert(q_out='0') report "Fail 0/0" severity error;
 
- a_in <= '0';
- b_in <= '1';
- wait for 1 ns;
- assert(q_out='0') report "Fail 0/1" severity error;
+    a_in <= '0';
+    b_in <= '1';
+    wait for 1 ns;
+    assert(q_out='0') report "Fail 0/1" severity error;
 
- a_in <= '1';
- b_in <= '0';
- wait for 1 ns;
- assert(q_out='0') report "Fail 1/0" severity error;
+    a_in <= '1';
+    b_in <= '0';
+    wait for 1 ns;
+    assert(q_out='0') report "Fail 1/0" severity error;
 
- a_in <= '1';
- b_in <= '1';
- wait for 1 ns;
- assert(q_out='1') report "Fail 1/1" severity error;
+    a_in <= '1';
+    b_in <= '1';
+    wait for 1 ns;
+    assert(q_out='1') report "Fail 1/1" severity error;
 
- -- Clear inputs
- a_in <= '0';
- b_in <= '0';
+    -- Clear inputs
+    a_in <= '0';
+    b_in <= '0';
 
- assert false report "Test done." severity note;
- wait;
- end process;
+    assert false report "Test done." severity note;
+    wait;
+  end process;
 end tb;
 ```
+
+<span style="text-decoration: underline;">EPWave</span>
+![Image](https://i.imgur.com/FwCNXOW.png)
+<span className=html2pdf__page-break></span>
 
 - ### <mark>NOT Gate</mark>
 
@@ -248,6 +260,10 @@ begin
 end tb;
 ```
 
+<span style="text-decoration: underline;">EPWave</span>
+![Image](https://i.imgur.com/BQCeNol.png)
+<span className=html2pdf__page-break></span>
+
 > ### 2.Design behavioral model for the universal logic gates(NAND, NOR).
 
 - ### <mark>NAND Gate</mark>
@@ -258,18 +274,18 @@ end tb;
 library IEEE;
 use IEEE.std_logic_1164.all;
 
-entity or_gate is
+entity nand_gate is
 port(
  a: in std_logic;
  b: in std_logic;
  q: out std_logic);
-end or_gate;
+end nand_gate;
 
-architecture behavioural of or_gate is
+architecture behavioural of nand_gate is
 begin
  process(a,b) is
  begin
- if (a='0' and b='0') then q<='0';
+ if (a='1' and b='1') then q<='0';
  else q<='1';
  end if;
  end process;
@@ -289,51 +305,55 @@ end testbench;
 architecture tb of testbench is
 
 -- DUT component
-component or_gate is
+component nand_gate is
 port(
- a: in std_logic;
- b: in std_logic;
- q: out std_logic);
+  a: in std_logic;
+  b: in std_logic;
+  q: out std_logic);
 end component;
 
 signal a_in, b_in, q_out: std_logic;
 
 begin
 
- -- Connect DUT
- DUT: or_gate port map(a_in, b_in, q_out);
+  -- Connect DUT
+  DUT: nand_gate port map(a_in, b_in, q_out);
 
- process
- begin
- a_in <= '0';
- b_in <= '0';
- wait for 1 ns;
- assert(q_out='0') report "Fail 0/0" severity error;
+  process
+  begin
+    a_in <= '0';
+    b_in <= '0';
+    wait for 1 ns;
+    assert(q_out='1') report "Fail 0/0" severity error;
 
- a_in <= '0';
- b_in <= '1';
- wait for 1 ns;
- assert(q_out='1') report "Fail 0/1" severity error;
+    a_in <= '0';
+    b_in <= '1';
+    wait for 1 ns;
+    assert(q_out='1') report "Fail 0/1" severity error;
 
- a_in <= '1';
- b_in <= '0';
- wait for 1 ns;
- assert(q_out='1') report "Fail 1/0" severity error;
+    a_in <= '1';
+    b_in <= '0';
+    wait for 1 ns;
+    assert(q_out='1') report "Fail 1/0" severity error;
 
- a_in <= '1';
- b_in <= '1';
- wait for 1 ns;
- assert(q_out='1') report "Fail 1/1" severity error;
+    a_in <= '1';
+    b_in <= '1';
+    wait for 1 ns;
+    assert(q_out='0') report "Fail 1/1" severity error;
 
- -- Clear inputs
- a_in <= '0';
- b_in <= '0';
+    -- Clear inputs
+    a_in <= '0';
+    b_in <= '0';
 
- assert false report "Test done." severity note;
- wait;
- end process;
+    assert false report "Test done." severity note;
+    wait;
+  end process;
 end tb;
 ```
+
+<span style="text-decoration: underline;">EPWave</span>
+![Image](https://i.imgur.com/Kwrjvl3.png)
+<span className=html2pdf__page-break></span>
 
 - ### <mark>NOR Gate</mark>
 
@@ -343,19 +363,19 @@ end tb;
 library IEEE;
 use IEEE.std_logic_1164.all;
 
-entity or_gate is
+entity nor_gate is
 port(
  a: in std_logic;
  b: in std_logic;
  q: out std_logic);
-end or_gate;
+end nor_gate;
 
-architecture behavioural of or_gate is
+architecture behavioural of nor_gate is
 begin
  process(a,b) is
  begin
- if (a='0' and b='0') then q<='0';
- else q<='1';
+ if (a='0' and b='0') then q<='1';
+ else q<='0';
  end if;
  end process;
 end behavioural;
@@ -374,51 +394,55 @@ end testbench;
 architecture tb of testbench is
 
 -- DUT component
-component or_gate is
+component nor_gate is
 port(
- a: in std_logic;
- b: in std_logic;
- q: out std_logic);
+  a: in std_logic;
+  b: in std_logic;
+  q: out std_logic);
 end component;
 
 signal a_in, b_in, q_out: std_logic;
 
 begin
 
- -- Connect DUT
- DUT: or_gate port map(a_in, b_in, q_out);
+  -- Connect DUT
+  DUT: nor_gate port map(a_in, b_in, q_out);
 
- process
- begin
- a_in <= '0';
- b_in <= '0';
- wait for 1 ns;
- assert(q_out='0') report "Fail 0/0" severity error;
+  process
+  begin
+    a_in <= '0';
+    b_in <= '0';
+    wait for 1 ns;
+    assert(q_out='1') report "Fail 0/0" severity error;
 
- a_in <= '0';
- b_in <= '1';
- wait for 1 ns;
- assert(q_out='1') report "Fail 0/1" severity error;
+    a_in <= '0';
+    b_in <= '1';
+    wait for 1 ns;
+    assert(q_out='0') report "Fail 0/1" severity error;
 
- a_in <= '1';
- b_in <= '0';
- wait for 1 ns;
- assert(q_out='1') report "Fail 1/0" severity error;
+    a_in <= '1';
+    b_in <= '0';
+    wait for 1 ns;
+    assert(q_out='0') report "Fail 1/0" severity error;
 
- a_in <= '1';
- b_in <= '1';
- wait for 1 ns;
- assert(q_out='1') report "Fail 1/1" severity error;
+    a_in <= '1';
+    b_in <= '1';
+    wait for 1 ns;
+    assert(q_out='0') report "Fail 1/1" severity error;
 
- -- Clear inputs
- a_in <= '0';
- b_in <= '0';
+    -- Clear inputs
+    a_in <= '0';
+    b_in <= '0';
 
- assert false report "Test done." severity note;
- wait;
- end process;
+    assert false report "Test done." severity note;
+    wait;
+  end process;
 end tb;
 ```
+
+<span style="text-decoration: underline;">EPWave</span>
+![Image](https://i.imgur.com/FWVWroA.png)
+<span className=html2pdf__page-break></span>
 
 > ### 3.Design behavioral model for the logic gates(XOR, XNOR).
 
@@ -430,18 +454,18 @@ end tb;
 library IEEE;
 use IEEE.std_logic_1164.all;
 
-entity or_gate is
+entity xor_gate is
 port(
  a: in std_logic;
  b: in std_logic;
  q: out std_logic);
-end or_gate;
+end xor_gate;
 
-architecture behavioural of or_gate is
+architecture behavioural of xor_gate is
 begin
  process(a,b) is
  begin
- if (a='0' and b='0') then q<='0';
+ if (a=b) then q<='0';
  else q<='1';
  end if;
  end process;
@@ -461,51 +485,55 @@ end testbench;
 architecture tb of testbench is
 
 -- DUT component
-component or_gate is
+component xor_gate is
 port(
- a: in std_logic;
- b: in std_logic;
- q: out std_logic);
+  a: in std_logic;
+  b: in std_logic;
+  q: out std_logic);
 end component;
 
 signal a_in, b_in, q_out: std_logic;
 
 begin
 
- -- Connect DUT
- DUT: or_gate port map(a_in, b_in, q_out);
+  -- Connect DUT
+  DUT: xor_gate port map(a_in, b_in, q_out);
 
- process
- begin
- a_in <= '0';
- b_in <= '0';
- wait for 1 ns;
- assert(q_out='0') report "Fail 0/0" severity error;
+  process
+  begin
+    a_in <= '0';
+    b_in <= '0';
+    wait for 1 ns;
+    assert(q_out='0') report "Fail 0/0" severity error;
 
- a_in <= '0';
- b_in <= '1';
- wait for 1 ns;
- assert(q_out='1') report "Fail 0/1" severity error;
+    a_in <= '0';
+    b_in <= '1';
+    wait for 1 ns;
+    assert(q_out='1') report "Fail 0/1" severity error;
 
- a_in <= '1';
- b_in <= '0';
- wait for 1 ns;
- assert(q_out='1') report "Fail 1/0" severity error;
+    a_in <= '1';
+    b_in <= '0';
+    wait for 1 ns;
+    assert(q_out='1') report "Fail 1/0" severity error;
 
- a_in <= '1';
- b_in <= '1';
- wait for 1 ns;
- assert(q_out='1') report "Fail 1/1" severity error;
+    a_in <= '1';
+    b_in <= '1';
+    wait for 1 ns;
+    assert(q_out='0') report "Fail 1/1" severity error;
 
- -- Clear inputs
- a_in <= '0';
- b_in <= '0';
+    -- Clear inputs
+    a_in <= '0';
+    b_in <= '0';
 
- assert false report "Test done." severity note;
- wait;
- end process;
+    assert false report "Test done." severity note;
+    wait;
+  end process;
 end tb;
 ```
+
+<span style="text-decoration: underline;">EPWave</span>
+![Image](https://i.imgur.com/VLvhaiI.png)
+<span className=html2pdf__page-break></span>
 
 - ### <mark>XNOR Gate</mark>
 
@@ -515,19 +543,19 @@ end tb;
 library IEEE;
 use IEEE.std_logic_1164.all;
 
-entity or_gate is
+entity xnor_gate is
 port(
  a: in std_logic;
  b: in std_logic;
  q: out std_logic);
-end or_gate;
+end xnor_gate;
 
-architecture behavioural of or_gate is
+architecture behavioural of xnor_gate is
 begin
  process(a,b) is
  begin
- if (a='0' and b='0') then q<='0';
- else q<='1';
+ if (a=b) then q<='1';
+ else q<='0';
  end if;
  end process;
 end behavioural;
@@ -546,48 +574,51 @@ end testbench;
 architecture tb of testbench is
 
 -- DUT component
-component or_gate is
+component xnor_gate is
 port(
- a: in std_logic;
- b: in std_logic;
- q: out std_logic);
+  a: in std_logic;
+  b: in std_logic;
+  q: out std_logic);
 end component;
 
 signal a_in, b_in, q_out: std_logic;
 
 begin
 
- -- Connect DUT
- DUT: or_gate port map(a_in, b_in, q_out);
+  -- Connect DUT
+  DUT: xnor_gate port map(a_in, b_in, q_out);
 
- process
- begin
- a_in <= '0';
- b_in <= '0';
- wait for 1 ns;
- assert(q_out='0') report "Fail 0/0" severity error;
+  process
+  begin
+    a_in <= '0';
+    b_in <= '0';
+    wait for 1 ns;
+    assert(q_out='1') report "Fail 0/0" severity error;
 
- a_in <= '0';
- b_in <= '1';
- wait for 1 ns;
- assert(q_out='1') report "Fail 0/1" severity error;
+    a_in <= '0';
+    b_in <= '1';
+    wait for 1 ns;
+    assert(q_out='0') report "Fail 0/1" severity error;
 
- a_in <= '1';
- b_in <= '0';
- wait for 1 ns;
- assert(q_out='1') report "Fail 1/0" severity error;
+    a_in <= '1';
+    b_in <= '0';
+    wait for 1 ns;
+    assert(q_out='0') report "Fail 1/0" severity error;
 
- a_in <= '1';
- b_in <= '1';
- wait for 1 ns;
- assert(q_out='1') report "Fail 1/1" severity error;
+    a_in <= '1';
+    b_in <= '1';
+    wait for 1 ns;
+    assert(q_out='1') report "Fail 1/1" severity error;
 
- -- Clear inputs
- a_in <= '0';
- b_in <= '0';
+    -- Clear inputs
+    a_in <= '0';
+    b_in <= '0';
 
- assert false report "Test done." severity note;
- wait;
- end process;
+    assert false report "Test done." severity note;
+    wait;
+  end process;
 end tb;
 ```
+
+<span style="text-decoration: underline;">EPWave</span>
+![Image](https://i.imgur.com/mhRLA2S.png)

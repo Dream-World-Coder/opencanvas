@@ -10,9 +10,9 @@ import {
     Quote,
     Code,
     Link,
-    List,
-    Heading,
-    Minus,
+    // List,
+    // Heading,
+    // Minus,
     ChevronDown,
     ChevronUp,
     ChevronsUpDown,
@@ -573,6 +573,32 @@ export const MarkdownPreview = ({ title, content, isVisible = true }) => {
 
                     {/* Markdown Content */}
                     <ReactMarkdown
+                        /*
+                        remarkPlugins={[
+                            remarkGfm,
+                            remarkBreaks,
+                            [
+                                remarkMath,
+                                {
+                                    singleDollarTextMath: true, // Enable single $ for inline math
+                                    doubleDollarMath: true, // Enable double $$ for block math
+                                    allowMathInInlines: true, // Allow math in inline contexts
+                                },
+                            ],
+                        ]}
+                        rehypePlugins={[
+                            rehypeRaw,
+                            [
+                                rehypeKatex,
+                                {
+                                    strict: false, // Less strict parsing
+                                    output: "html", // Output format
+                                    throwOnError: false, // Don't throw on parsing errors
+                                    displayMode: true, // Enable display mode for block math
+                                },
+                            ],
+                        ]}
+                        */
                         remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
                         rehypePlugins={[rehypeRaw, rehypeKatex]}
                         components={{
