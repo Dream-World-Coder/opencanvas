@@ -15,6 +15,7 @@ need to check scale up/down s though, --> adding pages creates complexity in ima
 
 ADD loading page when transitioning
 
+html in export formats
 
 -- [x] drop cap + ``
 -- [x] hidden when preview
