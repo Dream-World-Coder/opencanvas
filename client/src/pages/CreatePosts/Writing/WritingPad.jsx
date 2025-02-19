@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import {
     ArrowLeft,
     Save,
-    FileDown,
     Sun,
     Moon,
     Undo,
@@ -14,11 +13,31 @@ import {
     Eye,
     Edit,
     X,
+    Download,
+    FileText,
+    FileType,
+    Type,
+    Info,
 } from "lucide-react";
 import PropTypes from "prop-types";
 import html2pdf from "html2pdf.js";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
 import {
     MarkdownPreview,
     LinkInsertButton,
@@ -36,6 +55,8 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [wordCount, setWordCount] = useState(0);
+    const [isSerif, setIsSerif] = useState(false);
+    const [helpOpen, setHelpOpen] = useState(false);
     const [isDark, setIsDark] = useState(false);
     const [isSaved, setIsSaved] = useState(true);
     const [isPreview, setIsPreview] = useState(false);
@@ -76,6 +97,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                     content.substring(end);
                 break;
 
+            // select the paragraph where you want to implement this
             case "dropCap":
                 newText =
                     content.substring(0, start) +
@@ -220,18 +242,24 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
         }
     };
 
-    const handleExport = async () => {
+    const handlePdfExport = async () => {
         try {
             setLoading(true);
             await setIsPreview(true);
             await setTimeout(() => {}, 300);
             // waiting a bit for the html to be compiled, no need ig, cuz i have used await
             const element = document.getElementById("export");
+            const safeTitle = title
+                // Replace one or more non-alphanumeric characters with a hyphen
+                .replace(/[^a-zA-Z0-9]+/g, "-")
+                // Remove any leading or trailing hyphens
+                .replace(/^-|-$/g, "");
 
             // Configuration options for html2pdf
             const options = {
                 margin: 0.5,
-                filename: `${window.crypto.randomUUID()}-myOpenCanvas.pdf`,
+                filename: `${safeTitle}-myOpenCanvas.pdf`,
+                // window.crypto.randomUUID()
                 image: { type: "jpeg", quality: 1.0 },
                 html2canvas: {
                     scale: 2,
@@ -253,6 +281,42 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                 error,
             );
             // toast.error();
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleTxtExport = async (extension) => {
+        if (!extension) {
+            extension = "txt";
+        }
+        try {
+            setLoading(true);
+            const safeTitle = title
+                .replace(/[^a-zA-Z0-9]+/g, "-")
+                .replace(/^-|-$/g, "");
+            const filename = `${safeTitle}-myOpenCanvas.${extension}`;
+            const txtFileContent = `# ${title}\n\n\n${content}\n`;
+
+            const blob = new Blob([txtFileContent], {
+                type: "text/plain;charset=utf-8",
+            });
+            // temporary URL for the Blob
+            const url = URL.createObjectURL(blob);
+
+            // temporary anchor element to trigger the download
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+
+            // Clean up: remove the anchor element and revoke the Blob URL
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("txt export failed:", error);
+            alert("txt export failed", error);
         } finally {
             setLoading(false);
         }
@@ -516,7 +580,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
 
     return (
         <div
-            className={`min-h-screen transition-all duration-0 relative h-fit ${`font-serif`}
+            className={`min-h-screen transition-all duration-0 relative h-fit ${isSerif ? `font-serif` : ""}
                 ${isDark ? "bg-[#222] text-white" : "bg-white text-black"}`}
         >
             {/* Top Bar */}
@@ -623,13 +687,49 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                 )}
                             </button>
 
-                            {/* export btn */}
-                            <button
-                                onClick={handleExport}
-                                className={`hover:opacity-70 transition-opacity ${loading ? "opacity-20" : ""}`}
-                            >
-                                <FileDown className="size-4 md:size-5" />
-                            </button>
+                            {/* export dropdown */}
+                            <DropdownMenu>
+                                <DropdownMenuTrigger>
+                                    <Download className="size-4 md:size-5" />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    <DropdownMenuLabel>
+                                        Export document
+                                    </DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem>
+                                        <button
+                                            onClick={handlePdfExport}
+                                            className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
+                                        >
+                                            <FileText className="size-4 md:size-5" />{" "}
+                                            pdf
+                                        </button>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                        <button
+                                            onClick={() => {
+                                                handleTxtExport("txt");
+                                            }}
+                                            className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
+                                        >
+                                            <FileType className="size-4 md:size-5" />{" "}
+                                            txt
+                                        </button>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                        <button
+                                            onClick={() => {
+                                                handleTxtExport("md");
+                                            }}
+                                            className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
+                                        >
+                                            <FileType className="size-4 md:size-5" />{" "}
+                                            md
+                                        </button>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
 
                             {/* dark mode button */}
                             <button
@@ -646,9 +746,29 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                             </button>
 
                             {/* addtional more button */}
-                            <button className="hover:opacity-70 transition-opacity">
-                                <MoreHorizontal className="size-3 md:size-5" />
-                            </button>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger>
+                                    <MoreHorizontal className="size-3 md:size-5" />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    <DropdownMenuItem
+                                        className="cursor-pointer"
+                                        onClick={() => {
+                                            setIsSerif(!isSerif);
+                                        }}
+                                    >
+                                        <Type /> Serif
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        className="cursor-pointer"
+                                        onClick={() => {
+                                            setHelpOpen(true);
+                                        }}
+                                    >
+                                        <Info /> Help
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                     </div>
 
@@ -764,6 +884,38 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             {/* Writing Area */}
             <div className={`pt-[8.25rem] pb-[200px] px-6 relative h-fit`}>
                 <div className={`max-w-4xl mx-auto relative h-fit`}>
+                    {/* help div */}
+                    <div
+                        className={`w-[100%] h-auto mx-auto  relative mb-4
+                            rounded text-lg transition-all duration-0 max-w-4xl
+                            ${helpOpen ? "" : "hidden"} ${isDark ? "invert" : ""}`}
+                    >
+                        <Card className="bg-white">
+                            <CardHeader>
+                                <CardTitle className="flex items-center justify-between">
+                                    Formatting tools &amp; keyboard shortcuts
+                                    <X
+                                        onClick={() => {
+                                            setHelpOpen(false);
+                                        }}
+                                    />
+                                </CardTitle>
+                                <CardDescription>
+                                    grasp in minutes
+                                </CardDescription>
+                            </CardHeader>
+                            {formattingButtons.map(({ format, icon: Icon }) => (
+                                <CardContent
+                                    key={format}
+                                    className="flex items-center justify-start gap-3"
+                                >
+                                    <Icon className="size-3 md:size-4" />{" "}
+                                    {`${format}, ${format === "dropCap" ? "select the paragraph where you want to implment drop-cap and then click this icon" : `select the text you want to ${format} and click this button`}`}
+                                </CardContent>
+                            ))}
+                        </Card>
+                    </div>
+
                     {/* Title Input */}
                     <input
                         type="text"
