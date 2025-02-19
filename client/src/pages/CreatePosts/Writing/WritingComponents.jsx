@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo } from "react";
+import { useRef, useState, useMemo } from "react";
 import {
     Image,
     Bold,
@@ -21,7 +21,7 @@ import {
     Search,
 } from "lucide-react";
 import PropTypes from "prop-types";
-//
+// ***************************************************
 import { Card, CardContent } from "@/components/ui/card";
 import {
     Dialog,
@@ -42,7 +42,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-//
+// ***************************************************
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
@@ -156,7 +156,7 @@ export const ImageUploadButton = ({ onImageInsert }) => {
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="p-1 md:p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                    className="p-1 md:p-2 hover:bg-gray-200 rounded-lg transition-all duration-0"
                 >
                     <Image className="size-3 md:size-4" />
                 </Button>
@@ -262,7 +262,7 @@ export const LinkInsertButton = ({ onLinkInsert }) => {
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="p-1 md:p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                    className="p-1 md:p-2 hover:bg-gray-200 rounded-lg transition-all duration-0"
                 >
                     <Link className="size-3 md:size-4" />
                 </Button>
@@ -756,7 +756,7 @@ MarkdownPreview.propTypes = {
         </div>
         <button
             onClick={() => setIsFullscreen(!isFullscreen)}
-            className="text-sm text-gray-600 hover:text-black transition-colors"
+            className="text-sm text-gray-600 hover:text-black transition-all duration-0"
         >
             {isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
         </button>
