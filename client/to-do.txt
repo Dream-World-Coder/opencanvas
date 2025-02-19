@@ -27,7 +27,7 @@ ADD loading page when transitioning
 
 
 -- drop cap
--- hidden when preview
+-- [x] hidden when preview
 -- mermaid
 -- [x] scroll fix
 -- dropdown on export button -- claude
