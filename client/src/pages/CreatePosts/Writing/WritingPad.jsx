@@ -69,6 +69,23 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             case "handleImageInset":
                 break;
 
+            case "inlineCode":
+                newText =
+                    content.substring(0, start) +
+                    `\`${selectedText}\`` +
+                    content.substring(end);
+                break;
+
+            case "dropCap":
+                newText =
+                    content.substring(0, start) +
+                    `<p style="font-size: 18px; line-height: 1.5;">
+                    <span style="float: left; font-size: 3em; font-weight: bold; line-height: 1; margin-right: 8px;">${selectedText[0]}</span>
+                    ${selectedText.slice(1)}
+                    </p>` +
+                    content.substring(end);
+                break;
+
             case "bold":
                 newText =
                     content.substring(0, start) +

@@ -19,7 +19,8 @@ import {
     ChevronLeft,
     ChevronRight,
     Search,
-    Text,
+    FileJson,
+    LetterText,
 } from "lucide-react";
 import PropTypes from "prop-types";
 // ***************************************************
@@ -70,7 +71,9 @@ export const formattingButtons = [
     { format: "highlight", icon: Highlighter },
     { format: "pageBreak", icon: FilePlus },
     { format: "quote", icon: Quote },
-    { format: "code", icon: Code },
+    { format: "inlineCode", icon: Code },
+    { format: "code", icon: FileJson },
+    { format: "dropCap", icon: LetterText },
     // { format: "link", icon: Link },
     // { format: "list", icon: List },
     // { format: "heading", icon: Heading },
