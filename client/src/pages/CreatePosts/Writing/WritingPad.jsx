@@ -922,6 +922,8 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                         onChange={(e) => {
                             setTitle(e.target.value);
                             setIsSaved(false);
+                            e.target.style.height =
+                                e.target.scrollHeight + "px";
                         }}
                         placeholder="Title"
                         className={`w-full h-auto text-4xl font-bold mb-8 focus:outline-none transition-all duration-0
