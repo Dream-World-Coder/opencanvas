@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import PropTypes from "prop-types";
 // ***************************************************
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
     Dialog,
     DialogContent,
@@ -733,6 +733,7 @@ export const MarkdownPreview = ({ title, content, isVisible = true }) => {
                     </ReactMarkdown>
                 </div>
             </CardContent>
+            <CardFooter className="bg-transparent h-[15vh]" />
         </Card>
     );
 };
@@ -765,3 +766,30 @@ MarkdownPreview.propTypes = {
     </div>
 </div>
 */
+
+export const ScrollToBottomButton = ({
+    position = "fixed",
+    bottom = "bottom-8",
+    right = "right-32",
+    theme = "bg-white text-black border border-[#333]/30",
+    rounded = "rounded-full",
+    size = "p-4",
+    isDark = false,
+}) => {
+    const scrollToBottom = () => {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "smooth",
+        });
+    };
+
+    return (
+        <button
+            onClick={scrollToBottom}
+            className={`${position} ${bottom} ${right} ${theme} ${rounded} ${size} ${isDark ? "invert" : ""} shadow-lg cursor-pointer`}
+            aria-label="Scroll to bottom"
+        >
+            ↓
+        </button>
+    );
+};

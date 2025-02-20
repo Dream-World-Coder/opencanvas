@@ -42,6 +42,7 @@ import {
     MarkdownPreview,
     LinkInsertButton,
     ImageUploadButton,
+    ScrollToBottomButton,
     formattingButtons,
 } from "./WritingComponents";
 
@@ -945,7 +946,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                     <div
                         className={`w-[100%] h-auto mx-auto prose absolute top-0 left-0
                             rounded text-lg transition-all duration-0
-                            ${isPreview ? "" : "hidden"} ${isDark ? "invert" : ""}`}
+                            ${isPreview ? "" : "hidden"} ${isDark ? "bg-black text-white" : ""}`}
                     >
                         <MarkdownPreview
                             title={title}
@@ -955,6 +956,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                     </div>
                 </div>
             </div>
+            <ScrollToBottomButton isDark={isDark} />
         </div>
     );
 };
