@@ -44,6 +44,7 @@ import {
     ImageUploadButton,
     ScrollToBottomButton,
     formattingButtons,
+    rawText,
 } from "./WritingComponents";
 
 /**
@@ -758,15 +759,17 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                             setIsSerif(!isSerif);
                                         }}
                                     >
-                                        <Type /> Serif
+                                        <Type />
+                                        {isSerif ? "Sans" : "Serif"}
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                         className="cursor-pointer"
                                         onClick={() => {
-                                            setHelpOpen(true);
+                                            setHelpOpen(!helpOpen);
                                         }}
                                     >
-                                        <Info /> Help
+                                        <Info />
+                                        {helpOpen ? "close Help" : "Help"}
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
@@ -908,12 +911,26 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                             {formattingButtons.map(({ format, icon: Icon }) => (
                                 <CardContent
                                     key={format}
-                                    className="flex items-center justify-start gap-3"
+                                    className="flex items-center justify-start gap-3 h-6 text-sm font-sans"
                                 >
                                     <Icon className="size-3 md:size-4" />{" "}
                                     {`${format}, ${format === "dropCap" ? "select the paragraph where you want to implment drop-cap and then click this icon" : `select the text you want to ${format} and click this button`}`}
                                 </CardContent>
                             ))}
+                            <CardContent className="mt-4">
+                                <h1 className="text-3xl font-boska">
+                                    Paste these in writing area for better
+                                    understading.
+                                </h1>
+                                <pre
+                                    className="text-sm font-sans"
+                                    style={{
+                                        whiteSpace: "pre-wrap",
+                                    }}
+                                >
+                                    {rawText}
+                                </pre>
+                            </CardContent>
                         </Card>
                     </div>
 

@@ -809,3 +809,81 @@ export const ScrollToBottomButton = ({
         </button>
     );
 };
+
+export const rawText = `
+<p style="font-size: 18px; line-height: 1.5;">
+  <span style="float: left; font-size: 3em; font-weight: bold; line-height: 1; margin-right: 8px;">M</span>
+  arkdown, often abbreviated as MD, is a lightweight markup language that transforms plain text into richly formatted documents. Developed with readability in mind, its simple syntax allows users to add headers, lists, links, and other elements without heavy reliance on complex code. This ease of use has made Markdown a popular choice for everything from documentation and blogging to collaborative projects on platforms like GitHub. Its enduring appeal lies in the balance it strikes between simplicity and functionality, making it an essential tool in modern digital communication.
+</p>
+
+---
+
+<mark>Here are some examples</mark>
+
+# Gradient descent is a method for unconstrained mathematical optimization.
+## Gradient descent is a method for unconstrained mathematical optimization.
+### Gradient descent is a method for unconstrained mathematical optimization.
+#### Gradient descent is a method for unconstrained mathematical optimization.
+##### Gradient descent is a method for unconstrained mathematical optimization.
+###### Gradient descent is a method for unconstrained mathematical optimization.
+
+**Gradient descent is a method for unconstrained mathematical optimization.**
+
+*Gradient descent is a method for unconstrained mathematical optimization.*
+
+***Gradient descent is a method for unconstrained mathematical optimization.***
+
+Gradient descent is a method for unconstrained mathematical optimization.
+
+---
+<br/>
+
+> Gradient descent is a method for unconstrained mathematical optimization. It is a first-order iterative algorithm for minimizing a differentiable multivariate function.
+
+<br/>
+
+---
+
+- This is a bullet list item
+- Another item
+
+1. This is a numbered list item
+2. Another numbered item
+
+- [ ] This is an unchecked task
+- [x] This is a checked task
+
+---
+<br/>
+
+| Column 1 | Column 2 | Column 3 |
+|----------|----------|----------|
+| Data 1   | Data 2   | Data 3   |
+| Data 4   | Data 5   | Data 6   |
+
+<br/>
+
+\`This is inline code\`
+
+\`\`\`cpp
+#include <iostream>
+
+int main() {
+    std::cout << "Hello, World!" << std::endl;
+    return 0;
+}
+\`\`\`
+
+[This is a link](https://example.com)
+
+![This is an image](https://picsum.photos/150)
+
+---
+# <u>For underlined heading</u>
+
+Wrong:
+<u> ## heading</u>
+
+Correct:
+## <u>heading</u>
+  `;
