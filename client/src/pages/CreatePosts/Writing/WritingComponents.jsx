@@ -559,11 +559,18 @@ export const TableComp = ({
  *
  *
  */
-export const MarkdownPreview = ({ title, content, isVisible = true }) => {
+export const MarkdownPreview = ({
+    title,
+    content,
+    isVisible = true,
+    isDark = false,
+}) => {
     if (!isVisible) return null;
 
     return (
-        <Card className="w-full max-w-4xl mx-auto bg-white shadow-lg">
+        <Card
+            className={`w-full max-w-4xl mx-auto bg-white shadow-lg ${isDark ? "bg-black text-white border-none" : ""}`}
+        >
             <CardContent className="p-6">
                 <div id="export" className="prose prose-slate max-w-none">
                     {/* Title Rendering */}
@@ -621,13 +628,14 @@ export const MarkdownPreview = ({ title, content, isVisible = true }) => {
                                         PreTag="div"
                                         // showLineNumbers
                                         wrapLongLines
+                                        className={isDark ? "invert" : ""}
                                         {...props}
                                     >
                                         {String(children).replace(/\n$/, "")}
                                     </SyntaxHighlighter>
                                 ) : (
                                     <code
-                                        className="bg-gray-200 px-1 py-0.5 rounded text-sm font-mono"
+                                        className={`bg-gray-200 px-1 py-0.5 rounded text-sm font-mono ${isDark ? "text-black" : ""}`}
                                         {...props}
                                     >
                                         {children}
@@ -636,7 +644,12 @@ export const MarkdownPreview = ({ title, content, isVisible = true }) => {
                             },
                             blockquote({ children }) {
                                 return (
-                                    <blockquote className="border-l-4 border-gray-500 pl-4 italic text-gray-600">
+                                    <blockquote
+                                        // className={`border-l-4 pl-4 py-3 my-4 italic rounded-md shadow
+                                        //         ${isDark ? "border-gray-600 bg-gray-800 text-gray-300" : "border-gray-400 bg-gray-100 text-gray-700"}
+                                        //       `}
+                                        className={`border-l-4 pl-4 italic ${isDark ? "border-[#888] text-[#999]" : "border-gray-500 text-gray-600"}`}
+                                    >
                                         {children}
                                     </blockquote>
                                 );
@@ -677,7 +690,7 @@ export const MarkdownPreview = ({ title, content, isVisible = true }) => {
                             a: ({ href, children }) => (
                                 <a
                                     href={href}
-                                    className="text-blue-600 hover:text-blue-800 underline"
+                                    className={`underline ${isDark ? "text-blue-300 hover:text-blue-500" : "text-blue-600 hover:text-blue-800"}`}
                                 >
                                     {children}
                                 </a>
@@ -697,7 +710,9 @@ export const MarkdownPreview = ({ title, content, isVisible = true }) => {
                             ),
                             table: ({ children }) => (
                                 <div className="overflow-x-auto">
-                                    <table className="border border-gray-400 bg-white dark:bg-gray-800 w-full">
+                                    <table
+                                        className={`border border-gray-400 bg-white dark:bg-gray-800 w-full ${isDark ? "invert-[95%] text-black" : ""}`}
+                                    >
                                         {children}
                                     </table>
                                 </div>
@@ -742,6 +757,7 @@ MarkdownPreview.propTypes = {
     title: PropTypes.any,
     content: PropTypes.any,
     isVisible: PropTypes.bool,
+    isDark: PropTypes.bool,
 };
 
 /*

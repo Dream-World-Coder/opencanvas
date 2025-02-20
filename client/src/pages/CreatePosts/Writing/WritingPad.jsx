@@ -50,6 +50,7 @@ import {
  * -------- This file lacks some experimental features, check out this file instead: ./backup/WritingPad-recent.jsx
  * ----------------------------------------------------------------------------------------------------------------
  * supports latex && easy to use + image upload, easily give gap, cuz supports html
+ ## <span style="text-decoration: underline;">Understanding the Concept</span>
  */
 
 const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
@@ -125,7 +126,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             case "underline":
                 newText =
                     content.substring(0, start) +
-                    `<span style="text-decoration: underline;">${selectedText}</span>` +
+                    `<u>${selectedText}</u>` +
                     content.substring(end);
                 break;
 
@@ -586,7 +587,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             {/* Top Bar */}
             <div
                 className={`fixed top-0 left-0 right-0 border-b z-10 transition-all duration-0
-                    ${isDark ? "bg-[#222] border-gray-800" : "bg-white border-gray-100"}`}
+                    ${isDark ? "bg-[#222] border-[#333]" : "bg-white border-gray-100"}`}
             >
                 <div className="max-w-4xl mx-auto">
                     <div className="px-6 py-4 flex justify-between items-center">
@@ -946,12 +947,13 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                     <div
                         className={`w-[100%] h-auto mx-auto prose absolute top-0 left-0
                             rounded text-lg transition-all duration-0
-                            ${isPreview ? "" : "hidden"} ${isDark ? "bg-black text-white" : ""}`}
+                            ${isPreview ? "" : "hidden"}`}
                     >
                         <MarkdownPreview
                             title={title}
                             content={content}
                             isVisible={isPreview}
+                            isDark={isDark}
                         />
                     </div>
                 </div>
