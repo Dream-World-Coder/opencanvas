@@ -266,6 +266,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                 html2canvas: {
                     scale: 2,
                     useCORS: true,
+                    // letterRendering: true,
                 },
                 jsPDF: {
                     unit: "in",
