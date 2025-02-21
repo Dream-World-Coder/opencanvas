@@ -18,6 +18,10 @@ import {
     FileType,
     Type,
     Info,
+    AlignCenter,
+    AlignLeft,
+    NotebookText,
+    ScrollText,
 } from "lucide-react";
 import PropTypes from "prop-types";
 import html2pdf from "html2pdf.js";
@@ -48,10 +52,7 @@ import {
 } from "./WritingComponents";
 
 /**
- * -------- This file lacks some experimental features, check out this file instead: ./backup/WritingPad-recent.jsx
- * ----------------------------------------------------------------------------------------------------------------
  * supports latex && easy to use + image upload, easily give gap, cuz supports html
- ## <span style="text-decoration: underline;">Understanding the Concept</span>
  */
 
 const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
@@ -60,12 +61,16 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
     // const [content, setContent] = useState(rawText);
     // const [wordCount, setWordCount] = useState(0);
     const [isSerif, setIsSerif] = useState(false);
+    const [documentScroll, setDocumentScroll] = useState(false);
+    const [sepia, setSepia] = useState(false);
+    const [lightModeBg, setLightModeBg] = useState("bg-white");
     const [helpOpen, setHelpOpen] = useState(false);
     const [isDark, setIsDark] = useState(false);
     const [isSaved, setIsSaved] = useState(true);
     const [isPreview, setIsPreview] = useState(false);
     const [loading, setLoading] = useState(false);
     const [selectedText, setSelectedText] = useState("");
+    const [textAlignment, setTextAlignment] = useState("left");
     const [showUnsavedAlert, setShowUnsavedAlert] = useState(false);
     const [undoStack, setUndoStack] = useState([]);
     const [redoStack, setRedoStack] = useState([]);
@@ -81,12 +86,16 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
     };
 
     useEffect(() => {
-        if (isDark) {
+        if (isDark && sepia) {
             document.body.style.backgroundColor = "#222";
+        } else if (isDark && !sepia) {
+            document.body.style.backgroundColor = "#222";
+        } else if (!isDark && sepia) {
+            document.body.style.backgroundColor = "#FCF5E6";
         } else {
             document.body.style.backgroundColor = "#fff";
         }
-    }, [isDark]);
+    }, [isDark, sepia]);
 
     /**
      * Handle text formatting
@@ -590,14 +599,22 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
         };
     }, [isSaved, content, title]);
 
+    useEffect(() => {
+        if (sepia) {
+            setLightModeBg("bg-[#FCF5E6]");
+        } else {
+            setLightModeBg("bg-white");
+        }
+    }, [sepia]);
+
     return (
         <div
             className={`min-h-screen transition-all duration-0 relative h-fit ${isSerif ? `font-serif` : ""}
-                ${isDark ? "bg-[#222] text-white" : "bg-white text-black"}`}
+                ${isDark ? "bg-[#222] text-white" : `${lightModeBg} text-black`}`}
         >
             {/* Top Bar */}
             <div
-                className={`fixed top-0 left-0 right-0 border-b z-10 transition-all duration-0
+                className={`fixed top-0 left-0 right-0 border-b z-50 transition-all duration-0
                     ${isDark ? "bg-[#222] border-[#333]" : "bg-white border-gray-100"}`}
             >
                 <div className="max-w-4xl mx-auto">
@@ -762,6 +779,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                     <MoreHorizontal className="size-5" />
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent>
+                                    {/* font */}
                                     <DropdownMenuItem
                                         className="cursor-pointer"
                                         onClick={() => {
@@ -771,6 +789,63 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                         <Type />
                                         {isSerif ? "Sans" : "Serif"}
                                     </DropdownMenuItem>
+
+                                    {/* theme */}
+                                    <DropdownMenuItem
+                                        className="cursor-pointer"
+                                        onClick={() => {
+                                            setSepia(!sepia);
+                                        }}
+                                    >
+                                        <div
+                                            className={`rounded-full size-4 border border-[#222] ${sepia ? "bg-white" : "bg-[#FCF5E6]"}`}
+                                        ></div>
+                                        {sepia ? "White" : "Sepia"}
+                                    </DropdownMenuItem>
+
+                                    {/* align */}
+                                    <DropdownMenuItem
+                                        className="cursor-pointer"
+                                        onClick={() => {
+                                            {
+                                                textAlignment === "center"
+                                                    ? setTextAlignment("left")
+                                                    : setTextAlignment(
+                                                          "center",
+                                                      );
+                                            }
+                                        }}
+                                    >
+                                        {textAlignment === "center" ? (
+                                            <>
+                                                <AlignLeft /> Left
+                                            </>
+                                        ) : (
+                                            <>
+                                                <AlignCenter /> Center
+                                            </>
+                                        )}
+                                    </DropdownMenuItem>
+
+                                    {/* page distinct */}
+                                    <DropdownMenuItem
+                                        onClick={() => {
+                                            setDocumentScroll(!documentScroll);
+                                        }}
+                                        className="cursor-pointer"
+                                    >
+                                        {documentScroll ? (
+                                            <>
+                                                <NotebookText /> Pages
+                                            </>
+                                        ) : (
+                                            <>
+                                                <ScrollText /> Scroll
+                                            </>
+                                        )}
+                                    </DropdownMenuItem>
+
+                                    {/* help */}
                                     <DropdownMenuItem
                                         className="cursor-pointer"
                                         onClick={() => {
@@ -906,7 +981,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                 <div className={`max-w-4xl mx-auto relative h-fit`}>
                     {/* help div */}
                     <div
-                        className={`w-[100%] h-auto mx-auto  relative mb-4
+                        className={`w-[100%] h-auto mx-auto  relative mb-4 z-30
                             rounded text-lg transition-all duration-0 max-w-4xl
                             ${helpOpen ? "" : "hidden"} ${isDark ? "invert" : ""}`}
                     >
@@ -968,7 +1043,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                         }}
                         placeholder="Title"
                         className={`w-full h-auto text-4xl font-bold mb-8 focus:outline-none transition-all duration-0
-                            ${isDark ? "bg-[#222]" : "bg-white"}`}
+                            ${isDark ? "bg-[#222]" : lightModeBg}`}
                     />
 
                     {/* Content Textarea */}
@@ -978,8 +1053,13 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                         onChange={handleContentChange}
                         placeholder="Fill your canvas..."
                         className={`w-full min-h-screen h-auto resize-none focus:outline-none text-lg text-left transition-all duration-0
-                            ${isDark ? "bg-[#222]" : "bg-white"}
-                            ${isPreview ? "opacity-0 max-h-screen" : "opacity-100 max-h-auto"}`}
+                            ${isDark ? "bg-[#222]" : lightModeBg}
+                            ${isPreview ? "opacity-0 max-h-screen" : "opacity-100 max-h-auto"}
+                            ${
+                                textAlignment === "center"
+                                    ? "text-center"
+                                    : "text-left"
+                            }`}
                     />
 
                     {/* preview div */}
@@ -993,6 +1073,8 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                             content={content}
                             isVisible={isPreview}
                             isDark={isDark}
+                            textAlignment={textAlignment}
+                            lightModeBg={lightModeBg}
                         />
                     </div>
                 </div>

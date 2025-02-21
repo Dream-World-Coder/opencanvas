@@ -31,10 +31,7 @@ html in export formats
 -- dropdowns for heading and list ~ NO
 -- [x] text alignment [center/left]
 -- formatting tools appear on text select ~ NO
--- [x] pages showing for clear distinction -- needed in only pdf export {use Modes}
-    add in ••• dropdown
-
-    ••• -> theme color[yellow/white], align center, page distinct
+-- [x] pages showing Mode for clear distinction of pages
 
 in phone remove:
 heading, quote, inlineCode, list

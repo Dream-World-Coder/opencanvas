@@ -568,13 +568,16 @@ export const MarkdownPreview = ({
     content,
     isVisible = true,
     isDark = false,
+    textAlignment = "left",
+    lightModeBg = "bg-white",
 }) => {
     if (!isVisible) return null;
 
     return (
         <Card
             className={`w-full max-w-4xl mx-auto bg-white border-none shadow-none
-                ${isDark ? "bg-[#222] text-white border-none" : ""}`}
+                ${isDark ? "bg-[#222] text-white border-none" : lightModeBg}
+                ${textAlignment === "center" ? "text-center" : "text-left"}`}
         >
             <CardContent className="p-0">
                 <div id="export" className="prose prose-slate max-w-none">
@@ -763,6 +766,8 @@ MarkdownPreview.propTypes = {
     content: PropTypes.any,
     isVisible: PropTypes.bool,
     isDark: PropTypes.bool,
+    textAlignment: PropTypes.string,
+    lightModeBg: PropTypes.string,
 };
 
 /*
