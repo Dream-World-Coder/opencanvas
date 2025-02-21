@@ -573,9 +573,10 @@ export const MarkdownPreview = ({
 
     return (
         <Card
-            className={`w-full max-w-4xl mx-auto bg-white shadow-lg ${isDark ? "bg-black text-white border-none" : ""}`}
+            className={`w-full max-w-4xl mx-auto bg-white border-none shadow-none
+                ${isDark ? "bg-[#222] text-white border-none" : ""}`}
         >
-            <CardContent className="p-6">
+            <CardContent className="p-0">
                 <div id="export" className="prose prose-slate max-w-none">
                     {/* Title Rendering */}
                     {title && (

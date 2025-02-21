@@ -24,14 +24,20 @@ html in export formats
 -- [x] dropdown on export button
 
 
--- [x]remove unnecessary
--- preview div fix
--- font & theme
--- remove gap
--- dropdowns for heading and list
--- text alignment if any
--- formatting tools appear on text select
--- page showing -- needed in only pdf export {use Modes}
+-- [x] remove unnecessary
+-- [x] preview div fix
+-- [x] theme
+-- [x] remove gap
+-- dropdowns for heading and list ~ NO
+-- [x] text alignment [center/left]
+-- formatting tools appear on text select ~ NO
+-- [x] pages showing for clear distinction -- needed in only pdf export {use Modes}
+    add in ••• dropdown
+
+    ••• -> theme color[yellow/white], align center, page distinct
 
 in phone remove:
 heading, quote, inlineCode, list
+
+-- copy & save button not working in phone
+-- when export warning: file cannot be downloaded securely in phones, why
