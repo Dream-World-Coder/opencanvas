@@ -1,12 +1,12 @@
-change ser urls from opencanvas.blog -> myopencanvas.in
-Theme options: yellow, white, black
+[x] change seo urls from opencanvas.blog -> myopencanvas.in
+[x] Theme options: yellow, white, black
 optimisations to load faster
 better pdf quality and page breaks
 [x] Dropcaps and [less imp]:image direction & orientation
 save in folder/collections so that it can substitute notes app
 [x] Mobile Responsive
 Keyboard shortcuts for differnt formats,
-beginner totorial
+beginner totorial vid
 Electron app
 
 :page breaks will be easy: find the page length of html2pdf module and add
