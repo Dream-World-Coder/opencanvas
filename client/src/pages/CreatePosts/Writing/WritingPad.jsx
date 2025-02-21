@@ -57,7 +57,8 @@ import {
 const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
-    const [wordCount, setWordCount] = useState(0);
+    // const [content, setContent] = useState(rawText);
+    // const [wordCount, setWordCount] = useState(0);
     const [isSerif, setIsSerif] = useState(false);
     const [helpOpen, setHelpOpen] = useState(false);
     const [isDark, setIsDark] = useState(false);
@@ -70,6 +71,14 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
     const [redoStack, setRedoStack] = useState([]);
     const [syncStatus, setSyncStatus] = useState("synced"); // 'synced', 'saving', 'offline'
     const [lastSynced, setLastSynced] = useState(null);
+
+    const [copied, setCopied] = useState(false);
+    const handleCopy = () => {
+        navigator.clipboard.writeText(rawText).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+        });
+    };
 
     useEffect(() => {
         if (isDark) {
@@ -221,7 +230,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
         const newContent = e.target.value;
         addToUndoStack(content);
         setContent(newContent);
-        setWordCount(newContent.trim().split(/\s+/).filter(Boolean).length);
+        // setWordCount(newContent.trim().split(/\s+/).filter(Boolean).length);
         setIsSaved(false);
         e.target.style.height = e.target.scrollHeight + "px"; // Set new height based on content
     };
@@ -522,9 +531,9 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                         JSON.parse(savedPost);
                     setTitle(savedTitle);
                     setContent(savedContent);
-                    setWordCount(
-                        savedContent.trim().split(/\s+/).filter(Boolean).length,
-                    );
+                    // setWordCount(
+                    //     savedContent.trim().split(/\s+/).filter(Boolean).length,
+                    // );
                 }
 
                 // Wait for React state updates to complete
@@ -617,27 +626,27 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
 
                         {/* options */}
                         <div className="flex items-center space-x-3 md:space-x-4">
-                            {/* word count */}
-                            <span className="hidden md:inline text-sm text-gray-400">
+                            {/* word count : not needed */}
+                            {/* <span className="hidden md:inline text-sm text-gray-400">
                                 {wordCount} words
-                            </span>
+                            </span> */}
 
                             {/* save btn */}
                             <button
-                                className={`flex items-center space-x-1 px-1 md:px-3 py-1 rounded-full text-sm ${
+                                className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm ${
                                     isSaved
                                         ? "text-gray-400"
                                         : "bg-[#222] text-white"
                                 }`}
                                 onClick={handleSave}
                             >
-                                <Save className="size-3 md:size-4" />
+                                <Save className="size-4" />
                                 <span>{isSaved ? "Saved" : "Save"}</span>
                             </button>
 
                             {/* preview */}
                             <button
-                                className={`flex items-center space-x-1 px-1 md:px-3 py-1 rounded-full text-sm border
+                                className={`flex items-center space-x-1 px-2 md:px-3 py-1 rounded-full text-sm border
                                     ${isDark ? "border-gray-700" : "border-gray-300"}
                                     ${
                                         isPreview
@@ -655,7 +664,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                     </>
                                 ) : (
                                     <>
-                                        <Edit className="size-3 md:size-4" />
+                                        <Edit className="size-4" />
                                         <span>Editing</span>
                                     </>
                                 )}
@@ -693,7 +702,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                             {/* export dropdown */}
                             <DropdownMenu>
                                 <DropdownMenuTrigger>
-                                    <Download className="size-4 md:size-5" />
+                                    <Download className="size-5" />
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent>
                                     <DropdownMenuLabel>
@@ -705,8 +714,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                             onClick={handlePdfExport}
                                             className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
                                         >
-                                            <FileText className="size-4 md:size-5" />{" "}
-                                            pdf
+                                            <FileText className="size-5" /> pdf
                                         </button>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem>
@@ -742,16 +750,16 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                 className="hover:opacity-70 transition-opacity"
                             >
                                 {isDark ? (
-                                    <Sun className="size-4 md:size-5" />
+                                    <Sun className="size-5" />
                                 ) : (
-                                    <Moon className="size-4 md:size-5" />
+                                    <Moon className="size-5" />
                                 )}
                             </button>
 
                             {/* addtional more button */}
                             <DropdownMenu>
                                 <DropdownMenuTrigger>
-                                    <MoreHorizontal className="size-3 md:size-5" />
+                                    <MoreHorizontal className="size-5" />
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent>
                                     <DropdownMenuItem
@@ -779,16 +787,21 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
 
                     {/* Formatting Tools */}
                     <div
-                        className={`mb-2 flex items-center justify-between rounded-md ${isDark ? "bg-[#333]" : "bg-gray-50"} transition-all duration-0`}
+                        className={`mb-2 mx-4 md:mx-0 flex items-center justify-between rounded-md transition-all duration-0
+                            ${isDark ? "bg-[#333]" : "bg-gray-50"}`}
                     >
-                        <div className="flex items-center space-x-1 md:space-x-4">
+                        <div className="flex items-center md:space-x-2">
                             {formattingButtons.map(({ format, icon: Icon }) => (
                                 <button
                                     key={format}
                                     onClick={() => handleFormat(format)}
-                                    className={`p-1 md:p-2 ${isDark ? "hover:bg-gray-500" : "hover:bg-gray-200"} rounded-lg transition-all duration-0`}
+                                    className={`px-[6px] md:px-2 py-3 md:rounded-lg transition-all duration-0
+                                        border-r md:border-none
+                                        ${isDark ? "hover:bg-gray-500 border-[#222]" : "hover:bg-gray-200 border-gray-200"}
+                                        ${["heading", "quote", "list", "inlineCode", "dropCap"].includes(format) ? "hidden md:block" : ""}
+                                        `}
                                 >
-                                    <Icon className="size-3 md:size-4" />
+                                    <Icon className="size-4" />
                                 </button>
                             ))}
                             <LinkInsertButton
@@ -802,6 +815,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                         content.substring(start);
                                     setContent(newContent);
                                 }}
+                                sizing="px-[6px] md:px-2 py-3"
                             />
                             <ImageUploadButton
                                 onImageInsert={(markdownImageText) => {
@@ -814,32 +828,33 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                         content.substring(start);
                                     setContent(newContent);
                                 }}
+                                sizing="px-[6px] md:px-2 py-3"
                             />
                         </div>
 
                         {/* undo/redo */}
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-1 md:space-x-2">
                             <button
                                 onClick={handleUndo}
                                 disabled={undoStack.length === 0}
-                                className={`p-2 rounded-lg transition-all duration-0 ${
+                                className={`px-[6px] md:px-2 py-3 rounded-lg transition-all duration-0 ${
                                     undoStack.length === 0
                                         ? "opacity-50"
                                         : `${isDark ? "hover:bg-gray-700" : "hover:bg-gray-200"}`
                                 }`}
                             >
-                                <Undo className="size-3 md:size-4" />
+                                <Undo className="size-4" />
                             </button>
                             <button
                                 onClick={handleRedo}
                                 disabled={redoStack.length === 0}
-                                className={`p-2 rounded-lg transition-all duration-0 ${
+                                className={`p-1 md:p-2 rounded-lg transition-all duration-0 ${
                                     redoStack.length === 0
                                         ? "opacity-50"
                                         : `${isDark ? "hover:bg-gray-700" : "hover:bg-gray-200"}`
                                 }`}
                             >
-                                <Redo className="size-3 md:size-4" />
+                                <Redo className="size-4" />
                             </button>
                         </div>
                     </div>
@@ -912,17 +927,23 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                             {formattingButtons.map(({ format, icon: Icon }) => (
                                 <CardContent
                                     key={format}
-                                    className="flex items-center justify-start gap-3 h-6 text-sm font-sans"
+                                    className="flex items-center justify-start gap-3 h-fit md:h-6 text-sm font-sans"
                                 >
-                                    <Icon className="size-3 md:size-4" />{" "}
+                                    <Icon className="size-5 md:size-4" />{" "}
                                     {`${format}, ${format === "dropCap" ? "select the paragraph where you want to implment drop-cap and then click this icon" : `select the text you want to ${format} and click this button`}`}
                                 </CardContent>
                             ))}
                             <CardContent className="mt-4">
-                                <h1 className="text-3xl font-boska">
+                                <h1 className="text-3xl font-serif font-black">
                                     Paste these in writing area for better
                                     understading.
                                 </h1>
+                                <button
+                                    onClick={handleCopy}
+                                    className="bg-gray-200 hover:bg-gray-400 rounded px-2 py-1"
+                                >
+                                    {copied ? "Copied!" : "Copy"}
+                                </button>
                                 <pre
                                     className="text-sm font-sans"
                                     style={{

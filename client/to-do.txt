@@ -4,7 +4,7 @@ optimisations to load faster
 better pdf quality and page breaks
 [x] Dropcaps and [less imp]:image direction & orientation
 save in folder/collections so that it can substitute notes app
-Mobile Responsive
+[x] Mobile Responsive
 Keyboard shortcuts for differnt formats,
 beginner totorial
 Electron app
@@ -22,3 +22,16 @@ html in export formats
 -- mermaid
 -- [x] scroll fix
 -- [x] dropdown on export button
+
+
+-- [x]remove unnecessary
+-- preview div fix
+-- font & theme
+-- remove gap
+-- dropdowns for heading and list
+-- text alignment if any
+-- formatting tools appear on text select
+-- page showing -- needed in only pdf export {use Modes}
+
+in phone remove:
+heading, quote, inlineCode, list

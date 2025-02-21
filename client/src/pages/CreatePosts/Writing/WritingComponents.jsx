@@ -87,7 +87,7 @@ export const formattingButtons = [
  *
  *
  */
-export const ImageUploadButton = ({ onImageInsert }) => {
+export const ImageUploadButton = ({ onImageInsert, sizing }) => {
     const fileInputRef = useRef(null);
     const [preview, setPreview] = useState(null);
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -155,13 +155,14 @@ export const ImageUploadButton = ({ onImageInsert }) => {
     return (
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="p-1 md:p-2 hover:bg-gray-200 rounded-lg transition-all duration-0"
+                <button
+                    className={
+                        sizing +
+                        "hover:bg-gray-200 md:rounded-lg transition-all duration-0"
+                    }
                 >
-                    <Image className="size-3 md:size-4" />
-                </Button>
+                    <Image className="size-4" />
+                </button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
@@ -219,6 +220,7 @@ export const ImageUploadButton = ({ onImageInsert }) => {
 
 ImageUploadButton.propTypes = {
     onImageInsert: PropTypes.func,
+    sizing: PropTypes.string,
 };
 
 /**
@@ -227,7 +229,7 @@ ImageUploadButton.propTypes = {
  *
  *
  */
-export const LinkInsertButton = ({ onLinkInsert }) => {
+export const LinkInsertButton = ({ onLinkInsert, sizing }) => {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [linkText, setLinkText] = useState("");
     const [linkUrl, setLinkUrl] = useState("");
@@ -261,13 +263,14 @@ export const LinkInsertButton = ({ onLinkInsert }) => {
     return (
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="p-1 md:p-2 hover:bg-gray-200 rounded-lg transition-all duration-0"
+                <button
+                    className={
+                        sizing +
+                        "hover:bg-gray-200 md:rounded-lg transition-all duration-0"
+                    }
                 >
-                    <Link className="size-3 md:size-4" />
-                </Button>
+                    <Link className="size-4" />
+                </button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
@@ -318,6 +321,7 @@ export const LinkInsertButton = ({ onLinkInsert }) => {
 };
 LinkInsertButton.propTypes = {
     onLinkInsert: PropTypes.func,
+    sizing: PropTypes.string,
 };
 /**
  *
@@ -786,7 +790,7 @@ MarkdownPreview.propTypes = {
 export const ScrollToBottomButton = ({
     position = "fixed",
     bottom = "bottom-8",
-    right = "right-32",
+    right = "right-4 md:right-8 lg:right-32",
     theme = "bg-white text-black border border-[#333]/30",
     rounded = "rounded-full",
     size = "p-4",
@@ -802,7 +806,7 @@ export const ScrollToBottomButton = ({
     return (
         <button
             onClick={scrollToBottom}
-            className={`${position} ${bottom} ${right} ${theme} ${rounded} ${size} ${isDark ? "invert" : ""} shadow-lg cursor-pointer`}
+            className={`${position} ${bottom} ${right} ${theme} ${rounded} ${size} ${isDark ? "invert" : ""} shadow-lg cursor-pointer z-20`}
             aria-label="Scroll to bottom"
         >
             ↓
