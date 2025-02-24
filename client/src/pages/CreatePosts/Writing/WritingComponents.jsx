@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState, useMemo, useEffect } from "react";
 import {
     Image,
     Bold,
@@ -21,6 +21,7 @@ import {
     Search,
     FileJson,
     LetterText,
+    X,
 } from "lucide-react";
 import PropTypes from "prop-types";
 // ***************************************************
@@ -44,6 +45,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
 // ***************************************************
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -329,6 +333,599 @@ LinkInsertButton.propTypes = {
  *
  *
  */
+// need to implement unique classNames for every image
+// imaplement the changes directly in the image, also add zoom in/out features,
+// no need to preview on dialog
+
+// Custom hook to handle image popup functionality
+export const useImagePopup = () => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [currentImage, setCurrentImage] = useState(null);
+    const [imageSettings, setImageSettings] = useState({
+        marginTop: 0,
+        marginBottom: 0,
+        position: "center", // 'left', 'center', 'right'
+        maxHeight: 360,
+        maxWidth: 500,
+    });
+
+    // Update a specific setting
+    const updateSetting = (key, value) => {
+        setImageSettings((prev) => ({ ...prev, [key]: value }));
+    };
+
+    useEffect(() => {
+        // Function to handle click on markdown image containers
+        const handleImageClick = (e) => {
+            const container = e.target.closest(".markdown-image-container-div");
+            if (container) {
+                const image = container.querySelector("img");
+                if (image) {
+                    setCurrentImage({
+                        src: image.src,
+                        alt: image.alt,
+                    });
+                    setIsOpen(true);
+                }
+            }
+        };
+
+        // Add event listener
+        document.addEventListener("click", handleImageClick);
+
+        // Cleanup
+        return () => {
+            document.removeEventListener("click", handleImageClick);
+        };
+    }, []);
+
+    return {
+        isOpen,
+        setIsOpen,
+        currentImage,
+        imageSettings,
+        updateSetting,
+    };
+};
+
+// Image Popup Component
+export const ImagePopup = ({
+    setImgMaxWidth,
+    setImgMaxHeight,
+    setImgAlignment,
+    setMTop,
+    setMBottom,
+}) => {
+    const { isOpen, setIsOpen, currentImage, imageSettings, updateSetting } =
+        useImagePopup();
+
+    function updateImageProperties() {
+        setImgMaxWidth(`${imageSettings.maxWidth}px`);
+        setImgMaxHeight(`${imageSettings.maxHeight}px`);
+        setImgAlignment(imageSettings.position);
+        setMTop(`${imageSettings.marginTop}px`);
+        setMBottom(`${imageSettings.marginBottom}px`);
+        setIsOpen(false);
+    }
+
+    if (!currentImage) return null;
+
+    // Get position class based on setting
+    const getPositionClass = () => {
+        switch (imageSettings.position) {
+            case "left":
+                return "justify-start";
+            case "right":
+                return "justify-end";
+            default:
+                return "justify-center";
+        }
+    };
+
+    return (
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            {/* <DialogTitle>Image Settings</DialogTitle> */}
+            <DialogContent className="sm:max-w-2xl">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-semibold">Image Settings</h2>
+                    {/* close is already present in dialog */}
+                    {/* <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setIsOpen(false)}
+                    >
+                        <X className="h-4 w-4" />
+                    </Button> */}
+                </div>
+
+                <div className="space-y-6">
+                    {/* Image Preview */}
+                    <div
+                        className={`flex items-center ${getPositionClass()} overflow-hidden`}
+                        style={{
+                            marginTop: `${imageSettings.marginTop}px`,
+                            marginBottom: `${imageSettings.marginBottom}px`,
+                        }}
+                    >
+                        <img
+                            src={currentImage.src}
+                            alt={currentImage.alt || "Preview"}
+                            style={{
+                                maxHeight: `${imageSettings.maxHeight}px`,
+                                maxWidth: `${imageSettings.maxWidth}px`,
+                            }}
+                            className="object-cover"
+                        />
+                    </div>
+
+                    {/* Settings Controls */}
+                    <div className="grid grid-cols-1 gap-6">
+                        {/* Margin Top */}
+                        <div className="space-y-2">
+                            <Label>
+                                Margin Top: {imageSettings.marginTop}px
+                            </Label>
+                            <Slider
+                                value={[imageSettings.marginTop]}
+                                min={0}
+                                max={100}
+                                step={1}
+                                onValueChange={(value) =>
+                                    updateSetting("marginTop", value[0])
+                                }
+                            />
+                        </div>
+
+                        {/* Margin Bottom */}
+                        <div className="space-y-2">
+                            <Label>
+                                Margin Bottom: {imageSettings.marginBottom}px
+                            </Label>
+                            <Slider
+                                value={[imageSettings.marginBottom]}
+                                min={0}
+                                max={100}
+                                step={1}
+                                onValueChange={(value) =>
+                                    updateSetting("marginBottom", value[0])
+                                }
+                            />
+                        </div>
+
+                        {/* Position */}
+                        <div className="space-y-2">
+                            <Label>Position</Label>
+                            <RadioGroup
+                                value={imageSettings.position}
+                                onValueChange={(value) =>
+                                    updateSetting("position", value)
+                                }
+                                className="flex space-x-4"
+                            >
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="left" id="left" />
+                                    <Label htmlFor="left">Left</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem
+                                        value="center"
+                                        id="center"
+                                    />
+                                    <Label htmlFor="center">Center</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="right" id="right" />
+                                    <Label htmlFor="right">Right</Label>
+                                </div>
+                            </RadioGroup>
+                        </div>
+
+                        {/* Max Height */}
+                        <div className="space-y-2">
+                            <Label>
+                                Max Height: {imageSettings.maxHeight}px
+                            </Label>
+                            <Slider
+                                value={[imageSettings.maxHeight]}
+                                min={100}
+                                max={800}
+                                step={10}
+                                onValueChange={(value) =>
+                                    updateSetting("maxHeight", value[0])
+                                }
+                            />
+                        </div>
+
+                        {/* Max Width */}
+                        <div className="space-y-2">
+                            <Label>Max Width: {imageSettings.maxWidth}px</Label>
+                            <Slider
+                                value={[imageSettings.maxWidth]}
+                                min={100}
+                                max={1000}
+                                step={10}
+                                onValueChange={(value) =>
+                                    updateSetting("maxWidth", value[0])
+                                }
+                            />
+                        </div>
+                    </div>
+
+                    {/* Apply Button */}
+                    <div className="flex justify-end">
+                        <Button onClick={updateImageProperties}>
+                            Apply Changes
+                        </Button>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
+};
+
+/**
+ *
+ *
+ *
+ *
+ *
+ *
+ */
+export const MarkdownPreview = ({
+    title,
+    content,
+    isVisible = true,
+    isDark = false,
+    textAlignment = "left",
+    lightModeBg = "bg-white",
+}) => {
+    const [imgMaxWidth, setImgMaxWidth] = useState("500px");
+    const [imgMaxHeight, setImgMaxHeight] = useState("360px");
+    const [imgAlignment, setImgAlignment] = useState("justify-center");
+    const [mTop, setMTop] = useState("0px");
+    const [mBottom, setMBottom] = useState("0px");
+
+    if (!isVisible) return null;
+
+    return (
+        <Card
+            className={`w-full max-w-4xl mx-auto bg-white border-none shadow-none
+                ${isDark ? "bg-[#222] text-white border-none" : lightModeBg}
+                ${textAlignment === "center" ? "text-center" : "text-left"}`}
+        >
+            <CardContent className="p-0">
+                <div id="export" className="prose prose-slate max-w-none">
+                    {/* Title Rendering */}
+                    {title && (
+                        <div
+                            className={`mb-6 border-b pb-4 text-4xl font-bold ${isDark ? "border-[#444]" : "border-gray-300"}`}
+                        >
+                            {title}
+                        </div>
+                    )}
+
+                    {/* Markdown Content */}
+                    <ReactMarkdown
+                        remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
+                        rehypePlugins={[rehypeRaw, rehypeKatex]}
+                        components={{
+                            img(props) {
+                                const { node, ...rest } = props;
+                                return (
+                                    <div
+                                        className={`markdown-image-container-div relative cursor-pointer z-15 overflow-hidden
+                                        flex items-center`}
+                                        style={{
+                                            justifyContent: imgAlignment,
+                                            marginTop: mTop,
+                                            marginBottom: mBottom,
+                                        }}
+                                    >
+                                        <img
+                                            className={`relative object-cover`}
+                                            style={{
+                                                maxHeight: imgMaxHeight,
+                                                maxWidth: imgMaxWidth,
+                                            }}
+                                            {...rest}
+                                        />
+                                    </div>
+                                );
+                            },
+                            hr(props) {
+                                return (
+                                    <hr
+                                        className={`my-6 border-t ${isDark ? "border-[#333]" : "border-gray-200"}`}
+                                        {...props}
+                                    />
+                                );
+                            },
+                            code({
+                                node,
+                                inline,
+                                className,
+                                children,
+                                ...props
+                            }) {
+                                const match = /language-(\w+)/.exec(
+                                    className || "",
+                                );
+                                return !inline && match ? (
+                                    <SyntaxHighlighter
+                                        style={prism}
+                                        language={match[1]}
+                                        PreTag="div"
+                                        // showLineNumbers
+                                        wrapLongLines
+                                        className={isDark ? "invert" : ""}
+                                        {...props}
+                                    >
+                                        {String(children).replace(/\n$/, "")}
+                                    </SyntaxHighlighter>
+                                ) : (
+                                    <code
+                                        className={`bg-gray-200 px-1 py-0.5 rounded text-sm font-mono ${isDark ? "text-black" : ""}`}
+                                        {...props}
+                                    >
+                                        {children}
+                                    </code>
+                                );
+                            },
+                            blockquote({ children }) {
+                                return (
+                                    <blockquote
+                                        // className={`border-l-4 pl-4 py-3 my-4 italic rounded-md shadow
+                                        //         ${isDark ? "border-gray-600 bg-gray-800 text-gray-300" : "border-gray-400 bg-gray-100 text-gray-700"}
+                                        //       `}
+                                        className={`border-l-4 pl-4 italic ${isDark ? "border-[#888] text-[#999]" : "border-gray-500 text-gray-600"}`}
+                                    >
+                                        {children}
+                                    </blockquote>
+                                );
+                            },
+                            h1: ({ children }) => (
+                                <h1 className="text-4xl font-bold mt-6">
+                                    {children}
+                                </h1>
+                            ),
+                            h2: ({ children }) => (
+                                <h2 className="text-3xl font-semibold mt-5">
+                                    {children}
+                                </h2>
+                            ),
+                            h3: ({ children }) => (
+                                <h3 className="text-2xl font-semibold mt-4">
+                                    {children}
+                                </h3>
+                            ),
+                            h4: ({ children }) => (
+                                <h4 className="text-xl font-semibold mt-3">
+                                    {children}
+                                </h4>
+                            ),
+                            h5: ({ children }) => (
+                                <h5 className="text-lg font-semibold mt-2">
+                                    {children}
+                                </h5>
+                            ),
+                            h6: ({ children }) => (
+                                <h6 className="text-base font-semibold mt-2">
+                                    {children}
+                                </h6>
+                            ),
+                            p: ({ children }) => (
+                                <p className="text-base my-2">{children}</p>
+                            ),
+                            a: ({ href, children }) => (
+                                <a
+                                    href={href}
+                                    className={`underline ${isDark ? "text-blue-300 hover:text-blue-500" : "text-blue-600 hover:text-blue-800"}`}
+                                >
+                                    {children}
+                                </a>
+                            ),
+                            ul: ({ children }) => (
+                                <ul className="list-disc list-inside my-2">
+                                    {children}
+                                </ul>
+                            ),
+                            ol: ({ children }) => (
+                                <ol className="list-decimal list-inside my-2">
+                                    {children}
+                                </ol>
+                            ),
+                            li: ({ children }) => (
+                                <li className="ml-5">{children}</li>
+                            ),
+                            table: ({ children }) => (
+                                <div className="overflow-x-auto">
+                                    <table
+                                        className={`border border-gray-400 bg-white dark:bg-gray-800 w-full ${isDark ? "invert-[95%] text-black" : ""}`}
+                                    >
+                                        {children}
+                                    </table>
+                                </div>
+                            ),
+                            thead: ({ children }) => (
+                                <thead className="bg-gray-200 dark:bg-gray-700">
+                                    {children}
+                                </thead>
+                            ),
+                            tbody: ({ children }) => <tbody>{children}</tbody>,
+                            tr: ({ children }) => (
+                                <tr className="border border-gray-300 dark:border-gray-600">
+                                    {children}
+                                </tr>
+                            ),
+                            th: ({ children }) => (
+                                <th className="border border-gray-400 px-4 py-2 bg-gray-100 dark:bg-gray-600">
+                                    {children}
+                                </th>
+                            ),
+                            td: ({ children }) => (
+                                <td className="border border-gray-300 px-4 py-2">
+                                    {children}
+                                </td>
+                            ),
+                        }}
+                        className="prose-base prose-p:my-4 prose-headings:font-semibold prose-a:text-blue-600
+                        hover:prose-a:text-blue-800 prose-blockquote:border-l-4 prose-blockquote:pl-4
+                        prose-blockquote:italic prose-blockquote:text-gray-600 prose-code:bg-gray-100
+                        prose-code:px-1 prose-code:py-0.5 prose-code:rounded"
+                    >
+                        {content}
+                    </ReactMarkdown>
+                </div>
+            </CardContent>
+            <CardFooter className="bg-transparent h-[15vh]" />
+
+            <ImagePopup
+                setImgMaxWidth={setImgMaxWidth}
+                setImgMaxHeight={setImgMaxHeight}
+                setImgAlignment={setImgAlignment}
+                setMTop={setMTop}
+                setMBottom={setMBottom}
+            />
+        </Card>
+    );
+};
+
+MarkdownPreview.propTypes = {
+    title: PropTypes.any,
+    content: PropTypes.any,
+    isVisible: PropTypes.bool,
+    isDark: PropTypes.bool,
+    textAlignment: PropTypes.string,
+    lightModeBg: PropTypes.string,
+};
+
+/*
+ *
+ *
+ *
+ *
+ */
+/*
+// Bottom Bar
+<div className="fixed bottom-0 left-0 right-0 bg-white/10 backdrop-blur-sm border-t border-gray-100">
+    <div className="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div className="text-sm text-gray-400">
+            Last edited {new Date().toLocaleTimeString()}
+        </div>
+        <button
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            className="text-sm text-gray-600 hover:text-black transition-all duration-0"
+        >
+            {isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+        </button>
+    </div>
+</div>
+*/
+
+export const ScrollToBottomButton = ({
+    position = "fixed",
+    bottom = "bottom-8",
+    right = "right-4 md:right-8 lg:right-32",
+    theme = "bg-white text-black border border-[#333]/30",
+    rounded = "rounded-full",
+    size = "p-4",
+    isDark = false,
+}) => {
+    const scrollToBottom = () => {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "smooth",
+        });
+    };
+
+    return (
+        <button
+            onClick={scrollToBottom}
+            className={`${position} ${bottom} ${right} ${theme} ${rounded} ${size} ${isDark ? "invert" : ""} shadow-lg cursor-pointer z-20`}
+            aria-label="Scroll to bottom"
+        >
+            ↓
+        </button>
+    );
+};
+
+export const rawText = `
+<p style="font-size: 18px; line-height: 1.5;">
+  <span style="float: left; font-size: 3em; font-weight: bold; line-height: 1; margin-right: 8px;">M</span>
+  arkdown, often abbreviated as MD, is a lightweight markup language that transforms plain text into richly formatted documents. Developed with readability in mind, its simple syntax allows users to add headers, lists, links, and other elements without heavy reliance on complex code. This ease of use has made Markdown a popular choice for everything from documentation and blogging to collaborative projects on platforms like GitHub. Its enduring appeal lies in the balance it strikes between simplicity and functionality, making it an essential tool in modern digital communication.
+</p>
+
+---
+
+<mark>Here are some examples</mark>
+
+# Gradient descent is a method for unconstrained mathematical optimization.
+## Gradient descent is a method for unconstrained mathematical optimization.
+### Gradient descent is a method for unconstrained mathematical optimization.
+#### Gradient descent is a method for unconstrained mathematical optimization.
+##### Gradient descent is a method for unconstrained mathematical optimization.
+###### Gradient descent is a method for unconstrained mathematical optimization.
+
+**Gradient descent is a method for unconstrained mathematical optimization.**
+
+*Gradient descent is a method for unconstrained mathematical optimization.*
+
+***Gradient descent is a method for unconstrained mathematical optimization.***
+
+Gradient descent is a method for unconstrained mathematical optimization.
+
+---
+<br/>
+
+> Gradient descent is a method for unconstrained mathematical optimization. It is a first-order iterative algorithm for minimizing a differentiable multivariate function.
+
+<br/>
+
+---
+
+- This is a bullet list item
+- Another item
+
+1. This is a numbered list item
+2. Another numbered item
+
+- [ ] This is an unchecked task
+- [x] This is a checked task
+
+---
+<br/>
+
+| Column 1 | Column 2 | Column 3 |
+|----------|----------|----------|
+| Data 1   | Data 2   | Data 3   |
+| Data 4   | Data 5   | Data 6   |
+
+<br/>
+
+\`This is inline code\`
+
+\`\`\`cpp
+#include <iostream>
+
+int main() {
+    std::cout << "Hello, World!" << std::endl;
+    return 0;
+}
+\`\`\`
+
+[This is a link](https://example.com)
+
+![This is an image](https://picsum.photos/150)
+
+---
+# <u>For underlined heading</u>
+
+Wrong:
+<u> ## heading</u>
+
+Correct:
+## <u>heading</u>
+  `;
 
 export const TableComp = ({
     data,
@@ -554,346 +1151,3 @@ export const TableComp = ({
         </div>
     );
 };
-
-/**
- *
- *
- *
- *
- *
- *
- */
-export const MarkdownPreview = ({
-    title,
-    content,
-    isVisible = true,
-    isDark = false,
-    textAlignment = "left",
-    lightModeBg = "bg-white",
-}) => {
-    if (!isVisible) return null;
-
-    return (
-        <Card
-            className={`w-full max-w-4xl mx-auto bg-white border-none shadow-none
-                ${isDark ? "bg-[#222] text-white border-none" : lightModeBg}
-                ${textAlignment === "center" ? "text-center" : "text-left"}`}
-        >
-            <CardContent className="p-0">
-                <div id="export" className="prose prose-slate max-w-none">
-                    {/* Title Rendering */}
-                    {title && (
-                        <div className="mb-6 border-b pb-4 text-4xl font-bold">
-                            {title}
-                        </div>
-                    )}
-
-                    {/* Markdown Content */}
-                    <ReactMarkdown
-                        /*
-                        remarkPlugins={[
-                            remarkGfm,
-                            remarkBreaks,
-                            [
-                                remarkMath,
-                                {
-                                    singleDollarTextMath: true, // Enable single $ for inline math
-                                    doubleDollarMath: true, // Enable double $$ for block math
-                                    allowMathInInlines: true, // Allow math in inline contexts
-                                },
-                            ],
-                        ]}
-                        rehypePlugins={[
-                            rehypeRaw,
-                            [
-                                rehypeKatex,
-                                {
-                                    strict: false, // Less strict parsing
-                                    output: "html", // Output format
-                                    throwOnError: false, // Don't throw on parsing errors
-                                    displayMode: true, // Enable display mode for block math
-                                },
-                            ],
-                        ]}
-                        */
-                        remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
-                        rehypePlugins={[rehypeRaw, rehypeKatex]}
-                        components={{
-                            code({
-                                node,
-                                inline,
-                                className,
-                                children,
-                                ...props
-                            }) {
-                                const match = /language-(\w+)/.exec(
-                                    className || "",
-                                );
-                                return !inline && match ? (
-                                    <SyntaxHighlighter
-                                        style={prism}
-                                        language={match[1]}
-                                        PreTag="div"
-                                        // showLineNumbers
-                                        wrapLongLines
-                                        className={isDark ? "invert" : ""}
-                                        {...props}
-                                    >
-                                        {String(children).replace(/\n$/, "")}
-                                    </SyntaxHighlighter>
-                                ) : (
-                                    <code
-                                        className={`bg-gray-200 px-1 py-0.5 rounded text-sm font-mono ${isDark ? "text-black" : ""}`}
-                                        {...props}
-                                    >
-                                        {children}
-                                    </code>
-                                );
-                            },
-                            blockquote({ children }) {
-                                return (
-                                    <blockquote
-                                        // className={`border-l-4 pl-4 py-3 my-4 italic rounded-md shadow
-                                        //         ${isDark ? "border-gray-600 bg-gray-800 text-gray-300" : "border-gray-400 bg-gray-100 text-gray-700"}
-                                        //       `}
-                                        className={`border-l-4 pl-4 italic ${isDark ? "border-[#888] text-[#999]" : "border-gray-500 text-gray-600"}`}
-                                    >
-                                        {children}
-                                    </blockquote>
-                                );
-                            },
-                            h1: ({ children }) => (
-                                <h1 className="text-4xl font-bold mt-6">
-                                    {children}
-                                </h1>
-                            ),
-                            h2: ({ children }) => (
-                                <h2 className="text-3xl font-semibold mt-5">
-                                    {children}
-                                </h2>
-                            ),
-                            h3: ({ children }) => (
-                                <h3 className="text-2xl font-semibold mt-4">
-                                    {children}
-                                </h3>
-                            ),
-                            h4: ({ children }) => (
-                                <h4 className="text-xl font-semibold mt-3">
-                                    {children}
-                                </h4>
-                            ),
-                            h5: ({ children }) => (
-                                <h5 className="text-lg font-semibold mt-2">
-                                    {children}
-                                </h5>
-                            ),
-                            h6: ({ children }) => (
-                                <h6 className="text-base font-semibold mt-2">
-                                    {children}
-                                </h6>
-                            ),
-                            p: ({ children }) => (
-                                <p className="text-base my-2">{children}</p>
-                            ),
-                            a: ({ href, children }) => (
-                                <a
-                                    href={href}
-                                    className={`underline ${isDark ? "text-blue-300 hover:text-blue-500" : "text-blue-600 hover:text-blue-800"}`}
-                                >
-                                    {children}
-                                </a>
-                            ),
-                            ul: ({ children }) => (
-                                <ul className="list-disc list-inside my-2">
-                                    {children}
-                                </ul>
-                            ),
-                            ol: ({ children }) => (
-                                <ol className="list-decimal list-inside my-2">
-                                    {children}
-                                </ol>
-                            ),
-                            li: ({ children }) => (
-                                <li className="ml-5">{children}</li>
-                            ),
-                            table: ({ children }) => (
-                                <div className="overflow-x-auto">
-                                    <table
-                                        className={`border border-gray-400 bg-white dark:bg-gray-800 w-full ${isDark ? "invert-[95%] text-black" : ""}`}
-                                    >
-                                        {children}
-                                    </table>
-                                </div>
-                            ),
-                            thead: ({ children }) => (
-                                <thead className="bg-gray-200 dark:bg-gray-700">
-                                    {children}
-                                </thead>
-                            ),
-                            tbody: ({ children }) => <tbody>{children}</tbody>,
-                            tr: ({ children }) => (
-                                <tr className="border border-gray-300 dark:border-gray-600">
-                                    {children}
-                                </tr>
-                            ),
-                            th: ({ children }) => (
-                                <th className="border border-gray-400 px-4 py-2 bg-gray-100 dark:bg-gray-600">
-                                    {children}
-                                </th>
-                            ),
-                            td: ({ children }) => (
-                                <td className="border border-gray-300 px-4 py-2">
-                                    {children}
-                                </td>
-                            ),
-                        }}
-                        className="prose-base prose-p:my-4 prose-headings:font-semibold prose-a:text-blue-600
-                        hover:prose-a:text-blue-800 prose-blockquote:border-l-4 prose-blockquote:pl-4
-                        prose-blockquote:italic prose-blockquote:text-gray-600 prose-code:bg-gray-100
-                        prose-code:px-1 prose-code:py-0.5 prose-code:rounded"
-                    >
-                        {content}
-                    </ReactMarkdown>
-                </div>
-            </CardContent>
-            <CardFooter className="bg-transparent h-[15vh]" />
-        </Card>
-    );
-};
-
-MarkdownPreview.propTypes = {
-    title: PropTypes.any,
-    content: PropTypes.any,
-    isVisible: PropTypes.bool,
-    isDark: PropTypes.bool,
-    textAlignment: PropTypes.string,
-    lightModeBg: PropTypes.string,
-};
-
-/*
- *
- *
- *
- *
- */
-/*
-// Bottom Bar
-<div className="fixed bottom-0 left-0 right-0 bg-white/10 backdrop-blur-sm border-t border-gray-100">
-    <div className="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
-        <div className="text-sm text-gray-400">
-            Last edited {new Date().toLocaleTimeString()}
-        </div>
-        <button
-            onClick={() => setIsFullscreen(!isFullscreen)}
-            className="text-sm text-gray-600 hover:text-black transition-all duration-0"
-        >
-            {isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
-        </button>
-    </div>
-</div>
-*/
-
-export const ScrollToBottomButton = ({
-    position = "fixed",
-    bottom = "bottom-8",
-    right = "right-4 md:right-8 lg:right-32",
-    theme = "bg-white text-black border border-[#333]/30",
-    rounded = "rounded-full",
-    size = "p-4",
-    isDark = false,
-}) => {
-    const scrollToBottom = () => {
-        window.scrollTo({
-            top: document.body.scrollHeight,
-            behavior: "smooth",
-        });
-    };
-
-    return (
-        <button
-            onClick={scrollToBottom}
-            className={`${position} ${bottom} ${right} ${theme} ${rounded} ${size} ${isDark ? "invert" : ""} shadow-lg cursor-pointer z-20`}
-            aria-label="Scroll to bottom"
-        >
-            ↓
-        </button>
-    );
-};
-
-export const rawText = `
-<p style="font-size: 18px; line-height: 1.5;">
-  <span style="float: left; font-size: 3em; font-weight: bold; line-height: 1; margin-right: 8px;">M</span>
-  arkdown, often abbreviated as MD, is a lightweight markup language that transforms plain text into richly formatted documents. Developed with readability in mind, its simple syntax allows users to add headers, lists, links, and other elements without heavy reliance on complex code. This ease of use has made Markdown a popular choice for everything from documentation and blogging to collaborative projects on platforms like GitHub. Its enduring appeal lies in the balance it strikes between simplicity and functionality, making it an essential tool in modern digital communication.
-</p>
-
----
-
-<mark>Here are some examples</mark>
-
-# Gradient descent is a method for unconstrained mathematical optimization.
-## Gradient descent is a method for unconstrained mathematical optimization.
-### Gradient descent is a method for unconstrained mathematical optimization.
-#### Gradient descent is a method for unconstrained mathematical optimization.
-##### Gradient descent is a method for unconstrained mathematical optimization.
-###### Gradient descent is a method for unconstrained mathematical optimization.
-
-**Gradient descent is a method for unconstrained mathematical optimization.**
-
-*Gradient descent is a method for unconstrained mathematical optimization.*
-
-***Gradient descent is a method for unconstrained mathematical optimization.***
-
-Gradient descent is a method for unconstrained mathematical optimization.
-
----
-<br/>
-
-> Gradient descent is a method for unconstrained mathematical optimization. It is a first-order iterative algorithm for minimizing a differentiable multivariate function.
-
-<br/>
-
----
-
-- This is a bullet list item
-- Another item
-
-1. This is a numbered list item
-2. Another numbered item
-
-- [ ] This is an unchecked task
-- [x] This is a checked task
-
----
-<br/>
-
-| Column 1 | Column 2 | Column 3 |
-|----------|----------|----------|
-| Data 1   | Data 2   | Data 3   |
-| Data 4   | Data 5   | Data 6   |
-
-<br/>
-
-\`This is inline code\`
-
-\`\`\`cpp
-#include <iostream>
-
-int main() {
-    std::cout << "Hello, World!" << std::endl;
-    return 0;
-}
-\`\`\`
-
-[This is a link](https://example.com)
-
-![This is an image](https://picsum.photos/150)
-
----
-# <u>For underlined heading</u>
-
-Wrong:
-<u> ## heading</u>
-
-Correct:
-## <u>heading</u>
-  `;
