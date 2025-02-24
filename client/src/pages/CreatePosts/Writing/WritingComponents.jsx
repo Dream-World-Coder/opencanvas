@@ -21,7 +21,6 @@ import {
     Search,
     FileJson,
     LetterText,
-    X,
 } from "lucide-react";
 import PropTypes from "prop-types";
 // ***************************************************
@@ -81,6 +80,37 @@ export const formattingButtons = [
     { format: "dropCap", icon: LetterText },
     { format: "line", icon: Minus },
     { format: "pageBreak", icon: FilePlus },
+];
+
+const sliderOptions = [
+    {
+        id: "marginTop",
+        label: "Margin Top",
+        min: 0,
+        max: 100,
+        step: 1,
+    },
+    {
+        id: "marginBottom",
+        label: "Margin Bottom",
+        min: 0,
+        max: 100,
+        step: 1,
+    },
+    {
+        id: "maxHeight",
+        label: "Max Height",
+        min: 100,
+        max: 800,
+        step: 10,
+    },
+    {
+        id: "maxWidth",
+        label: "Max Width",
+        min: 100,
+        max: 1000,
+        step: 10,
+    },
 ];
 
 /**
@@ -349,9 +379,32 @@ export const useImagePopup = () => {
         maxWidth: 500,
     });
 
-    // Update a specific setting
-    const updateSetting = (key, value) => {
-        setImageSettings((prev) => ({ ...prev, [key]: value }));
+    // Update a specific setting with instant application
+    const updateSetting = (key, value, setters) => {
+        setImageSettings((prev) => {
+            const newSettings = { ...prev, [key]: value };
+
+            // Apply changes instantly
+            if (setters) {
+                if (key === "maxWidth" && setters.setImgMaxWidth) {
+                    setters.setImgMaxWidth(`${value}px`);
+                }
+                if (key === "maxHeight" && setters.setImgMaxHeight) {
+                    setters.setImgMaxHeight(`${value}px`);
+                }
+                if (key === "position" && setters.setImgAlignment) {
+                    setters.setImgAlignment(value);
+                }
+                if (key === "marginTop" && setters.setMTop) {
+                    setters.setMTop(`${value}px`);
+                }
+                if (key === "marginBottom" && setters.setMBottom) {
+                    setters.setMBottom(`${value}px`);
+                }
+            }
+
+            return newSettings;
+        });
     };
 
     useEffect(() => {
@@ -399,14 +452,14 @@ export const ImagePopup = ({
     const { isOpen, setIsOpen, currentImage, imageSettings, updateSetting } =
         useImagePopup();
 
-    function updateImageProperties() {
-        setImgMaxWidth(`${imageSettings.maxWidth}px`);
-        setImgMaxHeight(`${imageSettings.maxHeight}px`);
-        setImgAlignment(imageSettings.position);
-        setMTop(`${imageSettings.marginTop}px`);
-        setMBottom(`${imageSettings.marginBottom}px`);
-        setIsOpen(false);
-    }
+    // Group all setters in one object for easy access
+    const setters = {
+        setImgMaxWidth,
+        setImgMaxHeight,
+        setImgAlignment,
+        setMTop,
+        setMBottom,
+    };
 
     if (!currentImage) return null;
 
@@ -424,73 +477,58 @@ export const ImagePopup = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            {/* <DialogTitle>Image Settings</DialogTitle> */}
-            <DialogContent className="sm:max-w-2xl">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-lg font-semibold">Image Settings</h2>
-                    {/* close is already present in dialog */}
-                    {/* <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setIsOpen(false)}
-                    >
-                        <X className="h-4 w-4" />
-                    </Button> */}
-                </div>
+            {/* Hide the overlay completely */}
+            <DialogContent className="max-w-sm">
+                <DialogHeader>
+                    <DialogTitle className="text-lg font-semibold">
+                        Image Properties
+                    </DialogTitle>
+                </DialogHeader>
 
-                <div className="space-y-6">
+                <div className="">
                     {/* Image Preview */}
                     <div
-                        className={`flex items-center ${getPositionClass()} overflow-hidden`}
+                        className={`flex items-center justify-center overflow-hidden border border-gray-200 rounded`}
                         style={{
-                            marginTop: `${imageSettings.marginTop}px`,
-                            marginBottom: `${imageSettings.marginBottom}px`,
+                            marginTop: `0px`,
+                            marginBottom: `0px`,
                         }}
                     >
                         <img
                             src={currentImage.src}
                             alt={currentImage.alt || "Preview"}
                             style={{
-                                maxHeight: `${imageSettings.maxHeight}px`,
-                                maxWidth: `${imageSettings.maxWidth}px`,
+                                maxHeight: `135px`,
+                                maxWidth: `240px`,
                             }}
                             className="object-cover"
                         />
                     </div>
 
                     {/* Settings Controls */}
-                    <div className="grid grid-cols-1 gap-6">
-                        {/* Margin Top */}
-                        <div className="space-y-2">
-                            <Label>
-                                Margin Top: {imageSettings.marginTop}px
-                            </Label>
-                            <Slider
-                                value={[imageSettings.marginTop]}
-                                min={0}
-                                max={100}
-                                step={1}
-                                onValueChange={(value) =>
-                                    updateSetting("marginTop", value[0])
-                                }
-                            />
-                        </div>
-
-                        {/* Margin Bottom */}
-                        <div className="space-y-2">
-                            <Label>
-                                Margin Bottom: {imageSettings.marginBottom}px
-                            </Label>
-                            <Slider
-                                value={[imageSettings.marginBottom]}
-                                min={0}
-                                max={100}
-                                step={1}
-                                onValueChange={(value) =>
-                                    updateSetting("marginBottom", value[0])
-                                }
-                            />
-                        </div>
+                    <div className="grid grid-cols-1 gap-4 mt-4">
+                        {/* Sliders */}
+                        {sliderOptions.map((setting) => (
+                            <div className="space-y-2" key={setting.id}>
+                                <Label>
+                                    {setting.label}: {imageSettings[setting.id]}
+                                    px
+                                </Label>
+                                <Slider
+                                    value={[imageSettings[setting.id]]}
+                                    min={setting.min}
+                                    max={setting.max}
+                                    step={setting.step}
+                                    onValueChange={(value) =>
+                                        updateSetting(
+                                            setting.id,
+                                            value[0],
+                                            setters,
+                                        )
+                                    }
+                                />
+                            </div>
+                        ))}
 
                         {/* Position */}
                         <div className="space-y-2">
@@ -498,64 +536,27 @@ export const ImagePopup = ({
                             <RadioGroup
                                 value={imageSettings.position}
                                 onValueChange={(value) =>
-                                    updateSetting("position", value)
+                                    updateSetting("position", value, setters)
                                 }
                                 className="flex space-x-4"
                             >
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="left" id="left" />
-                                    <Label htmlFor="left">Left</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem
-                                        value="center"
-                                        id="center"
-                                    />
-                                    <Label htmlFor="center">Center</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="right" id="right" />
-                                    <Label htmlFor="right">Right</Label>
-                                </div>
+                                {["left", "center", "right"].map((position) => (
+                                    <div
+                                        className="flex items-center space-x-2"
+                                        key={position}
+                                    >
+                                        <RadioGroupItem
+                                            value={position}
+                                            id={position}
+                                        />
+                                        <Label htmlFor={position}>
+                                            {position.charAt(0).toUpperCase() +
+                                                position.slice(1)}
+                                        </Label>
+                                    </div>
+                                ))}
                             </RadioGroup>
                         </div>
-
-                        {/* Max Height */}
-                        <div className="space-y-2">
-                            <Label>
-                                Max Height: {imageSettings.maxHeight}px
-                            </Label>
-                            <Slider
-                                value={[imageSettings.maxHeight]}
-                                min={100}
-                                max={800}
-                                step={10}
-                                onValueChange={(value) =>
-                                    updateSetting("maxHeight", value[0])
-                                }
-                            />
-                        </div>
-
-                        {/* Max Width */}
-                        <div className="space-y-2">
-                            <Label>Max Width: {imageSettings.maxWidth}px</Label>
-                            <Slider
-                                value={[imageSettings.maxWidth]}
-                                min={100}
-                                max={1000}
-                                step={10}
-                                onValueChange={(value) =>
-                                    updateSetting("maxWidth", value[0])
-                                }
-                            />
-                        </div>
-                    </div>
-
-                    {/* Apply Button */}
-                    <div className="flex justify-end">
-                        <Button onClick={updateImageProperties}>
-                            Apply Changes
-                        </Button>
                     </div>
                 </div>
             </DialogContent>
