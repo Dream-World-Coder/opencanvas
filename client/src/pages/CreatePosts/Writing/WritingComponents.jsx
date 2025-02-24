@@ -46,6 +46,12 @@ import {
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+} from "@/components/ui/sheet";
 
 // ***************************************************
 import ReactMarkdown from "react-markdown";
@@ -476,37 +482,34 @@ export const ImagePopup = ({
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            {/* Hide the overlay completely */}
-            <DialogContent className="max-w-sm">
-                <DialogHeader>
-                    <DialogTitle className="text-lg font-semibold">
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetContent side="right" className="max-w-sm">
+                <SheetHeader>
+                    <SheetTitle className="text-lg font-semibold mb-6">
                         Image Properties
-                    </DialogTitle>
-                </DialogHeader>
-
+                    </SheetTitle>
+                </SheetHeader>
                 <div className="">
                     {/* Image Preview */}
                     <div
-                        className={`flex items-center justify-center overflow-hidden border border-gray-200 rounded`}
+                        className="flex items-center justify-center overflow-hidden border border-gray-200 rounded"
                         style={{
-                            marginTop: `0px`,
-                            marginBottom: `0px`,
+                            marginTop: "0px",
+                            marginBottom: "0px",
                         }}
                     >
                         <img
                             src={currentImage.src}
                             alt={currentImage.alt || "Preview"}
                             style={{
-                                maxHeight: `135px`,
-                                maxWidth: `240px`,
+                                maxHeight: "135px",
+                                maxWidth: "240px",
                             }}
                             className="object-cover"
                         />
                     </div>
-
                     {/* Settings Controls */}
-                    <div className="grid grid-cols-1 gap-4 mt-4">
+                    <div className="grid grid-cols-1 gap-6 mt-6">
                         {/* Sliders */}
                         {sliderOptions.map((setting) => (
                             <div className="space-y-2" key={setting.id}>
@@ -529,7 +532,6 @@ export const ImagePopup = ({
                                 />
                             </div>
                         ))}
-
                         {/* Position */}
                         <div className="space-y-2">
                             <Label>Position</Label>
@@ -559,8 +561,8 @@ export const ImagePopup = ({
                         </div>
                     </div>
                 </div>
-            </DialogContent>
-        </Dialog>
+            </SheetContent>
+        </Sheet>
     );
 };
 

@@ -1,701 +1,84 @@
-## Subhajit Gorai
-### 2023ITB071
-### C.O.A Lab: Assignment 2
-
-const imageStorage = {
-    store: (filename, base64Data) => {
-        const images = JSON.parse(
-            localStorage.getItem("markdown-images") || "{}",
-        );
-        images[filename] = base64Data;
-        localStorage.setItem("markdown-images", JSON.stringify(images));
-    },
-
-    get: (filename) => {
-        const images = JSON.parse(
-            localStorage.getItem("markdown-images") || "{}",
-        );
-        return images[filename];
-    },
-
-    // Helper to replace image references in markdown with actual base64 data
-    processMarkdown: (markdown) => {
-        return markdown.replace(
-            /!\[(.*?)\]\(local:(.*?)\)/g,
-            (match, alt, filename) => {
-                const base64Data = imageStorage.get(filename);
-                return base64Data ? `![${alt}](${base64Data})` : match;
-            },
-        );
-    },
-};
-
-export const ImageUploadButton = ({ onImageInsert }) => {
-    const fileInputRef = useRef(null);
-    const [preview, setPreview] = React.useState(null);
-    const [dialogOpen, setDialogOpen] = React.useState(false);
-
-    const handleImageSelect = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            // Create object URL for preview
-            const objectUrl = URL.createObjectURL(file);
-            setPreview(objectUrl);
-
-            // Convert to base64 for storage
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const base64Data = e.target.result;
-                // Generate a filename based on timestamp
-                const filename = `image-${Date.now()}-${file.name}`;
-
-                // Store the image
-                imageStorage.store(filename, base64Data);
-
-                // Insert markdown with local reference
-                onImageInsert(`![${file.name}](local:${filename})`);
-
-                // Clean up
-                URL.revokeObjectURL(objectUrl);
-                setPreview(null);
-                setDialogOpen(false);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    const handleButtonClick = () => {
-        fileInputRef.current?.click();
-    };
-
-    return (
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
-                >
-                    <Image className="w-4 h-4" />
-                </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle>Insert Image</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                    <Card className="border-2 border-dashed">
-                        <CardContent className="flex flex-col items-center justify-center p-6">
-                            {preview ? (
-                                <img
-                                    src={preview}
-                                    alt="Preview"
-                                    className="max-w-full max-h-48 object-contain mb-4"
-                                />
-                            ) : (
-                                <div className="text-center">
-                                    <Image className="mx-auto w-12 h-12 text-gray-400 mb-4" />
-                                    <p className="text-sm text-gray-600">
-                                        Click to upload or drag and drop
-                                    </p>
-                                </div>
-                            )}
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                accept="image/*"
-                                onChange={handleImageSelect}
-                                className="hidden"
-                            />
-                            <Button
-                                onClick={handleButtonClick}
-                                variant="outline"
-                                className="mt-4"
-                            >
-                                Select Image
-                            </Button>
-                        </CardContent>
-                    </Card>
-                </div>
-            </DialogContent>
-        </Dialog>
-    );
-};
----
-> ### 1.Design behavioral model for the basic logic gates(AND, OR,NOT).
-
-- ### <mark>OR Gate</mark>
-
-<span style="text-decoration: underline;">design code</span>
-```c
-library IEEE;
-use IEEE.std_logic_1164.all;
-
-entity or_gate is
-port(
- a: in std_logic;
- b: in std_logic;
- q: out std_logic);
-end or_gate;
-
-architecture behavioural of or_gate is
-begin
- process(a,b) is
- begin
- if (a='0' and b='0') then q<='0';
- else q<='1';
- end if;
- end process;
-end behavioural;
-```
-
-<span style="text-decoration: underline;">test bench code</span>
-```c
-library IEEE;
-use IEEE.std_logic_1164.all;
-
-entity testbench is
--- empty
-end testbench;
-
-architecture tb of testbench is
-
--- DUT component
-component or_gate is
-port(
- a: in std_logic;
- b: in std_logic;
- q: out std_logic);
-end component;
-
-signal a_in, b_in, q_out: std_logic;
-
-begin
-
- -- Connect DUT
- DUT: or_gate port map(a_in, b_in, q_out);
-
- process
- begin
- a_in <= '0';
- b_in <= '0';
- wait for 1 ns;
- assert(q_out='0') report "Fail 0/0" severity error;
-
- a_in <= '0';
- b_in <= '1';
- wait for 1 ns;
- assert(q_out='1') report "Fail 0/1" severity error;
-
- a_in <= '1';
- b_in <= '0';
- wait for 1 ns;
- assert(q_out='1') report "Fail 1/0" severity error;
-
- a_in <= '1';
- b_in <= '1';
- wait for 1 ns;
- assert(q_out='1') report "Fail 1/1" severity error;
-
- -- Clear inputs
- a_in <= '0';
- b_in <= '0';
-
- assert false report "Test done." severity note;
- wait;
- end process;
-end tb;
-```
-
--  ### <mark>AND Gate</mark>
-
-<span style="text-decoration: underline;">design code</span>
-
-```c
-library IEEE;
-use IEEE.std_logic_1164.all;
-
-entity and_gate is
-port(
- a: in std_logic;
- b: in std_logic;
- q: out std_logic);
-end and_gate;
-
-architecture behavioural of and_gate is
-begin
- process(a,b) is
- begin
- if (a='1' and b='1') then q<='1';
- else q<='0';
- end if;
- end process;
-end behavioural;
-```
-
-<span style="text-decoration: underline;">test bench code</span>
-
-```c
-library IEEE;
-use IEEE.std_logic_1164.all;
-
-entity testbench is
--- empty
-end testbench;
-
-architecture tb of testbench is
-
--- DUT component
-component and_gate is
-port(
- a: in std_logic;
- b: in std_logic;
- q: out std_logic);
-end component;
-
-signal a_in, b_in, q_out: std_logic;
-
-begin
-
- -- Connect DUT
- DUT: and_gate port map(a_in, b_in, q_out);
-
- process
- begin
- a_in <= '0';
- b_in <= '0';
- wait for 1 ns;
- assert(q_out='0') report "Fail 0/0" severity error;
-
- a_in <= '0';
- b_in <= '1';
- wait for 1 ns;
- assert(q_out='0') report "Fail 0/1" severity error;
-
- a_in <= '1';
- b_in <= '0';
- wait for 1 ns;
- assert(q_out='0') report "Fail 1/0" severity error;
-
- a_in <= '1';
- b_in <= '1';
- wait for 1 ns;
- assert(q_out='1') report "Fail 1/1" severity error;
-
- -- Clear inputs
- a_in <= '0';
- b_in <= '0';
-
- assert false report "Test done." severity note;
- wait;
- end process;
-end tb;
-```
-
-
-- ### <mark>NOT Gate</mark>
-
-<span style="text-decoration: underline;">design code</span>
-
-```c
-library IEEE;
-use IEEE.std_logic_1164.all;
-
-entity not_gate is
-port(
- a: in std_logic;
- q: out std_logic);
-end not_gate;
-
-architecture behavioural of not_gate is
-begin
- process(a) is
- begin
- if (a='0') then q<='1';
- else q<='0';
- end if;
- end process;
-end behavioural;
-```
-
-<span style="text-decoration: underline;">test bench code</span>
-```c
-library IEEE;
-use IEEE.std_logic_1164.all;
-
-entity testbench is
--- empty
-end testbench;
-
-architecture tb of testbench is
-
--- DUT component
-component not_gate is
-port(
- a: in std_logic;
- q: out std_logic);
-end component;
-
-signal a_in, q_out: std_logic;
-
-begin
-
- -- Connect DUT
- DUT: not_gate port map(a_in, q_out);
-
- process
- begin
- a_in <= '0';
- wait for 1 ns;
- assert(q_out='1') report "Fail 0" severity error;
-
- a_in <= '1';
- wait for 1 ns;
- assert(q_out='0') report "Fail 1" severity error;
-
- -- Clear inputs
- a_in <= '0';
-
- assert false report "Test done." severity note;
- wait;
- end process;
-end tb;
-```
-
-> ### 2.Design behavioral model for the universal logic gates(NAND, NOR).
-
-- ### <mark>NAND Gate</mark>
-
-<span style="text-decoration: underline;">design code</span>
-```c
-library IEEE;
-use IEEE.std_logic_1164.all;
-
-entity or_gate is
-port(
- a: in std_logic;
- b: in std_logic;
- q: out std_logic);
-end or_gate;
-
-architecture behavioural of or_gate is
-begin
- process(a,b) is
- begin
- if (a='0' and b='0') then q<='0';
- else q<='1';
- end if;
- end process;
-end behavioural;
-```
-
-<span style="text-decoration: underline;">test bench code</span>
-```c
-library IEEE;
-use IEEE.std_logic_1164.all;
-
-entity testbench is
--- empty
-end testbench;
-
-architecture tb of testbench is
-
--- DUT component
-component or_gate is
-port(
- a: in std_logic;
- b: in std_logic;
- q: out std_logic);
-end component;
-
-signal a_in, b_in, q_out: std_logic;
-
-begin
-
- -- Connect DUT
- DUT: or_gate port map(a_in, b_in, q_out);
-
- process
- begin
- a_in <= '0';
- b_in <= '0';
- wait for 1 ns;
- assert(q_out='0') report "Fail 0/0" severity error;
-
- a_in <= '0';
- b_in <= '1';
- wait for 1 ns;
- assert(q_out='1') report "Fail 0/1" severity error;
-
- a_in <= '1';
- b_in <= '0';
- wait for 1 ns;
- assert(q_out='1') report "Fail 1/0" severity error;
-
- a_in <= '1';
- b_in <= '1';
- wait for 1 ns;
- assert(q_out='1') report "Fail 1/1" severity error;
-
- -- Clear inputs
- a_in <= '0';
- b_in <= '0';
-
- assert false report "Test done." severity note;
- wait;
- end process;
-end tb;
-```
-
-- ### <mark>NOR Gate</mark>
-
-<span style="text-decoration: underline;">design code</span>
-```c
-library IEEE;
-use IEEE.std_logic_1164.all;
-
-entity or_gate is
-port(
- a: in std_logic;
- b: in std_logic;
- q: out std_logic);
-end or_gate;
-
-architecture behavioural of or_gate is
-begin
- process(a,b) is
- begin
- if (a='0' and b='0') then q<='0';
- else q<='1';
- end if;
- end process;
-end behavioural;
-```
-
-<span style="text-decoration: underline;">test bench code</span>
-```c
-library IEEE;
-use IEEE.std_logic_1164.all;
-
-entity testbench is
--- empty
-end testbench;
-
-architecture tb of testbench is
-
--- DUT component
-component or_gate is
-port(
- a: in std_logic;
- b: in std_logic;
- q: out std_logic);
-end component;
-
-signal a_in, b_in, q_out: std_logic;
-
-begin
-
- -- Connect DUT
- DUT: or_gate port map(a_in, b_in, q_out);
-
- process
- begin
- a_in <= '0';
- b_in <= '0';
- wait for 1 ns;
- assert(q_out='0') report "Fail 0/0" severity error;
-
- a_in <= '0';
- b_in <= '1';
- wait for 1 ns;
- assert(q_out='1') report "Fail 0/1" severity error;
-
- a_in <= '1';
- b_in <= '0';
- wait for 1 ns;
- assert(q_out='1') report "Fail 1/0" severity error;
-
- a_in <= '1';
- b_in <= '1';
- wait for 1 ns;
- assert(q_out='1') report "Fail 1/1" severity error;
-
- -- Clear inputs
- a_in <= '0';
- b_in <= '0';
-
- assert false report "Test done." severity note;
- wait;
- end process;
-end tb;
-```
-
-
-
-> ### 3.Design behavioral model for the logic gates(XOR, XNOR).
-
-- ### <mark>XOR Gate</mark>
-
-<span style="text-decoration: underline;">design code</span>
-```c
-library IEEE;
-use IEEE.std_logic_1164.all;
-
-entity or_gate is
-port(
- a: in std_logic;
- b: in std_logic;
- q: out std_logic);
-end or_gate;
-
-architecture behavioural of or_gate is
-begin
- process(a,b) is
- begin
- if (a='0' and b='0') then q<='0';
- else q<='1';
- end if;
- end process;
-end behavioural;
-```
-
-<span style="text-decoration: underline;">test bench code</span>
-```c
-library IEEE;
-use IEEE.std_logic_1164.all;
-
-entity testbench is
--- empty
-end testbench;
-
-architecture tb of testbench is
-
--- DUT component
-component or_gate is
-port(
- a: in std_logic;
- b: in std_logic;
- q: out std_logic);
-end component;
-
-signal a_in, b_in, q_out: std_logic;
-
-begin
-
- -- Connect DUT
- DUT: or_gate port map(a_in, b_in, q_out);
-
- process
- begin
- a_in <= '0';
- b_in <= '0';
- wait for 1 ns;
- assert(q_out='0') report "Fail 0/0" severity error;
-
- a_in <= '0';
- b_in <= '1';
- wait for 1 ns;
- assert(q_out='1') report "Fail 0/1" severity error;
-
- a_in <= '1';
- b_in <= '0';
- wait for 1 ns;
- assert(q_out='1') report "Fail 1/0" severity error;
-
- a_in <= '1';
- b_in <= '1';
- wait for 1 ns;
- assert(q_out='1') report "Fail 1/1" severity error;
-
- -- Clear inputs
- a_in <= '0';
- b_in <= '0';
-
- assert false report "Test done." severity note;
- wait;
- end process;
-end tb;
-```
-
-- ### <mark>XNOR Gate</mark>
-
-<span style="text-decoration: underline;">design code</span>
-```c
-library IEEE;
-use IEEE.std_logic_1164.all;
-
-entity or_gate is
-port(
- a: in std_logic;
- b: in std_logic;
- q: out std_logic);
-end or_gate;
-
-architecture behavioural of or_gate is
-begin
- process(a,b) is
- begin
- if (a='0' and b='0') then q<='0';
- else q<='1';
- end if;
- end process;
-end behavioural;
-```
-
-<span style="text-decoration: underline;">test bench code</span>
-```c
-library IEEE;
-use IEEE.std_logic_1164.all;
-
-entity testbench is
--- empty
-end testbench;
-
-architecture tb of testbench is
-
--- DUT component
-component or_gate is
-port(
- a: in std_logic;
- b: in std_logic;
- q: out std_logic);
-end component;
-
-signal a_in, b_in, q_out: std_logic;
-
-begin
-
- -- Connect DUT
- DUT: or_gate port map(a_in, b_in, q_out);
-
- process
- begin
- a_in <= '0';
- b_in <= '0';
- wait for 1 ns;
- assert(q_out='0') report "Fail 0/0" severity error;
-
- a_in <= '0';
- b_in <= '1';
- wait for 1 ns;
- assert(q_out='1') report "Fail 0/1" severity error;
-
- a_in <= '1';
- b_in <= '0';
- wait for 1 ns;
- assert(q_out='1') report "Fail 1/0" severity error;
-
- a_in <= '1';
- b_in <= '1';
- wait for 1 ns;
- assert(q_out='1') report "Fail 1/1" severity error;
-
- -- Clear inputs
- a_in <= '0';
- b_in <= '0';
-
- assert false report "Test done." severity note;
- wait;
- end process;
-end tb;
-```
+// <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        //     <DialogContent className="max-w-sm">
+        //         <DialogHeader>
+        //             <DialogTitle className="text-lg font-semibold">
+        //                 Image Properties
+        //             </DialogTitle>
+        //         </DialogHeader>
+
+        //         <div className="">
+        //             {/* Image Preview */}
+        //             <div
+        //                 className={`flex items-center justify-center overflow-hidden border border-gray-200 rounded`}
+        //                 style={{
+        //                     marginTop: `0px`,
+        //                     marginBottom: `0px`,
+        //                 }}
+        //             >
+        //                 <img
+        //                     src={currentImage.src}
+        //                     alt={currentImage.alt || "Preview"}
+        //                     style={{
+        //                         maxHeight: `135px`,
+        //                         maxWidth: `240px`,
+        //                     }}
+        //                     className="object-cover"
+        //                 />
+        //             </div>
+
+        //             {/* Settings Controls */}
+        //             <div className="grid grid-cols-1 gap-4 mt-4">
+        //                 {/* Sliders */}
+        //                 {sliderOptions.map((setting) => (
+        //                     <div className="space-y-2" key={setting.id}>
+        //                         <Label>
+        //                             {setting.label}: {imageSettings[setting.id]}
+        //                             px
+        //                         </Label>
+        //                         <Slider
+        //                             value={[imageSettings[setting.id]]}
+        //                             min={setting.min}
+        //                             max={setting.max}
+        //                             step={setting.step}
+        //                             onValueChange={(value) =>
+        //                                 updateSetting(
+        //                                     setting.id,
+        //                                     value[0],
+        //                                     setters,
+        //                                 )
+        //                             }
+        //                         />
+        //                     </div>
+        //                 ))}
+
+        //                 {/* Position */}
+        //                 <div className="space-y-2">
+        //                     <Label>Position</Label>
+        //                     <RadioGroup
+        //                         value={imageSettings.position}
+        //                         onValueChange={(value) =>
+        //                             updateSetting("position", value, setters)
+        //                         }
+        //                         className="flex space-x-4"
+        //                     >
+        //                         {["left", "center", "right"].map((position) => (
+        //                             <div
+        //                                 className="flex items-center space-x-2"
+        //                                 key={position}
+        //                             >
+        //                                 <RadioGroupItem
+        //                                     value={position}
+        //                                     id={position}
+        //                                 />
+        //                                 <Label htmlFor={position}>
+        //                                     {position.charAt(0).toUpperCase() +
+        //                                         position.slice(1)}
+        //                                 </Label>
+        //                             </div>
+        //                         ))}
+        //                     </RadioGroup>
+        //                 </div>
+        //             </div>
+        //         </div>
+        //     </DialogContent>
+        // </Dialog>
