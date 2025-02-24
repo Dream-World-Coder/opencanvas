@@ -76,6 +76,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
     const [redoStack, setRedoStack] = useState([]);
     const [syncStatus, setSyncStatus] = useState("synced"); // 'synced', 'saving', 'offline'
     const [lastSynced, setLastSynced] = useState(null);
+    const [optionsDropdownOpen, setOptionsDropdownOpen] = useState(false);
 
     const [copied, setCopied] = useState(false);
     const handleCopy = () => {
@@ -634,7 +635,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                             </button>
                             <div className="hidden md:flex items-center space-x-2">
                                 <button
-                                    className={`px-3 py-1 rounded-full text-sm ${isDark ? "bg-white text-black" : "bg-[#222] text-white"} hover:text-green-300`}
+                                    className={`px-3 py-1 rounded-full text-sm ${isDark ? "bg-white text-black hover:text-green-600" : "bg-[#222] text-white hover:text-green-300"}`}
                                 >
                                     {artType}
                                 </button>
@@ -664,10 +665,10 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                             {/* preview */}
                             <button
                                 className={`flex items-center space-x-1 px-2 md:px-3 py-1 rounded-full text-sm border
-                                    ${isDark ? "border-gray-700" : "border-gray-300"}
+                                    ${isDark ? "border-[#555]" : "border-gray-300"}
                                     ${
                                         isPreview
-                                            ? `${isDark ? "text-gray-200 bg-gray-700" : "text-gray-700 bg-gray-300"}`
+                                            ? `${isDark ? "text-gray-200 bg-[#555]" : "text-gray-700 bg-gray-300"}`
                                             : `${isDark ? "text-gray-200" : "text-gray-700"}`
                                     }`}
                                 onClick={() => {
@@ -682,7 +683,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                 ) : (
                                     <>
                                         <Edit className="size-4" />
-                                        <span>Editing</span>
+                                        <span>Edit</span>
                                     </>
                                 )}
                             </button>
@@ -774,7 +775,10 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                             </button>
 
                             {/* addtional more button */}
-                            <DropdownMenu>
+                            <DropdownMenu
+                                open={optionsDropdownOpen}
+                                onOpenChange={setOptionsDropdownOpen}
+                            >
                                 <DropdownMenuTrigger>
                                     <MoreHorizontal className="size-5" />
                                 </DropdownMenuTrigger>
@@ -782,7 +786,8 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                     {/* font */}
                                     <DropdownMenuItem
                                         className="cursor-pointer"
-                                        onClick={() => {
+                                        onClick={(e) => {
+                                            e.preventDefault();
                                             setIsSerif(!isSerif);
                                         }}
                                     >
@@ -793,7 +798,8 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                     {/* theme */}
                                     <DropdownMenuItem
                                         className="cursor-pointer"
-                                        onClick={() => {
+                                        onClick={(e) => {
+                                            e.preventDefault();
                                             setSepia(!sepia);
                                         }}
                                     >
@@ -806,7 +812,8 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                     {/* align */}
                                     <DropdownMenuItem
                                         className="cursor-pointer"
-                                        onClick={() => {
+                                        onClick={(e) => {
+                                            e.preventDefault();
                                             {
                                                 textAlignment === "center"
                                                     ? setTextAlignment("left")
@@ -829,12 +836,13 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
 
                                     {/* page distinct */}
                                     <DropdownMenuItem
-                                        onClick={() => {
+                                        onClick={(e) => {
+                                            e.preventDefault();
                                             setDocumentScroll(!documentScroll);
                                         }}
                                         className="cursor-pointer"
                                     >
-                                        {documentScroll ? (
+                                        {!documentScroll ? (
                                             <>
                                                 <NotebookText /> Pages
                                             </>
@@ -848,7 +856,8 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                     {/* help */}
                                     <DropdownMenuItem
                                         className="cursor-pointer"
-                                        onClick={() => {
+                                        onClick={(e) => {
+                                            e.preventDefault();
                                             setHelpOpen(!helpOpen);
                                         }}
                                     >
@@ -863,7 +872,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                     {/* Formatting Tools */}
                     <div
                         className={`mb-2 mx-4 md:mx-0 flex items-center justify-between rounded-md transition-all duration-0
-                            ${isDark ? "bg-[#333]" : "bg-gray-50"}`}
+                            ${isDark ? "bg-[#333]" : "bg-gray-50"} ${isPreview ? "opacity-0 h-0" : "opacity-100"}`}
                     >
                         <div className="flex items-center md:space-x-2">
                             {formattingButtons.map(({ format, icon: Icon }) => (
@@ -1043,7 +1052,8 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                         }}
                         placeholder="Title"
                         className={`w-full h-auto text-4xl font-bold mb-8 focus:outline-none transition-all duration-0
-                            ${isDark ? "bg-[#222]" : lightModeBg}`}
+                            ${isDark ? "bg-[#222]" : lightModeBg}
+                            ${isPreview ? "opacity-0" : "opacity-100"}`}
                     />
 
                     {/* Content Textarea */}
