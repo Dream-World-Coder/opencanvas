@@ -27,8 +27,8 @@ export const SlidingButton = ({ href, children }) => {
             onClick={() => {
                 window.location.href = href;
             }}
-            className="relative font-[Handlee] italic text-sm md:text-xl py-1 px-3 md:py-4 md:px-7 rounded-md
-                 border border-sky-300 overflow-hidden
+            className="relative font-[Handlee] italic text-xl md:text-xl py-1 px-3 md:py-4 md:px-7 rounded-md
+                 border border-sky-300 overflow-hidden bg-sky-300/20
                  text-#4d4d4d group z-30 cursor-pointer
                  transition-colors duration-300 ease-out
                  before:absolute before:inset-0

@@ -7,7 +7,7 @@ import { Analytics } from "@vercel/analytics/react";
 
 const LandingPage = () => {
     return (
-        <div className="min-h-screen min-w-screen bg-white relative overflow-hidden">
+        <div className="min-h-auto md:min-h-screen min-w-screen h-[100dvh] md:h-auto bg-white relative overflow-hidden">
             <div className="max-w-7xl mx-auto relative h-screen">
                 <Navbar />
 
@@ -15,8 +15,8 @@ const LandingPage = () => {
                 <div className="relative pt-[60%] sm:pt-[40%] md:pt-[20%] desktop-xl flex items-start justify-center w-full h-full">
                     {/* texts */}
                     <div className="flex flex-col gap-3 items-start justify-between">
-                        <h1 className="relative font-['Six_Caps'] text-6xl md:text-8xl text-[#1a1a1a] leading-tight tracking-normal">
-                            <span className="font-[Smooch] italic text-4xl md:text-6xl">
+                        <h1 className="relative font-['Six_Caps'] text-7xl md:text-8xl text-[#1a1a1a] leading-tight tracking-normal">
+                            <span className="font-[Smooch] italic text-5xl md:text-6xl">
                                 my
                             </span>
                             OPENCANVAS
@@ -38,11 +38,11 @@ const LandingPage = () => {
                 <Footer />
             </div>
             {/* poem hidden md:block */}
-            <div className="size-[65%] md:size-[35%] top-0 left-[-125px] absolute opacity-80">
+            <div className="size-[65%] md:size-[35%] top-[50%] md:top-0 left-[-125px] absolute opacity-80">
                 <img className="object-cover" src={Poem} alt="" />
             </div>
             {/* flower */}
-            <div className="size-[50%] md:size-[45%] bottom-0 md:bottom-[110px] right-[-100px] md:right-[-280px] absolute opacity-80 z-20">
+            <div className="size-[50%] md:size-[45%] bottom-[40%] md:bottom-[110px] right-[-100px] md:right-[-280px] absolute opacity-80 z-20">
                 <img className="object-cover" src={BlueFlowerImg} alt="" />
             </div>
 
