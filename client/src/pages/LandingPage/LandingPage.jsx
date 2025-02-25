@@ -15,7 +15,7 @@ const LandingPage = () => {
                 <div className="relative pt-[60%] sm:pt-[40%] md:pt-[20%] desktop-xl flex items-start justify-center w-full h-full">
                     {/* texts */}
                     <div className="flex flex-col gap-3 items-start justify-between">
-                        <h1 className="relative font-['Six_Caps'] text-7xl md:text-8xl text-[#1a1a1a] leading-tight tracking-normal">
+                        <h1 className="relative font-['Six_Caps'] text-7xl md:text-8xl text-[#1a1a1a] leading-tight tracking-wide md:tracking-normal">
                             <span className="font-[Smooch] italic text-5xl md:text-6xl">
                                 my
                             </span>

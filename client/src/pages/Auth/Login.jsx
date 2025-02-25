@@ -7,7 +7,7 @@ import { LoginForm } from "@/components/ui/login-form";
 const LoginPage = ({ bgClr = "bg-cream-light" }) => {
     return (
         <div
-            className={`min-h-screen ${bgClr} flex items-center justify-center p-4`}
+            className={`min-h-auto md:min-h-screen h-[100dvh] md:h-auto ${bgClr} flex items-center justify-center p-4`}
         >
             <Card className="w-full max-w-md p-12 space-y-8 relative overflow-hidden">
                 <div className="absolute top-0 right-0 -mr-18 -mt-18 opacity-10">
@@ -98,7 +98,8 @@ const LoginPage = ({ bgClr = "bg-cream-light" }) => {
                         <span className="font-['Six_Caps'] tracking-wide">
                             <span className="font-[Smooch]">my</span>
                             opencanvas
-                        </span>{" "}
+                        </span>
+                        ?{" "}
                         <a href="#" className="text-gray-800 hover:underline">
                             Create an account
                         </a>

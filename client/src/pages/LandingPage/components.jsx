@@ -28,7 +28,7 @@ export const SlidingButton = ({ href, children }) => {
                 window.location.href = href;
             }}
             className="relative font-[Handlee] italic text-xl md:text-xl py-1 px-3 md:py-4 md:px-7 rounded-md
-                 border border-sky-300 overflow-hidden bg-sky-300/20
+                 border border-sky-300 overflow-hidden bg-sky-200/20 md:bg-sky-300/20
                  text-#4d4d4d group z-30 cursor-pointer
                  transition-colors duration-300 ease-out
                  before:absolute before:inset-0
@@ -92,13 +92,13 @@ export const Navbar = () => {
 
             {/* Mobile Navigation */}
             {isMenuOpen && (
-                <div className="md:hidden absolute top-20 left-0 right-0 bg-white/90 backdrop-blur-sm z-50 border-b border-stone-200">
-                    <div className="flex flex-col space-y-4 p-6">
+                <div className="md:hidden absolute top-20 left-0 right-0 bg-white backdrop-blur-sm z-50 border-b border-stone-200 shadow-sm">
+                    <div className="flex flex-col p-6">
                         {navLinks.map((link, index) => (
                             <a
                                 key={index}
                                 href={link.href}
-                                className="text-stone-600 hover:text-stone-800 text-lg transition-colors"
+                                className="text-stone-600 hover:text-stone-800 hover:bg-sky-300/30 py-2 pl-4 rounded-lg text-lg transition-colors"
                             >
                                 {link.name}
                             </a>

@@ -43,11 +43,13 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
                 <div className="max-w-[1400px] mx-auto flex justify-between items-center px-8 py-6">
                     <a
                         href="/"
-                        className="text-md md:text-2xl text-stone-950 bg-lime-400 tracking-normal font-thin rounded-md box-content p-1"
+                        className="text-base md:text-2xl text-stone-950 bg-lime-400 tracking-normal font-thin rounded-md box-content px-1 py-0 md:px-1 md:py-1"
                     >
                         {/* OpenCanvas: font-stardom font-bold md:font-thin */}
-                        <span className="font-['Six_Caps'] text-2xl tracking-wide">
-                            <span className="font-[Smooch] text-lg">my</span>
+                        <span className="font-['Six_Caps'] text-lg md:text-2xl tracking-wide">
+                            <span className="font-[Smooch] text-sm md:text-lg">
+                                my
+                            </span>
                             opencanvas
                         </span>{" "}
                     </a>
@@ -127,7 +129,7 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
                                 <a
                                     key={index}
                                     href={link.href}
-                                    className="block px-4 py-2 hover:bg-lime-300 rounded-md"
+                                    className="block px-4 py-2 hover:bg-lime-300/60 rounded-md"
                                     onClick={() => setMobileMenuOpen(false)}
                                 >
                                     {link.label}
@@ -353,7 +355,7 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
             </main>
 
             {/* Footer */}
-            <footer className="fixed bottom-0 w-full bg-white border-t border-gray-100">
+            <footer className="hidden md:block fixed bottom-0 w-full bg-white border-t border-gray-100">
                 <div className="max-w-[1400px] mx-auto px-8 py-6 flex justify-between items-center">
                     <div className="text-sm text-gray-400">
                         © 2025 All rights reserved

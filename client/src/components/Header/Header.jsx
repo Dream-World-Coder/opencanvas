@@ -21,12 +21,14 @@ const Header = () => {
                     <a
                         href="/"
                         className="tracking-tight
-                        bg-lime-400 font-thin text-base sm:text-2xl text-stone-950
-                        rounded-md box-content p-1"
+                        bg-lime-400 font-thin text-sm sm:text-2xl text-stone-950
+                        rounded-md box-content px-1 py-0 md:px-1 md:py-1"
                     >
                         {/* OpenCanvas */}
-                        <span className="font-['Six_Caps'] text-3xl tracking-wide">
-                            <span className="font-[Smooch] text-xl">my</span>
+                        <span className="font-['Six_Caps'] text-xl md:text-3xl tracking-wide">
+                            <span className="font-[Smooch] text-sm md:text-xl">
+                                my
+                            </span>
                             opencanvas
                         </span>{" "}
                     </a>
@@ -72,12 +74,12 @@ const Header = () => {
                 >
                     <div className="px-4 py-6 space-y-6">
                         {/* Mobile Nav Links */}
-                        <div className="flex flex-col space-y-4">
+                        <div className="flex flex-col">
                             {navLinks.map((link, index) => (
                                 <a
                                     key={index}
                                     href={link.href}
-                                    className="text-stone-600 hover:text-stone-800 transition-colors"
+                                    className="py-2 pl-4 rounded-lg text-stone-600 hover:text-stone-800 hover:bg-lime-300/50 transition-colors"
                                     onClick={() => setIsMenuOpen(false)}
                                 >
                                     {link.name}

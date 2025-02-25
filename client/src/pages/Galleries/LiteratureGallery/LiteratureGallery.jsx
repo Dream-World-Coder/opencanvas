@@ -18,11 +18,17 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
     ];
 
     useEffect(() => {
-        const handleScroll = () => {
-            setScrollY(window.scrollY);
-        };
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
+        const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+        if (!isMobile) {
+            const handleScroll = () => {
+                setScrollY(window.scrollY);
+            };
+
+            window.addEventListener("scroll", handleScroll);
+            return () => {
+                window.removeEventListener("scroll", handleScroll);
+            };
+        }
     }, []);
 
     return (
@@ -31,7 +37,7 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
 
             {/* Top / Hero */}
             <div
-                className={`relative h-72 overflow-hidden bg-inherit`}
+                className={`relative h-32 md:h-72 overflow-hidden bg-inherit`}
                 style={{
                     transform: `translateY(${scrollY * 0.2}px)`,
                 }}
@@ -41,11 +47,11 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
                         <h1 className="text-3xl text-stone-800 mb-3 tracking-wide font-scribe pointer-events-none md:pointer-events-auto">
                             Literary Collection
                         </h1>
-                        <div className="h-px w-[100%] mx-auto bg-gradient-to-r from-transparent via-stone-500/40 to-transparent mb-3"></div>
-                        <p className="text-sm text-stone-600 tracking-wide font-light font-stardom pointer-events-none md:pointer-events-auto">
+                        <div className="h-px hidden md:block w-[100%] mx-auto bg-gradient-to-r from-transparent via-[#333]/40 to-transparent mb-1 md:mb-3"></div>
+                        <p className="hidden md:block text-sm text-stone-600 tracking-wide font-bold md:font-light font-stardom pointer-events-none md:pointer-events-auto">
                             A gathering of thoughts, verses, and tales
                         </p>
-                        <div className="h-px w-[100%] mx-auto bg-gradient-to-r from-transparent via-stone-500/40 to-transparent mt-3"></div>
+                        <div className="h-px hidden md:block w-[100%] mx-auto bg-gradient-to-r from-transparent via-[#333]/40 to-transparent mt-1 md:mt-3"></div>
                     </div>
                 </div>
             </div>
@@ -63,16 +69,16 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
                         >
                             <div
                                 className={`bg-gradient-to-br ${story.gradient} p-8 border-b border-stone-200
-                                    hover:border-stone-300 transition-all duration-500
+                                    hover:border-stone-300 transition-all duration-500 group
                                     hover:shadow-lg hover:shadow-stone-100/50 rounded`}
                             >
                                 <header className="mb-6">
                                     <div className="flex justify-between items-center mb-4">
                                         {/*  rounded-full border border-stone-500/30 box-content px-2 py-1 */}
-                                        <span className="text-xs tracking-widest text-stone-500 uppercase font-stardom">
+                                        <span className="text-xs tracking-widest text-stone-500 uppercase font-bold md:font-light font-stardom">
                                             {story.type}
                                         </span>
-                                        <span className="text-xs text-stone-400 italic font-stardom">
+                                        <span className="text-xs text-stone-400 italic font-bold md:font-light font-stardom">
                                             {story.date}
                                         </span>
                                     </div>
@@ -83,7 +89,7 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
                                         by{" "}
                                         <a
                                             href="#"
-                                            className="text-stone-700 font-stardom underline"
+                                            className="text-stone-700 font-bold md:font-light font-stardom underline"
                                         >
                                             {story.author}
                                         </a>
@@ -100,23 +106,23 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
 
                                 <footer className="flex items-center justify-between text-stone-500">
                                     <div className="flex items-center space-x-4">
-                                        <button className="flex items-center space-x-1 text-xs hover:text-stone-700 transition-colors group">
+                                        <button className="flex items-center space-x-1 text-xs hover:text-stone-700 transition-colors">
                                             <Heart
                                                 size={14}
-                                                className={`group-hover:fill-rose-600
-                                                    ${hoveredId === story.id ? "animate-pulse" : ""}`}
+                                                className={`hover:fill-rose-600
+                                                    ${hoveredId === story.id ? "animate-pulseX" : ""}`}
                                             />
                                             <span>{story.likes}</span>
                                         </button>
-                                        <button className="flex items-center space-x-1 text-xs hover:text-stone-700 transition-colors group">
+                                        <button className="flex items-center space-x-1 text-xs hover:text-stone-700 transition-colors">
                                             <Bookmark
                                                 size={14}
-                                                className="group-hover:fill-sky-400"
+                                                className="hover:fill-sky-400"
                                             />
                                             <span>{story.saves}</span>
                                         </button>
                                     </div>
-                                    <span className="group text-xs text-stone-400 hover:text-stone-600 hover:bg-sky-100 px-3 py-1 rounded-xl transition-colors flex items-center gap-1">
+                                    <span className="group text-xs text-stone-400 group-hover:text-stone-600 group-hover:bg-sky-100 px-3 py-1 rounded-xl transition-colors flex items-center gap-1">
                                         Read more
                                         <ArrowRight
                                             size={12}

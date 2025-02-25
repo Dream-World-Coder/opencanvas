@@ -71,12 +71,12 @@ const Header = ({ filters, navLinks }) => {
                 >
                     <div className="px-4 py-6 space-y-6">
                         {/* Mobile Nav Links */}
-                        <div className="flex flex-col space-y-4">
+                        <div className="flex flex-col">
                             {navLinks.map((link, index) => (
                                 <a
                                     key={index}
                                     href={link.href}
-                                    className="text-stone-600 hover:text-stone-800 transition-colors"
+                                    className="py-2 pl-4 rounded-lg text-stone-600 hover:text-stone-800 hover:bg-gray-300/30 transition-colors"
                                     onClick={() => setIsMenuOpen(false)}
                                 >
                                     {link.name}
