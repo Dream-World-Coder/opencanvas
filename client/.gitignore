@@ -8,7 +8,6 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-pnpm-lock.yaml
 dist
 dist-ssr
 *.local
@@ -28,5 +27,5 @@ dist-ssr
 src/assets/icons/o*.svg
 src/assets/icons/O*.svg
 
-
+# important
 _api_v1/
