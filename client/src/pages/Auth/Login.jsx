@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FlowerIcon } from "./Flower";
 import PropTypes from "prop-types";
-import { LoginForm } from "@/components/ui/login-form";
+// import { LoginForm } from "@/components/ui/login-form";
 
 const LoginPage = ({ bgClr = "bg-cream-light" }) => {
     return (

@@ -1,7 +1,15 @@
 import { useEffect } from "react";
 import Lenis from "lenis";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+    BrowserRouter as Router,
+    Routes,
+    Route,
+    Navigate,
+} from "react-router-dom";
 import "./App.css";
+
+import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import LandingPage from "./pages/LandingPage/LandingPage";
 import LoginPage from "./pages/Auth/Login";
@@ -42,66 +50,62 @@ export default function App() {
 
     return (
         <Router>
-            <Routes>
-                {/* basic */}
-                <Route path="/" element={<LandingPage />} />
-                <Route
-                    path="/login"
-                    element={<LoginPage bgClr="bg-cream-light" />}
-                />
-                <Route
-                    path="/profile"
-                    element={<Profile bgClr="bg-white" />}
-                    // loader={<LoadingPage />}
-                />
-                <Route
-                    path="/about"
-                    element={<AboutPage bgClr="bg-white" />}
-                    // loader={<LoadingPage />}
-                />
-                <Route
-                    path="/contact"
-                    element={<ContactPage bgClr="bg-white" />}
-                    // loader={<LoadingPage />}
-                />
+            <AuthProvider>
+                <Routes>
+                    {/* public */}
+                    <Route path="/" element={<LandingPage />} />
+                    <Route
+                        path="/login"
+                        element={<LoginPage bgClr="bg-cream-light" />}
+                    />
+                    <Route path="/register" element={<LoginPage />} />
+                    {/* <Route path="/auth/success" element={<AuthSuccess />} /> */}
+                    {/* <Route path="/post/:id" element={<PostDetail />} /> */}
+                    <Route
+                        path="/about"
+                        element={<AboutPage bgClr="bg-white" />}
+                    />
+                    <Route
+                        path="/contact"
+                        element={<ContactPage bgClr="bg-white" />}
+                    />
+                    <Route
+                        path="/gallery/photos"
+                        element={<PhotoGalleryPage bgClr="bg-white" />}
+                    />
+                    <Route
+                        path="/gallery/literature"
+                        element={<LiteratureGallery bgClr="bg-white" />}
+                    />
+                    <Route path="/markdown2pdf" element={<WritingPad />} />
 
-                {/* gallery */}
-                <Route
-                    path="/gallery/photos"
-                    element={<PhotoGalleryPage bgClr="bg-white" />}
-                    // loader={<LoadingPage />}
-                />
-                <Route
-                    path="/gallery/literature"
-                    element={<LiteratureGallery bgClr="bg-white" />}
-                    // loader={<LoadingPage />}
-                />
+                    {/* protected */}
+                    <Route element={<ProtectedRoute />}>
+                        <Route
+                            path="/profile"
+                            element={<Profile bgClr="bg-white" />}
+                        />
+                        <Route path="/new/poem" element={<PoemPad />} />
+                        <Route path="/new/story" element={<StoryPad />} />
+                        {/* <Route path="/my-posts" element={<UserPosts />} /> */}
+                    </Route>
 
-                {/* new post */}
-                <Route
-                    path="/new/poem"
-                    element={<PoemPad />}
-                    // loader={<LoadingPage />}
-                />
-                <Route
-                    path="/new/story"
-                    element={<StoryPad />}
-                    // loader={<LoadingPage />}
-                />
-                <Route
-                    path="/markdown2pdf"
-                    element={<WritingPad />}
-                    // loader={<LoadingPage />}
-                />
-
-                {/* others */}
-                <Route path="/thanks" element={<Thanks bgClr="bg-white" />} />
-                <Route
-                    path="/loading"
-                    element={<LoadingPage bgClr="bg-white" />}
-                />
-                <Route path="*" element={<NotFoundPage bgClr="bg-white" />} />
-            </Routes>
+                    {/* others */}
+                    <Route
+                        path="/thanks"
+                        element={<Thanks bgClr="bg-white" />}
+                    />
+                    <Route
+                        path="/loading"
+                        element={<LoadingPage bgClr="bg-white" />}
+                    />
+                    <Route
+                        path="/404"
+                        element={<NotFoundPage bgClr="bg-white" />}
+                    />
+                    <Route path="*" element={<Navigate to="/404" />} />
+                </Routes>
+            </AuthProvider>
         </Router>
     );
 }
