@@ -1,33 +1,83 @@
-import express from "express";
-import dotenv from "dotenv";
-import cookieParser from "cookie-parser";
-import { connectDB } from "./lib/db.js";
-import userRoutes from "./routes/user.route.js";
-import postRoutes from "./routes/post.route.js";
-import commentRoutes from "./routes/comment.route.js";
-import cors from "cors";
+// app.js - Main Express application setup
 
-dotenv.config();
+const express = require("express");
+const mongoose = require("mongoose");
+const passport = require("passport");
+const session = require("express-session");
+const cors = require("cors");
+const helmet = require("helmet");
+const morgan = require("morgan");
+const { router: authRoutes } = require("./routes/auth");
 
+// Initialize Express app
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-app.use(cookieParser());
+// Connect to MongoDB
+mongoose
+    .connect(
+        process.env.MONGODB_URI || "mongodb://localhost:27017/opencanvas",
+        {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        },
+    )
+    .then(() => console.log("Connected to MongoDB"))
+    .catch((err) => console.error("MongoDB connection error:", err));
+
+// Basic middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(
     cors({
-        origin: "http://localhost:5173",
+        origin: process.env.FRONTEND_URL || "http://localhost:3000",
         credentials: true,
     }),
 );
+app.use(helmet()); // Security headers
+app.use(morgan("dev")); // Logging
 
-const PORT = process.env.PORT || 5000;
+// Session configuration
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET || "nhed9rbv749j3Snek",
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+            maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        },
+    }),
+);
 
-app.use(express.json({ limit: "5mb" }));
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
-app.use("/api/v1/users", userRoutes);
-app.use("/api/v1/posts", postRoutes);
-app.use("/api/v1/comments", commentRoutes);
+// Routes
+app.use("/auth", authRoutes);
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    connectDB();
+// Root route
+app.get("/", (req, res) => {
+    res.json({ message: "Welcome to OpenCanvas API" });
 });
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({
+        success: false,
+        message: "Something went wrong",
+        error:
+            process.env.NODE_ENV === "development"
+                ? err.message
+                : "Server error",
+    });
+});
+
+// Start server
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
+
+module.exports = app;
