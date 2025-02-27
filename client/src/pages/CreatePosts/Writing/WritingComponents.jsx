@@ -88,84 +88,6 @@ export const formattingButtons = [
     { format: "pageBreak", icon: FilePlus },
 ];
 
-export const rawText = `
-    <p style="font-size: 18px; line-height: 1.5;">
-    <span style="float: left; font-size: 3em; font-weight: bold; line-height: 1; margin-right: 8px;">M</span>
-    arkdown, often abbreviated as MD, is a lightweight markup language that transforms plain text into richly formatted documents. Developed with readability in mind, its simple syntax allows users to add headers, lists, links, and other elements without heavy reliance on complex code. This ease of use has made Markdown a popular choice for everything from documentation and blogging to collaborative projects on platforms like GitHub. Its enduring appeal lies in the balance it strikes between simplicity and functionality, making it an essential tool in modern digital communication.
-    </p>
-
-    ---
-
-    <mark>Here are some examples</mark>
-
-    # Gradient descent is a method for unconstrained mathematical optimization.
-    ## Gradient descent is a method for unconstrained mathematical optimization.
-    ### Gradient descent is a method for unconstrained mathematical optimization.
-    #### Gradient descent is a method for unconstrained mathematical optimization.
-    ##### Gradient descent is a method for unconstrained mathematical optimization.
-    ###### Gradient descent is a method for unconstrained mathematical optimization.
-
-    **Gradient descent is a method for unconstrained mathematical optimization.**
-
-    *Gradient descent is a method for unconstrained mathematical optimization.*
-
-    ***Gradient descent is a method for unconstrained mathematical optimization.***
-
-    Gradient descent is a method for unconstrained mathematical optimization.
-
-    ---
-    <br/>
-
-    > Gradient descent is a method for unconstrained mathematical optimization. It is a first-order iterative algorithm for minimizing a differentiable multivariate function.
-
-    <br/>
-
-    ---
-
-    - This is a bullet list item
-    - Another item
-
-    1. This is a numbered list item
-    2. Another numbered item
-
-    - [ ] This is an unchecked task
-    - [x] This is a checked task
-
-    ---
-    <br/>
-
-    | Column 1 | Column 2 | Column 3 |
-    |----------|----------|----------|
-    | Data 1   | Data 2   | Data 3   |
-    | Data 4   | Data 5   | Data 6   |
-
-    <br/>
-
-    \`This is inline code\`
-
-    \`\`\`cpp
-    #include <iostream>
-
-    int main() {
-        std::cout << "Hello, World!" << std::endl;
-        return 0;
-    }
-    \`\`\`
-
-    [This is a link](https://example.com)
-
-    ![This is an image](https://picsum.photos/150)
-
-    ---
-    # <u>For underlined heading</u>
-
-    Wrong:
-    <u> ## heading</u>
-
-    Correct:
-    ## <u>heading</u>
-`;
-
 const sliderOptions = [
     {
         id: "marginTop",
@@ -1179,3 +1101,234 @@ TableComp.propTypes = {
     searchable: PropTypes.bool,
     sortable: PropTypes.bool,
 };
+
+export const rawText = `
+    <p style="font-size: 18px; line-height: 1.5;"><span style="float: left; font-size: 3em; font-weight: bold; line-height: 1; margin-right: 8px;">M</span>arkdown is a lightweight markup language with plain text formatting syntax. This tutorial covers both the basics and some advanced features of Markdown.</p>
+
+    <br /><br />
+
+    ## Table of Contents
+
+    - [Introduction](#introduction)
+    - [Headers](#headers)
+    - [Text Formatting](#text-formatting)
+    - [Lists](#lists)
+        - [Unordered Lists](#unordered-lists)
+        - [Ordered Lists](#ordered-lists)
+    - [Links and Images](#links-and-images)
+    - [Code Blocks and Inline Code](#code-blocks-and-inline-code)
+    - [Blockquotes](#blockquotes)
+    - [Tables](#tables)
+    - [Footnotes](#footnotes)
+    - [Task Lists](#task-lists)
+    - [Conclusion](#conclusion)
+
+    <br /><br />
+
+    ## Introduction
+
+    Markdown allows you to write using an easy-to-read, easy-to-write plain text format that can be converted into HTML and other formats. It’s perfect for writing documentation, notes, and even web content.
+
+    <br /><br />
+
+    ## Headers
+
+    Headers are created using the \`#\` symbol. The number of \`#\` symbols indicates the header level.
+
+    ### Example:
+
+    \`\`\`markdown
+    # heading 1.
+
+    ## heading 2.
+
+    ### heading 3.
+
+    #### heading 4.
+
+    ##### heading 5.
+
+    ###### heading 6.
+    \`\`\`
+
+    # heading 1.
+
+    ## heading 2.
+
+    ### heading 3.
+
+    #### heading 4.
+
+    ##### heading 5.
+
+    ###### heading 6.
+
+    <br /><br />
+
+    ## Text Formatting
+
+    You can add emphasis to text using asterisks \`*\` or underscores \`_\`.
+
+    - **Bold**: Use \`**Bold Text**\` or \`__Bold Text__\`
+    - _Italic_: Use \`*Italic Text*\` or \`_Italic Text_\`
+    - **_Bold and Italic_**: Use \`***Bold and Italic***\` or \`___Bold and Italic___\`
+    - ~~Strikethrough~~: Use \`~~Strikethrough~~\`
+
+    ### Example:
+
+    \`\`\`markdown
+    **This text is bold**
+
+    _This text is italic_
+
+    **_This text is both bold and italic_**
+
+    ~~This text has a strikethrough~~
+    \`\`\`
+
+    <br /><br />
+
+    ## Lists
+
+    ### Unordered Lists
+
+    Create unordered lists using dashes \`-\`, asterisks \`*\`, or plus signs \`+\`.
+
+    \`\`\`markdown
+    - Item 1
+    - Item 2
+        - Subitem 2.1
+        - Subitem 2.2
+    - Item 3
+    \`\`\`
+
+    ### Ordered Lists
+
+    Create ordered lists by starting lines with numbers followed by a period.
+
+    \`\`\`markdown
+    1. First item
+    2. Second item
+        1. Subitem 2.1
+        2. Subitem 2.2
+    3. Third item
+    \`\`\`
+
+    <br /><br />
+
+    ## Links and Images
+
+    ### Links
+
+    To create a link, wrap the link text in square brackets and the URL in parentheses.
+
+    \`\`\`markdown
+    [Visit](https://www.example.com)
+    \`\`\`
+
+    ### Images
+
+    Images are inserted similarly to links but start with an exclamation mark \`!\`.
+
+    \`\`\`markdown
+    ![A descriptive alt text](https://www.example.com/image.jpg)
+    \`\`\`
+
+    <br /><br />
+
+    ## Code Blocks and Inline Code
+
+    ### Inline Code
+
+    Wrap inline code in single backticks \`\` \` \`\`.
+
+    \`\`\`markdown
+    Here is some inline code: \`print("Hello, World!")\`
+    \`\`\`
+
+    ### Code Blocks
+
+    For longer sections of code, use triple backticks or indent with four spaces. You can also specify the language for syntax highlighting.
+
+    \`\`\`python
+    def hello_world():
+        print("Hello, World!")
+
+    hello_world()
+    \`\`\`
+
+    <br /><br />
+
+    ## Blockquotes
+
+    Blockquotes are created by starting a line with the \`>\` symbol.
+
+    \`\`\`markdown
+    > This is a blockquote.
+    >
+    > It can span multiple lines.
+    \`\`\`
+
+    > This is a blockquote.
+    >
+    > It can span multiple lines.
+
+    <br /><br />
+
+    ## Tables
+
+    Tables can be created using pipes \`|\` to separate columns and hyphens \`-\` to create the header row.
+
+    | Column 1 | Column 2 | Column 3 |
+    | -------- | -------- | -------- |
+    | Row 1    | Data 1   | Data 2   |
+    | Row 2    | Data 3   | Data 4   |
+
+    <br /><br />
+
+    ## Footnotes
+
+    Some Markdown processors support footnotes for adding extra context.
+
+    \`\`\`markdown
+    Here is a statement that needs a footnote.[^1]
+
+    [^1]: This is the footnote providing extra information.
+    \`\`\`
+
+    Here is a statement that needs a footnote.[^1]
+
+    [^1]: This is the footnote providing extra information.
+
+    <br /><br />
+
+    ## Task Lists
+
+    Task lists are useful for to-do lists or tracking progress. Use \`- [ ]\` for unchecked items and \`- [x]\` for checked items.
+
+    \`\`\`markdown
+    - [ ] Task 1
+    - [x] Task 2 (completed)
+    - [ ] Task 3
+    \`\`\`
+
+    - [ ] Task 1
+    - [x] Task 2 (completed)
+    - [ ] Task 3
+
+    <br /><br />
+
+    ## Additionals
+
+    use \`<br />\` or if you want to add space between paragraphs, use can use many of them for more space
+
+    use \`---\` to add a line
+
+    <br /><br />
+
+    ## Conclusion
+
+    This tutorial has covered a variety of Markdown features from headers to tables, code blocks, and more. Experiment with these elements to get comfortable with Markdown and enhance your documents.
+
+    Happy writing!
+    `;
