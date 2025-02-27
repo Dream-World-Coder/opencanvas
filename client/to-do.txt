@@ -39,3 +39,6 @@ heading, quote, inlineCode, list
 
 -- [x] copy & save button not working in phone
 -- [x] when export warning: file cannot be downloaded securely in phones, why
+
+
+-- [x] find and replace
