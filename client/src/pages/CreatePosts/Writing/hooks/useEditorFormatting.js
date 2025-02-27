@@ -18,11 +18,11 @@ export function useEditorFormatting(content, setContent) {
      * Handle Text area's content change
      */
     // ----------------- ^%SOS#
-    const handleContentChange = (e) => {
+    const handleContentChange = (e, setIsSaved) => {
         const newContent = e.target.value;
         addToUndoStack(content);
         setContent(newContent);
-        // Note: isSaved is handled in the parent component
+        setIsSaved(false);
         e.target.style.height = "auto";
         e.target.style.height = e.target.scrollHeight + "px";
     };

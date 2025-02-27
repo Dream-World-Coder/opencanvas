@@ -604,7 +604,9 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                         <textarea
                             id="txtArea"
                             value={content}
-                            onChange={handleContentChange}
+                            onChange={(e) => {
+                                handleContentChange(e, setIsSaved);
+                            }}
                             placeholder="Fill your canvas..."
                             className={`w-full min-h-screen h-auto resize-none focus:outline-none text-lg text-left transition-all duration-0
                             ${isDark ? "bg-[#222]" : lightModeBg}
