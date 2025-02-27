@@ -53,9 +53,15 @@ import {
     rawText,
 } from "./WritingComponents";
 
+/**
+ * supports latex && easy to use + image upload, easily give gap, cuz supports html
+ */
+
 const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
+    // const [content, setContent] = useState(rawText);
+    // const [wordCount, setWordCount] = useState(0);
     const [isSerif, setIsSerif] = useState(false);
     const [documentScroll, setDocumentScroll] = useState(false);
     const [sepia, setSepia] = useState(false);
@@ -107,10 +113,105 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
 
         let newText = content;
         switch (format) {
+            case "handleImageInset":
+                break;
+
+            case "inlineCode":
+                newText =
+                    content.substring(0, start) +
+                    `\`${selectedText}\`` +
+                    content.substring(end);
+                break;
+
+            // select the paragraph where you want to implement this
+            case "dropCap":
+                newText =
+                    content.substring(0, start) +
+                    `<p style="font-size: 18px; line-height: 1.5;"><span style="float: left; font-size: 3em; font-weight: bold; line-height: 1; margin-right: 8px;">${selectedText[0]}</span>${selectedText.slice(1)}</p>\n` +
+                    content.substring(end);
+                break;
+
+            case "bold":
+                newText =
+                    content.substring(0, start) +
+                    `**${selectedText}**` +
+                    content.substring(end);
+                break;
+
+            case "italic":
+                newText =
+                    content.substring(0, start) +
+                    `*${selectedText}*` +
+                    content.substring(end);
+                break;
+
+            case "underline":
+                newText =
+                    content.substring(0, start) +
+                    `<u>${selectedText}</u>` +
+                    content.substring(end);
+                break;
+
+            case "strikethrough":
+                newText =
+                    content.substring(0, start) +
+                    `~~${selectedText}~~` +
+                    content.substring(end);
+                break;
+
+            case "highlight":
+                newText =
+                    content.substring(0, start) +
+                    `<mark>${selectedText}</mark>` +
+                    content.substring(end);
+                break;
+
             case "quote":
                 newText =
                     content.substring(0, start) +
                     `> ${selectedText}` +
+                    content.substring(end);
+                break;
+
+            case "line":
+                newText =
+                    content.substring(0, start) +
+                    `\n---\n${selectedText}` +
+                    content.substring(end);
+                break;
+
+            case "code":
+                newText =
+                    content.substring(0, start) +
+                    `\`\`\`c\n${selectedText}\n\`\`\`` +
+                    content.substring(end);
+                break;
+
+            case "link":
+                newText =
+                    content.substring(0, start) +
+                    `[${selectedText}](http://example.com)` +
+                    content.substring(end);
+                break;
+
+            case "subscript":
+                newText =
+                    content.substring(0, start) +
+                    `~${selectedText}~` +
+                    content.substring(end);
+                break;
+
+            case "pageBreak":
+                newText =
+                    content.substring(0, start) +
+                    `${selectedText}\n<span className=html2pdf__page-break></span>` +
+                    content.substring(end);
+                break;
+
+            case "list":
+                newText =
+                    content.substring(0, start) +
+                    `- ${selectedText}` +
                     content.substring(end);
                 break;
 
@@ -141,9 +242,10 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
         const newContent = e.target.value;
         addToUndoStack(content);
         setContent(newContent);
+        // setWordCount(newContent.trim().split(/\s+/).filter(Boolean).length);
         setIsSaved(false);
-        e.target.style.height = "auto";
-        e.target.style.height = e.target.scrollHeight + "px";
+        e.target.style.height = "auto"; // reset the height for proper increase
+        e.target.style.height = e.target.scrollHeight + "px"; // Set new height based on content
     };
 
     const handleUndo = () => {
@@ -172,16 +274,21 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             // waiting a bit for the html to be compiled, no need ig, cuz i have used await
             const element = document.getElementById("export");
             const safeTitle = title
+                // Replace one or more non-alphanumeric characters with a hyphen
                 .replace(/[^a-zA-Z0-9]+/g, "-")
+                // Remove any leading or trailing hyphens
                 .replace(/^-|-$/g, "");
 
+            // Configuration options for html2pdf
             const options = {
                 margin: 0.5,
                 filename: `${safeTitle}-myOpenCanvas.pdf`,
+                // window.crypto.randomUUID()
                 image: { type: "jpeg", quality: 1.0 },
                 html2canvas: {
                     scale: 2,
                     useCORS: true,
+                    // letterRendering: true,
                 },
                 jsPDF: {
                     unit: "in",
@@ -189,6 +296,8 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                     orientation: "portrait",
                 },
             };
+
+            // Generate and download PDF
             await html2pdf().set(options).from(element).save();
         } catch (error) {
             console.error("PDF export failed:", error);
@@ -196,6 +305,43 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                 "PDF export failed, Set Preview Mode on when exporting.",
                 error,
             );
+            // toast.error();
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleTxtExport = async (extension) => {
+        if (!extension) {
+            extension = "txt";
+        }
+        try {
+            setLoading(true);
+            const safeTitle = title
+                .replace(/[^a-zA-Z0-9]+/g, "-")
+                .replace(/^-|-$/g, "");
+            const filename = `${safeTitle}-myOpenCanvas.${extension}`;
+            const txtFileContent = `# ${title}\n\n\n${content}\n`;
+
+            const blob = new Blob([txtFileContent], {
+                type: "text/plain;charset=utf-8",
+            });
+            // temporary URL for the Blob
+            const url = URL.createObjectURL(blob);
+
+            // temporary anchor element to trigger the download
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+
+            // Clean up: remove the anchor element and revoke the Blob URL
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("txt export failed:", error);
+            alert("txt export failed", error);
         } finally {
             setLoading(false);
         }
@@ -209,6 +355,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             lastSaved: new Date().toISOString(),
             syncedWithServer: false,
         };
+        // localStorage.setItem(`draft-${draft.id}`, JSON.stringify(draft));
         localStorage.setItem(`blogPost`, JSON.stringify(draft));
         setIsSaved(true);
     };
@@ -227,6 +374,42 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             setLastSynced(new Date());
             return;
         }, 200);
+
+        /*
+        try {
+            const response = await fetch(`/api/posts/${postId || ""}`, {
+                method: postId ? "PUT" : "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    title,
+                    content,
+                    type: artType,
+                }),
+            });
+
+            if (response.ok) {
+                const savedPost = await response.json();
+                if (!postId) {
+                    // If this was a new post, update URL with new post ID
+                    window.history.replaceState(
+                        {},
+                        "",
+                        `/edit/${savedPost.id}`,
+                    );
+                }
+                setSyncStatus("synced");
+                setLastSynced(new Date());
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error("Error saving to backend:", error);
+            setSyncStatus("offline");
+            return false;
+        }
+        */
     };
 
     /**
@@ -239,6 +422,33 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
             setLastSynced(new Date());
             return;
         }, 200);
+
+        /*
+        const draftKeys = Object.keys(localStorage).filter((key) =>
+            key.startsWith("draft-"),
+        );
+
+        for (const key of draftKeys) {
+            const draft = JSON.parse(localStorage.getItem(key));
+            if (!draft.syncedWithServer) {
+                try {
+                    const response = await fetch(`/api/posts/${draft.id}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(draft),
+                    });
+
+                    if (response.ok) {
+                        localStorage.removeItem(key);
+                    }
+                } catch (error) {
+                    console.error("Error syncing draft:", error);
+                }
+            }
+        }
+        */
     };
 
     const handleSave = async () => {
@@ -291,6 +501,40 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
     /**
      * Load existing post or draft
      */
+    /*
+    useEffect(() => {
+        const loadPost = async () => {
+            if (postId) {
+                try {
+                    // Try loading from backend first
+                    const response = await fetch(
+                        `localhost:5050/posts/${postId}`,
+                    );
+                    if (response.ok) {
+                        const post = await response.json();
+                        setTitle(post.title);
+                        setContent(post.content);
+                        setLastSynced(new Date());
+                    }
+                } catch (error) {
+                    // If backend fails, try loading from local draft
+                    const localDraft = localStorage.getItem(`draft-${postId}`);
+                    if (localDraft) {
+                        const { title, content, lastSaved } =
+                            JSON.parse(localDraft);
+                        setTitle(title);
+                        setContent(content);
+                        setSyncStatus("offline");
+                    }
+                }
+            }
+        };
+        loadPost();
+    }, [postId]);
+    */
+    // not needed now, backend not ready, so:
+    // loadPost();
+    // instead there is a simple version:
     useEffect(() => {
         const loadSaved = async () => {
             try {
@@ -300,6 +544,9 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                         JSON.parse(savedPost);
                     setTitle(savedTitle);
                     setContent(savedContent);
+                    // setWordCount(
+                    //     savedContent.trim().split(/\s+/).filter(Boolean).length,
+                    // );
                 }
 
                 // Wait for React state updates to complete

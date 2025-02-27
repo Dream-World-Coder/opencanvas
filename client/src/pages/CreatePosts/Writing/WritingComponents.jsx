@@ -88,6 +88,84 @@ export const formattingButtons = [
     { format: "pageBreak", icon: FilePlus },
 ];
 
+export const rawText = `
+    <p style="font-size: 18px; line-height: 1.5;">
+    <span style="float: left; font-size: 3em; font-weight: bold; line-height: 1; margin-right: 8px;">M</span>
+    arkdown, often abbreviated as MD, is a lightweight markup language that transforms plain text into richly formatted documents. Developed with readability in mind, its simple syntax allows users to add headers, lists, links, and other elements without heavy reliance on complex code. This ease of use has made Markdown a popular choice for everything from documentation and blogging to collaborative projects on platforms like GitHub. Its enduring appeal lies in the balance it strikes between simplicity and functionality, making it an essential tool in modern digital communication.
+    </p>
+
+    ---
+
+    <mark>Here are some examples</mark>
+
+    # Gradient descent is a method for unconstrained mathematical optimization.
+    ## Gradient descent is a method for unconstrained mathematical optimization.
+    ### Gradient descent is a method for unconstrained mathematical optimization.
+    #### Gradient descent is a method for unconstrained mathematical optimization.
+    ##### Gradient descent is a method for unconstrained mathematical optimization.
+    ###### Gradient descent is a method for unconstrained mathematical optimization.
+
+    **Gradient descent is a method for unconstrained mathematical optimization.**
+
+    *Gradient descent is a method for unconstrained mathematical optimization.*
+
+    ***Gradient descent is a method for unconstrained mathematical optimization.***
+
+    Gradient descent is a method for unconstrained mathematical optimization.
+
+    ---
+    <br/>
+
+    > Gradient descent is a method for unconstrained mathematical optimization. It is a first-order iterative algorithm for minimizing a differentiable multivariate function.
+
+    <br/>
+
+    ---
+
+    - This is a bullet list item
+    - Another item
+
+    1. This is a numbered list item
+    2. Another numbered item
+
+    - [ ] This is an unchecked task
+    - [x] This is a checked task
+
+    ---
+    <br/>
+
+    | Column 1 | Column 2 | Column 3 |
+    |----------|----------|----------|
+    | Data 1   | Data 2   | Data 3   |
+    | Data 4   | Data 5   | Data 6   |
+
+    <br/>
+
+    \`This is inline code\`
+
+    \`\`\`cpp
+    #include <iostream>
+
+    int main() {
+        std::cout << "Hello, World!" << std::endl;
+        return 0;
+    }
+    \`\`\`
+
+    [This is a link](https://example.com)
+
+    ![This is an image](https://picsum.photos/150)
+
+    ---
+    # <u>For underlined heading</u>
+
+    Wrong:
+    <u> ## heading</u>
+
+    Correct:
+    ## <u>heading</u>
+`;
+
 const sliderOptions = [
     {
         id: "marginTop",
@@ -566,6 +644,14 @@ export const ImagePopup = ({
     );
 };
 
+ImagePopup.propTypes = {
+    setImgMaxWidth: PropTypes.func.isRequired,
+    setImgMaxHeight: PropTypes.func.isRequired,
+    setImgAlignment: PropTypes.func.isRequired,
+    setMTop: PropTypes.func.isRequired,
+    setMBottom: PropTypes.func.isRequired,
+};
+
 /**
  *
  *
@@ -808,23 +894,6 @@ MarkdownPreview.propTypes = {
  *
  *
  */
-/*
-// Bottom Bar
-<div className="fixed bottom-0 left-0 right-0 bg-white/10 backdrop-blur-sm border-t border-gray-100">
-    <div className="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
-        <div className="text-sm text-gray-400">
-            Last edited {new Date().toLocaleTimeString()}
-        </div>
-        <button
-            onClick={() => setIsFullscreen(!isFullscreen)}
-            className="text-sm text-gray-600 hover:text-black transition-all duration-0"
-        >
-            {isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
-        </button>
-    </div>
-</div>
-*/
-
 export const ScrollToBottomButton = ({
     position = "fixed",
     bottom = "bottom-8",
@@ -851,84 +920,32 @@ export const ScrollToBottomButton = ({
         </button>
     );
 };
+ScrollToBottomButton.propTypes = {
+    position: PropTypes.string,
+    bottom: PropTypes.string,
+    right: PropTypes.string,
+    theme: PropTypes.string,
+    rounded: PropTypes.string,
+    size: PropTypes.string,
+    isDark: PropTypes.bool,
+};
 
-export const rawText = `
-<p style="font-size: 18px; line-height: 1.5;">
-  <span style="float: left; font-size: 3em; font-weight: bold; line-height: 1; margin-right: 8px;">M</span>
-  arkdown, often abbreviated as MD, is a lightweight markup language that transforms plain text into richly formatted documents. Developed with readability in mind, its simple syntax allows users to add headers, lists, links, and other elements without heavy reliance on complex code. This ease of use has made Markdown a popular choice for everything from documentation and blogging to collaborative projects on platforms like GitHub. Its enduring appeal lies in the balance it strikes between simplicity and functionality, making it an essential tool in modern digital communication.
-</p>
-
----
-
-<mark>Here are some examples</mark>
-
-# Gradient descent is a method for unconstrained mathematical optimization.
-## Gradient descent is a method for unconstrained mathematical optimization.
-### Gradient descent is a method for unconstrained mathematical optimization.
-#### Gradient descent is a method for unconstrained mathematical optimization.
-##### Gradient descent is a method for unconstrained mathematical optimization.
-###### Gradient descent is a method for unconstrained mathematical optimization.
-
-**Gradient descent is a method for unconstrained mathematical optimization.**
-
-*Gradient descent is a method for unconstrained mathematical optimization.*
-
-***Gradient descent is a method for unconstrained mathematical optimization.***
-
-Gradient descent is a method for unconstrained mathematical optimization.
-
----
-<br/>
-
-> Gradient descent is a method for unconstrained mathematical optimization. It is a first-order iterative algorithm for minimizing a differentiable multivariate function.
-
-<br/>
-
----
-
-- This is a bullet list item
-- Another item
-
-1. This is a numbered list item
-2. Another numbered item
-
-- [ ] This is an unchecked task
-- [x] This is a checked task
-
----
-<br/>
-
-| Column 1 | Column 2 | Column 3 |
-|----------|----------|----------|
-| Data 1   | Data 2   | Data 3   |
-| Data 4   | Data 5   | Data 6   |
-
-<br/>
-
-\`This is inline code\`
-
-\`\`\`cpp
-#include <iostream>
-
-int main() {
-    std::cout << "Hello, World!" << std::endl;
-    return 0;
-}
-\`\`\`
-
-[This is a link](https://example.com)
-
-![This is an image](https://picsum.photos/150)
-
----
-# <u>For underlined heading</u>
-
-Wrong:
-<u> ## heading</u>
-
-Correct:
-## <u>heading</u>
-  `;
+/*
+    // Bottom Bar
+    <div className="fixed bottom-0 left-0 right-0 bg-white/10 backdrop-blur-sm border-t border-gray-100">
+        <div className="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div className="text-sm text-gray-400">
+                Last edited {new Date().toLocaleTimeString()}
+            </div>
+            <button
+                onClick={() => setIsFullscreen(!isFullscreen)}
+                className="text-sm text-gray-600 hover:text-black transition-all duration-0"
+            >
+                {isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+            </button>
+        </div>
+    </div>
+*/
 
 export const TableComp = ({
     data,
@@ -1153,4 +1170,12 @@ export const TableComp = ({
             </div>
         </div>
     );
+};
+
+TableComp.propTypes = {
+    data: PropTypes.array.isRequired,
+    columns: PropTypes.array.isRequired,
+    pageSize: PropTypes.number,
+    searchable: PropTypes.bool,
+    sortable: PropTypes.bool,
 };
