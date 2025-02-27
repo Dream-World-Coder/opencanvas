@@ -124,7 +124,7 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                 <title>Markdown to PDF Converter | OpenCanvas</title>
                 <meta
                     name="description"
-                    content="Convert your Markdown to PDF easily"
+                    content="Powerful markdown & latex editor with images upload and pdf export."
                 />
             </Helmet>
             <div
