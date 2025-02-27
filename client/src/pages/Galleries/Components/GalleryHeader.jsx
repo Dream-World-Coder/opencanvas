@@ -6,7 +6,7 @@ const Header = ({ filters, navLinks }) => {
     const [selectedFilter, setSelectedFilter] = useState("all");
 
     return (
-        <header className="fixed top-0 w-full bg-white/20 backdrop-blur-md z-50 border-b border-gray-100">
+        <header className="fixed top-0 w-full bg-white/20 backdrop-blur-md z-50 border-none border-gray-100">
             <div className="max-w-[1400px] mx-auto px-6 py-6">
                 <div className="flex flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
                     <h1 className="text-2xl font-stardom font-semibold tracking-tight">

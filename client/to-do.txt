@@ -1,25 +1,26 @@
 [x] change seo urls from opencanvas.blog -> myopencanvas.in
 [x] Theme options: yellow, white, black
-optimisations to load faster
-better pdf quality and page breaks
 [x] Dropcaps and [less imp]:image direction & orientation
-save in folder/collections so that it can substitute notes app
 [x] Mobile Responsive
-Keyboard shortcuts for differnt formats,
-beginner totorial vid
-Electron app
+
 
 :page breaks will be easy: find the page length of html2pdf module and add
 <span className=html2pdf__page-break></span>
 need to check scale up/down s though, --> adding pages creates complexity in image handling, so no need to use it in web version
 
-ADD loading page when transitioning
+-- better pdf quality and page breaks
+-- optimisations to load faster
+-- Keyboard shortcuts for differnt formats,
 
+* less imp
 html in export formats
+mermaid
+beginner totorial vid
+Electron app
 
+-- [x] ADD loading page when transitioning
 -- [x] drop cap + ``
 -- [x] hidden when preview
--- mermaid
 -- [x] scroll fix
 -- [x] dropdown on export button
 
@@ -36,5 +37,5 @@ html in export formats
 in phone remove:
 heading, quote, inlineCode, list
 
--- copy & save button not working in phone
--- when export warning: file cannot be downloaded securely in phones, why
+-- [x] copy & save button not working in phone
+-- [x] when export warning: file cannot be downloaded securely in phones, why
