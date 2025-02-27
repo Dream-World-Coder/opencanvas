@@ -88,12 +88,12 @@ export function useExport(title, content) {
         }
     };
 
-    const handleCopy = (rawText) => {
+    function handleCopy(rawText) {
         navigator.clipboard.writeText(rawText).then(() => {
             setCopied(true);
             setTimeout(() => setCopied(false), 1500);
         });
-    };
+    }
 
     return {
         isPreview,

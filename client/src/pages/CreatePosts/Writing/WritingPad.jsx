@@ -565,7 +565,9 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                         understading.
                                     </h1>
                                     <button
-                                        onClick={handleCopy}
+                                        onClick={() => {
+                                            handleCopy(rawText);
+                                        }}
                                         className="bg-gray-200 hover:bg-gray-400 rounded px-2 py-1"
                                     >
                                         {copied ? "Copied!" : "Copy"}

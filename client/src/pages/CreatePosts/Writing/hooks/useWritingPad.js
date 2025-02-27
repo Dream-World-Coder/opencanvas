@@ -27,7 +27,7 @@ export function useWritingPad({ postId = null }) {
     const syncWithBackend = async () => {
         if (!navigator.onLine) {
             setSyncStatus("offline");
-            return;
+            return; // +++
         }
 
         setSyncStatus("saving");
