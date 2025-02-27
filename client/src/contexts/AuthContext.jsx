@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
-import jwt_decode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
 
     // API URL
-    const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
     // Setup axios instance with auth headers
     const authAxios = axios.create({
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
     // Check if token is expired
     const isTokenExpired = (token) => {
         try {
-            const decoded = jwt_decode(token);
+            const decoded = jwtDecode(token);
             return decoded.exp < Date.now() / 1000;
         } catch (error) {
             return true;
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }) => {
             }
 
             try {
-                const response = await authAxios.get("/auth/me");
+                const response = await authAxios.get("/auth/user");
                 setCurrentUser(response.data.user);
             } catch (error) {
                 console.error("Failed to load user:", error);
@@ -134,7 +134,7 @@ export const AuthProvider = ({ children }) => {
                 },
             };
 
-            const response = await axios.get(`${API_URL}/auth/me`, config);
+            const response = await axios.get(`${API_URL}/auth/user`, config);
             setCurrentUser(response.data.user);
         } catch (error) {
             console.error("Failed to load user data:", error);

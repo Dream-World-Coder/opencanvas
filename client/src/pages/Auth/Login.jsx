@@ -2,9 +2,11 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FlowerIcon } from "./Flower";
 import PropTypes from "prop-types";
+import { useNavigate } from "react-router-dom";
 // import { LoginForm } from "@/components/ui/login-form";
 
 const LoginPage = ({ bgClr = "bg-cream-light" }) => {
+    const navigate = useNavigate();
     return (
         <div
             className={`min-h-auto md:min-h-screen h-[100dvh] md:h-auto ${bgClr} flex items-center justify-center p-4`}
@@ -41,6 +43,9 @@ const LoginPage = ({ bgClr = "bg-cream-light" }) => {
                         <Button
                             className="w-full flex items-center justify-center space-x-3 bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 p-6"
                             variant="outline"
+                            onClick={() => {
+                                navigate("/auth/google");
+                            }}
                         >
                             <svg className="w-6 h-12" viewBox="0 0 24 24">
                                 <path
@@ -65,6 +70,9 @@ const LoginPage = ({ bgClr = "bg-cream-light" }) => {
                         <Button
                             className="w-full flex items-center justify-center space-x-3 bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 p-6"
                             variant="outline"
+                            onClick={() => {
+                                alert("will be available soon");
+                            }}
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -92,9 +100,8 @@ const LoginPage = ({ bgClr = "bg-cream-light" }) => {
                         </a>
                     </p>
 
-                    <div className="text-sm text-gray-500">
+                    {/* <div className="text-sm text-gray-500">
                         New to{" "}
-                        {/* <span className="font-[stardom]">OpenCanvas</span>?{" "} */}
                         <span className="font-['Six_Caps'] tracking-wide">
                             <span className="font-[Smooch]">my</span>
                             opencanvas
@@ -103,7 +110,7 @@ const LoginPage = ({ bgClr = "bg-cream-light" }) => {
                         <a href="#" className="text-gray-800 hover:underline">
                             Create an account
                         </a>
-                    </div>
+                    </div> */}
                 </div>
             </Card>
         </div>
