@@ -1,5 +1,4 @@
 // auth.js - Authentication routes
-
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
@@ -12,7 +11,7 @@ const User = require("../models/User");
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const JWT_SECRET = process.env.JWT_SECRET || "238238d68905djd5efd689059jK5ef"; // will change later
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
 // Configure Google Strategy for Passport
 passport.use(
@@ -314,7 +313,7 @@ const authenticateToken = (req, res, next) => {
 };
 
 // Protected route example
-router.get("/me", authenticateToken, async (req, res) => {
+router.get("/user", authenticateToken, async (req, res) => {
     try {
         const user = await User.findById(req.userId).select("-passwordHash");
 

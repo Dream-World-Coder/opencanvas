@@ -8,17 +8,21 @@
         "dev": "nodemon src/index.js"
     },
     "keywords": [],
-    "author": "",
+    "author": "Subhajit Gorai",
     "license": "ISC",
     "dependencies": {
+        "bcrypt": "^5.1.1",
         "bcryptjs": "^2.4.3",
         "cookie-parser": "^1.4.7",
         "cookie-session": "^2.1.0",
         "cors": "^2.8.5",
         "dotenv": "^16.4.7",
         "express": "^4.21.2",
+        "express-session": "^1.18.1",
+        "helmet": "^8.0.0",
         "jsonwebtoken": "^9.0.2",
         "mongoose": "^8.10.2",
+        "morgan": "^1.10.0",
         "passport": "^0.7.0",
         "passport-google-oauth20": "^2.0.0"
     },
