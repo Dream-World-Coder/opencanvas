@@ -18,6 +18,7 @@ const ContactPage = lazy(() => import("./pages/Contact/Contact"));
 const WritingPad = lazy(() => import("./pages/CreatePosts/Writing/WritingPad"));
 const PoemPad = lazy(() => import("./pages/CreatePosts/WritePoem"));
 const StoryPad = lazy(() => import("./pages/CreatePosts/WriteStory"));
+const ImageUploadPage = lazy(() => import("./pages/CreatePosts/UploadImage"));
 const PhotoGalleryPage = lazy(
     () => import("./pages/Galleries/PhotoGallery/PhotoGallery"),
 );
@@ -92,6 +93,10 @@ export default function App() {
                                 />
                                 {/* <Route path="/my-posts" element={<UserPosts />} /> */}
                             </Route>
+                            <Route
+                                path="/new/image"
+                                element={<ImageUploadPage />}
+                            />
                             {/* others */}
                             <Route
                                 path="/thanks"

@@ -27,17 +27,11 @@ export const SlidingButton = ({ href, children }) => {
             onClick={() => {
                 window.location.href = href;
             }}
-            className="relative font-[Handlee] italic text-xl md:text-xl py-1 px-3 md:py-4 md:px-7 rounded-md
-                 border border-sky-300 overflow-hidden bg-sky-200/20 md:bg-sky-300/20
-                 text-#4d4d4d group z-30 cursor-pointer
-                 transition-colors duration-300 ease-out
-                 before:absolute before:inset-0
-                 before:bg-sky-300/50
-                 before:translate-x-[-100%]
-                 before:transition-transform
-                 before:duration-300
-                 hover:before:translate-x-0
-                 before:z-[-1]"
+            className="relative font-[Handlee] italic text-xl md:text-xl py-1 px-3 md:py-2 rounded-md
+                 border border-[#d2d4d0] overflow-hidden bg-sky-200/20 md:bg-sky-100/20 group
+                 text-[#4d4d4d] group z-30 cursor-pointer transition-colors duration-300 ease-out
+                 before:absolute before:inset-0 before:bg-[#d2d4d0] before:translate-x-[-100%]
+                 before:transition-transform before:duration-300 hover:before:translate-x-0 before:z-[-1]"
         >
             <span className="relative z-[1] flex items-center justify-center gap-2">
                 {children}
@@ -46,7 +40,7 @@ export const SlidingButton = ({ href, children }) => {
     );
 };
 
-export const Navbar = () => {
+export const Navbar = ({ bg }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const navLinks = [
@@ -66,12 +60,12 @@ export const Navbar = () => {
                         <React.Fragment key={index}>
                             <a
                                 href={link.href}
-                                className="text-stone-600 hover:text-stone-800 hover:bg-sky-200/50 rounded-lg text-sm transition-all duration-300 box-content px-3 py-1"
+                                className="text-stone-600 hover:text-stone-800 hover:bg-[#d2d4d0] rounded-lg text-sm transition-all duration-300 box-content px-3 py-1"
                             >
                                 {link.name}
                             </a>
                             {index !== navLinks.length - 1 && (
-                                <span className="text-sky-300">•</span>
+                                <span className="text-[#c2c4c0]">•</span>
                             )}
                         </React.Fragment>
                     ))}
@@ -92,13 +86,15 @@ export const Navbar = () => {
 
             {/* Mobile Navigation */}
             {isMenuOpen && (
-                <div className="md:hidden absolute top-20 left-0 right-0 bg-white backdrop-blur-sm z-50 border-b border-stone-200 shadow-sm">
+                <div
+                    className={`md:hidden absolute top-20 left-0 right-0 ${bg} backdrop-blur-sm z-50 border-b border-stone-200 shadow-sm`}
+                >
                     <div className="flex flex-col p-6">
                         {navLinks.map((link, index) => (
                             <a
                                 key={index}
                                 href={link.href}
-                                className="text-stone-600 hover:text-stone-800 hover:bg-sky-300/30 py-2 pl-4 rounded-lg text-lg transition-colors"
+                                className="text-stone-600 hover:text-stone-800 hover:bg-[#d2d4d0]/90 py-2 pl-4 rounded-lg text-lg transition-colors"
                             >
                                 {link.name}
                             </a>
@@ -114,11 +110,11 @@ export const Footer = () => {
     return (
         <footer className="absolute bottom-0 w-full bg-transparent">
             <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-center">
-                <p className="font-sans text-xs sm:text-sm text-gray-400/80 hover:text-[#5789ba] transition-colors">
+                <p className="font-sans text-xs sm:text-sm text-gray-400/80 hover:text-gray-500 transition-colors">
                     Copyright &copy; 2025{" "}
                     {/* <span className="font-stardom">OpenCanvas.</span> */}
                     <span className="font-['Six_Caps'] text-lg tracking-wide">
-                        <span className="font-[Smooch] text-base">my</span>
+                        {/* <span className="font-[Smooch] text-base">my</span> */}
                         opencanvas
                     </span>{" "}
                     All rights reserved.

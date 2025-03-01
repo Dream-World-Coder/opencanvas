@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Heart, Bookmark } from "lucide-react";
-import stories from "./Stories";
+import stories from "../src/pages/Galleries/LiteratureGallery/Stories";
 
 const LiteraryGallery = () => {
     const [scrollY, setScrollY] = useState(0);

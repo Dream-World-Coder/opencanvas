@@ -7,20 +7,20 @@ import { Analytics } from "@vercel/analytics/react";
 
 const LandingPage = () => {
     return (
-        <div className="min-h-auto md:min-h-screen min-w-screen h-[100dvh] md:h-auto bg-white relative overflow-hidden">
+        <div className="min-h-auto md:min-h-screen min-w-screen h-[100dvh] md:h-auto bg-[#e2e4e0] relative overflow-hidden">
             <div className="max-w-7xl mx-auto relative h-screen">
-                <Navbar />
+                <Navbar bg={"bg-[#e2e4e0]"} />
 
                 {/* container */}
                 <div className="relative pt-[60%] sm:pt-[40%] md:pt-[20%] desktop-xl flex items-start justify-center w-full h-full">
                     {/* texts */}
                     <div className="flex flex-col gap-3 items-start justify-between">
-                        <h1 className="relative font-['Six_Caps'] text-7xl md:text-8xl text-[#1a1a1a] leading-tight tracking-wide md:tracking-normal">
-                            <span className="font-[Smooch] italic text-5xl md:text-6xl">
-                                my
-                            </span>
+                        <h1
+                            translate="no"
+                            className="relative font-stardom text-5xl md:text-6xl text-[#393b37] tracking-tight pointer-events-none"
+                        >
                             OPENCANVAS
-                            <div className="absolute right-0 top-0 size-6 z-10">
+                            <div className="absolute right-0 top-[-8px] size-6 z-10">
                                 <img
                                     className="object-cover size-full"
                                     src={Butterfly}
@@ -30,7 +30,7 @@ const LandingPage = () => {
                         </h1>
                         <SlidingButton href="/profile">
                             Start Exploring{" "}
-                            <ChevronRight className="text-[#4d4d4d]" />
+                            <ChevronRight className="text-[#4d4d4d] transform transition-transform duration-200 size-4 group-hover:translate-x-2" />
                         </SlidingButton>
                     </div>
                 </div>
@@ -38,7 +38,7 @@ const LandingPage = () => {
                 <Footer />
             </div>
             {/* poem hidden md:block */}
-            <div className="size-[65%] md:size-[35%] top-[50%] md:top-0 left-[-125px] absolute opacity-80">
+            <div className="size-[65%] md:size-[35%] top-[50%] md:top-0 left-[-125px] absolute opacity-70 mix-blend-multiply">
                 <img className="object-cover" src={Poem} alt="" />
             </div>
             {/* flower */}

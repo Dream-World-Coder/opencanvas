@@ -8,7 +8,7 @@ const Footer = () => {
                     Copyright &copy; 2025{" "}
                     {/* <span className="font-stardom">OpenCanvas.</span> */}
                     <span className="font-['Six_Caps'] text-lg tracking-wide">
-                        <span className="font-[Smooch] text-base">my</span>
+                        {/* <span className="font-[Smooch] text-base">my</span> */}
                         opencanvas
                     </span>{" "}
                     All rights reserved.

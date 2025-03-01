@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Heart, Bookmark, ArrowRight } from "lucide-react";
 import stories from "./Stories";
-import Footer from "../Components/GalleryFooter";
-import Header from "../Components/GalleryHeader";
+import Footer from "../../../components/Footer/GalleryFooter";
+import Header from "../../../components/Header/GalleryHeader";
 import vineSvg from "../../../assets/icons/vine.svg";
 
 const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {

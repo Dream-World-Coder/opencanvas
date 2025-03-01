@@ -20,17 +20,11 @@ const Header = () => {
                     {/* Logo */}
                     <a
                         href="/"
-                        className="tracking-tight
-                        bg-lime-400 font-thin text-sm sm:text-2xl text-stone-950
-                        rounded-md box-content px-1 py-0 md:px-1 md:py-1"
+                        className="bg-lime-400 font-thin text-stone-950
+                        rounded-md box-content px-1 md:px-1 py-0
+                        text-xl md:text-2xl tracking-wide"
                     >
-                        {/* OpenCanvas */}
-                        <span className="font-['Six_Caps'] text-xl md:text-3xl tracking-wide">
-                            <span className="font-[Smooch] text-sm md:text-xl">
-                                my
-                            </span>
-                            opencanvas
-                        </span>{" "}
+                        <span className="font-['Six_Caps']">opencanvas</span>
                     </a>
 
                     {/* Desktop Navigation */}
