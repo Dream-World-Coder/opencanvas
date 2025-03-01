@@ -661,21 +661,78 @@ export const MarkdownPreview = ({
                                 const match = /language-(\w+)/.exec(
                                     className || "",
                                 );
+                                const codeString = String(children).replace(
+                                    /\n$/,
+                                    "",
+                                );
+
                                 return !inline && match ? (
-                                    <SyntaxHighlighter
-                                        style={prism}
-                                        language={match[1]}
-                                        PreTag="div"
-                                        // showLineNumbers
-                                        wrapLongLines
-                                        className={isDark ? "invert" : ""}
-                                        {...props}
+                                    // block code
+                                    <div
+                                        className={`relative my-4 overflow-hidden rounded-xl flex flex-col
+                                            ${
+                                                isDark
+                                                    ? "bg-[#333]"
+                                                    : "bg-[#e8eae6]"
+                                            }`}
                                     >
-                                        {String(children).replace(/\n$/, "")}
-                                    </SyntaxHighlighter>
+                                        {/* codeHeader */}
+                                        <div
+                                            className={`flex items-center justify-between px-6 pt-2 ${
+                                                isDark
+                                                    ? "bg-[#333]"
+                                                    : "bg-[#e8eae6]"
+                                            }`}
+                                        >
+                                            {/* lagguage */}
+                                            <span className="text-sm font-sans">
+                                                {match[1]}
+                                            </span>
+                                            {/* Copy button */}
+                                            <button
+                                                onClick={(e) => {
+                                                    navigator.clipboard.writeText(
+                                                        codeString,
+                                                    );
+                                                    e.target.textContent =
+                                                        "Copied!";
+                                                    setTimeout(() => {
+                                                        e.target.textContent =
+                                                            "Copy";
+                                                    }, 1000);
+                                                }}
+                                                className="bg-[#222] text-white px-3 py-1 text-xs rounded hover:bg-[#444] focus:outline-none z-10"
+                                            >
+                                                Copy
+                                            </button>
+                                        </div>
+
+                                        {/* Rounded code card */}
+                                        <div className="rounded-xl overflow-hidden border-none">
+                                            <SyntaxHighlighter
+                                                style={prism}
+                                                language={match[1]}
+                                                PreTag="div"
+                                                wrapLongLines
+                                                codeTagProps={{
+                                                    style: {
+                                                        fontSize: "0.875rem",
+                                                        lineHeight: "1.25rem",
+                                                    },
+                                                }}
+                                                className={
+                                                    isDark ? "invert" : ""
+                                                }
+                                                {...props}
+                                            >
+                                                {codeString}
+                                            </SyntaxHighlighter>
+                                        </div>
+                                    </div>
                                 ) : (
+                                    // inline code
                                     <code
-                                        className={`bg-gray-200 px-1 py-0.5 rounded text-sm font-mono ${isDark ? "text-black" : ""}`}
+                                        className={`bg-gray-200 px-1 py-0.5 rounded text-sm font-mono ${isDark ? "text-[#ffd085] bg-[#ffd085]/10" : ""}`}
                                         {...props}
                                     >
                                         {children}
@@ -685,10 +742,10 @@ export const MarkdownPreview = ({
                             blockquote({ children }) {
                                 return (
                                     <blockquote
-                                        // className={`border-l-4 pl-4 py-3 my-4 italic rounded-md shadow
-                                        //         ${isDark ? "border-gray-600 bg-gray-800 text-gray-300" : "border-gray-400 bg-gray-100 text-gray-700"}
-                                        //       `}
-                                        className={`border-l-4 pl-4 italic ${isDark ? "border-[#888] text-[#999]" : "border-gray-500 text-gray-600"}`}
+                                        className={`border-l-4 px-4 py-3 my-4 italic rounded-md shadow
+                                                ${isDark ? "border-gray-600 bg-gray-800 text-gray-300" : "border-gray-400 bg-gray-100 text-gray-700"}
+                                              `}
+                                        // className={`border-l-4 pl-4 italic ${isDark ? "border-[#888] text-[#999]" : "border-gray-500 text-gray-600"}`}
                                     >
                                         {children}
                                     </blockquote>
