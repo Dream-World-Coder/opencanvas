@@ -42,3 +42,8 @@ heading, quote, inlineCode, list
 
 
 -- [x] find and replace
+
+
+-- decide main route
+-- create sitemap.xml and make google indexing,
+-- internal linking for better seo
