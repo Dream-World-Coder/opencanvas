@@ -47,9 +47,9 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
                     >
                         {/* OpenCanvas: font-stardom font-bold md:font-thin */}
                         <span className="font-['Six_Caps'] text-lg md:text-2xl tracking-wide">
-                            <span className="font-[Smooch] text-sm md:text-lg">
+                            {/* <span className="font-[Smooch] text-sm md:text-lg">
                                 my
-                            </span>
+                            </span> */}
                             opencanvas
                         </span>{" "}
                     </a>

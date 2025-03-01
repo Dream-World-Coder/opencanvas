@@ -86,17 +86,20 @@ export default function App() {
                                     path="/profile"
                                     element={<Profile bgClr="bg-white" />}
                                 />
-                                <Route path="/new/poem" element={<PoemPad />} />
                                 <Route
-                                    path="/new/story"
+                                    path="/createpost/poem"
+                                    element={<PoemPad />}
+                                />
+                                <Route
+                                    path="/createpost/story"
                                     element={<StoryPad />}
+                                />
+                                <Route
+                                    path="/createpost/image"
+                                    element={<ImageUploadPage />}
                                 />
                                 {/* <Route path="/my-posts" element={<UserPosts />} /> */}
                             </Route>
-                            <Route
-                                path="/new/image"
-                                element={<ImageUploadPage />}
-                            />
                             {/* others */}
                             <Route
                                 path="/thanks"

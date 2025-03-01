@@ -3,21 +3,21 @@ import { Book, BookOpen, Images, Library, Files, Camera } from "lucide-react";
 const createOptions = [
     {
         id: "poem",
-        href: "/new/poem",
+        href: "/createpost/poem",
         icon: Book,
         label: "New Poem",
         color: "bg-purple-500",
     },
     {
         id: "story",
-        href: "/new/story",
+        href: "/createpost/story",
         icon: BookOpen,
         label: "New Story",
         color: "bg-blue-500",
     },
     {
         id: "picture",
-        href: "/new/picture",
+        href: "/createpost/image",
         icon: Camera,
         label: "Upload Picture",
         color: "bg-emerald-500",
