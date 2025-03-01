@@ -1,5 +1,5 @@
 import { useState } from "react";
-import html2pdf from "html2pdf.js"; // Make sure this dependency is installed
+import html2pdf from "html2pdf.js";
 
 export function useExport(title, content) {
     // ****
@@ -23,13 +23,13 @@ export function useExport(title, content) {
             // Configuration options for html2pdf
             const options = {
                 margin: 0.5,
-                filename: `${safeTitle}-myOpenCanvas.pdf`,
+                filename: `${safeTitle}-OpenCanvas.pdf`,
                 // window.crypto.randomUUID()
                 image: { type: "jpeg", quality: 1.0 },
                 html2canvas: {
-                    scale: 2,
+                    scale: 3,
                     useCORS: true,
-                    // letterRendering: true,
+                    letterRendering: true,
                 },
                 jsPDF: {
                     unit: "in",

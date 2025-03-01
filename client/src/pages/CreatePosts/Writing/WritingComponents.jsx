@@ -380,7 +380,7 @@ export const useImagePopup = () => {
     const [imageSettings, setImageSettings] = useState({
         marginTop: 0,
         marginBottom: 0,
-        position: "center", // 'left', 'center', 'right'
+        position: "left", // 'left', 'center', 'right'
         maxHeight: 360,
         maxWidth: 500,
     });
