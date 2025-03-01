@@ -732,8 +732,8 @@ export const MarkdownPreview = ({
                                 ) : (
                                     // inline code
                                     <code
-                                        className={`bg-gray-200 px-1 py-0.5 rounded text-sm font-mono ${isDark ? "text-[#ffd085] bg-[#ffd085]/10" : ""}`}
-                                        {...props}
+                                        className={`px-1 py-0.5 rounded text-sm font-mono
+                                            ${isDark ? "text-[#ffd085] bg-[#ffd085]/10" : "bg-gray-200"}`}
                                     >
                                         {children}
                                     </code>
