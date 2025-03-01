@@ -743,7 +743,7 @@ export const MarkdownPreview = ({
                                 return (
                                     <blockquote
                                         className={`border-l-4 px-4 py-3 my-4 italic rounded-md shadow
-                                                ${isDark ? "border-gray-600 bg-gray-800 text-gray-300" : "border-gray-400 bg-gray-100 text-gray-700"}
+                                                ${isDark ? "border-[#999] bg-[#999]/10 text-[#ddd]" : "border-gray-400 bg-gray-100 text-gray-700"}
                                               `}
                                         // className={`border-l-4 pl-4 italic ${isDark ? "border-[#888] text-[#999]" : "border-gray-500 text-gray-600"}`}
                                     >
