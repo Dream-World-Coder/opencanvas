@@ -11,6 +11,7 @@ import {
     Plus,
     Menu,
     X,
+    Settings,
 } from "lucide-react";
 
 import {
@@ -49,7 +50,7 @@ const createOptions = [
     },
     {
         id: "article",
-        href: "#",
+        href: "/createpost/article",
         icon: NotebookPen,
         label: "New Article",
         color: "bg-amber-500",
@@ -63,14 +64,14 @@ const createOptions = [
     },
     {
         id: "mybook",
-        href: "#",
+        href: "/createpost/book",
         icon: Book,
         label: "Create Book",
         color: "bg-indigo-500",
     },
     {
         id: "collection",
-        href: "#",
+        href: "/createpost/collection",
         icon: Library,
         label: "Create Collection",
         color: "bg-rose-500",
@@ -131,6 +132,10 @@ export default function ProfileHeader() {
                         </AlertDialogContent>
                     </AlertDialog>
 
+                    <button className="size-6">
+                        <Settings />
+                    </button>
+
                     {/* Create Button with Dropdown */}
                     <div className="relative">
                         <button
@@ -155,7 +160,6 @@ export default function ProfileHeader() {
                                         className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
                                         onClick={() => {
                                             setCreateMenuOpen(false);
-                                            // Handle creation...
                                         }}
                                         href={option.href}
                                     >
@@ -174,17 +178,55 @@ export default function ProfileHeader() {
                         )}
                     </div>
                 </div>
-                {/* Mobile Menu Button */}
-                <button
-                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                    className="md:hidden p-2 hover:bg-gray-100 rounded-lg"
-                >
-                    {mobileMenuOpen ? (
-                        <X className="w-6 h-6" />
-                    ) : (
-                        <Menu className="w-6 h-6" />
+
+                <div className="md:hidden flex items-center justify-center gap-2">
+                    {/* Mobile Create Button */}
+                    <button
+                        onClick={() => setCreateMenuOpen(!createMenuOpen)}
+                        className="w-fit p-1 flex items-center justify-center bg-black text-white rounded-full hover:bg-stone-800/90 transition-colors"
+                    >
+                        {createMenuOpen ? (
+                            <X className="w-4 h-4" />
+                        ) : (
+                            <Plus className="w-4 h-4" />
+                        )}
+                    </button>
+                    {/* Mobile Menu Button */}
+                    <button
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        className="p-2 hover:bg-gray-100 rounded-lg"
+                    >
+                        {mobileMenuOpen ? (
+                            <X className="w-6 h-6" />
+                        ) : (
+                            <Menu className="w-6 h-6" />
+                        )}
+                    </button>
+                    {createMenuOpen && (
+                        <div className="absolute top-20 right-0 w-64 bg-white border border-gray-100 rounded-lg shadow-lg py-2 z-50">
+                            {createOptions.map((option) => (
+                                <a
+                                    key={option.id}
+                                    className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
+                                    onClick={() => {
+                                        setCreateMenuOpen(false);
+                                    }}
+                                    href={option.href}
+                                >
+                                    <div
+                                        className={`p-2 rounded-full ${option.color}`}
+                                    >
+                                        <option.icon className="w-4 h-4 text-white" />
+                                    </div>
+                                    <span className="flex items-center justify-center gap-3">
+                                        {option.label}{" "}
+                                        <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700" />
+                                    </span>
+                                </a>
+                            ))}
+                        </div>
                     )}
-                </button>
+                </div>
             </div>
             {/* mobile menu */}
             {mobileMenuOpen && (
@@ -200,14 +242,18 @@ export default function ProfileHeader() {
                                 {link.label}
                             </a>
                         ))}
-                        {/* Mobile Create Button */}
-                        <button
-                            onClick={() => setCreateMenuOpen(!createMenuOpen)}
-                            className="w-full mt-4 flex items-center justify-center space-x-2 bg-black text-white px-4 py-2 rounded-full hover:bg-stone-800/90 transition-colors"
+                        <a
+                            className="block px-4 py-2 hover:bg-lime-300/60 rounded-md"
+                            href="/logout"
                         >
-                            <span>Create</span>
-                            <Plus className="w-4 h-4" />
-                        </button>
+                            Settings
+                        </a>
+                        <a
+                            className="block px-4 py-2 text-red-700 hover:bg-red-300/60 rounded-md"
+                            href="/logout"
+                        >
+                            Logout
+                        </a>
                     </div>
                 </div>
             )}

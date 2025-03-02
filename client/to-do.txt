@@ -52,3 +52,11 @@ heading, quote, inlineCode, list
 
 -- book: collection of articles, stories, poems
 -- collection: coll of photos
+
+-- usename and profile update options
+-- blog Post
+-- image fix
+-- public profile
+-- skeleton
+
+ two url: public(/u/:username) & private (/profile)

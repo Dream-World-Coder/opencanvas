@@ -1,32 +1,74 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
     ArrowUpRight,
     Share2,
     Grid,
     Rows,
-    Camera,
     Heart,
     MessageCircle,
 } from "lucide-react";
 import ProfileHeader from "../../components/Header/ProfileHeader";
 // import ProfileFooter from "../../components/Footer/ProfileFooter";
 import PropTypes from "prop-types";
-import { useAuth } from "../../contexts/AuthContext";
+// import { useAuth } from "../../contexts/AuthContext";
 
 const Profile = ({ bgClr = "bg-cream-light" }) => {
-    const { currentUser } = useAuth();
+    const [currentProfile, setCurrentProfile] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
+    const { username } = useParams();
+    const navigate = useNavigate();
+
     const [viewMode, setViewMode] = useState("grid");
     const [activeTab, setActiveTab] = useState("all");
 
+    useEffect(() => {
+        async function fetchCurrentProfile(username) {
+            if (!username) {
+                navigate("/404");
+                return;
+            }
+
+            const apiUrl = `http://127.0.0.1:3000/auth/u/${username}`;
+            setIsLoading(true);
+
+            try {
+                const res = await fetch(apiUrl);
+
+                if (!res.ok) {
+                    navigate("/404");
+                    return;
+                }
+
+                const data = await res.json();
+                setCurrentProfile(data.user);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        fetchCurrentProfile(username);
+    }, [username, navigate]);
+
+    if (isLoading) return <div>Loading...</div>;
+    if (!currentProfile) return null;
+
     const userStats = [
-        { name: "POSTS", amount: currentUser.posts.length },
-        { name: "TOTAL LIKES", amount: currentUser.totalLikes },
-        { name: "FOLLOWERS", amount: currentUser.noOfFollowers },
-        { name: "FOLLOWING", amount: currentUser.noOfFollowing },
+        { name: "POSTS", amount: currentProfile.posts.length },
+        { name: "TOTAL LIKES", amount: currentProfile.totalLikes },
+        { name: "FOLLOWERS", amount: currentProfile.noOfFollowers },
+        { name: "FOLLOWING", amount: currentProfile.noOfFollowing },
     ];
 
-    const collections = currentUser.collections;
-    const posts = currentUser.posts;
+    let collections = [];
+    let posts = [];
+
+    if (currentProfile) {
+        collections = currentProfile.collections || [];
+        posts = currentProfile.posts || [];
+    }
 
     return (
         <div className={`min-h-screen ${bgClr} font-sans`}>
@@ -43,34 +85,31 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
                                 <div className="relative group">
                                     <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100">
                                         <img
-                                            src={`/defaults/profile.jpeg`} // currentUser.profilePicture
+                                            src={`/defaults/profile.jpeg`} // currentProfile.profilePicture
                                             alt="Profile"
                                             className="w-full h-full object-cover"
                                         />
                                     </div>
-                                    <button className="absolute bottom-0 right-0 bg-black text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Camera className="w-4 h-4" />
-                                    </button>
                                 </div>
                                 <div className="flex-1">
                                     <h1
                                         className="text-5xl md:text-7xl font-boska leading-[0.95] tracking-tighter
                                         pointer-events-none md:pointer-events-auto uppercase"
                                     >
-                                        {currentUser.fullName}
+                                        {currentProfile.fullName}
                                         <span className="block text-2xl md:text-5xl font-bold md:font-normal tracking-normal md:tracking-tighter italic capitalize leading-[1.7rem]">
-                                            {currentUser.tagline}
+                                            {currentProfile.tagline}
                                         </span>
                                     </h1>
                                 </div>
                             </div>
-                            {currentUser.aboutMe && (
+                            {currentProfile.aboutMe && (
                                 <p
                                     className="text-stone-700 font-boskaLight font-bold md:font-normal
                                 text-lg md:text-2xl leading-tight tracking-normal
                                 max-w-xl pointer-events-none md:pointer-events-auto"
                                 >
-                                    &quot; {currentUser.aboutMe} &quot;
+                                    &quot; {currentProfile.aboutMe} &quot;
                                 </p>
                             )}
                         </div>

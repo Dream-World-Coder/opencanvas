@@ -60,7 +60,7 @@ const Header = ({ filters }) => {
                                         link.name
                                     ) : (
                                         <img
-                                            src="https://picsum.photos/200"
+                                            src="/defaults/profile.jpeg"
                                             className="size-6 md:size-8 rounded-full overflow-hidden object-cover block cursor-pointer"
                                             alt=""
                                         />

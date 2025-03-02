@@ -15,11 +15,13 @@ const LoginPage = lazy(() => import("./pages/Auth/Login"));
 const LogoutPage = lazy(() => import("./pages/Auth/Logout"));
 const AuthSuccess = lazy(() => import("./pages/Auth/AuthSuccess"));
 const Profile = lazy(() => import("./pages/Profile/Profile"));
+const PublicProfile = lazy(() => import("./pages/Profile/PublicProfile"));
 const AboutPage = lazy(() => import("./pages/About/About"));
 const ContactPage = lazy(() => import("./pages/Contact/Contact"));
 const WritingPad = lazy(() => import("./pages/CreatePosts/Writing/WritingPad"));
 const PoemPad = lazy(() => import("./pages/CreatePosts/WritePoem"));
 const StoryPad = lazy(() => import("./pages/CreatePosts/WriteStory"));
+const ArticlePad = lazy(() => import("./pages/CreatePosts/WriteArticle"));
 const ImageUploadPage = lazy(() => import("./pages/CreatePosts/UploadImage"));
 const PhotoGalleryPage = lazy(
     () => import("./pages/Galleries/PhotoGallery/PhotoGallery"),
@@ -65,7 +67,10 @@ export default function App() {
                                 element={<AuthSuccess />}
                             />
                             <Route path="/logout" element={<LogoutPage />} />
-                            {/* <Route path="/post/:id" element={<PostDetail />} /> */}
+
+                            {/* <Route path="/p/:id" element={<PostDetail />} /> */}
+                            {/* <Route path="/u/:id" element={<PublicProfile />} /> */}
+                            {/* will move to protected routes later cuz dont want to db qurey for every person's call, only signedin peeps should be able to see  */}
                             <Route
                                 path="/about"
                                 element={<AboutPage bgClr="bg-white" />}
@@ -86,6 +91,11 @@ export default function App() {
                                 path="/markdown2pdf"
                                 element={<WritingPad />}
                             />
+                            <Route
+                                path="/u/:username"
+                                element={<PublicProfile bgClr="bg-white" />}
+                            />
+
                             {/* protected */}
                             <Route element={<ProtectedRoute />}>
                                 <Route
@@ -101,11 +111,16 @@ export default function App() {
                                     element={<StoryPad />}
                                 />
                                 <Route
+                                    path="/createpost/article"
+                                    element={<ArticlePad />}
+                                />
+                                <Route
                                     path="/createpost/image"
                                     element={<ImageUploadPage />}
                                 />
                                 {/* <Route path="/my-posts" element={<UserPosts />} /> */}
                             </Route>
+
                             {/* others */}
                             <Route
                                 path="/thanks"
