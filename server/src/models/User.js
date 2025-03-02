@@ -57,6 +57,14 @@ const userSchema = new Schema(
             type: String,
             default: "https://example.com/defaults/profile.jpeg",
         },
+        tagline: {
+            type: String,
+            maxlength: [32, "Tagline must be 32 characters or less"],
+        },
+        aboutMe: {
+            type: String,
+            maxlength: [300, "Bio must be 300 characters or less"],
+        },
         ipAddress: {
             type: String,
         },

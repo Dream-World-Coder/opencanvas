@@ -6,13 +6,14 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-
-require("dotenv").config();
+const { generateRandomAlphanumeric } = require("../utils/helper");
 
 const {
     handleAuthErrors,
     authenticateToken,
 } = require("../middlewares/authorisation");
+
+require("dotenv").config();
 
 // in production need to use dotenv
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
@@ -54,8 +55,8 @@ passport.use(
                     // Create new user
                     const newUser = new User({
                         username:
-                            profile.emails[0].value.split("@")[0] +
-                            Math.floor(Math.random() * 1000), // Generate username
+                            profile.emails[0].value.split("@")[0].slice(0, 4) +
+                            generateRandomAlphanumeric(4),
                         fullName: profile.displayName || "Google User",
                         email: profile.emails[0].value,
                         passwordHash:
@@ -268,7 +269,6 @@ router.get(
             );
 
             // Redirect to frontend with token
-            // console.log(`\n\n${FRONTEND_URL}/auth/success?token=${token}\n\n`);
             res.redirect(`${FRONTEND_URL}/auth/success?token=${token}`);
         } catch (error) {
             console.error("Google callback error:", error);
@@ -277,7 +277,6 @@ router.get(
     },
 );
 
-// Protected route example
 router.get("/user", authenticateToken, async (req, res) => {
     try {
         const user = await User.findById(req.userId).select("-passwordHash");
@@ -306,7 +305,35 @@ router.get("/user", authenticateToken, async (req, res) => {
     }
 });
 
-// Apply error handler
+// public profile view : tune informations later, do not send entire user
+router.get("/u/:username", async (req, res) => {
+    try {
+        const user = await User.findOne({ username: req.params.username });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            user,
+        });
+    } catch (error) {
+        console.error("Get user error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to retrieve user data",
+            error:
+                process.env.NODE_ENV === "development"
+                    ? error.message
+                    : "Server error",
+        });
+    }
+});
+
 router.use(handleAuthErrors);
 
 module.exports = {

@@ -48,16 +48,16 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// middlewares
+// app.use(authenticateToken); // only use for specific routes
+app.use(errorHandler);
+
 // routes
 app.use("/auth", authRoutes);
 
 app.get("/", (req, res) => {
     res.json({ message: "Welcome to OpenCanvas API" });
 });
-
-// middlewares
-app.use(authenticateToken);
-app.use(errorHandler);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
