@@ -3,10 +3,21 @@ import { Button } from "@/components/ui/button";
 import { FlowerIcon } from "./Flower";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import { useEffect } from "react";
+
 // import { LoginForm } from "@/components/ui/login-form";
 
 const LoginPage = ({ bgClr = "bg-cream-light" }) => {
     const navigate = useNavigate();
+    const { currentUser } = useAuth();
+
+    useEffect(() => {
+        if (currentUser) {
+            navigate("/profile");
+        }
+    }, [navigate, currentUser]);
+
     return (
         <div
             className={`min-h-auto md:min-h-screen h-[100dvh] md:h-auto ${bgClr} flex items-center justify-center p-4`}
@@ -23,7 +34,7 @@ const LoginPage = ({ bgClr = "bg-cream-light" }) => {
                     <h2 className="text-2xl font-[stardom] font-medium text-gray-400">
                         {/* OpenCanvas */}
                         <span className="font-['Six_Caps'] text-2xl tracking-wide">
-                            <span className="font-[Smooch]">my</span>
+                            {/* <span className="font-[Smooch]">my</span> */}
                             opencanvas
                         </span>{" "}
                     </h2>
@@ -44,7 +55,9 @@ const LoginPage = ({ bgClr = "bg-cream-light" }) => {
                             className="w-full flex items-center justify-center space-x-3 bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 p-6"
                             variant="outline"
                             onClick={() => {
-                                navigate("/auth/google");
+                                // navigate("/auth/google");
+                                window.location.href =
+                                    "http://127.0.0.1:3000/auth/google";
                             }}
                         >
                             <svg className="w-6 h-12" viewBox="0 0 24 24">

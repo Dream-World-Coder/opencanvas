@@ -4,31 +4,19 @@ import {
     Share2,
     Grid,
     Rows,
-    Plus,
-    ChevronDown,
     Camera,
     Heart,
     MessageCircle,
-    ChevronUp,
-    Menu,
-    X,
 } from "lucide-react";
 import posts from "./posts";
 import collections from "./collections";
-import createOptions from "./createOptions";
+import ProfileHeader from "../../components/Header/ProfileHeader";
+import ProfileFooter from "../../components/Footer/ProfileFooter";
+import PropTypes from "prop-types";
 
 const Profile = ({ bgClr = "bg-cream-light" }) => {
     const [viewMode, setViewMode] = useState("grid");
     const [activeTab, setActiveTab] = useState("all");
-    const [createMenuOpen, setCreateMenuOpen] = useState(false);
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-    const navLinks = [
-        { href: "/gallery/photos", label: "Gallery" },
-        { href: "/gallery/literature", label: "Stories" },
-        { href: "/about", label: "About" },
-        { href: "/contact", label: "Contact" },
-    ];
 
     const userStats = [
         { name: "COLLECTIONS", amount: "12" },
@@ -39,117 +27,7 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
     return (
         <div className={`min-h-screen ${bgClr} font-sans`}>
             {/* Navigation */}
-            <nav className="fixed top-0 w-full bg-white z-50 border-b border-gray-100">
-                <div className="max-w-[1400px] mx-auto flex justify-between items-center px-8 py-6">
-                    <a
-                        href="/"
-                        className="text-base md:text-2xl text-stone-950 bg-lime-400 tracking-normal font-thin rounded-md box-content px-1 py-0 md:px-1 md:py-1"
-                    >
-                        {/* OpenCanvas: font-stardom font-bold md:font-thin */}
-                        <span className="font-['Six_Caps'] text-lg md:text-2xl tracking-wide">
-                            {/* <span className="font-[Smooch] text-sm md:text-lg">
-                                my
-                            </span> */}
-                            opencanvas
-                        </span>{" "}
-                    </a>
-                    <div className="hidden md:flex items-center space-x-5 text-[15px]">
-                        {navLinks.map((link, index) => (
-                            <a
-                                key={index}
-                                href={link.href}
-                                className="hover:opacity-70 hover:bg-lime-300 px-3 py-1 box-content rounded-md"
-                            >
-                                {link.label}
-                            </a>
-                        ))}
-
-                        {/* Create Button with Dropdown */}
-                        <div className="relative">
-                            <button
-                                onClick={() =>
-                                    setCreateMenuOpen(!createMenuOpen)
-                                }
-                                className="flex items-center space-x-2 bg-black text-white px-4 py-2 rounded-full hover:bg-stone-800/90 transition-colors"
-                            >
-                                <span>Create</span>
-                                {!createMenuOpen && (
-                                    <ChevronDown className="w-4 h-4" />
-                                )}
-                                {createMenuOpen && (
-                                    <ChevronUp className="w-4 h-4" />
-                                )}
-                            </button>
-
-                            {/* Create Menu Dropdown */}
-                            {createMenuOpen && (
-                                <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-100 rounded-lg shadow-lg py-2 z-50">
-                                    {createOptions.map((option) => (
-                                        <a
-                                            key={option.id}
-                                            className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
-                                            onClick={() => {
-                                                setCreateMenuOpen(false);
-                                                // Handle creation...
-                                            }}
-                                            href={option.href}
-                                        >
-                                            <div
-                                                className={`p-2 rounded-full ${option.color}`}
-                                            >
-                                                <option.icon className="w-4 h-4 text-white" />
-                                            </div>
-                                            <span className="flex items-center justify-center gap-3">
-                                                {option.label}{" "}
-                                                <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700" />
-                                            </span>
-                                        </a>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                    {/* Mobile Menu Button */}
-                    <button
-                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        className="md:hidden p-2 hover:bg-gray-100 rounded-lg"
-                    >
-                        {mobileMenuOpen ? (
-                            <X className="w-6 h-6" />
-                        ) : (
-                            <Menu className="w-6 h-6" />
-                        )}
-                    </button>
-                </div>
-                {/* mobile menu */}
-                {mobileMenuOpen && (
-                    <div className="md:hidden bg-white border-t border-gray-100">
-                        <div className="px-4 py-2 space-y-1">
-                            {navLinks.map((link, index) => (
-                                <a
-                                    key={index}
-                                    href={link.href}
-                                    className="block px-4 py-2 hover:bg-lime-300/60 rounded-md"
-                                    onClick={() => setMobileMenuOpen(false)}
-                                >
-                                    {link.label}
-                                </a>
-                            ))}
-                            {/* Mobile Create Button */}
-                            <button
-                                onClick={() =>
-                                    setCreateMenuOpen(!createMenuOpen)
-                                }
-                                className="w-full mt-4 flex items-center justify-center space-x-2 bg-black text-white px-4 py-2 rounded-full hover:bg-stone-800/90 transition-colors"
-                            >
-                                <span>Create</span>
-                                <Plus className="w-4 h-4" />
-                            </button>
-                        </div>
-                    </div>
-                )}
-            </nav>
-
+            <ProfileHeader />
             {/* Profile Header */}
             <main className="pt-32 px-8">
                 <div className="max-w-[1400px] mx-auto">
@@ -354,28 +232,13 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
                 </div>
             </main>
 
-            {/* Footer */}
-            <footer className="hidden md:block fixed bottom-0 w-full bg-white border-t border-gray-100">
-                <div className="max-w-[1400px] mx-auto px-8 py-6 flex justify-between items-center">
-                    <div className="text-sm text-gray-400">
-                        © 2025 All rights reserved
-                    </div>
-                    <button
-                        onClick={() => {
-                            window.scrollTo({
-                                top: 0,
-                                behavior: "smooth",
-                            });
-                        }}
-                        className="flex items-center space-x-2 text-sm hover:opacity-70"
-                    >
-                        Back to top
-                        <ArrowUpRight className="w-4 h-4 ml-0.5" />
-                    </button>
-                </div>
-            </footer>
+            <ProfileFooter />
         </div>
     );
+};
+
+Profile.propTypes = {
+    bgClr: PropTypes.string,
 };
 
 export default Profile;

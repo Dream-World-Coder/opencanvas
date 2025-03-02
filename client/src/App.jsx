@@ -12,6 +12,8 @@ import LandingPage from "./pages/LandingPage/LandingPage";
 
 // Lazy loaded components
 const LoginPage = lazy(() => import("./pages/Auth/Login"));
+const LogoutPage = lazy(() => import("./pages/Auth/Logout"));
+const AuthSuccess = lazy(() => import("./pages/Auth/AuthSuccess"));
 const Profile = lazy(() => import("./pages/Profile/Profile"));
 const AboutPage = lazy(() => import("./pages/About/About"));
 const ContactPage = lazy(() => import("./pages/Contact/Contact"));
@@ -58,7 +60,11 @@ export default function App() {
                                 element={<LoginPage bgClr="bg-cream-light" />}
                             />
                             <Route path="/register" element={<LoginPage />} />
-                            {/* <Route path="/auth/success" element={<AuthSuccess />} /> */}
+                            <Route
+                                path="/auth/success"
+                                element={<AuthSuccess />}
+                            />
+                            <Route path="/logout" element={<LogoutPage />} />
                             {/* <Route path="/post/:id" element={<PostDetail />} /> */}
                             <Route
                                 path="/about"

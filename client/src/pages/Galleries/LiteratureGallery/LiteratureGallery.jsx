@@ -10,13 +10,6 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
     const [hoveredId, setHoveredId] = useState(null);
 
     const filters = ["all", "stories", "poems", "romance", "experience"];
-    const navLinks = [
-        { name: "Literature", href: "/gallery/literature" },
-        { name: "Photos", href: "/gallery/photos" },
-        { name: "About", href: "/about" },
-        { name: "Contact", href: "/contact" },
-        { name: "Login", href: "/login" },
-    ];
 
     useEffect(() => {
         const isMobile = /Mobi|Android/i.test(navigator.userAgent);
@@ -34,7 +27,7 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
 
     return (
         <div className={`min-h-screen ${bgClr} pt-24`}>
-            <Header filters={filters} navLinks={navLinks} />
+            <Header filters={filters} />
 
             {/* Top / Hero */}
             {/* ----------------------------------- */}

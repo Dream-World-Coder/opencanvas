@@ -1,9 +1,24 @@
 import React, { useState } from "react";
 import { X, Menu } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContext";
 
-const Header = ({ filters, navLinks }) => {
+const Header = ({ filters }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [selectedFilter, setSelectedFilter] = useState("all");
+    const { currentUser } = useAuth();
+
+    let navLinks = [
+        { name: "Literature", href: "/gallery/literature" },
+        { name: "Photos", href: "/gallery/photos" },
+        { name: "About", href: "/about" },
+        { name: "Contact", href: "/contact" },
+    ];
+    if (!currentUser) {
+        navLinks.push({ name: "Login", href: "/login" });
+    }
+    if (currentUser) {
+        navLinks.push({ name: "Profile", href: "/profile" });
+    }
 
     return (
         <header className="fixed top-0 w-full bg-white/20 backdrop-blur-md z-50 border-none border-gray-100">
@@ -37,12 +52,24 @@ const Header = ({ filters, navLinks }) => {
                             <React.Fragment key={index}>
                                 <a
                                     href={link.href}
-                                    className="text-stone-600 hover:text-stone-800 hover:bg-lime-300/50 box-content px-3 py-1 rounded-lg transition-all text-sm"
+                                    className={`text-stone-600 hover:text-stone-800
+                                        ${link.href !== "/profile" ? "hover:bg-lime-300/50" : ""}
+                                        box-content px-3 py-1 rounded-lg transition-all text-sm`}
                                 >
-                                    {link.name}
+                                    {link.href !== "/profile" ? (
+                                        link.name
+                                    ) : (
+                                        <img
+                                            src="https://picsum.photos/200"
+                                            className="size-6 md:size-8 rounded-full overflow-hidden object-cover block cursor-pointer"
+                                            alt=""
+                                        />
+                                    )}
                                 </a>
                                 {index !== navLinks.length - 1 && (
-                                    <span className="text-lime-300">•</span>
+                                    <span className="text-lime-300 flex items-center">
+                                        •
+                                    </span>
                                 )}
                             </React.Fragment>
                         ))}

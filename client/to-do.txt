@@ -45,10 +45,10 @@ heading, quote, inlineCode, list
 
 
 -- decide main route
--- create sitemap.xml and make google indexing,
+-- [x] create sitemap.xml and make google indexing,
 -- internal linking for better seo
 
 
 
-wkhtml-to-pdf: https://wkhtmltopdf.org/downloads.html
-weasyPrint: https://weasyprint.org
+-- book: collection of articles, stories, poems
+-- collection: coll of photos

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { X, Menu } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContext";
 
 export const Circle = ({
     radius = "300px",
@@ -42,14 +43,20 @@ export const SlidingButton = ({ href, children }) => {
 
 export const Navbar = ({ bg }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const { currentUser } = useAuth();
 
-    const navLinks = [
+    let navLinks = [
         { name: "Literature", href: "/gallery/literature" },
         { name: "Photos", href: "/gallery/photos" },
         { name: "About", href: "/about" },
         { name: "Contact", href: "/contact" },
-        { name: "Login", href: "/login" },
     ];
+    if (!currentUser) {
+        navLinks.push({ name: "Login", href: "/login" });
+    }
+    if (currentUser) {
+        navLinks.push({ name: "Profile", href: "/profile" });
+    }
 
     return (
         <>
@@ -60,12 +67,24 @@ export const Navbar = ({ bg }) => {
                         <React.Fragment key={index}>
                             <a
                                 href={link.href}
-                                className="text-stone-600 hover:text-stone-800 hover:bg-[#d2d4d0] rounded-lg text-sm transition-all duration-300 box-content px-3 py-1"
+                                className={`text-stone-600 hover:text-stone-800 flex items-center
+                                    ${link.href !== "/profile" ? "hover:bg-[#d2d4d0]" : ""}
+                                    rounded-lg text-sm transition-all duration-300 box-content px-3 py-1`}
                             >
-                                {link.name}
+                                {link.href !== "/profile" ? (
+                                    link.name
+                                ) : (
+                                    <img
+                                        src="https://picsum.photos/200"
+                                        className="size-6 md:size-8 rounded-full overflow-hidden object-cover block cursor-pointer"
+                                        alt=""
+                                    />
+                                )}
                             </a>
                             {index !== navLinks.length - 1 && (
-                                <span className="text-[#c2c4c0]">•</span>
+                                <span className="text-[#c2c4c0] flex items-center">
+                                    •
+                                </span>
                             )}
                         </React.Fragment>
                     ))}

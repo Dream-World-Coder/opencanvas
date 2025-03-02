@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 
     // API URL
@@ -27,7 +28,7 @@ export const AuthProvider = ({ children }) => {
 
     // Add auth token to requests
     authAxios.interceptors.request.use((config) => {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("authToken");
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -47,10 +48,10 @@ export const AuthProvider = ({ children }) => {
     // Load user from token on initial load
     useEffect(() => {
         const loadUser = async () => {
-            const token = localStorage.getItem("token");
+            const token = localStorage.getItem("authToken");
 
             if (!token || isTokenExpired(token)) {
-                localStorage.removeItem("token");
+                localStorage.removeItem("authToken");
                 setCurrentUser(null);
                 setLoading(false);
                 return;
@@ -61,7 +62,7 @@ export const AuthProvider = ({ children }) => {
                 setCurrentUser(response.data.user);
             } catch (error) {
                 console.error("Failed to load user:", error);
-                localStorage.removeItem("token");
+                localStorage.removeItem("authToken");
                 setCurrentUser(null);
             } finally {
                 setLoading(false);
@@ -81,7 +82,7 @@ export const AuthProvider = ({ children }) => {
             );
 
             if (response.data.success) {
-                localStorage.setItem("token", response.data.token);
+                localStorage.setItem("authToken", response.data.token);
                 setCurrentUser(response.data.user);
                 navigate("/profile");
                 return true;
@@ -102,7 +103,7 @@ export const AuthProvider = ({ children }) => {
             });
 
             if (response.data.success) {
-                localStorage.setItem("token", response.data.token);
+                localStorage.setItem("authToken", response.data.token);
                 setCurrentUser(response.data.user);
                 navigate("/profile");
                 return true;
@@ -114,14 +115,26 @@ export const AuthProvider = ({ children }) => {
     };
 
     // Handle Google Auth success
-    const handleGoogleAuthSuccess = () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get("token");
+    const handleGoogleAuthSuccess = async () => {
+        const token = searchParams.get("token");
 
         if (token) {
-            localStorage.setItem("token", token);
-            loadUserData(token);
-            navigate("/profile");
+            localStorage.setItem("authToken", token);
+            try {
+                await loadUserData(token);
+                navigate("/profile");
+            } catch (error) {
+                console.error("Failed during Google auth:", error);
+                alert("Authentication failed, redirecting to login");
+                setTimeout(() => {
+                    navigate("/login");
+                }, 400);
+            }
+        } else {
+            alert("token not found, redirecting to login");
+            setTimeout(() => {
+                navigate("/login");
+            }, 400);
         }
     };
 
@@ -144,7 +157,7 @@ export const AuthProvider = ({ children }) => {
 
     // Logout
     const logout = () => {
-        localStorage.removeItem("token");
+        localStorage.removeItem("authToken");
         setCurrentUser(null);
         navigate("/login");
     };
