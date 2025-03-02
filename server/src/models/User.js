@@ -39,7 +39,7 @@ const userSchema = new Schema(
         },
         fullName: {
             type: String,
-            required: true,
+            required: false,
             trim: true,
         },
         email: {
@@ -55,7 +55,7 @@ const userSchema = new Schema(
         },
         profilePicture: {
             type: String,
-            default: "https://example.com/defaults/profile.png",
+            default: "https://example.com/defaults/profile.jpeg",
         },
         ipAddress: {
             type: String,

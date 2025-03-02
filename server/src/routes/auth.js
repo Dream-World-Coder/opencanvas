@@ -7,19 +7,26 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-// Environment variables - in production use dotenv
+require("dotenv").config();
+
+const {
+    handleAuthErrors,
+    authenticateToken,
+} = require("../middlewares/authorisation");
+
+// in production need to use dotenv
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const JWT_SECRET = process.env.JWT_SECRET || "238238d68905djd5efd689059jK5ef"; // will change later
+const JWT_SECRET = process.env.JWT_SECRET || "238238d68905djd5efd689059jK5ef";
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
-// Configure Google Strategy for Passport
+// google strategy for passport
 passport.use(
     new GoogleStrategy(
         {
             clientID: GOOGLE_CLIENT_ID,
             clientSecret: GOOGLE_CLIENT_SECRET,
-            callbackURL: "/auth/google/callback",
+            callbackURL: "http://127.0.0.1:3000/auth/google/callback",
             userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
         },
         async (accessToken, refreshToken, profile, done) => {
@@ -92,33 +99,18 @@ passport.deserializeUser(async (id, done) => {
     }
 });
 
-// Middleware to handle authentication errors
-const handleAuthErrors = (err, req, res, next) => {
-    console.error("Authentication error:", err);
-    return res.status(500).json({
-        success: false,
-        message: "Authentication failed",
-        error:
-            process.env.NODE_ENV === "development"
-                ? err.message
-                : "Server error",
-    });
-};
-
-// Regular register route
 router.post("/register", async (req, res) => {
     try {
-        const { username, fullName, email, password } = req.body;
+        const { username, email, password } = req.body;
 
-        // Validate input
-        if (!username || !fullName || !email || !password) {
+        if (!username || !email || !password) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required",
             });
         }
 
-        // Check if user already exists
+        // user already exists check
         const existingUser = await User.findOne({
             $or: [{ email }, { username }],
         });
@@ -133,13 +125,12 @@ router.post("/register", async (req, res) => {
             });
         }
 
-        // Hash password
-        const passwordHash = await bcrypt.hash(password, 10);
+        const passwordHash = await bcrypt.hash(password, 10); // password hashing
 
         // Create new user
         const newUser = new User({
             username,
-            fullName,
+            fullName: null,
             email,
             passwordHash,
             ipAddress: req.ip,
@@ -153,14 +144,14 @@ router.post("/register", async (req, res) => {
 
         await newUser.save();
 
-        // Generate JWT token
+        // JWT token generation
         const token = jwt.sign(
             { userId: newUser._id, email: newUser.email },
             JWT_SECRET,
             { expiresIn: "7d" },
         );
 
-        // Return success with token
+        // return success with token
         return res.status(201).json({
             success: true,
             message: "User registered successfully",
@@ -186,12 +177,10 @@ router.post("/register", async (req, res) => {
     }
 });
 
-// Regular login route
 router.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Validate input
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
@@ -199,7 +188,7 @@ router.post("/login", async (req, res) => {
             });
         }
 
-        // Find user
+        // find user
         const user = await User.findOne({ email });
 
         // Check if user exists and password is correct
@@ -279,6 +268,7 @@ router.get(
             );
 
             // Redirect to frontend with token
+            // console.log(`\n\n${FRONTEND_URL}/auth/success?token=${token}\n\n`);
             res.redirect(`${FRONTEND_URL}/auth/success?token=${token}`);
         } catch (error) {
             console.error("Google callback error:", error);
@@ -286,31 +276,6 @@ router.get(
         }
     },
 );
-
-// Authentication middleware for protected routes
-const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
-
-    if (!token) {
-        return res.status(401).json({
-            success: false,
-            message: "Access token required",
-        });
-    }
-
-    jwt.verify(token, JWT_SECRET, (err, decoded) => {
-        if (err) {
-            return res.status(403).json({
-                success: false,
-                message: "Invalid or expired token",
-            });
-        }
-
-        req.userId = decoded.userId;
-        next();
-    });
-};
 
 // Protected route example
 router.get("/user", authenticateToken, async (req, res) => {
@@ -346,5 +311,4 @@ router.use(handleAuthErrors);
 
 module.exports = {
     router,
-    authenticateToken,
 };

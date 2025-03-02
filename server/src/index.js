@@ -1,5 +1,3 @@
-// app.js - Main Express application setup
-
 const express = require("express");
 const mongoose = require("mongoose");
 const passport = require("passport");
@@ -8,24 +6,20 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const { router: authRoutes } = require("./routes/auth");
+const { router: errorHandler } = require("./middlewares/errorHandler.js");
+const { authenticateToken } = require("./middlewares/authorisation.js");
 
-// Initialize Express app
+require("dotenv").config();
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Connect to MongoDB
 mongoose
-    .connect(
-        process.env.MONGODB_URI || "mongodb://localhost:27017/opencanvas",
-        {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        },
-    )
+    .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/opencanvas")
     .then(() => console.log("Connected to MongoDB"))
     .catch((err) => console.error("MongoDB connection error:", err));
 
-// Basic middleware
+// necessary middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -35,7 +29,7 @@ app.use(
     }),
 );
 app.use(helmet()); // Security headers
-app.use(morgan("dev")); // Logging
+app.use(morgan("dev")); // logger
 
 // Session configuration
 app.use(
@@ -50,34 +44,23 @@ app.use(
     }),
 );
 
-// Initialize Passport
+// init passport
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Routes
+// routes
 app.use("/auth", authRoutes);
 
-// Root route
 app.get("/", (req, res) => {
     res.json({ message: "Welcome to OpenCanvas API" });
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({
-        success: false,
-        message: "Something went wrong",
-        error:
-            process.env.NODE_ENV === "development"
-                ? err.message
-                : "Server error",
-    });
-});
+// middlewares
+app.use(authenticateToken);
+app.use(errorHandler);
 
-// Start server
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
 
-module.exports = app;
+// module.exports = app;
