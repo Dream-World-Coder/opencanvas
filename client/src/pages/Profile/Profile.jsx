@@ -29,7 +29,7 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
     const posts = currentUser.posts;
 
     return (
-        <div className={`min-h-screen ${bgClr} font-sans`}>
+        <div className={`min-h-screen ${bgClr} font-sans invert`}>
             {/* Navigation */}
             <ProfileHeader />
 
