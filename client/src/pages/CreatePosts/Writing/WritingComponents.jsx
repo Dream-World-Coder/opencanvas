@@ -378,8 +378,8 @@ export const useImagePopup = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [currentImage, setCurrentImage] = useState(null);
     const [imageSettings, setImageSettings] = useState({
-        marginTop: 0,
-        marginBottom: 0,
+        marginTop: 35,
+        marginBottom: 35,
         position: "left", // 'left', 'center', 'right'
         maxHeight: 360,
         maxWidth: 500,
@@ -494,8 +494,8 @@ export const ImagePopup = ({
                     <div
                         className="flex items-center justify-center overflow-hidden border border-gray-200 rounded"
                         style={{
-                            marginTop: "0px",
-                            marginBottom: "0px",
+                            marginTop: "35px",
+                            marginBottom: "35px",
                         }}
                     >
                         <img
@@ -593,8 +593,8 @@ export const MarkdownPreview = ({
     const [imgMaxWidth, setImgMaxWidth] = useState("500px");
     const [imgMaxHeight, setImgMaxHeight] = useState("360px");
     const [imgAlignment, setImgAlignment] = useState("justify-center");
-    const [mTop, setMTop] = useState("0px");
-    const [mBottom, setMBottom] = useState("0px");
+    const [mTop, setMTop] = useState("35px");
+    const [mBottom, setMBottom] = useState("35px");
 
     if (!isVisible) return null;
 

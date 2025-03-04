@@ -6,6 +6,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LoadingPage from "./pages/Others/LoadingPage";
 import { HelmetProvider } from "react-helmet-async";
+import { Toaster } from "@/components/ui/sonner";
 
 // Loaded with main bundle
 import LandingPage from "./pages/LandingPage/LandingPage";
@@ -137,6 +138,7 @@ export default function App() {
                         </Routes>
                     </Suspense>
                 </AuthProvider>
+                <Toaster />
             </Router>
         </HelmetProvider>
     );

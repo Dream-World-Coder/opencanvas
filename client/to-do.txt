@@ -53,7 +53,7 @@ heading, quote, inlineCode, list
 -- book: collection of articles, stories, poems
 -- collection: coll of photos
 
--- usename and profile update options
+-- usename, fullname and profile update options
 -- blog Post
 -- image fix
 -- public profile

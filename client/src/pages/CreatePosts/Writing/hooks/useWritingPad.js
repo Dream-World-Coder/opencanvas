@@ -1,79 +1,91 @@
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import ObjectId from "bson-objectid";
 
-export function useWritingPad({ postId = null }) {
+export function useWritingPad({ postId }) {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
-    // const [content, setContent] = useState(rawText);
-    // const [wordCount, setWordCount] = useState(0);
-
+    const [twoColumn, setTwoColumn] = useState(false);
     const [isSaved, setIsSaved] = useState(true);
     const [lastSynced, setLastSynced] = useState(null);
     const [syncStatus, setSyncStatus] = useState("synced"); // 'synced', 'saving', 'offline'
     const [showUnsavedAlert, setShowUnsavedAlert] = useState(false);
+    const [tags, setTags] = useState(["general"]);
+    // const [isPublic, setIsPublic] = useState(true);
+    const [media, setMedia] = useState([]);
 
+    const id = ObjectId().toString();
+    if (!postId) postId = id;
     const saveDraftLocally = () => {
         const draft = {
-            id: postId || crypto.randomUUID(),
+            id: postId,
             title,
             content,
             lastSaved: new Date().toISOString(),
             syncedWithServer: false,
         };
-        // localStorage.setItem(`draft-${draft.id}`, JSON.stringify(draft));
         localStorage.setItem(`blogPost`, JSON.stringify(draft));
-        setIsSaved(true);
+        // setIsSaved(true); // st saved only when saved in db
     };
 
     const syncWithBackend = async () => {
+        // device online check
         if (!navigator.onLine) {
             setSyncStatus("offline");
-            return; // +++
+            return;
         }
 
         setSyncStatus("saving");
 
-        // tmp api handling
-        setTimeout(() => {
-            setSyncStatus("synced");
-            setLastSynced(new Date());
-            return;
-        }, 200);
-
-        /*
         try {
-            const response = await fetch(`/api/posts/${postId || ""}`, {
-                method: postId ? "PUT" : "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    title,
-                    content,
-                    type: artType,
-                }),
-            });
+            // title must not be empty
+            if (!title || title.trim() === "") {
+                setSyncStatus("offline");
+                toast("Title is required");
+                return;
+            }
 
-            if (response.ok) {
-                const savedPost = await response.json();
-                if (!postId) {
-                    // If this was a new post, update URL with new post ID
-                    window.history.replaceState(
-                        {},
-                        "",
-                        `/edit/${savedPost.id}`,
-                    );
-                }
+            // Prepare post data
+            const postData = {
+                id: postId,
+                title,
+                content,
+                tags,
+                media,
+            };
+
+            // Get auth token - assuming you store it in localStorage or similar
+            const token = localStorage.getItem("authToken");
+
+            // Make API call to backend
+            const response = await fetch(
+                "http://127.0.0.1:3000/savepost/written",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(postData),
+                },
+            );
+
+            const data = await response.json();
+
+            if (data.success) {
+                setIsSaved(true);
                 setSyncStatus("synced");
                 setLastSynced(new Date());
-                return true;
+                toast("Post saved successfully");
+            } else {
+                setSyncStatus("offline");
+                toast(data.message || "Failed to save post in server");
             }
-            return false;
         } catch (error) {
-            console.error("Error saving to backend:", error);
+            console.error("Error saving post:", error);
             setSyncStatus("offline");
-            return false;
+            toast("Failed to connect to server");
         }
-        */
     };
 
     /**
@@ -124,7 +136,7 @@ export function useWritingPad({ postId = null }) {
     };
 
     /**
-     * Load existing post or draft
+     * Load existing post or draft : simple version is fine
      */
     /*
     useEffect(() => {
@@ -169,9 +181,6 @@ export function useWritingPad({ postId = null }) {
                         JSON.parse(savedPost);
                     setTitle(savedTitle);
                     setContent(savedContent);
-                    // setWordCount(
-                    //     savedContent.trim().split(/\s+/).filter(Boolean).length,
-                    // );
                 }
 
                 // Wait for React state updates to complete
@@ -254,9 +263,9 @@ export function useWritingPad({ postId = null }) {
             }
         }, 5000);
 
-        // Backend sync every 30 seconds if online
+        // Backend sync every 5 mins if online
         if (navigator.onLine) {
-            autosaveInterval = setInterval(performAutosave, 30000);
+            autosaveInterval = setInterval(performAutosave, 300000);
         }
 
         return () => {
@@ -281,5 +290,7 @@ export function useWritingPad({ postId = null }) {
         handleSave,
         saveDraftLocally,
         syncWithBackend,
+        twoColumn,
+        setTwoColumn,
     };
 }

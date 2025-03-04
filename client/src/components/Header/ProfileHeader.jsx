@@ -95,13 +95,15 @@ export default function ProfileHeader() {
                 </a>
                 <div className="hidden md:flex items-center space-x-5 text-[15px]">
                     {navLinks.map((link, index) => (
-                        <a
+                        <button
                             key={index}
-                            href={link.href}
+                            onClick={() => {
+                                window.location.href = link.href;
+                            }}
                             className={`px-3 py-1 box-content rounded-md hover:opacity-70 hover:bg-lime-300`}
                         >
                             {link.label}
-                        </a>
+                        </button>
                     ))}
 
                     <AlertDialog>
@@ -132,7 +134,12 @@ export default function ProfileHeader() {
                         </AlertDialogContent>
                     </AlertDialog>
 
-                    <button className="size-6">
+                    <button
+                        className="size-6"
+                        onClick={() => {
+                            window.location.href = "/profile/settings";
+                        }}
+                    >
                         <Settings />
                     </button>
 
@@ -155,13 +162,14 @@ export default function ProfileHeader() {
                         {createMenuOpen && (
                             <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-100 rounded-lg shadow-lg py-2 z-50">
                                 {createOptions.map((option) => (
-                                    <a
+                                    <button
                                         key={option.id}
                                         className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
                                         onClick={() => {
+                                            localStorage.removeItem("blogPost");
                                             setCreateMenuOpen(false);
+                                            window.location.href = option.href;
                                         }}
-                                        href={option.href}
                                     >
                                         <div
                                             className={`p-2 rounded-full ${option.color}`}
@@ -172,7 +180,7 @@ export default function ProfileHeader() {
                                             {option.label}{" "}
                                             <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700" />
                                         </span>
-                                    </a>
+                                    </button>
                                 ))}
                             </div>
                         )}
@@ -210,6 +218,7 @@ export default function ProfileHeader() {
                                     className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
                                     onClick={() => {
                                         setCreateMenuOpen(false);
+                                        localStorage.removeItem("blogPost");
                                     }}
                                     href={option.href}
                                 >

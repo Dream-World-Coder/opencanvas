@@ -9,8 +9,8 @@ import {
     MessageCircle,
 } from "lucide-react";
 import ProfileHeader from "../../components/Header/ProfileHeader";
-// import ProfileFooter from "../../components/Footer/ProfileFooter";
 import PropTypes from "prop-types";
+// import ProfileFooter from "../../components/Footer/ProfileFooter";
 // import { useAuth } from "../../contexts/AuthContext";
 
 const Profile = ({ bgClr = "bg-cream-light" }) => {
@@ -216,7 +216,11 @@ const Profile = ({ bgClr = "bg-cream-light" }) => {
                         className={`grid gap-8 mb-24 ${viewMode === "grid" ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"}`}
                     >
                         {posts.map((post) => (
-                            <div key={post.id} className="group cursor-pointer">
+                            <div
+                                key={post._id}
+                                data-postId={post._id}
+                                className="group cursor-pointer"
+                            >
                                 {post.type === "photo" ? (
                                     // Photo Post
                                     <div className="space-y-4">

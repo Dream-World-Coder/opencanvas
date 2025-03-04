@@ -1,5 +1,3 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import {
     ArrowLeft,
@@ -29,7 +27,6 @@ import {
     Columns2,
 } from "lucide-react";
 import PropTypes from "prop-types";
-import ObjectId from "bson-objectid";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
@@ -62,20 +59,8 @@ import { useEditorFormatting } from "./hooks/useEditorFormatting";
 import { useEditorAppearance } from "./hooks/useEditorAppearance";
 import { useExport } from "./hooks/useExport";
 
-/**
- • supports latex && easy to use + image upload, easily give gap, cuz supports html
- • ^%SOS# for unTested code
- • post click : edit preview settings
- */
-const WritingPad = ({ artType = "article" }) => {
-    const navigate = useNavigate();
-
-    const [postId, setPostId] = useState("");
-    useEffect(() => {
-        const id = ObjectId();
-        setPostId(id.toString());
-    }, []);
-
+const Md2pdf = ({ artType = "markdown2pdf" }) => {
+    const postId = null;
     // Core writing pad functionality
     const {
         title,
@@ -134,48 +119,14 @@ const WritingPad = ({ artType = "article" }) => {
         handleTxtExport,
         handleCopy,
     } = useExport(title, content);
-
-    const schemaData = {
-        "@context": "https://schema.org",
-        "@type": "Article",
-        headline: { title },
-        // image: ["https://opencanvas.blog/photos/1x1/photo.jpg"],
-        datePublished: {},
-        dateModified: {},
-        author: {
-            "@type": "Person",
-            name: {},
-        },
-        publisher: {
-            "@type": "Organization",
-            name: "Opencanvas",
-            logo: {
-                "@type": "ImageObject",
-                url: "https://opencanvas.blog/logo.png",
-            },
-        },
-        description:
-            "A sample article description goes here, summarizing the main content of the article.",
-        mainEntityOfPage: {
-            "@type": "WebPage",
-            "@id": "https://opencanvas.blog/sample-article",
-        },
-        keywords:
-            "SEO, keywords, search engine optimization, blog, web development",
-    };
-
     return (
         <>
             <Helmet>
-                <title>{title} • OpenCanvas</title>
-                <meta name="description" content={title} />
+                <title>Markdown to PDF converter | OpenCanvas</title>
                 <meta
-                    name="keywords"
-                    content="technology, blog, javascript, SEO, web development"
+                    name="description"
+                    content="Powerful markdown & latex editor with images upload and pdf export."
                 />
-                <script type="application/ld+json">
-                    {JSON.stringify(schemaData)}
-                </script>
             </Helmet>
             <div
                 className={`min-h-screen transition-all duration-0 relative h-fit ${isSerif ? `font-serif` : ""}
@@ -195,7 +146,7 @@ const WritingPad = ({ artType = "article" }) => {
                                             setShowUnsavedAlert(true);
                                             return;
                                         }
-                                        navigate("/profile");
+                                        window.history.back();
                                     }}
                                     className="hover:opacity-70 transition-opacity"
                                 >
@@ -721,9 +672,9 @@ const WritingPad = ({ artType = "article" }) => {
     );
 };
 
-export default WritingPad;
+export default Md2pdf;
 
-WritingPad.propTypes = {
+Md2pdf.propTypes = {
     artType: PropTypes.string,
     postId: PropTypes.any,
 };
