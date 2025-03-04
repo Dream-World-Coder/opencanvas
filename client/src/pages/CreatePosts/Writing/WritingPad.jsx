@@ -23,6 +23,8 @@ import {
     NotebookText,
     ScrollText,
     FileSearch,
+    PanelTop,
+    Columns2,
 } from "lucide-react";
 import PropTypes from "prop-types";
 
@@ -75,6 +77,8 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
         showUnsavedAlert,
         setShowUnsavedAlert,
         handleSave,
+        twoColumn,
+        setTwoColumn,
     } = useWritingPad({ postId });
 
     // Editor formatting functionality
@@ -162,11 +166,6 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
 
                             {/* options */}
                             <div className="flex items-center space-x-3 md:space-x-4">
-                                {/* word count : not needed */}
-                                {/* <span className="hidden md:inline text-sm text-gray-400">
-                                {wordCount} words
-                            </span> */}
-
                                 {/* save btn */}
                                 <button
                                     className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm ${
@@ -180,31 +179,33 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                     <span>{isSaved ? "Saved" : "Save"}</span>
                                 </button>
 
-                                {/* preview */}
-                                <button
-                                    className={`flex items-center space-x-1 px-2 md:px-3 py-1 rounded-full text-sm border
+                                {/* preview btn */}
+                                {!twoColumn && (
+                                    <button
+                                        className={`flex items-center space-x-1 px-2 md:px-3 py-1 rounded-full text-sm border
                                     ${isDark ? "border-[#555]" : "border-gray-300"}
                                     ${
                                         isPreview
                                             ? `${isDark ? "text-gray-200 bg-[#555]" : "text-gray-700 bg-gray-300"}`
                                             : `${isDark ? "text-gray-200" : "text-gray-700"}`
                                     }`}
-                                    onClick={() => {
-                                        setIsPreview(!isPreview);
-                                    }}
-                                >
-                                    {isPreview ? (
-                                        <>
-                                            <Eye className="size-3 md:size-4" />
-                                            <span>Preview</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Edit className="size-4" />
-                                            <span>Edit</span>
-                                        </>
-                                    )}
-                                </button>
+                                        onClick={() => {
+                                            setIsPreview(!isPreview);
+                                        }}
+                                    >
+                                        {isPreview ? (
+                                            <>
+                                                <Eye className="size-3 md:size-4" />
+                                                <span>Preview</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Edit className="size-4" />
+                                                <span>Edit</span>
+                                            </>
+                                        )}
+                                    </button>
+                                )}
 
                                 {/* sync btn */}
                                 <button className="hidden md:flex items-center space-x-2 text-sm size-auto z-50">
@@ -381,12 +382,33 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                             onClick={(e) => {
                                                 e.preventDefault();
                                                 alert("will be available soon");
-                                                // setHelpOpen(!helpOpen);
                                             }}
                                         >
                                             <FileSearch />
                                             Find &amp; replace
                                         </DropdownMenuItem>
+
+                                        {!isPreview && (
+                                            <DropdownMenuItem
+                                                className="hidden md:flex"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    setTwoColumn(!twoColumn);
+                                                }}
+                                            >
+                                                {!twoColumn ? (
+                                                    <>
+                                                        <Columns2 />
+                                                        side preview
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <PanelTop />
+                                                        single column
+                                                    </>
+                                                )}
+                                            </DropdownMenuItem>
+                                        )}
 
                                         {/* help */}
                                         <DropdownMenuItem
@@ -407,7 +429,8 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                         {/* Formatting Tools */}
                         <div
                             className={`mb-2 mx-4 md:mx-0 flex items-center justify-between rounded-md transition-all duration-0
-                            ${isDark ? "bg-[#333]" : "bg-gray-50"} ${isPreview ? "opacity-0 h-0" : "opacity-100"}`}
+                                        ${isDark ? "bg-[#333]" : "bg-gray-50"}
+                                        ${isPreview ? "opacity-0 h-0" : ""}`}
                         >
                             <div className="flex items-center md:space-x-2">
                                 {formattingButtons.map(
@@ -416,10 +439,9 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                                             key={format}
                                             onClick={() => handleFormat(format)}
                                             className={`px-[6px] md:px-2 py-3 md:rounded-lg transition-all duration-0
-                                        border-r md:border-none
-                                        ${isDark ? "hover:bg-gray-500 border-[#222]" : "hover:bg-gray-200 border-gray-200"}
-                                        ${["heading", "quote", "list", "inlineCode", "dropCap"].includes(format) ? "hidden md:block" : ""}
-                                        `}
+                                                        border-r md:border-none
+                                                        ${isDark ? "hover:bg-gray-500 border-[#222]" : "hover:bg-gray-200 border-gray-200"}
+                                                        ${["heading", "quote", "list", "inlineCode", "dropCap"].includes(format) ? "hidden md:block" : ""}`}
                                         >
                                             <Icon className="size-4" />
                                         </button>
@@ -526,7 +548,9 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
 
                 {/* Writing Area */}
                 <div className={`pt-[8.25rem] pb-[200px] px-6 relative h-fit`}>
-                    <div className={`max-w-4xl mx-auto relative h-fit`}>
+                    <div
+                        className={`${twoColumn ? "max-w-6xl" : "max-w-4xl"} mx-auto relative h-fit`}
+                    >
                         {/* help div */}
                         <div
                             className={`w-[100%] h-auto mx-auto  relative mb-4 z-30
@@ -584,54 +608,64 @@ const WritingPad = ({ artType = "markdown2pdf", postId = null }) => {
                             </Card>
                         </div>
 
-                        {/* Title Input */}
-                        <input
-                            type="text"
-                            value={title}
-                            onChange={(e) => {
-                                setTitle(e.target.value);
-                                setIsSaved(false);
-                                e.target.style.height =
-                                    e.target.scrollHeight + "px";
-                            }}
-                            placeholder="Title"
-                            className={`w-full h-auto text-4xl font-bold mb-8 focus:outline-none transition-all duration-0
-                            ${isDark ? "bg-[#222]" : lightModeBg}
-                            ${isPreview ? "opacity-0" : "opacity-100"}`}
-                        />
+                        <div className={twoColumn ? "flex gap-4" : ""}>
+                            <div
+                                className={
+                                    twoColumn
+                                        ? `border-r-2 w-1/2 h-full ${isDark ? "border-[#333]" : "border-gray-400"}`
+                                        : ""
+                                }
+                            >
+                                {/* Title Input */}
+                                <input
+                                    type="text"
+                                    value={title}
+                                    onChange={(e) => {
+                                        setTitle(e.target.value);
+                                        setIsSaved(false);
+                                        e.target.style.height =
+                                            e.target.scrollHeight + "px";
+                                    }}
+                                    placeholder="Title"
+                                    className={`w-full h-auto text-4xl font-bold mb-8 focus:outline-none transition-all duration-0
+                                                ${isDark ? "bg-[#222]" : lightModeBg}
+                                                ${isPreview ? "opacity-0" : "opacity-100"}`}
+                                />
 
-                        {/* Content Textarea */}
-                        <textarea
-                            id="txtArea"
-                            value={content}
-                            onChange={(e) => {
-                                handleContentChange(e, setIsSaved);
-                            }}
-                            placeholder="Fill your canvas..."
-                            className={`w-full min-h-screen h-auto resize-none focus:outline-none text-lg text-left transition-all duration-0
-                            ${isDark ? "bg-[#222]" : lightModeBg}
-                            ${isPreview ? "opacity-0 max-h-screen" : "opacity-100 max-h-auto"}
-                            ${
-                                textAlignment === "center"
-                                    ? "text-center"
-                                    : "text-left"
-                            }`}
-                        />
+                                {/* Content Textarea */}
+                                <textarea
+                                    id="txtArea"
+                                    value={content}
+                                    onChange={(e) => {
+                                        handleContentChange(e, setIsSaved);
+                                    }}
+                                    placeholder="Fill your canvas..."
+                                    className={`w-full min-h-screen h-auto resize-none focus:outline-none text-lg text-left transition-all duration-0
+                                                ${isDark ? "bg-[#222]" : lightModeBg}
+                                                ${isPreview ? "opacity-0 max-h-screen" : "opacity-100 max-h-auto"}
+                                                ${
+                                                    textAlignment === "center"
+                                                        ? "text-center"
+                                                        : "text-left"
+                                                }`}
+                                />
+                            </div>
 
-                        {/* preview div */}
-                        <div
-                            className={`w-[100%] h-auto mx-auto prose absolute top-0 left-0
-                            rounded text-lg transition-all duration-0
-                            ${isPreview ? "" : "hidden"}`}
-                        >
-                            <MarkdownPreview
-                                title={title}
-                                content={content}
-                                isVisible={isPreview}
-                                isDark={isDark}
-                                textAlignment={textAlignment}
-                                lightModeBg={lightModeBg}
-                            />
+                            {/* preview div */}
+                            <div
+                                className={`prose rounded text-lg transition-all duration-0
+                                    ${!twoColumn ? "w-[100%] h-auto mx-auto absolute top-0 left-0" : "w-1/2 h-full"}
+                                    ${isPreview || twoColumn ? "" : "hidden"}`}
+                            >
+                                <MarkdownPreview
+                                    title={title}
+                                    content={content}
+                                    isVisible={twoColumn ? true : isPreview}
+                                    isDark={isDark}
+                                    textAlignment={textAlignment}
+                                    lightModeBg={lightModeBg}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
