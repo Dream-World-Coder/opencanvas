@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
+import { createOptions } from "./createOptions";
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [createMenuOpen, setCreateMenuOpen] = useState(false);
     const { currentUser } = useAuth();
 
     // Navigation Links
@@ -62,20 +64,107 @@ const Header = () => {
                                 )}
                             </React.Fragment>
                         ))}
+                        {/* Create Button with Dropdown */}
+                        <div className="relative">
+                            <button
+                                onClick={() =>
+                                    setCreateMenuOpen(!createMenuOpen)
+                                }
+                                className="flex items-center space-x-2 bg-black text-white px-4 py-2 rounded-full hover:bg-stone-800/90 transition-colors"
+                            >
+                                <span>Create</span>
+                                {!createMenuOpen && (
+                                    <ChevronDown className="w-4 h-4" />
+                                )}
+                                {createMenuOpen && (
+                                    <ChevronUp className="w-4 h-4" />
+                                )}
+                            </button>
+
+                            {/* Create Menu Dropdown */}
+                            {createMenuOpen && (
+                                <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-100 rounded-lg shadow-lg py-2 z-50">
+                                    {createOptions.map((option) => (
+                                        <button
+                                            key={option.id}
+                                            className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
+                                            onClick={() => {
+                                                localStorage.removeItem(
+                                                    "blogPost",
+                                                );
+                                                setCreateMenuOpen(false);
+                                                window.location.href =
+                                                    option.href;
+                                            }}
+                                        >
+                                            <div
+                                                className={`p-2 rounded-full ${option.color}`}
+                                            >
+                                                <option.icon className="w-4 h-4 text-white" />
+                                            </div>
+                                            <span className="flex items-center justify-center gap-3">
+                                                {option.label}{" "}
+                                                <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700" />
+                                            </span>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
-                    {/* Mobile Menu Button */}
-                    <button
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        className="md:hidden p-2 hover:bg-white/50 rounded-sm transition-colors"
-                        aria-label="Toggle menu"
-                    >
-                        {isMenuOpen ? (
-                            <X className="h-6 w-6 text-stone-600" />
-                        ) : (
-                            <Menu className="h-6 w-6 text-stone-600" />
+                    <div className="md:hidden flex items-center justify-center gap-2">
+                        {/* Mobile Create Button */}
+                        <button
+                            onClick={() => setCreateMenuOpen(!createMenuOpen)}
+                            className="w-fit p-1 flex items-center justify-center bg-black text-white rounded-full hover:bg-stone-800/90 transition-colors"
+                        >
+                            {createMenuOpen ? (
+                                <X className="w-4 h-4" />
+                            ) : (
+                                <Plus className="w-4 h-4" />
+                            )}
+                        </button>
+
+                        {/* Mobile Menu Button */}
+                        <button
+                            onClick={() => setIsMenuOpen(!isMenuOpen)}
+                            className="md:hidden p-2 hover:bg-white/50 rounded-sm transition-colors"
+                            aria-label="Toggle menu"
+                        >
+                            {isMenuOpen ? (
+                                <X className="h-6 w-6 text-stone-600" />
+                            ) : (
+                                <Menu className="h-6 w-6 text-stone-600" />
+                            )}
+                        </button>
+
+                        {createMenuOpen && (
+                            <div className="absolute top-20 right-0 w-64 bg-white border border-gray-100 rounded-lg shadow-lg py-2 z-50">
+                                {createOptions.map((option) => (
+                                    <a
+                                        key={option.id}
+                                        className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
+                                        onClick={() => {
+                                            setCreateMenuOpen(false);
+                                            localStorage.removeItem("blogPost");
+                                        }}
+                                        href={option.href}
+                                    >
+                                        <div
+                                            className={`p-2 rounded-full ${option.color}`}
+                                        >
+                                            <option.icon className="w-4 h-4 text-white" />
+                                        </div>
+                                        <span className="flex items-center justify-center gap-3">
+                                            {option.label}{" "}
+                                            <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700" />
+                                        </span>
+                                    </a>
+                                ))}
+                            </div>
                         )}
-                    </button>
+                    </div>
                 </nav>
 
                 {/* Mobile Menu */}
