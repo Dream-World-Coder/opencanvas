@@ -89,3 +89,17 @@ show articles instead of literature gallery
 
 
 -- save & clear post id in local storage or some other place so that id does not creates different post id
+
+
+-- use pop over instead of sheet in the writing-pad
+
+-- localhost for saving id
+
+-- md2pdf route and public profile
+
+-- profile settings
+
+-- post & article view
+
+
+-- in private profile view options for post: 1.view[public] 2.edit 3.delete
