@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { X, Menu, Plus, ChevronUp, ChevronDown, Filter } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { createOptions } from "./createOptions";
+import SearchBar from "../SearchBar";
 
 const Header = ({ filters }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -76,6 +77,7 @@ const Header = ({ filters }) => {
                         )}
                     </h1>
                     <div className="hidden md:flex items-center space-x-2">
+                        <SearchBar />
                         {navLinks.map((link, index) => (
                             <React.Fragment key={index}>
                                 <a

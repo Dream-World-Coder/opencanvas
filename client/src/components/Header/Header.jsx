@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Menu, X, ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { createOptions } from "./createOptions";
+import SearchBar from "../SearchBar";
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -27,15 +28,20 @@ const Header = () => {
         <header className="fixed w-full top-0 z-50 bg-white/20 backdrop-blur-md">
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
                 <nav className="flex items-center justify-between h-16 sm:h-20">
-                    {/* Logo */}
-                    <a
-                        href="/"
-                        className="bg-lime-400 font-thin text-stone-950
+                    <div className="flex items-center justify-center gap-2">
+                        {/* Logo */}
+                        <a
+                            href="/"
+                            className="bg-lime-400 font-thin text-stone-950
                         rounded-md box-content px-1 md:px-1 py-0
                         text-xl md:text-2xl tracking-wide"
-                    >
-                        <span className="font-['Six_Caps']">opencanvas</span>
-                    </a>
+                        >
+                            <span className="font-['Six_Caps']">
+                                opencanvas
+                            </span>
+                        </a>
+                        <SearchBar />
+                    </div>
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center space-x-2">
