@@ -5,10 +5,12 @@
   "content": "Long-form content goes here...",
   "authorId": ObjectId("60f6a2b4a2e8c2a123456789"),
   "createdAt": ISODate("2025-02-26T11:00:00Z"),
-  "tags": ["MongoDB", "NoSQL", "Blog"],
+  "tags": ["MongoDB", "NoSQL", "Blog"], // max 5, default "general", so 4 more can be added
   "postDeleteHash": "d3l3t3H45hEx4mpl3",
+  "isEdited": "false", // edit after posting
+  "isPublic": "true", // public / private
 
-  "type": "article", // 'article', 'image'
+  "type": "written", // 'written', 'image'
   "imgUrl": "", // null if type is not 'image'
   "imgDeleteHash": "", // null if type is not 'image'
 
@@ -32,13 +34,14 @@
   "totalViews": 0,
   "totalLoves": 0,
   "totalSaves": 0,
-  "totalComments": 0,
   "totalShares": 0,
 }
 */
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+// the additional media uploaded, like images in a article
+// no need to be unique
 const mediaSchema = new Schema({
     url: {
         type: String,
@@ -70,20 +73,38 @@ const postSchema = new Schema(
             type: Date,
             default: Date.now,
         },
-        tags: [
-            {
-                type: String,
-                trim: true,
+
+        // max 5, default "general", in images use pre added tags, in blog/articles you can add custom tags
+        tags: {
+            type: [String],
+            trim: true,
+            default: ["general"],
+            required: true,
+            validate: {
+                validator: function (tags) {
+                    return tags.length <= 5;
+                },
+                message: "Maximum 5 tags are allowed.",
             },
-        ],
+        },
+
         postDeleteHash: {
             type: String,
+            unique: true,
+            required: true,
+            // default: uuidv4, -> in the routes
         },
+
+        isEdited: { type: Boolean, default: false },
+        isPublic: { type: Boolean, default: true },
+
         type: {
             type: String,
-            enum: ["article", "image"],
-            default: "article",
+            enum: ["written", "image"],
+            default: "written",
         },
+
+        // only if post type is image
         imgUrl: {
             type: String,
             default: "",
@@ -92,6 +113,8 @@ const postSchema = new Schema(
             type: String,
             default: "",
         },
+        // ****
+
         media: [mediaSchema],
         comments: [
             {
@@ -108,10 +131,6 @@ const postSchema = new Schema(
             default: 0,
         },
         totalSaves: {
-            type: Number,
-            default: 0,
-        },
-        totalComments: {
             type: Number,
             default: 0,
         },

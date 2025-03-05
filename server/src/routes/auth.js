@@ -40,7 +40,7 @@ passport.use(
                 if (user) {
                     // Update login info
                     if (user.lastFiveLogin.length >= 5) {
-                        user.lastFiveLogin.pop(); // Remove oldest login
+                        user.lastFiveLogin.pop(); // pop oldest
                     }
 
                     user.lastFiveLogin.unshift({
@@ -305,10 +305,18 @@ router.get("/user", authenticateToken, async (req, res) => {
     }
 });
 
-// public profile view : tune informations later, do not send entire user
+// public profile view
 router.get("/u/:username", async (req, res) => {
     try {
-        const user = await User.findOne({ username: req.params.username });
+        const user = await User.findOne({
+            username: req.params.username,
+        }).select({
+            _id: 0,
+            passwordHash: 0,
+            email: 0,
+            ipAddress: 0,
+            lastFiveLogin: 0,
+        });
 
         if (!user) {
             return res.status(404).json({

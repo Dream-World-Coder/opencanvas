@@ -6,6 +6,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const { router: authRoutes } = require("./routes/auth");
+const { router: postRoutes } = require("./routes/post");
 const { router: errorHandler } = require("./middlewares/errorHandler.js");
 const { authenticateToken } = require("./middlewares/authorisation.js");
 
@@ -24,10 +25,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
     cors({
-        origin: process.env.FRONTEND_URL || "http://localhost:3000",
+        origin: [
+            "http://127.0.0.1:5173",
+            "http://127.0.0.1:3000",
+            "http://127.0.0.1:5500",
+            "http://localhost:5173",
+            "http://localhost:3000",
+            "http://localhost:5500",
+        ],
         credentials: true,
     }),
 );
+
 app.use(helmet()); // Security headers
 app.use(morgan("dev")); // logger
 
@@ -54,6 +63,7 @@ app.use(errorHandler);
 
 // routes
 app.use("/auth", authRoutes);
+app.use(postRoutes);
 
 app.get("/", (req, res) => {
     res.json({ message: "Welcome to OpenCanvas API" });
