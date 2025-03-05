@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 
 // in posts also hide details like deletehash for public options
 
@@ -130,7 +131,7 @@ const Profile = () => {
 
     return (
         <div
-            className={`min-h-screen bg-white font-sans dark:bg-[#111]`} //bg-cream-light
+            className={`min-h-screen bg-white font-sans`} //bg-cream-light
         >
             <ProfileHeader />
 
@@ -211,9 +212,9 @@ const Profile = () => {
                                 : userStats.map((item, index) => (
                                       <div
                                           key={index}
-                                          className="flex justify-between items-center border-b border-gray-200 dark:border-[#333333] py-3 pr-4"
+                                          className="flex justify-between items-center border-b border-gray-200 dark:border-[#333] py-3 pr-4"
                                       >
-                                          <span className="text-gray-500 dark:text-[#999999] text-sm md:text-md">
+                                          <span className="text-gray-500 dark:text-[#999] text-sm md:text-md">
                                               {item.name}
                                           </span>
                                           <span className="dark:text-[#e0e0e0]">
@@ -226,18 +227,25 @@ const Profile = () => {
 
                     {/* preview */}
                     {previewVisible && (
-                        <Card className="w-full md:w-[50%] max-h-screen fixed right-0 top-24 md:overflow-y-scroll overflow-x-hidden">
+                        <Card
+                            data-lenis-prevent
+                            className="w-full md:w-[50%] max-h-screen bg-white fixed right-0 top-24 md:overflow-y-scroll overflow-x-hidden"
+                        >
                             <CardHeader className="flex flex-row items-center justify-between">
-                                <CardTitle>Post Preview</CardTitle>
+                                <CardTitle>
+                                    <Badge className="bg-lime-600 hover:bg-lime-500">
+                                        Post Preview
+                                    </Badge>
+                                </CardTitle>
                                 <div className="z-20 flex items-center justify-center gap-3">
                                     <SquareArrowOutUpRight
-                                        className="cursor-pointer size-5"
+                                        className="cursor-pointer hover:bg-lime-300/30 rounded-md box-content p-1 size-5"
                                         onClick={() => {
                                             // setPreviewVisible(previewPost._id);
                                         }}
                                     />
                                     <X
-                                        className="cursor-pointer size-6"
+                                        className="cursor-pointer hover:bg-lime-300/30 rounded-md box-content p-1 size-6"
                                         onClick={() => {
                                             setPreviewVisible(false);
                                         }}
@@ -261,7 +269,7 @@ const Profile = () => {
                     {collections.length > 0 && (
                         <div className="mb-24">
                             <h2 className="text-2xl font-semibold tracking-tight mb-8 dark:text-[#f0f0f0]">
-                                <span className="bg-inherit dark:bg-inherit hover:bg-lime-100 dark:hover:bg-[#222222] rounded-md box-content px-2 py-1">
+                                <span className="bg-inherit dark:bg-inherit hover:bg-lime-100 dark:hover:bg-[#222] rounded-md box-content px-2 py-1">
                                     Featured Works
                                 </span>
                             </h2>
@@ -299,7 +307,7 @@ const Profile = () => {
                                                   {collection.title}
                                                   <Share2 className="w-6 h-6 text-black dark:text-white rounded-lg p-1 hover:bg-yellow-200 dark:hover:bg-[#2c2c2c]" />
                                               </h3>
-                                              <p className="text-sm text-gray-400 dark:text-[#888888]">
+                                              <p className="text-sm text-gray-400 dark:text-[#888]">
                                                   {collection.items}{" "}
                                                   {collection.type === "album"
                                                       ? "photos"
@@ -339,8 +347,8 @@ const Profile = () => {
                                     onClick={() => setViewMode("grid")}
                                     className={`p-2 ${
                                         viewMode === "grid"
-                                            ? "bg-black dark:bg-[#333333] text-white"
-                                            : "text-gray-400 dark:text-[#999999]"
+                                            ? "bg-black dark:bg-[#333] text-white"
+                                            : "text-gray-400 dark:text-[#999]"
                                     }`}
                                 >
                                     <Grid className="w-5 h-5" />
@@ -349,8 +357,8 @@ const Profile = () => {
                                     onClick={() => setViewMode("rows")}
                                     className={`p-2 ${
                                         viewMode === "rows"
-                                            ? "bg-black dark:bg-[#333333] text-white"
-                                            : "text-gray-400 dark:text-[#999999]"
+                                            ? "bg-black dark:bg-[#333] text-white"
+                                            : "text-gray-400 dark:text-[#999]"
                                     }`}
                                 >
                                     <Rows className="w-5 h-5" />
@@ -404,7 +412,7 @@ const Profile = () => {
                                                   <h3 className="font-medium dark:text-[#e8e8e8]">
                                                       {post.title}
                                                   </h3>
-                                                  <div className="flex items-center space-x-4 text-sm text-gray-400 dark:text-[#999999]">
+                                                  <div className="flex items-center space-x-4 text-sm text-gray-400 dark:text-[#999]">
                                                       <div className="flex items-center">
                                                           <Heart className="w-4 h-4 mr-1" />
                                                           {post.likes}
@@ -418,12 +426,12 @@ const Profile = () => {
                                           </div>
                                       ) : (
                                           // Text Post
-                                          <div className="p-6 border border-gray-100 dark:border-[#333333] hover:border-gray-200 dark:hover:border-[#444444] transition-colors duration-300 dark:bg-[#1c1c1c]">
+                                          <div className="p-6 border border-gray-100 dark:border-[#333] hover:border-gray-200 dark:hover:border-[#444] transition-colors duration-300 dark:bg-[#1c1c1c]">
                                               <div className="flex justify-between items-start mb-4">
                                                   <h3 className="font-medium dark:text-[#e8e8e8] capitalize">
                                                       {post.title}
                                                   </h3>
-                                                  <div className="flex items-center space-x-4 text-sm text-gray-400 dark:text-[#999999]">
+                                                  <div className="flex items-center space-x-4 text-sm text-gray-400 dark:text-[#999]">
                                                       <div className="flex items-center">
                                                           <Heart className="w-4 h-4 mr-1" />
                                                           {post.totalLoves}

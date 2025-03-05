@@ -16,6 +16,7 @@ const LoginPage = lazy(() => import("./pages/Auth/Login"));
 const LogoutPage = lazy(() => import("./pages/Auth/Logout"));
 const AuthSuccess = lazy(() => import("./pages/Auth/AuthSuccess"));
 const Profile = lazy(() => import("./pages/Profile/Profile"));
+const ProfileSettings = lazy(() => import("./pages/Profile/ProfileSettings"));
 const PublicProfile = lazy(() => import("./pages/Profile/PublicProfile"));
 const AboutPage = lazy(() => import("./pages/About/About"));
 const ContactPage = lazy(() => import("./pages/Contact/Contact"));
@@ -102,6 +103,10 @@ export default function App() {
                                 <Route
                                     path="/profile"
                                     element={<Profile bgClr="bg-white" />}
+                                />
+                                <Route
+                                    path="/profile/settings"
+                                    element={<ProfileSettings />}
                                 />
                                 <Route
                                     path="/createpost/poem"

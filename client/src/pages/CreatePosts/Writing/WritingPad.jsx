@@ -680,6 +680,7 @@ const WritingPad = ({ artType = "article" }) => {
 
                                 {/* Content Textarea */}
                                 <textarea
+                                    data-lenis-prevent
                                     id="txtArea"
                                     value={content}
                                     onChange={(e) => {
@@ -699,6 +700,7 @@ const WritingPad = ({ artType = "article" }) => {
 
                             {/* preview div */}
                             <div
+                                data-lenis-prevent
                                 className={`prose rounded text-lg transition-all duration-0
                                     ${!twoColumn ? "w-[100%] h-auto mx-auto absolute top-0 left-0" : "w-1/2 h-full"}
                                     ${isPreview || twoColumn ? "" : "hidden"}`}

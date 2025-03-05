@@ -56,7 +56,36 @@ heading, quote, inlineCode, list
 -- usename, fullname and profile update options
 -- blog Post
 -- image fix
--- public profile
+-- [x] public profile
 -- skeleton
 
- two url: public(/u/:username) & private (/profile)
+two url: public(/u/:username) & private (/profile)
+
+
+-- thumbnail in article
+show articles instead of literature gallery
+
+
+-- profile settings:
+1. genaral: theme
+2. notifications
+3.
+
+-- personal information:
+1. add title/bio
+2. change username profile picture
+
+-- add topics you are interseted in
+-- add contact information in public profile
+-- delete account
+-- always keep the post write option
+-- copy link to public profile
+
+-- profeatures
+1.
+
+
+> use searchbar or the name of the page, like login instead of `opencanvas` logo in headers, as no need to go there after login
+
+
+-- save & clear post id in local storage or some other place so that id does not creates different post id

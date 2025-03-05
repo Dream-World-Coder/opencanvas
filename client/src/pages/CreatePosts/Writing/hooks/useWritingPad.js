@@ -76,15 +76,24 @@ export function useWritingPad({ postId }) {
                 setIsSaved(true);
                 setSyncStatus("synced");
                 setLastSynced(new Date());
-                toast("Post saved successfully");
+                toast.success("Post saved successfully", {
+                    style: {
+                        backgroundColor: "#f5f5f5",
+                    },
+                });
             } else {
                 setSyncStatus("offline");
-                toast(data.message || "Failed to save post in server");
+                toast.error(data.message || "Failed to save post in server");
             }
         } catch (error) {
             console.error("Error saving post:", error);
             setSyncStatus("offline");
-            toast("Failed to connect to server");
+            toast.error("Failed to connect to server", {
+                style: {
+                    backgroundColor: "red",
+                    color: "white",
+                },
+            });
         }
     };
 
@@ -199,6 +208,7 @@ export function useWritingPad({ postId }) {
                 txtArea.style.height = txtArea.scrollHeight + "px"; // it was not working if i didn't use async
             } catch (error) {
                 console.error("Error loading saved blog post:", error);
+                toast.error("Error loading saved blog post:", error);
             }
         };
 
