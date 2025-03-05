@@ -5,6 +5,7 @@
   "content": "Long-form content goes here...",
   "authorId": ObjectId("60f6a2b4a2e8c2a123456789"),
   "createdAt": ISODate("2025-02-26T11:00:00Z"),
+  "thumbnailUrl":"",
   "tags": ["MongoDB", "NoSQL", "Blog"], // max 5, default "general", so 4 more can be added
   "postDeleteHash": "d3l3t3H45hEx4mpl3",
   "isEdited": "false", // edit after posting
@@ -72,6 +73,11 @@ const postSchema = new Schema(
         createdAt: {
             type: Date,
             default: Date.now,
+        },
+
+        thumbnailUrl: {
+            type: String,
+            default: "",
         },
 
         // max 5, default "general", in images use pre added tags, in blog/articles you can add custom tags
