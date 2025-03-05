@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import ObjectId from "bson-objectid";
 
-export function useWritingPad({ postId }) {
+export function useWritingPad({ postId, frontendOnly }) {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [twoColumn, setTwoColumn] = useState(false);
@@ -25,10 +25,15 @@ export function useWritingPad({ postId }) {
             syncedWithServer: false,
         };
         localStorage.setItem(`blogPost`, JSON.stringify(draft));
-        // setIsSaved(true); // st saved only when saved in db
+
+        if (frontendOnly) {
+            setIsSaved(true); // st saved only when saved in db
+        }
     };
 
     const syncWithBackend = async () => {
+        if (frontendOnly) return;
+
         // device online check
         if (!navigator.onLine) {
             setSyncStatus("offline");
@@ -101,7 +106,9 @@ export function useWritingPad({ postId }) {
      * Sync pending changes when coming back online
      */
     const syncPendingChanges = async () => {
-        // tmp api handling
+        if (frontendOnly) return;
+
+        // tmp api handling for backend
         setTimeout(() => {
             setSyncStatus("synced");
             setLastSynced(new Date());
@@ -138,7 +145,8 @@ export function useWritingPad({ postId }) {
 
     const handleSave = async () => {
         saveDraftLocally();
-        if (navigator.onLine) {
+
+        if (navigator.onLine && !frontendOnly) {
             await syncWithBackend();
         }
         setShowUnsavedAlert(false);
@@ -273,8 +281,8 @@ export function useWritingPad({ postId }) {
             }
         }, 5000);
 
-        // Backend sync every 5 mins if online
-        if (navigator.onLine) {
+        // Backend sync every 5 mins if online && not frontendOnly
+        if (navigator.onLine && !frontendOnly) {
             autosaveInterval = setInterval(performAutosave, 300000);
         }
 
@@ -284,7 +292,7 @@ export function useWritingPad({ postId }) {
                 clearInterval(autosaveInterval);
             }
         };
-    }, [isSaved, content, title]);
+    }, [isSaved, content, title, frontendOnly]);
 
     return {
         title,

@@ -62,10 +62,10 @@ const Profile = () => {
 
             // post IDs to query string
             const postIdsParam = currentUser.posts
-                .slice(0 + postsToFetch, 100 + postsToFetch)
+                .slice(0 + postsToFetch, 10 + postsToFetch)
                 .join(",");
 
-            setPostsToFetch(postsToFetch + 100);
+            setPostsToFetch(postsToFetch + 10);
 
             const response = await fetch(
                 `http://127.0.0.1:3000/u/posts/byids`,
@@ -234,7 +234,7 @@ const Profile = () => {
                             <CardHeader className="flex flex-row items-center justify-between">
                                 <CardTitle>
                                     <Badge className="bg-lime-600 hover:bg-lime-500">
-                                        Post Preview
+                                        Preview
                                     </Badge>
                                 </CardTitle>
                                 <div className="z-20 flex items-center justify-center gap-3">

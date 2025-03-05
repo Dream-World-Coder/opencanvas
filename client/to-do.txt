@@ -92,14 +92,27 @@ show articles instead of literature gallery
 
 
 -- use pop over instead of sheet in the writing-pad
-
 -- localhost for saving id
-
 -- md2pdf route and public profile
-
 -- profile settings
-
 -- post & article view
 
 
--- in private profile view options for post: 1.view[public] 2.edit 3.delete
+-- in private profile view options for post: 1.view[public view] 2.edit 3.delete
+
+
+-- store postTitle, shortDescription also anong with it's id in currentUser.posts[], it will reduce db query a lot
+
+
+-- use axios for tetching and for some common fetches use the src/services/dataService.js
+
+-- no need for intermediate post preview [like in profilepage] ---
+    only 2 states: normal & in view -- less dbQuery
+
+    on profilePage: choose between the 3 stages mentioned earlier ->
+        if `view`:open in postViewer
+        if `edit` open in writingPad with properId
+        if `delete` confirm & delete
+
+
+-- add useStrict in main.jsx if needed

@@ -1,6 +1,7 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import {
-    ArrowLeft,
     Save,
     Sun,
     Moon,
@@ -8,8 +9,6 @@ import {
     Redo,
     MoreHorizontal,
     AlertTriangle,
-    Wifi,
-    WifiOff,
     Eye,
     Edit,
     X,
@@ -25,6 +24,7 @@ import {
     FileSearch,
     PanelTop,
     Columns2,
+    Home,
 } from "lucide-react";
 import PropTypes from "prop-types";
 
@@ -60,7 +60,11 @@ import { useEditorAppearance } from "./hooks/useEditorAppearance";
 import { useExport } from "./hooks/useExport";
 
 const Md2pdf = ({ artType = "markdown2pdf" }) => {
-    const postId = null;
+    const [postId, setPostId] = useState(null);
+    const [frontendOnly, setFrontendOnly] = useState(true);
+
+    const navigate = useNavigate();
+
     // Core writing pad functionality
     const {
         title,
@@ -69,14 +73,12 @@ const Md2pdf = ({ artType = "markdown2pdf" }) => {
         setContent,
         isSaved,
         setIsSaved,
-        syncStatus,
-        lastSynced,
         showUnsavedAlert,
         setShowUnsavedAlert,
         handleSave,
         twoColumn,
         setTwoColumn,
-    } = useWritingPad({ postId });
+    } = useWritingPad({ postId, frontendOnly });
 
     // Editor formatting functionality
     const {
@@ -146,11 +148,11 @@ const Md2pdf = ({ artType = "markdown2pdf" }) => {
                                             setShowUnsavedAlert(true);
                                             return;
                                         }
-                                        window.history.back();
+                                        navigate("/");
                                     }}
-                                    className="hover:opacity-70 transition-opacity"
+                                    className="hover:opacity-70 transition-opacity font-serif"
                                 >
-                                    <ArrowLeft className="w-5 h-5" />
+                                    <Home className="size-5" />
                                 </button>
                                 <div className="hidden md:flex items-center space-x-2">
                                     <button
@@ -203,35 +205,6 @@ const Md2pdf = ({ artType = "markdown2pdf" }) => {
                                         )}
                                     </button>
                                 )}
-
-                                {/* sync btn */}
-                                <button className="hidden md:flex items-center space-x-2 text-sm size-auto z-50">
-                                    {syncStatus === "offline" ? (
-                                        <>
-                                            <WifiOff className="size-3 md:size-4 text-yellow-500" />
-                                            <span className="text-yellow-500">
-                                                Offline
-                                            </span>
-                                        </>
-                                    ) : syncStatus === "saving" ? (
-                                        <>
-                                            <Wifi className="size-3 md:size-4 text-blue-500" />
-                                            <span className="text-blue-500">
-                                                Saving...
-                                            </span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Wifi className="size-3 md:size-4 text-green-600" />
-                                            <span className="text-green-600">
-                                                Synced{" "}
-                                                {lastSynced
-                                                    ? `at ${lastSynced.toLocaleTimeString()}`
-                                                    : ""}
-                                            </span>
-                                        </>
-                                    )}
-                                </button>
 
                                 {/* export dropdown */}
                                 <DropdownMenu>

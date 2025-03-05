@@ -15,15 +15,20 @@ import LandingPage from "./pages/LandingPage/LandingPage";
 const LoginPage = lazy(() => import("./pages/Auth/Login"));
 const LogoutPage = lazy(() => import("./pages/Auth/Logout"));
 const AuthSuccess = lazy(() => import("./pages/Auth/AuthSuccess"));
+
 const Profile = lazy(() => import("./pages/Profile/Profile"));
 const ProfileSettings = lazy(() => import("./pages/Profile/ProfileSettings"));
 const PublicProfile = lazy(() => import("./pages/Profile/PublicProfile"));
+
 const AboutPage = lazy(() => import("./pages/About/About"));
 const ContactPage = lazy(() => import("./pages/Contact/Contact"));
+
 const WritingPad = lazy(() => import("./pages/CreatePosts/Writing/WritingPad"));
 const PoemPad = lazy(() => import("./pages/CreatePosts/WritePoem"));
 const StoryPad = lazy(() => import("./pages/CreatePosts/WriteStory"));
 const ArticlePad = lazy(() => import("./pages/CreatePosts/WriteArticle"));
+const Md2Pdf = lazy(() => import("./pages/CreatePosts/Writing/Md2pdf"));
+
 const ImageUploadPage = lazy(() => import("./pages/CreatePosts/UploadImage"));
 const PhotoGalleryPage = lazy(
     () => import("./pages/Galleries/PhotoGallery/PhotoGallery"),
@@ -31,6 +36,7 @@ const PhotoGalleryPage = lazy(
 const LiteratureGallery = lazy(
     () => import("./pages/Galleries/LiteratureGallery/LiteratureGallery"),
 );
+
 const Thanks = lazy(() => import("./pages/Others/Thanks"));
 const NotFoundPage = lazy(() => import("./pages/Others/404"));
 
@@ -89,10 +95,7 @@ export default function App() {
                                 path="/gallery/literature"
                                 element={<LiteratureGallery bgClr="bg-white" />}
                             />
-                            <Route
-                                path="/markdown2pdf"
-                                element={<WritingPad />}
-                            />
+                            <Route path="/markdown2pdf" element={<Md2Pdf />} />
                             <Route
                                 path="/u/:username"
                                 element={<PublicProfile bgClr="bg-white" />}

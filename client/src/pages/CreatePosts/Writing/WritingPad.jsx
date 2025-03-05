@@ -76,6 +76,8 @@ const WritingPad = ({ artType = "article" }) => {
         setPostId(id.toString());
     }, []);
 
+    const [frontendOnly, setFrontendOnly] = useState(false);
+
     // Core writing pad functionality
     const {
         title,
@@ -91,7 +93,7 @@ const WritingPad = ({ artType = "article" }) => {
         handleSave,
         twoColumn,
         setTwoColumn,
-    } = useWritingPad({ postId });
+    } = useWritingPad({ postId, frontendOnly });
 
     // Editor formatting functionality
     const {
