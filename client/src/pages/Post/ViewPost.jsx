@@ -8,11 +8,18 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents"; // add prop: in edit: for image pop regulate
 import { Save, Share, MoreHorizontal, Heart } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 // replace 5 min read with save & share on top
 
 const ViewPost = ({ postId }) => {
-    const data = ``;
+    const data = `## hello world!`;
+    function isDarkMode() {
+        return (
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches
+        );
+    }
 
     const readOptions = [
         { name: "Home", href: "#" },
@@ -119,7 +126,7 @@ const ViewPost = ({ postId }) => {
                                 <div>
                                     <div className="font-medium flex items-center justify-center gap-2">
                                         {post.author.name}
-                                        <button className="px-1 rounded bg-black text-white text-xs cursor-pointer">
+                                        <button className="px-1 rounded bg-black text-white dark:invert text-xs cursor-pointer">
                                             Follow
                                         </button>
                                     </div>
@@ -131,11 +138,19 @@ const ViewPost = ({ postId }) => {
                                     <div>
                                         {post.publishedAt} · {post.readTime}
                                     </div>
-                                    <div className="">
-                                        {/* love */}
-                                        {/* share */}
-                                        {/* save */}
-                                        {/* more */}
+                                    <div className="flex items-center justify-center">
+                                        {/* <Separator /> */}
+                                        {[
+                                            Heart,
+                                            Save,
+                                            Share,
+                                            MoreHorizontal,
+                                        ].map((item, index) => (
+                                            <item
+                                                key={index}
+                                                className="size-4"
+                                            />
+                                        ))}
                                     </div>
                                 </div>
                             </div>
@@ -156,7 +171,12 @@ const ViewPost = ({ postId }) => {
 
                         {/* Article content */}
                         <div className="prose dark:prose-invert max-w-none mb-12 leading-[1.5]">
-                            <MarkdownPreview content={data} />
+                            <MarkdownPreview
+                                content={data}
+                                isDark={isDarkMode()}
+                                darkBg="bg-[#111]"
+                                textAlignment="left"
+                            />
                         </div>
 
                         {/* Engagement section */}
@@ -249,7 +269,7 @@ const ViewPost = ({ postId }) => {
                                 {moreFromAuthor.map((item) => (
                                     <Card
                                         key={item.id}
-                                        className="hover:shadow-md transition duration-200 shadow-none"
+                                        className="hover:shadow-md transition duration-200 shadow-none dark:bg-[#222] dark:text-[#fff] dark:border-none"
                                     >
                                         <CardContent className="p-4">
                                             <h4 className="font-medium text-lg mb-2">
@@ -273,7 +293,7 @@ const ViewPost = ({ postId }) => {
                                 {relatedPosts.map((item) => (
                                     <Card
                                         key={item.id}
-                                        className="hover:shadow-md transition duration-200 shadow-none"
+                                        className="hover:shadow-md transition duration-200 shadow-none dark:bg-[#222] dark:text-[#fff] dark:border-none"
                                     >
                                         <CardContent className="p-4">
                                             <h4 className="font-medium text-lg mb-2">

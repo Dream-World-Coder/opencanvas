@@ -26,7 +26,7 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
     }, []);
 
     return (
-        <div className={`min-h-screen ${bgClr} pt-24`}>
+        <div className={`min-h-screen ${bgClr} dark:invert pt-24`}>
             <Header filters={filters} />
 
             {/* Top / Hero */}

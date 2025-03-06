@@ -25,7 +25,7 @@ export default function ProfileHeader() {
     const [createMenuOpen, setCreateMenuOpen] = useState(false);
 
     return (
-        <nav className="fixed top-0 w-full bg-white dark:bg-[#222] dark:text-white z-50 border-b border-gray-100 dark:border-[#333]">
+        <nav className="fixed top-0 w-full bg-white dark:bg-[#111] dark:text-white z-50 border-b border-gray-100 dark:border-[#222]">
             <div className="max-w-[1400px] mx-auto flex justify-between items-center px-8 py-6">
                 <a
                     href="/"
@@ -89,7 +89,7 @@ export default function ProfileHeader() {
                     <div className="relative">
                         <button
                             onClick={() => setCreateMenuOpen(!createMenuOpen)}
-                            className="flex items-center space-x-2 bg-black text-white px-4 py-2 rounded-full hover:bg-stone-800/90 dark:hover:bg-[#000] transition-colors"
+                            className="flex items-center space-x-2 bg-black dark:bg-[#333] text-white px-4 py-2 rounded-full hover:bg-stone-800/90 dark:hover:bg-[#333] transition-colors"
                         >
                             <span>Create</span>
                             {!createMenuOpen && (

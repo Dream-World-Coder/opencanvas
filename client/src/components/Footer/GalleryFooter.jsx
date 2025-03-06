@@ -2,7 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 
 const Footer = () => {
     return (
-        <footer className="fixed bottom-0 w-full bg-white border-t border-gray-100">
+        <footer className="fixed bottom-0 w-full bg-white border-t border-gray-100 dark:invert">
             <div className="max-w-[1400px] mx-auto px-8 py-6 flex justify-between items-center">
                 <div className="text-sm text-gray-400 hidden md:block">
                     Copyright &copy; 2025{" "}

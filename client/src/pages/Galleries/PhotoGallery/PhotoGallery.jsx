@@ -117,9 +117,9 @@ const GalleryPage = ({ bgClr = "bg-cream-light" }) => {
     );
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-white dark:bg-black dark:text-white">
             {/* Header */}
-            <header className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-40 border-b border-gray-100">
+            <header className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-40 border-b border-gray-100 dark:invert">
                 <div className="max-w-[1600px] mx-auto px-4 sm:px-8 py-4 sm:py-6">
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-4">

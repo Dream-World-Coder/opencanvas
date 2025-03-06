@@ -131,7 +131,7 @@ const Profile = () => {
 
     return (
         <div
-            className={`min-h-screen bg-white dark:bg-[#111] dark:text-white font-sans`} //bg-cream-light
+            className={`min-h-screen bg-white dark:bg-black dark:text-white font-sans`} //bg-cream-light
         >
             <ProfileHeader />
 
@@ -420,13 +420,14 @@ const Profile = () => {
                                                       <div className="flex items-center">
                                                           <MessageCircle className="w-4 h-4 mr-1" />
                                                           {post.comments}
+                                                          {/* //post.comments.length */}
                                                       </div>
                                                   </div>
                                               </div>
                                           </div>
                                       ) : (
                                           // Text Post
-                                          <div className="p-6 border border-gray-100 dark:border-[#333] hover:border-gray-200 dark:hover:border-[#444] transition-colors duration-300 dark:bg-[#1c1c1c]">
+                                          <div className="p-6 border border-gray-100 dark:border-[#222] hover:border-gray-200 dark:hover:border-[#333] transition-colors duration-300 dark:bg-[#111]">
                                               <div className="flex justify-between items-start mb-4">
                                                   <h3 className="font-medium dark:text-[#e8e8e8] capitalize">
                                                       {post.title}
@@ -439,14 +440,10 @@ const Profile = () => {
                                                       <div className="flex items-center">
                                                           <MessageCircle className="w-4 h-4 mr-1" />
                                                           {post.comments || ""}
+                                                          {/* post.comments.length */}
                                                       </div>
                                                   </div>
                                               </div>
-                                              <p className="text-gray-600 dark:text-[#b0b0b0] mb-4">
-                                                  {/* will use post description */}
-                                                  {post.content.slice(0, 150)}{" "}
-                                                  ...
-                                              </p>
                                           </div>
                                       )}
                                   </div>

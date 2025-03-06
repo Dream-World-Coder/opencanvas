@@ -344,6 +344,8 @@ export const MarkdownPreview = ({
     isDark = false,
     textAlignment = "left",
     lightModeBg = "bg-white",
+    insidePost = false,
+    darkBg = "bg-[#222]",
 }) => {
     // Use ref to store settings for all images
     const imageSettingsRef = useRef({});
@@ -395,7 +397,7 @@ export const MarkdownPreview = ({
         <>
             <Card
                 className={`w-full max-w-4xl mx-auto bg-white border-none shadow-none
-                ${isDark ? "bg-[#222] text-white border-none" : lightModeBg}
+                ${isDark ? `${darkBg} text-white border-none` : lightModeBg}
                 ${textAlignment === "center" ? "text-center" : "text-left"}`}
             >
                 <CardContent className="p-0">
@@ -666,7 +668,7 @@ export const MarkdownPreview = ({
             </Card>
 
             {/* create a seperate comp */}
-            {activeImageId && (
+            {!insidePost && activeImageId && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div
                         className={`relative bg-white text-black rounded-lg p-6 w-80`}
@@ -851,6 +853,8 @@ MarkdownPreview.propTypes = {
     isDark: PropTypes.bool,
     textAlignment: PropTypes.string,
     lightModeBg: PropTypes.string,
+    insidePost: PropTypes.bool,
+    darkBg: PropTypes.string,
 };
 
 /*

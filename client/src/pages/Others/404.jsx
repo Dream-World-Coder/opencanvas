@@ -5,11 +5,11 @@ import { ChevronLeft } from "lucide-react";
 const NotFoundPage = ({ bgClr = "bg-cream-light" }) => {
     return (
         <>
-            <Header />
+            <Header noBlur={true} />
             <div
-                className={`relative size-full min-h-dvh ${bgClr} flex flex-col items-center justify-center text-lg gap-6`}
+                className={`relative size-full min-h-dvh ${bgClr} dark:bg-[#111] dark:text-white flex flex-col items-center justify-center text-lg gap-6`}
             >
-                <div className="text-center font-semibold text-3xl text-stone-600/80">
+                <div className="text-center font-semibold text-3xl text-stone-600/80 dark:text-white">
                     Page not found.
                     <br />
                     Error 404

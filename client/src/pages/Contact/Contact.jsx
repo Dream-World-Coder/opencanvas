@@ -10,7 +10,7 @@ const ContactPage = ({ bgClr = "bg-cream-light" }) => {
     const connectLinks = [
         {
             name: "OpenCanvas",
-            href: "#",
+            href: "https://opencanvas.blog/u/subhajit",
             icon: OpenCanvasIcon,
         },
         {
@@ -33,16 +33,18 @@ const ContactPage = ({ bgClr = "bg-cream-light" }) => {
     ];
 
     return (
-        <div className={`min-h-screen ${bgClr} pt-8`}>
+        <div
+            className={`min-h-screen ${bgClr} dark:bg-black dark:text-white pt-8`}
+        >
             <Header />
 
             <main className="max-w-2xl mx-auto px-6 py-16">
                 {/* Header Section */}
                 <div className="mb-24 text-center space-y-3">
-                    <h1 className="font-serif text-4xl text-stone-800 pointer-events-none md:pointer-events-auto">
+                    <h1 className="font-serif text-4xl text-stone-800 pointer-events-none md:pointer-events-auto dark:text-white">
                         Subhajit Gorai
                     </h1>
-                    <p className="font-serif text-lg text-stone-500 italic pointer-events-none md:pointer-events-auto">
+                    <p className="font-serif text-lg text-stone-500 italic pointer-events-none md:pointer-events-auto dark:text-white">
                         Developer &amp; Maintainer
                     </p>
                 </div>
@@ -56,7 +58,7 @@ const ContactPage = ({ bgClr = "bg-cream-light" }) => {
                                     key={index}
                                     href={item.href}
                                     target="_blank"
-                                    className="flex items-center justify-center gap-3 text-stone-600 hover:text-stone-900 transition-colors"
+                                    className="flex items-center justify-center gap-3 text-stone-600 dark:text-white hover:text-stone-900 transition-colors dark:hover:text-white"
                                 >
                                     {index === 0 && (
                                         <span className="w-4 h-4 block">
@@ -77,7 +79,7 @@ const ContactPage = ({ bgClr = "bg-cream-light" }) => {
 
                 {/* Contact Form */}
                 <div className="relative max-w-xl mx-auto">
-                    <h2 className="font-serif text-2xl text-stone-800 text-center mb-12 pointer-events-none md:pointer-events-auto">
+                    <h2 className="font-serif text-2xl text-stone-800 text-center mb-12 pointer-events-none md:pointer-events-auto dark:text-white">
                         Feel free to suggest any thoughts
                     </h2>
                     <form
@@ -134,7 +136,7 @@ const ContactPage = ({ bgClr = "bg-cream-light" }) => {
                                 className="font-serif text-lg text-stone-600
                                 hover:text-stone-900 transition-colors inline-flex
                                 items-center gap-2 bg-lime-300/30
-                                border border-lime-300 rounded-full box-content px-4 py-1"
+                                border border-lime-300 rounded-full box-content px-4 py-1 dark:text-white"
                             >
                                 <span>Send</span>
                                 <Send className="w-4 h-4" />

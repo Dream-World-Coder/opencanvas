@@ -4,11 +4,11 @@ import Footer from "../../components/Footer/GalleryFooter";
 const Thanks = ({ bgClr = "bg-cream-light" }) => {
     return (
         <>
-            <Header />
+            <Header noBlur={true} />
             <div
-                className={`relative size-full min-h-dvh ${bgClr} flex flex-col items-center justify-center text-lg gap-6`}
+                className={`relative size-full min-h-dvh ${bgClr} dark:bg-[#111] dark:text-white flex flex-col items-center justify-center text-lg gap-6`}
             >
-                <div className="text-center font-semibold font-[scribe] text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-stone-600/80">
+                <div className="text-center font-semibold font-serif text-3xl sm:text-4xl text-stone-600/80 dark:text-white transform -translate-y-20">
                     &quot;Thank you for contacting,
                     <br />
                     I&apos;ll get in touch as soon as possible.&quot;
