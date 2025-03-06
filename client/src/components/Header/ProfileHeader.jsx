@@ -25,7 +25,7 @@ export default function ProfileHeader() {
     const [createMenuOpen, setCreateMenuOpen] = useState(false);
 
     return (
-        <nav className="fixed top-0 w-full bg-white z-50 border-b border-gray-100">
+        <nav className="fixed top-0 w-full bg-white dark:bg-[#222] dark:text-white z-50 border-b border-gray-100 dark:border-[#333]">
             <div className="max-w-[1400px] mx-auto flex justify-between items-center px-8 py-6">
                 <a
                     href="/"
@@ -42,14 +42,14 @@ export default function ProfileHeader() {
                             onClick={() => {
                                 window.location.href = link.href;
                             }}
-                            className={`px-3 py-1 box-content rounded-md hover:opacity-70 hover:bg-lime-300`}
+                            className={`px-3 py-1 box-content rounded-md hover:opacity-70 dark:hover:opacity-100 hover:bg-lime-300 dark:hover:bg-[#333]`}
                         >
                             {link.label}
                         </button>
                     ))}
 
                     <AlertDialog>
-                        <AlertDialogTrigger className="hover:bg-red-300/80 rounded-md px-3 py-1 box-content">
+                        <AlertDialogTrigger className="hover:bg-red-300/80 dark:hover:bg-red-800/80 rounded-md px-3 py-1 box-content">
                             Logout
                         </AlertDialogTrigger>
                         <AlertDialogContent>
@@ -89,7 +89,7 @@ export default function ProfileHeader() {
                     <div className="relative">
                         <button
                             onClick={() => setCreateMenuOpen(!createMenuOpen)}
-                            className="flex items-center space-x-2 bg-black text-white px-4 py-2 rounded-full hover:bg-stone-800/90 transition-colors"
+                            className="flex items-center space-x-2 bg-black text-white px-4 py-2 rounded-full hover:bg-stone-800/90 dark:hover:bg-[#000] transition-colors"
                         >
                             <span>Create</span>
                             {!createMenuOpen && (
@@ -102,11 +102,11 @@ export default function ProfileHeader() {
 
                         {/* Create Menu Dropdown */}
                         {createMenuOpen && (
-                            <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-100 rounded-lg shadow-lg py-2 z-50">
+                            <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#111] border border-gray-100 dark:border-[#333] rounded-lg shadow-lg py-2 z-50">
                                 {createOptions.map((option) => (
                                     <button
                                         key={option.id}
-                                        className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
+                                        className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-[#333] transition-colors group"
                                         onClick={() => {
                                             localStorage.removeItem("blogPost");
                                             setCreateMenuOpen(false);
@@ -120,7 +120,7 @@ export default function ProfileHeader() {
                                         </div>
                                         <span className="flex items-center justify-center gap-3">
                                             {option.label}{" "}
-                                            <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700" />
+                                            <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700 dark:text-stone-200" />
                                         </span>
                                     </button>
                                 ))}
@@ -133,7 +133,7 @@ export default function ProfileHeader() {
                     {/* Mobile Create Button */}
                     <button
                         onClick={() => setCreateMenuOpen(!createMenuOpen)}
-                        className="w-fit p-1 flex items-center justify-center bg-black text-white rounded-full hover:bg-stone-800/90 transition-colors"
+                        className="w-fit p-1 flex items-center justify-center bg-black text-white dark:bg-white dark:text-black rounded-full hover:bg-stone-800/90 transition-colors"
                     >
                         {createMenuOpen ? (
                             <X className="w-4 h-4" />
@@ -145,7 +145,7 @@ export default function ProfileHeader() {
                     {/* Mobile Menu Button */}
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        className="p-2 hover:bg-gray-100 rounded-lg"
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                     >
                         {mobileMenuOpen ? (
                             <X className="w-6 h-6" />
@@ -154,11 +154,15 @@ export default function ProfileHeader() {
                         )}
                     </button>
                     {createMenuOpen && (
-                        <div className="absolute top-20 right-0 w-64 bg-white border border-gray-100 rounded-lg shadow-lg py-2 z-50">
+                        <div
+                            className="absolute top-20 right-0 w-64 bg-white border border-gray-100
+                            rounded-lg shadow-lg py-2 z-50 dark:bg-[#111] dark:border-[#333]"
+                        >
                             {createOptions.map((option) => (
                                 <a
                                     key={option.id}
-                                    className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
+                                    className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50
+                                    dark:hover:bg-[#333] transition-colors group"
                                     onClick={() => {
                                         setCreateMenuOpen(false);
                                         localStorage.removeItem("blogPost");
@@ -172,7 +176,7 @@ export default function ProfileHeader() {
                                     </div>
                                     <span className="flex items-center justify-center gap-3">
                                         {option.label}{" "}
-                                        <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700" />
+                                        <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700 dark:text-stone-200" />
                                     </span>
                                 </a>
                             ))}
@@ -182,7 +186,7 @@ export default function ProfileHeader() {
             </div>
             {/* mobile menu */}
             {mobileMenuOpen && (
-                <div className="md:hidden bg-white border-t border-gray-100">
+                <div className="md:hidden bg-white dark:bg-[#111] border-t border-gray-100 dark:border-[#333]">
                     <div className="px-4 py-2 space-y-1">
                         {navLinks.map((link, index) => (
                             <a

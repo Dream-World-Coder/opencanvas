@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo, useEffect } from "react";
+import { useRef, useState } from "react";
 import {
     Image,
     Bold,
@@ -13,12 +13,6 @@ import {
     List,
     Heading,
     Minus,
-    ChevronDown,
-    ChevronUp,
-    ChevronsUpDown,
-    ChevronLeft,
-    ChevronRight,
-    Search,
     FileJson,
     LetterText,
 } from "lucide-react";
@@ -37,21 +31,13 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle,
-} from "@/components/ui/sheet";
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
 
 // ***************************************************
 import ReactMarkdown from "react-markdown";
@@ -86,37 +72,6 @@ export const formattingButtons = [
     { format: "dropCap", icon: LetterText },
     { format: "line", icon: Minus },
     { format: "pageBreak", icon: FilePlus },
-];
-
-const sliderOptions = [
-    {
-        id: "marginTop",
-        label: "Margin Top",
-        min: 0,
-        max: 100,
-        step: 1,
-    },
-    {
-        id: "marginBottom",
-        label: "Margin Bottom",
-        min: 0,
-        max: 100,
-        step: 1,
-    },
-    {
-        id: "maxHeight",
-        label: "Max Height",
-        min: 100,
-        max: 800,
-        step: 10,
-    },
-    {
-        id: "maxWidth",
-        label: "Max Width",
-        min: 100,
-        max: 1000,
-        step: 10,
-    },
 ];
 
 /**
@@ -373,207 +328,6 @@ LinkInsertButton.propTypes = {
 // imaplement the changes directly in the image, also add zoom in/out features,
 // no need to preview on dialog
 
-// Custom hook to handle image popup functionality
-export const useImagePopup = () => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [currentImage, setCurrentImage] = useState(null);
-    const [imageSettings, setImageSettings] = useState({
-        marginTop: 35,
-        marginBottom: 35,
-        position: "left", // 'left', 'center', 'right'
-        maxHeight: 360,
-        maxWidth: 500,
-    });
-
-    // Update a specific setting with instant application
-    const updateSetting = (key, value, setters) => {
-        setImageSettings((prev) => {
-            const newSettings = { ...prev, [key]: value };
-
-            // Apply changes instantly
-            if (setters) {
-                if (key === "maxWidth" && setters.setImgMaxWidth) {
-                    setters.setImgMaxWidth(`${value}px`);
-                }
-                if (key === "maxHeight" && setters.setImgMaxHeight) {
-                    setters.setImgMaxHeight(`${value}px`);
-                }
-                if (key === "position" && setters.setImgAlignment) {
-                    setters.setImgAlignment(value);
-                }
-                if (key === "marginTop" && setters.setMTop) {
-                    setters.setMTop(`${value}px`);
-                }
-                if (key === "marginBottom" && setters.setMBottom) {
-                    setters.setMBottom(`${value}px`);
-                }
-            }
-
-            return newSettings;
-        });
-    };
-
-    useEffect(() => {
-        // Function to handle click on markdown image containers
-        const handleImageClick = (e) => {
-            const container = e.target.closest(".markdown-image-container-div");
-            if (container) {
-                const image = container.querySelector("img");
-                if (image) {
-                    setCurrentImage({
-                        src: image.src,
-                        alt: image.alt,
-                    });
-                    setIsOpen(true);
-                }
-            }
-        };
-
-        // Add event listener
-        document.addEventListener("click", handleImageClick);
-
-        // Cleanup
-        return () => {
-            document.removeEventListener("click", handleImageClick);
-        };
-    }, []);
-
-    return {
-        isOpen,
-        setIsOpen,
-        currentImage,
-        imageSettings,
-        updateSetting,
-    };
-};
-
-// Image Popup Component
-export const ImagePopup = ({
-    setImgMaxWidth,
-    setImgMaxHeight,
-    setImgAlignment,
-    setMTop,
-    setMBottom,
-}) => {
-    const { isOpen, setIsOpen, currentImage, imageSettings, updateSetting } =
-        useImagePopup();
-
-    // Group all setters in one object for easy access
-    const setters = {
-        setImgMaxWidth,
-        setImgMaxHeight,
-        setImgAlignment,
-        setMTop,
-        setMBottom,
-    };
-
-    if (!currentImage) return null;
-
-    // Get position class based on setting
-    const getPositionClass = () => {
-        switch (imageSettings.position) {
-            case "left":
-                return "justify-start";
-            case "right":
-                return "justify-end";
-            default:
-                return "justify-center";
-        }
-    };
-
-    return (
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetContent side="right" className="max-w-sm">
-                <SheetHeader>
-                    <SheetTitle className="text-lg font-semibold mb-6">
-                        Image Properties
-                    </SheetTitle>
-                </SheetHeader>
-                <div className="">
-                    {/* Image Preview */}
-                    <div
-                        className="flex items-center justify-center overflow-hidden border border-gray-200 rounded"
-                        style={{
-                            marginTop: "35px",
-                            marginBottom: "35px",
-                        }}
-                    >
-                        <img
-                            src={currentImage.src}
-                            alt={currentImage.alt || "Preview"}
-                            style={{
-                                maxHeight: "135px",
-                                maxWidth: "240px",
-                            }}
-                            className="object-cover"
-                        />
-                    </div>
-                    {/* Settings Controls */}
-                    <div className="grid grid-cols-1 gap-6 mt-6">
-                        {/* Sliders */}
-                        {sliderOptions.map((setting) => (
-                            <div className="space-y-2" key={setting.id}>
-                                <Label>
-                                    {setting.label}: {imageSettings[setting.id]}
-                                    px
-                                </Label>
-                                <Slider
-                                    value={[imageSettings[setting.id]]}
-                                    min={setting.min}
-                                    max={setting.max}
-                                    step={setting.step}
-                                    onValueChange={(value) =>
-                                        updateSetting(
-                                            setting.id,
-                                            value[0],
-                                            setters,
-                                        )
-                                    }
-                                />
-                            </div>
-                        ))}
-                        {/* Position */}
-                        <div className="space-y-2">
-                            <Label>Position</Label>
-                            <RadioGroup
-                                value={imageSettings.position}
-                                onValueChange={(value) =>
-                                    updateSetting("position", value, setters)
-                                }
-                                className="flex space-x-4"
-                            >
-                                {["left", "center", "right"].map((position) => (
-                                    <div
-                                        className="flex items-center space-x-2"
-                                        key={position}
-                                    >
-                                        <RadioGroupItem
-                                            value={position}
-                                            id={position}
-                                        />
-                                        <Label htmlFor={position}>
-                                            {position.charAt(0).toUpperCase() +
-                                                position.slice(1)}
-                                        </Label>
-                                    </div>
-                                ))}
-                            </RadioGroup>
-                        </div>
-                    </div>
-                </div>
-            </SheetContent>
-        </Sheet>
-    );
-};
-
-ImagePopup.propTypes = {
-    setImgMaxWidth: PropTypes.func.isRequired,
-    setImgMaxHeight: PropTypes.func.isRequired,
-    setImgAlignment: PropTypes.func.isRequired,
-    setMTop: PropTypes.func.isRequired,
-    setMBottom: PropTypes.func.isRequired,
-};
-
 /**
  *
  *
@@ -590,11 +344,64 @@ export const MarkdownPreview = ({
     textAlignment = "left",
     lightModeBg = "bg-white",
 }) => {
-    const [imgMaxWidth, setImgMaxWidth] = useState("500px");
-    const [imgMaxHeight, setImgMaxHeight] = useState("360px");
-    const [imgAlignment, setImgAlignment] = useState("justify-center");
-    const [mTop, setMTop] = useState("35px");
-    const [mBottom, setMBottom] = useState("35px");
+    const [imgMaxWidth, setImgMaxWidth] = useState(500);
+    const [imgMaxHeight, setImgMaxHeight] = useState(360);
+    const [imgAlignment, setImgAlignment] = useState("center");
+    const [mTop, setMTop] = useState(35);
+    const [mBottom, setMBottom] = useState(35);
+    const [open, setOpen] = useState(false);
+
+    const sliderOptions = [
+        {
+            id: "marginTop",
+            label: "Margin Top",
+            val: mTop,
+            min: 35,
+            max: 100,
+            step: 1,
+            setterFunc: setMTop,
+        },
+        {
+            id: "marginBottom",
+            label: "Margin Bottom",
+            val: mBottom,
+            min: 35,
+            max: 100,
+            step: 1,
+            setterFunc: setMBottom,
+        },
+        {
+            id: "maxHeight",
+            label: "Max Height",
+            val: imgMaxHeight,
+            min: 360,
+            max: 800,
+            step: 10,
+            setterFunc: setImgMaxHeight,
+        },
+        {
+            id: "maxWidth",
+            label: "Max Width",
+            val: imgMaxWidth,
+            min: 500,
+            max: 1000,
+            step: 10,
+            setterFunc: setImgMaxWidth,
+        },
+    ];
+
+    function convertFlexAlignment(alignment) {
+        switch (alignment) {
+            case "flex-start":
+                return "left";
+            case "center":
+                return "center";
+            case "flex-end":
+                return "right";
+            default:
+                return alignment;
+        }
+    }
 
     if (!isVisible) return null;
 
@@ -623,24 +430,104 @@ export const MarkdownPreview = ({
                             img(props) {
                                 const { node, ...rest } = props;
                                 return (
-                                    <div
-                                        className={`markdown-image-container-div relative cursor-pointer z-15 overflow-hidden
-                                        flex items-center`}
-                                        style={{
-                                            justifyContent: imgAlignment,
-                                            marginTop: mTop,
-                                            marginBottom: mBottom,
-                                        }}
-                                    >
-                                        <img
-                                            className={`relative object-cover`}
-                                            style={{
-                                                maxHeight: imgMaxHeight,
-                                                maxWidth: imgMaxWidth,
-                                            }}
-                                            {...rest}
-                                        />
-                                    </div>
+                                    <Popover open={open} onOpenChange={setOpen}>
+                                        <PopoverTrigger
+                                            asChild
+                                            className="w-full"
+                                        >
+                                            <div
+                                                className={`markdown-image-container-div relative cursor-pointer z-15 overflow-hidden
+                                                                                            flex items-center`}
+                                                style={{
+                                                    justifyContent: `${imgAlignment}`,
+                                                    marginTop: `${mTop}px`,
+                                                    marginBottom: `${mBottom}px`,
+                                                }}
+                                            >
+                                                <img
+                                                    className={`relative object-cover`}
+                                                    style={{
+                                                        maxHeight: `${imgMaxHeight}px`,
+                                                        maxWidth: `${imgMaxWidth}px`,
+                                                    }}
+                                                    {...rest}
+                                                />
+                                            </div>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-80">
+                                            <h3 className="font-lg font-semibold">
+                                                Image Settings
+                                            </h3>
+                                            {/* Settings Controls */}
+                                            <div className="grid grid-cols-1 gap-6 mt-6">
+                                                {/* Sliders */}
+                                                {sliderOptions.map((option) => (
+                                                    <div
+                                                        className="space-y-2"
+                                                        key={option.id}
+                                                    >
+                                                        <Label>
+                                                            {option.label}:{" "}
+                                                            {option.val} px
+                                                        </Label>
+                                                        <Slider
+                                                            value={[option.val]}
+                                                            min={option.min}
+                                                            max={option.max}
+                                                            step={option.step}
+                                                            onValueChange={(
+                                                                value,
+                                                            ) => {
+                                                                option.setterFunc(
+                                                                    value[0],
+                                                                );
+                                                            }}
+                                                        />
+                                                    </div>
+                                                ))}
+                                                {/* Position */}
+                                                <div className="space-y-2">
+                                                    <Label>Position</Label>
+                                                    <RadioGroup
+                                                        value={imgAlignment}
+                                                        onValueChange={
+                                                            setImgAlignment
+                                                        }
+                                                        className="flex space-x-4"
+                                                    >
+                                                        {[
+                                                            "flex-start",
+                                                            "center",
+                                                            "flex-end",
+                                                        ].map((position) => (
+                                                            <div
+                                                                className="flex items-center space-x-2"
+                                                                key={position}
+                                                            >
+                                                                <RadioGroupItem
+                                                                    value={
+                                                                        position
+                                                                    }
+                                                                    id={
+                                                                        position
+                                                                    }
+                                                                />
+                                                                <Label
+                                                                    htmlFor={
+                                                                        position
+                                                                    }
+                                                                >
+                                                                    {convertFlexAlignment(
+                                                                        position,
+                                                                    )}
+                                                                </Label>
+                                                            </div>
+                                                        ))}
+                                                    </RadioGroup>
+                                                </div>
+                                            </div>
+                                        </PopoverContent>
+                                    </Popover>
                                 );
                             },
                             hr(props) {
@@ -846,14 +733,6 @@ export const MarkdownPreview = ({
                 </div>
             </CardContent>
             <CardFooter className="bg-transparent h-[15vh]" />
-
-            <ImagePopup
-                setImgMaxWidth={setImgMaxWidth}
-                setImgMaxHeight={setImgMaxHeight}
-                setImgAlignment={setImgAlignment}
-                setMTop={setMTop}
-                setMBottom={setMBottom}
-            />
         </Card>
     );
 };
@@ -925,239 +804,6 @@ ScrollToBottomButton.propTypes = {
         </div>
     </div>
 */
-
-export const TableComp = ({
-    data,
-    columns,
-    pageSize = 10,
-    searchable = true,
-    sortable = true,
-}) => {
-    /*
-    const columns = [
-        { key: "name", label: "Name" },
-        { key: "email", label: "Email" },
-        {
-            key: "status",
-            label: "Status",
-            // Custom renderer example
-            render: (value, row) => (
-                <span
-                    className={`px-2 py-1 rounded-full text-xs ${
-                        value === "active"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                    }`}
-                >
-                    {value}
-                </span>
-            ),
-        },
-    ];
-
-    const data = [
-        { name: "John Doe", email: "john@example.com", status: "active" },
-        { name: "Jane Smith", email: "jane@example.com", status: "inactive" },
-        // ... more data
-    ];
-    */
-    const [currentPage, setCurrentPage] = useState(1);
-    const [sortConfig, setSortConfig] = useState({
-        key: null,
-        direction: null,
-    });
-    const [searchTerm, setSearchTerm] = useState("");
-    const [currentPageSize, setCurrentPageSize] = useState(pageSize);
-
-    // Sort function
-    const sortData = (data, sortConfig) => {
-        if (!sortConfig.key) return data;
-
-        return [...data].sort((a, b) => {
-            const aValue = a[sortConfig.key];
-            const bValue = b[sortConfig.key];
-
-            if (aValue === null || aValue === undefined) return 1;
-            if (bValue === null || bValue === undefined) return -1;
-
-            const comparison = aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
-            return sortConfig.direction === "asc" ? comparison : -comparison;
-        });
-    };
-
-    // Filter function
-    const filterData = (data, searchTerm) => {
-        if (!searchTerm) return data;
-
-        return data.filter((item) =>
-            Object.values(item).some((value) =>
-                String(value).toLowerCase().includes(searchTerm.toLowerCase()),
-            ),
-        );
-    };
-
-    // Memoized data processing
-    const processedData = useMemo(() => {
-        let result = [...data];
-        result = filterData(result, searchTerm);
-        result = sortData(result, sortConfig);
-        return result;
-    }, [data, searchTerm, sortConfig]);
-
-    // Pagination calculations
-    const totalPages = Math.ceil(processedData.length / currentPageSize);
-    const startIndex = (currentPage - 1) * currentPageSize;
-    const endIndex = startIndex + currentPageSize;
-    const currentData = processedData.slice(startIndex, endIndex);
-
-    // Sort handler
-    const handleSort = (key) => {
-        setSortConfig((prevConfig) => ({
-            key,
-            direction:
-                prevConfig.key === key && prevConfig.direction === "asc"
-                    ? "desc"
-                    : "asc",
-        }));
-    };
-
-    // Render sort icon
-    const renderSortIcon = (columnKey) => {
-        if (!sortable) return null;
-        if (sortConfig.key !== columnKey)
-            return <ChevronsUpDown className="size-4" />;
-        return sortConfig.direction === "asc" ? (
-            <ChevronUp className="size-4" />
-        ) : (
-            <ChevronDown className="size-4" />
-        );
-    };
-
-    return (
-        <div className="space-y-4">
-            <div className="flex justify-between items-center">
-                {searchable && (
-                    <div className="relative w-72">
-                        <Search className="absolute left-2 top-2.5 size-4 text-gray-500" />
-                        <Input
-                            placeholder="Search..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-8"
-                        />
-                    </div>
-                )}
-                <Select
-                    value={String(currentPageSize)}
-                    onValueChange={(value) => {
-                        setCurrentPageSize(Number(value));
-                        setCurrentPage(1);
-                    }}
-                >
-                    <SelectTrigger className="w-32">
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {[5, 10, 20, 50].map((size) => (
-                            <SelectItem key={size} value={String(size)}>
-                                {size} per page
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </div>
-
-            <div className="rounded-md border">
-                <table className="w-full text-sm">
-                    <thead className="bg-gray-50 border-b">
-                        <tr>
-                            {columns.map((column) => (
-                                <th
-                                    key={column.key}
-                                    className="px-4 py-3 text-left font-medium text-gray-500"
-                                >
-                                    <div
-                                        className={`flex items-center space-x-1 ${
-                                            sortable ? "cursor-pointer" : ""
-                                        }`}
-                                        onClick={() =>
-                                            sortable && handleSort(column.key)
-                                        }
-                                    >
-                                        <span>{column.label}</span>
-                                        {renderSortIcon(column.key)}
-                                    </div>
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                        {currentData.map((row, index) => (
-                            <tr key={index} className="hover:bg-gray-50">
-                                {columns.map((column) => (
-                                    <td
-                                        key={column.key}
-                                        className="px-4 py-3 text-gray-900"
-                                    >
-                                        {column.render
-                                            ? column.render(
-                                                  row[column.key],
-                                                  row,
-                                              )
-                                            : row[column.key]}
-                                    </td>
-                                ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-
-            <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-500">
-                    Showing {startIndex + 1} to{" "}
-                    {Math.min(endIndex, processedData.length)} of{" "}
-                    {processedData.length} results
-                </div>
-                <div className="flex items-center space-x-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                            setCurrentPage((prev) => Math.max(prev - 1, 1))
-                        }
-                        disabled={currentPage === 1}
-                    >
-                        <ChevronLeft className="size-4" />
-                    </Button>
-                    <div className="text-sm">
-                        Page {currentPage} of {totalPages}
-                    </div>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                            setCurrentPage((prev) =>
-                                Math.min(prev + 1, totalPages),
-                            )
-                        }
-                        disabled={currentPage === totalPages}
-                    >
-                        <ChevronRight className="size-4" />
-                    </Button>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-TableComp.propTypes = {
-    data: PropTypes.array.isRequired,
-    columns: PropTypes.array.isRequired,
-    pageSize: PropTypes.number,
-    searchable: PropTypes.bool,
-    sortable: PropTypes.bool,
-};
 
 export const rawText = `
 <p style="font-size: 18px; line-height: 1.5;"><span style="float: left; font-size: 3em; font-weight: bold; line-height: 1; margin-right: 8px;">M</span>arkdown is a lightweight markup language with plain text formatting syntax. This tutorial covers both the basics and some advanced features of Markdown.</p>

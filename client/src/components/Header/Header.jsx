@@ -25,7 +25,7 @@ const Header = () => {
     }
 
     return (
-        <header className="fixed w-full top-0 z-50 bg-white/20 backdrop-blur-md">
+        <header className="fixed w-full top-0 z-50 bg-white/20 dark:bg-[#222]/20 backdrop-blur-md">
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
                 <nav className="flex items-center justify-between h-16 sm:h-20">
                     <div className="flex items-center justify-center gap-2">
@@ -49,8 +49,8 @@ const Header = () => {
                             <React.Fragment key={index}>
                                 <a
                                     href={link.href}
-                                    className={`text-stone-600 hover:text-stone-800
-                                    ${link.href !== "/profile" ? "hover:bg-lime-300/50" : ""}
+                                    className={`text-stone-600 hover:text-stone-800 dark:text-[#f8f8f8] dark:hover:text-[#fff]
+                                    ${link.href !== "/profile" ? "hover:bg-lime-300/50 dark:hover:bg-lime-700/50" : ""}
                                     box-content px-3 py-1 rounded-lg transition-all text-sm`}
                                 >
                                     {link.href !== "/profile" ? (
@@ -89,11 +89,11 @@ const Header = () => {
 
                             {/* Create Menu Dropdown */}
                             {createMenuOpen && (
-                                <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-100 rounded-lg shadow-lg py-2 z-50">
+                                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#111] border border-gray-100 dark:border-[#333] rounded-lg shadow-lg py-2 z-50">
                                     {createOptions.map((option) => (
                                         <button
                                             key={option.id}
-                                            className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
+                                            className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-[#333] transition-colors group"
                                             onClick={() => {
                                                 localStorage.removeItem(
                                                     "blogPost",
@@ -110,7 +110,7 @@ const Header = () => {
                                             </div>
                                             <span className="flex items-center justify-center gap-3">
                                                 {option.label}{" "}
-                                                <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700" />
+                                                <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700 dark:text-stone-200" />
                                             </span>
                                         </button>
                                     ))}

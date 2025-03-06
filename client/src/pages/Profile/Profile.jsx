@@ -131,7 +131,7 @@ const Profile = () => {
 
     return (
         <div
-            className={`min-h-screen bg-white font-sans`} //bg-cream-light
+            className={`min-h-screen bg-white dark:bg-[#111] dark:text-white font-sans`} //bg-cream-light
         >
             <ProfileHeader />
 
@@ -229,7 +229,7 @@ const Profile = () => {
                     {previewVisible && (
                         <Card
                             data-lenis-prevent
-                            className="w-full md:w-[50%] max-h-screen bg-white fixed right-0 top-24 md:overflow-y-scroll overflow-x-hidden"
+                            className="w-full md:w-[50%] max-h-screen bg-white dark:bg-[#222] fixed right-0 top-24 md:overflow-y-scroll overflow-x-hidden"
                         >
                             <CardHeader className="flex flex-row items-center justify-between">
                                 <CardTitle>
@@ -455,7 +455,7 @@ const Profile = () => {
                     {currentUser.posts.length > postsToFetch && (
                         <div className="w-[100%] flex items-center justify-center">
                             <Button
-                                className="mx-auto z-20"
+                                className="mx-auto z-20 dark:invert"
                                 onClick={() => {
                                     if (currentUser && currentUser.posts) {
                                         fetchUserPosts();

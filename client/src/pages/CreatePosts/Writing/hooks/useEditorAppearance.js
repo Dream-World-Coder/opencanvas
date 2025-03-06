@@ -5,7 +5,9 @@ export function useEditorAppearance() {
     const [documentScroll, setDocumentScroll] = useState(false);
     const [sepia, setSepia] = useState(false);
     const [lightModeBg, setLightModeBg] = useState("bg-white");
-    const [isDark, setIsDark] = useState(false);
+    const [isDark, setIsDark] = useState(
+        localStorage.getItem("darkMode") === "true" ? true : false,
+    );
     const [helpOpen, setHelpOpen] = useState(false);
     const [optionsDropdownOpen, setOptionsDropdownOpen] = useState(false);
 
