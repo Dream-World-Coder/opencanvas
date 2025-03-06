@@ -20,6 +20,8 @@ const Profile = lazy(() => import("./pages/Profile/Profile"));
 const ProfileSettings = lazy(() => import("./pages/Profile/ProfileSettings"));
 const PublicProfile = lazy(() => import("./pages/Profile/PublicProfile"));
 
+const ViewPost = lazy(() => import("./pages/Post/ViewPost"));
+
 const AboutPage = lazy(() => import("./pages/About/About"));
 const ContactPage = lazy(() => import("./pages/Contact/Contact"));
 
@@ -95,7 +97,10 @@ export default function App() {
                                 path="/gallery/literature"
                                 element={<LiteratureGallery bgClr="bg-white" />}
                             />
+
                             <Route path="/markdown2pdf" element={<Md2Pdf />} />
+
+                            <Route path="/vp" element={<ViewPost />} />
                             <Route
                                 path="/u/:username"
                                 element={<PublicProfile bgClr="bg-white" />}

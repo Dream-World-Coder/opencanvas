@@ -1,231 +1,788 @@
 import { useState, useEffect } from "react";
+import Header from "../../components/Header/Header";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
-    Moon,
-    Sun,
-    User,
-    Shield,
-    Zap,
-    ChevronRight,
-    Trash2,
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Badge } from "@/components/ui/badge";
+import {
+    BellIcon,
+    LockIcon,
+    UserIcon,
+    CreditCardIcon,
+    MoonIcon,
+    SunIcon,
+    LogOutIcon,
+    UserPlusIcon,
+    ShieldIcon,
+    GlobeIcon,
 } from "lucide-react";
 
-export default function ProfileSettings() {
-    const [selectedTab, setSelectedTab] = useState("general");
-    const [activeSection, setActiveSection] = useState("general");
-    const [theme, setTheme] = useState("light");
-    const [font, setFont] = useState("inter");
+const ProfileSettings = () => {
+    const [darkMode, setDarkMode] = useState(false);
+    const [activeTab, setActiveTab] = useState("general");
+    const [formValues, setFormValues] = useState({
+        username: "alexjohnson",
+        fullName: "Alex Johnson",
+        email: "alex.johnson@example.com",
+        bio: "UI/UX Designer & Developer",
+        notifications: {
+            email: true,
+            push: true,
+            sms: false,
+        },
+        privacy: "friends",
+        twoFactorEnabled: true,
+    });
 
-    useEffect(() => {
-        let darkMode = localStorage.getItem("darkMode");
-        if (darkMode === "true") {
-            setTheme("dark");
-        }
-    }, []);
+    /*
+        // Effect to initialize dark mode from localStorage
+        useEffect(() => {
+            // Check localStorage for dark mode preference
+            const savedDarkMode = localStorage.getItem("darkMode");
+            const initialDarkMode = savedDarkMode
+                ? JSON.parse(savedDarkMode)
+                : window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-    const sections = [
-        { id: "general", label: "General", icon: User },
-        { id: "account", label: "Account", icon: Shield },
-        { id: "pro", label: "Pro Features", icon: Zap },
-    ];
+            setDarkMode(initialDarkMode);
+            setFormValues((prevValues) => ({
+                ...prevValues,
+                darkMode: initialDarkMode,
+            }));
+            applyDarkMode(initialDarkMode);
+        }, []);
 
-    function handleDarkMode() {
-        let dm = localStorage.getItem("darkMode");
-        if (!dm) {
-            localStorage.setItem("darkMode", "true");
-        }
-        if (dm === "false") {
-            localStorage.setItem("darkMode", "true");
-        } else {
-            localStorage.setItem("darkMode", "false");
-        }
-        setTheme(theme === "light" ? "dark" : "light");
-    }
+        // Function to toggle dark mode
+        const toggleDarkMode = (value) => {
+            setDarkMode(value);
+            setFormValues((prevValues) => ({
+                ...prevValues,
+                darkMode: value,
+            }));
 
-    return (
-        <div className="min-h-screen bg-white dark:bg-gray-900">
-            <div className="container mx-auto px-4 py-8">
-                <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Sidebar */}
-                    <div className="lg:w-64 flex-shrink-0">
-                        <nav className="space-y-1">
-                            {sections.map((section) => (
-                                <button
-                                    key={section.id}
-                                    onClick={() => setActiveSection(section.id)}
-                                    className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                                        activeSection === section.id
-                                            ? "bg-lime-100 dark:bg-lime-900 text-lime-700 dark:text-lime-300"
-                                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                                    }`}
-                                >
-                                    <section.icon className="w-5 h-5 mr-3" />
-                                    {section.label}
-                                    <ChevronRight className="w-4 h-4 ml-auto" />
-                                </button>
-                            ))}
-                        </nav>
+            // Save to localStorage
+            localStorage.setItem("darkMode", JSON.stringify(value));
+
+            // Apply dark mode to document
+            applyDarkMode(value);
+        };
+
+        // Apply dark mode to HTML element
+        const applyDarkMode = (isDark) => {
+            if (isDark) {
+                document.documentElement.classList.add("dark");
+            } else {
+                document.documentElement.classList.remove("dark");
+            }
+        };
+    */
+
+    const general = {
+        id: "general",
+        label: "General",
+        icon: <UserIcon className="h-4 w-4" />,
+        content: (
+            <div className="space-y-6 dark:text-white">
+                <div className="flex flex-col sm:flex-row gap-6 items-start">
+                    <div className="flex flex-col items-center gap-2">
+                        <Avatar className="h-24 w-24  dark:text-black">
+                            <AvatarImage
+                                src="/api/placeholder/150/150"
+                                alt="Profile picture"
+                            />
+                            <AvatarFallback>AJ</AvatarFallback>
+                        </Avatar>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="mt-2 dark:text-black"
+                        >
+                            Change Photo
+                        </Button>
                     </div>
 
-                    {/* Main Content */}
-                    <div className="flex-1 max-w-3xl">
-                        {activeSection === "general" && (
-                            <div className="space-y-6">
-                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                                    General Settings
-                                </h2>
-
-                                {/* Profile Section */}
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-20 h-20 rounded-full bg-gray-200 dark:bg-gray-700" />
-                                        <button className="px-4 py-2 text-sm font-medium text-lime-600 border border-lime-600 rounded-lg hover:bg-lime-50 dark:text-lime-400 dark:border-lime-400 dark:hover:bg-lime-900/30">
-                                            Change Photo
-                                        </button>
-                                    </div>
-
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                Full Name
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm focus:outline-none focus:border-lime-500 dark:focus:border-lime-500"
-                                                placeholder="John Doe"
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                Bio
-                                            </label>
-                                            <textarea
-                                                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm focus:outline-none focus:border-lime-500 dark:focus:border-lime-500"
-                                                rows={3}
-                                                placeholder="Tell us about yourself"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Appearance */}
-                                <div className="space-y-4">
-                                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                                        Appearance
-                                    </h3>
-
-                                    <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                        <div className="flex items-center gap-3">
-                                            {theme === "light" ? (
-                                                <Sun className="w-5 h-5" />
-                                            ) : (
-                                                <Moon className="w-5 h-5" />
-                                            )}
-                                            <span className="text-sm font-medium">
-                                                Theme
-                                            </span>
-                                        </div>
-                                        <button
-                                            onClick={handleDarkMode}
-                                            className="px-3 py-1 text-sm bg-white dark:bg-gray-700 rounded-md shadow"
-                                        >
-                                            {theme === "light"
-                                                ? "Light"
-                                                : "Dark"}
-                                        </button>
-                                    </div>
-
-                                    <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                        <span className="text-sm font-medium">
-                                            Font Family
-                                        </span>
-                                        <select
-                                            value={font}
-                                            onChange={(e) =>
-                                                setFont(e.target.value)
-                                            }
-                                            className="px-3 py-1 text-sm bg-white dark:bg-gray-700 rounded-md shadow"
-                                        >
-                                            <option value="inter">Inter</option>
-                                            <option value="roboto">
-                                                Roboto
-                                            </option>
-                                            <option value="system">
-                                                System
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
+                    <div className="flex-1 space-y-4 w-full">
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <div className="space-y-2">
+                                <Label htmlFor="username">Username</Label>
+                                <Input
+                                    id="username"
+                                    value={formValues.username}
+                                    onChange={(e) =>
+                                        setFormValues({
+                                            ...formValues,
+                                            username: e.target.value,
+                                        })
+                                    }
+                                    className="dark:bg-black dark:text-white dark:border-gray-800"
+                                />
                             </div>
-                        )}
-
-                        {activeSection === "account" && (
-                            <div className="space-y-6">
-                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                                    Account Settings
-                                </h2>
-
-                                <div className="space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                            Email Address
-                                        </label>
-                                        <input
-                                            type="email"
-                                            className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm focus:outline-none focus:border-lime-500 dark:focus:border-lime-500"
-                                            placeholder="john@example.com"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                            Username
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm focus:outline-none focus:border-lime-500 dark:focus:border-lime-500"
-                                            placeholder="@johndoe"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
-                                    <h3 className="text-lg font-medium text-red-600 dark:text-red-400">
-                                        Danger Zone
-                                    </h3>
-                                    <div className="mt-4">
-                                        <button className="flex items-center px-4 py-2 text-sm font-medium text-red-600 bg-red-50 dark:bg-red-900/30 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50">
-                                            <Trash2 className="w-4 h-4 mr-2" />
-                                            Delete Account
-                                        </button>
-                                    </div>
-                                </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="fullName">Full Name</Label>
+                                <Input
+                                    id="fullName"
+                                    value={formValues.fullName}
+                                    onChange={(e) =>
+                                        setFormValues({
+                                            ...formValues,
+                                            fullName: e.target.value,
+                                        })
+                                    }
+                                    className="dark:bg-black dark:text-white dark:border-gray-800"
+                                />
                             </div>
-                        )}
+                        </div>
 
-                        {activeSection === "pro" && (
-                            <div className="space-y-6">
-                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                                    Pro Features
-                                </h2>
+                        <div className="space-y-2">
+                            <Label htmlFor="email">Email</Label>
+                            <Input
+                                id="email"
+                                type="email"
+                                value={formValues.email}
+                                onChange={(e) =>
+                                    setFormValues({
+                                        ...formValues,
+                                        email: e.target.value,
+                                    })
+                                }
+                                className="dark:bg-black dark:text-white dark:border-gray-800"
+                            />
+                        </div>
 
-                                <div className="p-6 bg-gradient-to-r from-lime-50 to-lime-100 dark:from-lime-900/30 dark:to-lime-800/30 rounded-xl">
-                                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                                        Upgrade to Pro
-                                    </h3>
-                                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                                        Get access to advanced features,
-                                        priority support, and more.
-                                    </p>
-                                    <button className="mt-4 px-4 py-2 bg-lime-600 text-white rounded-lg hover:bg-lime-700">
-                                        Upgrade Now
-                                    </button>
-                                </div>
-                            </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="bio">Bio</Label>
+                            <Input
+                                id="bio"
+                                value={formValues.bio}
+                                onChange={(e) =>
+                                    setFormValues({
+                                        ...formValues,
+                                        bio: e.target.value,
+                                    })
+                                }
+                                className="dark:bg-black dark:text-white dark:border-gray-800"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex items-center justify-between dark:text-white">
+                    <div className="flex items-center space-x-2">
+                        <Switch
+                            id="darkMode"
+                            checked={darkMode}
+                            // onCheckedChange={toggleDarkMode}
+                        />
+                        <Label htmlFor="darkMode" className="cursor-pointer">
+                            Dark Mode
+                        </Label>
+                        {darkMode ? (
+                            <MoonIcon className="h-4 w-4 ml-2" />
+                        ) : (
+                            <SunIcon className="h-4 w-4 ml-2" />
                         )}
                     </div>
                 </div>
+
+                <div className="flex justify-end gap-2">
+                    <Button
+                        variant="outline"
+                        className="dark:bg-gray-900 dark:hover:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white"
+                    >
+                        Cancel
+                    </Button>
+                    <Button className="bg-lime-600 hover:bg-lime-700 dark:bg-lime-700 dark:hover:bg-lime-800 text-white">
+                        Save Changes
+                    </Button>
+                </div>
             </div>
-        </div>
+        ),
+    };
+
+    const account = {
+        id: "account",
+        label: "Account",
+        icon: <LockIcon className="h-4 w-4" />,
+        content: (
+            <div className="space-y-6 dark:text-white">
+                <div className="space-y-4 dark:text-white">
+                    <h3 className="text-lg font-medium dark:text-white">
+                        Password &amp; Security
+                    </h3>
+                    <div className="grid gap-4 dark:text-white">
+                        <div className="space-y-2">
+                            <Label htmlFor="currentPassword">
+                                Current Password
+                            </Label>
+                            <Input
+                                id="currentPassword"
+                                type="password"
+                                value="************"
+                                className="dark:bg-black dark:text-white dark:border-gray-800"
+                            />
+                        </div>
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <div className="space-y-2">
+                                <Label htmlFor="newPassword">
+                                    New Password
+                                </Label>
+                                <Input
+                                    id="newPassword"
+                                    type="password"
+                                    className="dark:bg-black dark:text-white dark:border-gray-800"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="confirmPassword">
+                                    Confirm Password
+                                </Label>
+                                <Input
+                                    id="confirmPassword"
+                                    type="password"
+                                    className="dark:bg-black dark:text-white dark:border-gray-800"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h3 className="text-lg font-medium">
+                                Two-Factor Authentication
+                            </h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                                Add an extra layer of security to your account
+                            </p>
+                        </div>
+                        <Switch
+                            id="twoFactorEnabled"
+                            checked={formValues.twoFactorEnabled}
+                            onCheckedChange={(checked) =>
+                                setFormValues({
+                                    ...formValues,
+                                    twoFactorEnabled: checked,
+                                })
+                            }
+                        />
+                    </div>
+
+                    {formValues.twoFactorEnabled && (
+                        <div className="rounded-lg border p-4 mt-2 dark:border-gray-800 dark:bg-gray-900">
+                            <div className="flex items-center justify-between">
+                                <div className="space-y-1">
+                                    <p className="text-sm font-medium">
+                                        Authenticator App
+                                    </p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                        Using Google Authenticator or Authy
+                                    </p>
+                                </div>
+                                <Badge className="bg-lime-600 dark:bg-lime-700 text-white">
+                                    Active
+                                </Badge>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Sessions</h3>
+                    <div className="rounded-lg border p-4 dark:border-gray-800 dark:bg-gray-900">
+                        <div className="flex items-center justify-between">
+                            <div className="space-y-1">
+                                <p className="text-sm font-medium">
+                                    Current Device • Chrome on macOS
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                    Last active: Just now
+                                </p>
+                            </div>
+                            <Badge className="bg-green-600 text-white">
+                                Active
+                            </Badge>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex justify-end gap-2">
+                    <Button
+                        variant="outline"
+                        className="dark:bg-gray-900 dark:hover:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white"
+                    >
+                        Cancel
+                    </Button>
+                    <Button className="bg-lime-600 hover:bg-lime-700 dark:bg-lime-700 dark:hover:bg-lime-800 text-white">
+                        Save Changes
+                    </Button>
+                </div>
+
+                <Card className="border border-red-200 dark:border-red-900 dark:bg-black dark:text-white">
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <CardTitle className="text-red-600 dark:text-red-400">
+                                    Danger Zone
+                                </CardTitle>
+                                <CardDescription className="dark:text-gray-400">
+                                    Irreversible account actions
+                                </CardDescription>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-4">
+                            <div className="rounded-lg border border-red-200 dark:border-red-900 p-4 dark:bg-gray-900">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                    <div>
+                                        <h3 className="text-base font-medium dark:text-white">
+                                            Deactivate Account
+                                        </h3>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                                            Temporarily disable your account.
+                                            You can reactivate anytime.
+                                        </p>
+                                    </div>
+                                    <Button
+                                        variant="outline"
+                                        className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950"
+                                    >
+                                        <LockIcon className="mr-2 h-4 w-4" />
+                                        Deactivate
+                                    </Button>
+                                </div>
+                            </div>
+
+                            <div className="rounded-lg border border-red-200 dark:border-red-900 p-4 dark:bg-gray-900">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                    <div>
+                                        <h3 className="text-base font-medium dark:text-white">
+                                            Delete Account
+                                        </h3>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                                            Permanently delete your account and
+                                            all your data. This action cannot be
+                                            undone.
+                                        </p>
+                                    </div>
+                                    <Button variant="destructive">
+                                        <LogOutIcon className="mr-2 h-4 w-4" />
+                                        Delete
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        ),
+    };
+
+    const notifications = {
+        id: "notifications",
+        label: "Notifications",
+        icon: <BellIcon className="h-4 w-4" />,
+        content: (
+            <div className="space-y-6 dark:text-white">
+                <div className="space-y-4">
+                    {["email", "push", "sms"].map((type) => {
+                        const label =
+                            type.charAt(0).toUpperCase() + type.slice(1);
+                        return (
+                            <div
+                                key={type}
+                                className="flex items-center justify-between"
+                            >
+                                <div>
+                                    <h3 className="text-base font-medium">
+                                        {label} Notifications
+                                    </h3>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                                        {type === "email" &&
+                                            "Receive updates via email"}
+                                        {type === "push" &&
+                                            "Get notifications on your device"}
+                                        {type === "sms" &&
+                                            "Receive text messages for important updates"}
+                                    </p>
+                                </div>
+                                <Switch
+                                    id={`${type}Notifications`}
+                                    checked={formValues.notifications[type]}
+                                    onCheckedChange={(checked) =>
+                                        setFormValues({
+                                            ...formValues,
+                                            notifications: {
+                                                ...formValues.notifications,
+                                                [type]: checked,
+                                            },
+                                        })
+                                    }
+                                />
+                            </div>
+                        );
+                    })}
+                </div>
+
+                <div className="space-y-4">
+                    <h3 className="text-lg font-medium">
+                        Notification Categories
+                    </h3>
+
+                    {["mentions", "comments", "follows", "messages"].map(
+                        (category) => {
+                            const label =
+                                category.charAt(0).toUpperCase() +
+                                category.slice(1);
+                            return (
+                                <div
+                                    key={category}
+                                    className="flex items-center justify-between rounded-lg border p-4 dark:border-gray-800 dark:bg-gray-900"
+                                >
+                                    <div>
+                                        <h3 className="text-sm font-medium">
+                                            {label}
+                                        </h3>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                                            Notifications when someone{" "}
+                                            {category === "follows"
+                                                ? "follows you"
+                                                : category === "messages"
+                                                  ? "sends you a message"
+                                                  : `${category} you in a post`}
+                                        </p>
+                                    </div>
+                                    <Switch
+                                        id={`${category}Notifications`}
+                                        defaultChecked={true}
+                                    />
+                                </div>
+                            );
+                        },
+                    )}
+                </div>
+
+                <div className="flex justify-end gap-2">
+                    <Button
+                        variant="outline"
+                        className="dark:bg-gray-900 dark:hover:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white"
+                    >
+                        Reset to Default
+                    </Button>
+                    <Button className="bg-lime-600 hover:bg-lime-700 dark:bg-lime-700 dark:hover:bg-lime-800 text-white">
+                        Save Changes
+                    </Button>
+                </div>
+            </div>
+        ),
+    };
+
+    const privacy = {
+        id: "privacy",
+        label: "Privacy",
+        icon: <ShieldIcon className="h-4 w-4" />,
+        content: (
+            <div className="space-y-6 dark:text-white">
+                <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Profile Visibility</h3>
+                    <RadioGroup
+                        value={formValues.privacy}
+                        onValueChange={(value) =>
+                            setFormValues({ ...formValues, privacy: value })
+                        }
+                        className="space-y-2"
+                    >
+                        {[
+                            {
+                                value: "public",
+                                label: "Public",
+                                description:
+                                    "Anyone can see your profile and posts",
+                            },
+                            {
+                                value: "friends",
+                                label: "Friends Only",
+                                description:
+                                    "Only people you follow can see your posts",
+                            },
+                            {
+                                value: "private",
+                                label: "Private",
+                                description: "Only you can see your posts",
+                            },
+                        ].map((option) => (
+                            <div
+                                key={option.value}
+                                className="flex items-center space-x-2 rounded-lg border p-4 dark:border-gray-800 dark:bg-gray-900 dark:text-white"
+                            >
+                                <RadioGroupItem
+                                    value={option.value}
+                                    id={option.value}
+                                    className="dark:text-white dark:fill-white dark:bg-black"
+                                />
+                                <div className="flex-1">
+                                    <Label
+                                        htmlFor={option.value}
+                                        className="text-sm font-medium cursor-pointer"
+                                    >
+                                        {option.label}
+                                    </Label>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                        {option.description}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
+                    </RadioGroup>
+                </div>
+
+                <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Data & Privacy</h3>
+
+                    <div className="space-y-2">
+                        {[
+                            {
+                                id: "activityStatus",
+                                label: "Show Activity Status",
+                                description:
+                                    "Let others see when you were last active",
+                            },
+                            {
+                                id: "readReceipts",
+                                label: "Read Receipts",
+                                description:
+                                    "Let others know when you've seen their messages",
+                            },
+                            {
+                                id: "dataCollection",
+                                label: "Data Collection",
+                                description:
+                                    "Allow us to collect usage data to improve your experience",
+                            },
+                        ].map((setting) => (
+                            <div
+                                key={setting.id}
+                                className="flex items-center justify-between rounded-lg border p-4 dark:border-gray-800 dark:bg-gray-900"
+                            >
+                                <div>
+                                    <Label
+                                        htmlFor={setting.id}
+                                        className="text-sm font-medium cursor-pointer"
+                                    >
+                                        {setting.label}
+                                    </Label>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                        {setting.description}
+                                    </p>
+                                </div>
+                                <Switch
+                                    id={setting.id}
+                                    defaultChecked={
+                                        setting.id !== "dataCollection"
+                                    }
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="flex justify-end gap-2">
+                    <Button
+                        variant="outline"
+                        className="dark:bg-gray-900 dark:hover:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white"
+                    >
+                        Cancel
+                    </Button>
+                    <Button className="bg-lime-600 hover:bg-lime-700 dark:bg-lime-700 dark:hover:bg-lime-800 text-white">
+                        Save Changes
+                    </Button>
+                </div>
+            </div>
+        ),
+    };
+
+    const pro = {
+        id: "pro",
+        label: "Pro",
+        icon: <CreditCardIcon className="h-4 w-4" />,
+        content: (
+            <div className="space-y-6 dark:text-white">
+                <div className="rounded-lg border p-6 text-center space-y-4 dark:border-gray-800 dark:bg-gray-900">
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-lime-100 dark:bg-lime-900">
+                        <UserPlusIcon className="h-8 w-8 text-lime-600 dark:text-lime-400" />
+                    </div>
+                    <div>
+                        <h3 className="text-xl font-medium">Upgrade to Pro</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            Unlock premium features and enjoy an ad-free
+                            experience
+                        </p>
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        {[
+                            {
+                                feature: "Ad-free experience",
+                                icon: <ShieldIcon className="h-4 w-4" />,
+                            },
+                            {
+                                feature: "Unlimited posts",
+                                icon: <GlobeIcon className="h-4 w-4" />,
+                            },
+                            {
+                                feature: "Priority support",
+                                icon: <BellIcon className="h-4 w-4" />,
+                            },
+                            {
+                                feature: "Custom themes",
+                                icon: <MoonIcon className="h-4 w-4" />,
+                            },
+                            {
+                                feature: "Analytics dashboard",
+                                icon: <CreditCardIcon className="h-4 w-4" />,
+                            },
+                            {
+                                feature: "Exclusive content",
+                                icon: <UserIcon className="h-4 w-4" />,
+                            },
+                        ].map((item, i) => (
+                            <div
+                                key={i}
+                                className="flex items-center space-x-2 rounded-lg border p-3 dark:border-gray-800 dark:bg-gray-900"
+                            >
+                                <div className="text-lime-600 dark:text-lime-400">
+                                    {item.icon}
+                                </div>
+                                <span className="text-sm">{item.feature}</span>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="space-y-3 pt-4">
+                        <div className="text-center">
+                            <span className="text-3xl font-bold">$5.99</span>
+                            <span className="text-sm text-gray-500 dark:text-gray-400">
+                                {" "}
+                                / month
+                            </span>
+                        </div>
+                        <Button className="w-full bg-lime-600 hover:bg-lime-700 dark:bg-lime-700 dark:hover:bg-lime-800 text-white">
+                            Upgrade Now
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="rounded-lg border p-4 dark:border-gray-800 dark:bg-gray-900">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h3 className="text-sm font-medium">
+                                Current Plan
+                            </h3>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                                Free tier • Limited features
+                            </p>
+                        </div>
+                        <Badge
+                            variant="outline"
+                            className="dark:border-gray-700 dark:text-white dark:hover:text-white"
+                        >
+                            Free
+                        </Badge>
+                    </div>
+                </div>
+            </div>
+        ),
+    };
+
+    const settingsSections = [general, account, notifications, privacy, pro];
+
+    return (
+        <>
+            <Header noBlur={true} />
+            <div className="w-full h-full bg-white dark:bg-black dark:text-white">
+                <div className="mx-auto max-w-4xl mt-20 px-4 py-8 dark:bg-black">
+                    <h1 className="text-3xl font-bold mb-6 dark:text-white">
+                        Profile Settings
+                    </h1>
+
+                    <div className="mb-4 block sm:hidden">
+                        <select
+                            value={activeTab}
+                            onChange={(e) => setActiveTab(e.target.value)}
+                            className="w-full p-2 rounded-md border border-gray-300 dark:border-gray-700 dark:bg-black dark:text-white focus:ring-lime-500 focus:border-lime-500"
+                        >
+                            {settingsSections.map((section) => (
+                                <option key={section.id} value={section.id}>
+                                    {section.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <Tabs
+                        value={activeTab}
+                        onValueChange={setActiveTab}
+                        className="space-y-6"
+                    >
+                        <Card className="dark:bg-black dark:border-gray-800">
+                            <CardHeader className="pb-2">
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                    <div>
+                                        <CardTitle className="dark:text-white">
+                                            Settings
+                                        </CardTitle>
+                                        <CardDescription className="dark:text-gray-400">
+                                            Manage your account settings and
+                                            preferences.
+                                        </CardDescription>
+                                    </div>
+                                    <TabsList className="hidden sm:grid grid-cols-5 gap-1 dark:bg-gray-900">
+                                        {settingsSections.map((section) => (
+                                            <TabsTrigger
+                                                key={section.id}
+                                                value={section.id}
+                                                className="data-[state=active]:bg-lime-50 data-[state=active]:text-lime-900 dark:data-[state=active]:bg-lime-950 dark:data-[state=active]:text-lime-300 dark:text-gray-200"
+                                            >
+                                                <div className="flex items-center gap-1">
+                                                    {section.icon}
+                                                    <span className="hidden sm:inline">
+                                                        {section.label}
+                                                    </span>
+                                                </div>
+                                            </TabsTrigger>
+                                        ))}
+                                    </TabsList>
+                                </div>
+                            </CardHeader>
+
+                            <CardContent className="pt-4">
+                                {settingsSections.map((section) => (
+                                    <TabsContent
+                                        key={section.id}
+                                        value={section.id}
+                                    >
+                                        {section.content}
+                                    </TabsContent>
+                                ))}
+                            </CardContent>
+                        </Card>
+                    </Tabs>
+                    <div className="h-[30vh] w-full"></div>
+                </div>
+            </div>
+        </>
     );
-}
+};
+
+export default ProfileSettings;

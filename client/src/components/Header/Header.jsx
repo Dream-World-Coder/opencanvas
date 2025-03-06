@@ -4,7 +4,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { createOptions } from "./createOptions";
 import SearchBar from "../SearchBar";
 
-const Header = () => {
+const Header = ({ noBlur = false, ballClr = "text-lime-300" }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [createMenuOpen, setCreateMenuOpen] = useState(false);
     const { currentUser } = useAuth();
@@ -25,7 +25,9 @@ const Header = () => {
     }
 
     return (
-        <header className="fixed w-full top-0 z-50 bg-white/20 dark:bg-[#222]/20 backdrop-blur-md">
+        <header
+            className={`fixed w-full top-0 z-50 ${noBlur ? "bg-white dark:bg-black dark:text-white border-b border-gray-200 dark:border-[#333]" : "bg-white/20 dark:bg-[#222]/20 backdrop-blur-md"}`}
+        >
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
                 <nav className="flex items-center justify-between h-16 sm:h-20">
                     <div className="flex items-center justify-center gap-2">
@@ -64,7 +66,9 @@ const Header = () => {
                                     )}
                                 </a>
                                 {index !== navLinks.length - 1 && (
-                                    <span className="text-lime-300 flex items-center">
+                                    <span
+                                        className={`${ballClr} flex items-center`}
+                                    >
                                         •
                                     </span>
                                 )}
@@ -76,7 +80,7 @@ const Header = () => {
                                 onClick={() =>
                                     setCreateMenuOpen(!createMenuOpen)
                                 }
-                                className="flex items-center space-x-2 bg-black text-white px-4 py-2 rounded-full hover:bg-stone-800/90 transition-colors"
+                                className="flex items-center space-x-2 bg-black dark:bg-[#333] text-white px-4 py-2 rounded-full hover:bg-stone-800/90 transition-colors"
                             >
                                 <span>Create</span>
                                 {!createMenuOpen && (

@@ -19,17 +19,18 @@ export default function SearchBar() {
             <Input
                 type="text"
                 placeholder="Search"
-                className={
-                    loading
-                        ? "opacity-60 pointer-events-none cursor-wait"
-                        : "opacity-100"
-                }
+                className={`shadow-none dark:border-[#333]
+                    ${
+                        loading
+                            ? "opacity-60 pointer-events-none cursor-wait"
+                            : "opacity-100"
+                    }`}
             />
             {/* have changed the component for lime ring on focus, focus-visible:ring-lime-400 */}
             <button
                 type="submit"
                 disabled={loading}
-                className="flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed dark:text-[#f7f7f7]"
             >
                 {loading ? <Loader2 className="animate-spin" /> : <Search />}
             </button>
