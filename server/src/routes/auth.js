@@ -56,8 +56,8 @@ passport.use(
                     const newUser = new User({
                         username:
                             profile.emails[0].value.split("@")[0].slice(0, 4) +
-                            generateRandomAlphanumeric(4),
-                        fullName: profile.displayName || "User",
+                            generateRandomAlphanumeric(4), // total 8 chars
+                        fullName: profile.displayName.slice(0, 32) || "User",
                         email: profile.emails[0].value,
                         passwordHash: "google-hash",
                         provider: "google",
@@ -99,6 +99,8 @@ passport.deserializeUser(async (id, done) => {
     }
 });
 
+// not needed for now
+/*
 router.post("/register", async (req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -243,6 +245,7 @@ router.post("/login", async (req, res) => {
         });
     }
 });
+*/
 
 // Google authentication routes
 router.get(
@@ -278,7 +281,9 @@ router.get(
 
 router.get("/user", authenticateToken, async (req, res) => {
     try {
-        const user = await User.findById(req.userId).select("-passwordHash");
+        const user = await User.findById(req.userId).select(
+            "-passwordHash -provider -ipAddress",
+        );
 
         if (!user) {
             return res.status(404).json({
@@ -313,8 +318,11 @@ router.get("/u/:username", async (req, res) => {
             _id: 0,
             passwordHash: 0,
             email: 0,
+            provider: 0,
             ipAddress: 0,
             lastFiveLogin: 0,
+            savedPosts: 0,
+            totalSavedPosts: 0,
         });
 
         if (!user) {
