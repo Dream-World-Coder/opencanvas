@@ -34,11 +34,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
 
 // ***************************************************
 import ReactMarkdown from "react-markdown";
@@ -49,7 +44,7 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { prism } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 /**
  *
@@ -523,7 +518,7 @@ export const MarkdownPreview = ({
                                             {/* Rounded code card */}
                                             <div className="rounded-xl overflow-hidden border-none">
                                                 <SyntaxHighlighter
-                                                    style={prism}
+                                                    style={oneLight}
                                                     language={match[1]}
                                                     PreTag="div"
                                                     wrapLongLines
@@ -531,8 +526,7 @@ export const MarkdownPreview = ({
                                                         style: {
                                                             fontSize:
                                                                 "0.875rem",
-                                                            lineHeight:
-                                                                "1.25rem",
+                                                            lineHeight: "1.2",
                                                         },
                                                     }}
                                                     className={
@@ -566,60 +560,88 @@ export const MarkdownPreview = ({
                                         </blockquote>
                                     );
                                 },
+
                                 h1: ({ children }) => (
-                                    <h1 className="text-4xl font-bold mt-6">
+                                    <h1 className="font-serif text-4xl font-bold mt-12 mb-6 leading-tight tracking-tight">
                                         {children}
                                     </h1>
                                 ),
                                 h2: ({ children }) => (
-                                    <h2 className="text-3xl font-semibold mt-5">
+                                    <h2 className="font-serif text-3xl font-bold mt-10 mb-5 leading-tight tracking-tight">
                                         {children}
                                     </h2>
                                 ),
                                 h3: ({ children }) => (
-                                    <h3 className="text-2xl font-semibold mt-4">
+                                    <h3 className="font-serif text-2xl font-bold mt-8 mb-4 leading-tight">
                                         {children}
                                     </h3>
                                 ),
                                 h4: ({ children }) => (
-                                    <h4 className="text-xl font-semibold mt-3">
+                                    <h4 className="font-sans text-xl font-semibold mt-6 mb-3 leading-snug">
                                         {children}
                                     </h4>
                                 ),
                                 h5: ({ children }) => (
-                                    <h5 className="text-lg font-semibold mt-2">
+                                    <h5 className="font-sans text-lg font-semibold mt-5 mb-3 leading-snug">
                                         {children}
                                     </h5>
                                 ),
                                 h6: ({ children }) => (
-                                    <h6 className="text-base font-semibold mt-2">
+                                    <h6 className="font-sans text-base font-semibold mt-4 mb-2 uppercase tracking-wider">
                                         {children}
                                     </h6>
                                 ),
                                 p: ({ children }) => (
-                                    <p className="text-base my-2">{children}</p>
+                                    <p className="font-sans text-base leading-relaxed my-5 max-w-prose">
+                                        {children}
+                                    </p>
+                                ),
+                                strong: ({ children }) => (
+                                    <strong className="font-semibold">
+                                        {children}
+                                    </strong>
+                                ),
+                                em: ({ children }) => (
+                                    <em className="italic">{children}</em>
                                 ),
                                 a: ({ href, children }) => (
                                     <a
                                         href={href}
-                                        className={`underline ${isDark ? "text-blue-300 hover:text-blue-500" : "text-blue-600 hover:text-blue-800"}`}
+                                        className={`border-b border-current pb-0.5 font-medium transition-colors duration-200 ${
+                                            isDark
+                                                ? "text-blue-300 hover:text-blue-400"
+                                                : "text-blue-600 hover:text-blue-800"
+                                        }`}
+                                        target={
+                                            href.startsWith("http")
+                                                ? "_blank"
+                                                : "_self"
+                                        }
+                                        rel={
+                                            href.startsWith("http")
+                                                ? "noopener noreferrer"
+                                                : ""
+                                        }
                                     >
                                         {children}
                                     </a>
                                 ),
                                 ul: ({ children }) => (
-                                    <ul className="list-disc list-inside my-2">
+                                    <ul className="list-disc pl-8 my-5 space-y-2">
                                         {children}
                                     </ul>
                                 ),
                                 ol: ({ children }) => (
-                                    <ol className="list-decimal list-inside my-2">
+                                    <ol className="list-decimal pl-8 my-5 space-y-2">
                                         {children}
                                     </ol>
                                 ),
                                 li: ({ children }) => (
-                                    <li className="ml-5">{children}</li>
+                                    <li className="leading-relaxed text-base">
+                                        {children}
+                                    </li>
                                 ),
+
                                 table: ({ children }) => (
                                     <div className="overflow-x-auto">
                                         <table

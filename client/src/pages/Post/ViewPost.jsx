@@ -1,6 +1,6 @@
 // Its the public view --> add options like link share
 
-// import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import Header from "../../components/Header/Header"; // add prop to implement non blur & color of *
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,12 +15,33 @@ import {
     MessageSquareText,
 } from "lucide-react";
 
-// replace 5 min read with save & share on top
+function useDarkMode() {
+    const getDarkMode = () =>
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    const [isDark, setIsDark] = useState(getDarkMode());
+
+    useEffect(() => {
+        const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+        const handleChange = (e) => setIsDark(e.matches);
+
+        // Add event listener
+        mediaQuery.addEventListener("change", handleChange);
+
+        // Cleanup event listener on component unmount
+        return () => mediaQuery.removeEventListener("change", handleChange);
+    }, []);
+
+    return isDark;
+}
 
 const ViewPost = ({ postId }) => {
+    const isDark = useDarkMode();
     const data = `In modern web development, providing a seamless user experience is crucial. One way to achieve this is by aligning your website's appearance with the user's system preferences, such as dark mode. This blog will guide you through detecting system dark mode using pure JavaScript and applying dynamic styles accordingly.
 ### Why Detect Dark Mode?
-Dark mode has become a popular feature across various platforms due to its aesthetic appeal and reduced eye strain in low-light environments. Automatically switching your website's theme based on the user's preference can enhance the overall user experience.
+> Dark mode has become a popular feature across various platforms due to its aesthetic appeal and reduced eye strain in low-light environments. Automatically switching your website's theme based on the user's preference can enhance the overall user experience.
 ### Detecting Dark Mode in JavaScript
 JavaScript provides a straightforward way to detect if the user has enabled dark mode using the \`window.matchMedia()\` method.
 \`\`\`javascript
@@ -55,19 +76,14 @@ body {
 \`\`\`
 ![img](https://picsum.photos/1200)
 ### Best Practices
+
 - Use \`transition\` properties to create smooth visual effects.
 - Allow users to override system preferences with manual toggle switches.
 - Test your implementation on different devices and browsers.
+
 ### Conclusion
 Detecting and applying system dark mode in JavaScript is a simple yet effective way to enhance user experience. By combining media queries, event listeners, and dynamic class manipulation, you can create a visually adaptive website that caters to user preferences.
 Implement this feature in your projects to provide a modern and user-friendly interface.`;
-
-    function isDarkMode() {
-        return (
-            window.matchMedia &&
-            window.matchMedia("(prefers-color-scheme: dark)").matches
-        );
-    }
 
     const readOptions = [
         { name: "Home", href: "#" },
@@ -230,24 +246,24 @@ Implement this feature in your projects to provide a modern and user-friendly in
                                     <div className="flex items-center justify-center mt-2 text-white">
                                         <Heart className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] text-red-600 hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
                                         <span className="w-px h-[15px] dark:bg-[#ccc]/60 bg-[#444]/60" />
-                                        <Bookmark className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] text-black hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
+                                        <Bookmark className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] dark:text-white text-black hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
                                         <span className="w-px h-[15px] dark:bg-[#ccc]/60 bg-[#444]/60" />
-                                        <Share2 className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] text-black hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
+                                        <Share2 className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] dark:text-white text-black hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
                                         <span className="w-px h-[15px] dark:bg-[#ccc]/60 bg-[#444]/60" />
-                                        <MoreHorizontal className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] text-black hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
+                                        <MoreHorizontal className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] dark:text-white text-black hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
                                     </div>
                                 </div>
                             </div>
-                            <h1 className="text-4xl font-bold mb-4 md:mt-2">
+                            <h1 className="font-serif text-4xl font-bold leading-tight tracking-tight mb-4 md:mt-2">
                                 {post.title}
                             </h1>
                         </div>
 
                         {/* Article content */}
-                        <div className="prose dark:prose-invert max-w-none pt-4 mb-16 text-[18px] md:text-[28px] leading-[28px] md:leading-[32px]">
+                        <div className="prose dark:prose-invert max-w-none pt-4 mb-16">
                             <MarkdownPreview
                                 content={data}
-                                isDark={isDarkMode()}
+                                isDark={isDark}
                                 darkBg="bg-[#111]"
                                 textAlignment="left"
                                 insidePost={true}

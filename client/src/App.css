@@ -1,4 +1,30 @@
 @import url("https://fonts.googleapis.com/css2?family=Handlee&family=Six+Caps&family=Smooch&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&display=swap");
+:root {
+    --font-sans:
+        "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Arial, sans-serif;
+    --font-serif:
+        "Merriweather", Georgia, Cambria, "Times New Roman", Times, serif;
+    --text-base-size: 1.125rem;
+    --line-height-normal: 1.6;
+    --line-height-tight: 1.3;
+    --text-spacing: 0.5rem;
+}
+
+article {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 1rem;
+    font-family: var(--font-sans);
+    font-size: var(--text-base-size);
+    line-height: var(--line-height-normal);
+    color: #333;
+}
+
+article p {
+    margin-bottom: 1.5rem;
+}
 @font-face {
     font-family: scribe;
     src: url("/fonts/military-scribe.woff2") format("woff2");

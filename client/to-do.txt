@@ -120,3 +120,5 @@ show articles instead of literature gallery
 -- add specific schemadata in About & contact page
 
 // img options are for pdf export only
+
+-- in profile prevent remap of existing elements when more are loaded
