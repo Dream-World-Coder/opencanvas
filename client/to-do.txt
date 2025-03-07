@@ -118,3 +118,5 @@ show articles instead of literature gallery
 -- add useStrict in main.jsx if needed
 
 -- add specific schemadata in About & contact page
+
+// img options are for pdf export only

@@ -12,7 +12,6 @@ const Header = ({ filters }) => {
     const { currentUser } = useAuth();
 
     let navLinks = [
-        { name: "Literature", href: "/gallery/literature" },
         { name: "Photos", href: "/gallery/photos" },
         { name: "About", href: "/about" },
         { name: "Contact", href: "/contact" },
@@ -25,7 +24,7 @@ const Header = ({ filters }) => {
     }
 
     return (
-        <header className="fixed top-0 w-full bg-white/20 backdrop-blur-md z-50 border-none border-gray-100">
+        <header className="fixed top-0 w-full bg-white/20 backdrop-blur-md z-50 border-none border-gray-100 dark:bg-[#111] dark:border-none dark:text-white">
             <div className="max-w-[1400px] mx-auto px-6 py-6">
                 <div className="flex flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
                     <h1 className="text-2xl font-stardom font-semibold tracking-tight">
@@ -41,8 +40,8 @@ const Header = ({ filters }) => {
                                         }
                                         className={`text-sm font-sans capitalize ${
                                             selectedFilter === filter
-                                                ? "text-black font-medium"
-                                                : "text-gray-400 hover:text-gray-600 font-thin"
+                                                ? "text-black font-medium dark:text-white"
+                                                : "text-gray-400 hover:text-gray-600 font-thin dark:text-[#f1f1f1] dark:hover:text-[#f1f1f1]"
                                         }`}
                                     >
                                         {filter}
@@ -66,8 +65,8 @@ const Header = ({ filters }) => {
                                         }
                                         className={`text-lg font-sans capitalize ${
                                             selectedFilter === filter
-                                                ? "text-black font-medium"
-                                                : "text-gray-400 hover:text-gray-600 font-thin"
+                                                ? "text-black font-medium dark:text-[#fff]"
+                                                : "text-gray-400 hover:text-gray-600 font-thind dark:text-[#f1f1f1] dark:hover:text-[#f1f1f1]"
                                         }`}
                                     >
                                         {filter}
@@ -82,7 +81,7 @@ const Header = ({ filters }) => {
                             <React.Fragment key={index}>
                                 <a
                                     href={link.href}
-                                    className={`text-stone-600 hover:text-stone-800
+                                    className={`text-stone-600 hover:text-stone-800 dark:text-[#f1f1f1] dark:hover:text-[#f1f1f1]
                                         ${link.href !== "/profile" ? "hover:bg-lime-300/50" : ""}
                                         box-content px-3 py-1 rounded-lg transition-all text-sm`}
                                 >
@@ -109,7 +108,7 @@ const Header = ({ filters }) => {
                                 onClick={() =>
                                     setCreateMenuOpen(!createMenuOpen)
                                 }
-                                className="flex items-center space-x-2 bg-black text-white px-4 py-2 rounded-full hover:bg-stone-800/90 transition-colors"
+                                className="flex items-center space-x-2 bg-black dark:bg-[#333] text-white px-4 py-2 rounded-full hover:bg-stone-800/90 transition-colors"
                             >
                                 <span>Create</span>
                                 {!createMenuOpen && (
@@ -122,11 +121,11 @@ const Header = ({ filters }) => {
 
                             {/* Create Menu Dropdown */}
                             {createMenuOpen && (
-                                <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-100 rounded-lg shadow-lg py-2 z-50">
+                                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#111] border border-gray-100 dark:border-[#333] rounded-lg shadow-lg py-2 z-50">
                                     {createOptions.map((option) => (
                                         <button
                                             key={option.id}
-                                            className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
+                                            className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-[#333] transition-colors group"
                                             onClick={() => {
                                                 localStorage.removeItem(
                                                     "blogPost",
@@ -143,7 +142,7 @@ const Header = ({ filters }) => {
                                             </div>
                                             <span className="flex items-center justify-center gap-3">
                                                 {option.label}{" "}
-                                                <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700" />
+                                                <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700 dark:text-stone-200" />
                                             </span>
                                         </button>
                                     ))}

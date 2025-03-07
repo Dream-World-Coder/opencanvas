@@ -4,7 +4,11 @@ import { useAuth } from "../../contexts/AuthContext";
 import { createOptions } from "./createOptions";
 import SearchBar from "../SearchBar";
 
-const Header = ({ noBlur = false, ballClr = "text-lime-300" }) => {
+const Header = ({
+    noBlur = false,
+    ballClr = "text-lime-300",
+    exclude = "",
+}) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [createMenuOpen, setCreateMenuOpen] = useState(false);
     const { currentUser } = useAuth();
@@ -49,28 +53,32 @@ const Header = ({ noBlur = false, ballClr = "text-lime-300" }) => {
                     <div className="hidden md:flex items-center space-x-2">
                         {navLinks.map((link, index) => (
                             <React.Fragment key={index}>
-                                <a
-                                    href={link.href}
-                                    className={`text-stone-600 hover:text-stone-800 dark:text-[#f8f8f8] dark:hover:text-[#fff]
+                                {link.href !== exclude && (
+                                    <>
+                                        <a
+                                            href={link.href}
+                                            className={`text-stone-600 hover:text-stone-800 dark:text-[#f8f8f8] dark:hover:text-[#fff]
                                     ${link.href !== "/profile" ? "hover:bg-lime-300/50 dark:hover:bg-lime-700/50" : ""}
                                     box-content px-3 py-1 rounded-lg transition-all text-sm`}
-                                >
-                                    {link.href !== "/profile" ? (
-                                        link.name
-                                    ) : (
-                                        <img
-                                            src="/defaults/profile.jpeg"
-                                            className="size-6 md:size-8 rounded-full overflow-hidden object-cover block cursor-pointer"
-                                            alt=""
-                                        />
-                                    )}
-                                </a>
-                                {index !== navLinks.length - 1 && (
-                                    <span
-                                        className={`${ballClr} flex items-center`}
-                                    >
-                                        •
-                                    </span>
+                                        >
+                                            {link.href !== "/profile" ? (
+                                                link.name
+                                            ) : (
+                                                <img
+                                                    src="/defaults/profile.jpeg"
+                                                    className="size-6 md:size-8 rounded-full overflow-hidden object-cover block cursor-pointer"
+                                                    alt=""
+                                                />
+                                            )}
+                                        </a>
+                                        {index !== navLinks.length - 1 && (
+                                            <span
+                                                className={`${ballClr} flex items-center`}
+                                            >
+                                                •
+                                            </span>
+                                        )}
+                                    </>
                                 )}
                             </React.Fragment>
                         ))}

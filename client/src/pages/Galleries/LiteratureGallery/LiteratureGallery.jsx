@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Heart, Bookmark, ArrowRight } from "lucide-react";
 import stories from "./Stories";
-import Footer from "../../../components/Footer/GalleryFooter";
+// import Footer from "../../../components/Footer/GalleryFooter";
 import Header from "../../../components/Header/GalleryHeader";
 import vineSvg from "../../../assets/icons/vine.svg";
 
@@ -26,7 +26,9 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
     }, []);
 
     return (
-        <div className={`min-h-screen ${bgClr} dark:invert pt-24`}>
+        <div
+            className={`min-h-screen ${bgClr} dark:bg-black dark:text-[#f2f2f2] pt-24`}
+        >
             <Header filters={filters} />
 
             {/* Top / Hero */}
@@ -34,7 +36,7 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
             {/* Replace some portions with various filters, and no love/save/author viewing form here, its just preview */}
             {/* ----------------------------------- */}
             <div
-                className={`relative h-32 md:h-72 overflow-hidden bg-inherit`}
+                className={`relative h-32 md:h-72 overflow-hidden bg-inherit border-b border-gray-200 dark:border-[#333]`}
                 style={{
                     transform: `translateY(${scrollY * 0.2}px)`,
                 }}
@@ -42,7 +44,7 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
                 <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center px-6">
                         <h1 className="text-3xl text-stone-800 mb-3 tracking-wide font-scribe pointer-events-none md:pointer-events-auto">
-                            <span className="relative px-4 pt-3">
+                            <span className="relative px-4 pt-3 dark:invert">
                                 Literary Collection
                                 <img
                                     className="hidden md:block object-cover w-16 absolute opacity-70 top-[-28%] left-[110%]"
@@ -53,7 +55,7 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
                         </h1>
                         <p
                             className="hidden md:flex flex-col text-sm text-stone-600 tracking-wide font-bold
-                            items-center justify-center
+                            items-center justify-center dark:text-[#f5f5f5]
                             md:font-light font-serif pointer-events-none md:pointer-events-auto"
                         >
                             A gathering of thoughts, verses, and tales
@@ -63,8 +65,8 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
             </div>
 
             {/* Main Content */}
-            <div className="max-w-6xl mx-auto px-4 py-16 border border-black/0">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="max-w-3xl mx-auto px-4 py-16 border-x border-gray-200 dark:border-[#333]">
+                <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
                     {stories.map((story, index) => (
                         <article
                             key={index}
@@ -75,25 +77,25 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
                             <div
                                 className={`bg-gradient-to-br ${story.gradient} p-8 border-b border-stone-200
                                     hover:border-stone-300 transition-all duration-500 group
-                                    hover:shadow-lg hover:shadow-stone-100/50 rounded`}
+                                    hover:shadow-lg hover:shadow-stone-100/50 rounded dark:shadow-none dark:border-[#333] dark:hover:shadow-none dark:hover:border-[#333]`}
                             >
                                 <header className="mb-6">
                                     <div className="flex justify-between items-center mb-4">
-                                        <span className="text-xs text-stone-500 uppercase font-bold md:font-light font-stardom md:font-serif underline underline-offset-4 decoration-2 decoration-lime-300/75">
+                                        <span className="text-xs text-stone-500 uppercase font-bold md:font-light font-stardom md:font-serif underline underline-offset-4 decoration-2 decoration-lime-300/75 dark:text-gray-300 dark:hover:text-gray-300">
                                             {story.type}
                                         </span>
-                                        <span className="text-xs text-stone-400 italic font-bold md:font-light font-stardom md:font-serif">
+                                        <span className="text-xs text-stone-400 italic font-bold md:font-light font-stardom md:font-serif dark:text-gray-300 dark:hover:text-gray-300">
                                             {story.date}
                                         </span>
                                     </div>
-                                    <h2 className="font-serif text-xl text-stone-800 mb-2 hover:text-stone-900 transition-colors">
+                                    <h2 className="font-serif text-xl text-stone-800 mb-2 hover:text-stone-900 transition-colors dark:text-gray-200 dark:hover:text-gray-200">
                                         {story.title}
                                     </h2>
-                                    <p className="text-sm text-stone-600 font-light">
+                                    <p className="text-sm text-stone-600 font-light dark:text-gray-400 dark:hover:text-gray-400">
                                         by{" "}
                                         <span
                                             href="#"
-                                            className="text-stone-700 font-bold md:font-light font-stardom underline cursor-auto"
+                                            className="text-stone-700 font-bold md:font-light font-stardom underline cursor-auto dark:text-gray-400 dark:hover:text-gray-400"
                                         >
                                             {story.author}
                                         </span>
@@ -101,27 +103,27 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
                                 </header>
 
                                 <div className="mb-6">
-                                    <p className="text-md leading-relaxed text-stone-700 whitespace-pre-line font-light">
+                                    <p className="text-md leading-relaxed text-stone-700 whitespace-pre-line font-light dark:text-gray-300">
                                         {story.excerpt.length > 150
                                             ? `${story.excerpt.slice(0, 150)}...`
                                             : story.excerpt}
                                     </p>
                                 </div>
 
-                                <footer className="flex items-center justify-between text-stone-500">
+                                <footer className="flex items-center justify-between text-stone-500 dark:text-gray-200 dark:hover:text-gray-200">
                                     <div className="flex items-center space-x-4">
-                                        <button className="flex items-center space-x-1 text-xs hover:text-stone-700 transition-colors cursor-auto">
+                                        <button className="flex items-center space-x-1 text-xs hover:text-stone-700 transition-colors cursor-auto dark:text-gray-200 dark:hover:text-gray-200">
                                             <Heart size={14} />
                                             <span>{story.likes}</span>
                                         </button>
-                                        <button className="flex items-center space-x-1 text-xs hover:text-stone-700 transition-colors cursor-auto">
+                                        <button className="flex items-center space-x-1 text-xs hover:text-stone-700 transition-colors cursor-auto dark:text-gray-200 dark:hover:text-gray-200">
                                             <Bookmark size={14} />
                                             <span>{story.saves}</span>
                                         </button>
                                     </div>
                                     <span
                                         className="group text-xs text-stone-600 group-hover:text-stone-950 group-hover:bg-lime-300/60
-                                        border group-hover:border-lime-300
+                                        border group-hover:border-lime-300 dark:text-gray-200 dark:hover:text-gray-200 dark:group-hover:text-gray-200 dark:group-hover:bg-lime-600/60
                                         px-3 py-1 rounded-xl transition-colors flex items-center gap-1 cursor-pointer"
                                     >
                                         Read
@@ -137,7 +139,7 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
                 </div>
             </div>
 
-            <Footer />
+            {/* <Footer /> */}
         </div>
     );
 };

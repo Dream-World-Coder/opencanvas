@@ -7,13 +7,61 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents"; // add prop: in edit: for image pop regulate
-import { Save, Share, MoreHorizontal, Heart } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+import {
+    Bookmark,
+    Share2,
+    MoreHorizontal,
+    Heart,
+    MessageSquareText,
+} from "lucide-react";
 
 // replace 5 min read with save & share on top
 
 const ViewPost = ({ postId }) => {
-    const data = `## hello world!`;
+    const data = `In modern web development, providing a seamless user experience is crucial. One way to achieve this is by aligning your website's appearance with the user's system preferences, such as dark mode. This blog will guide you through detecting system dark mode using pure JavaScript and applying dynamic styles accordingly.
+### Why Detect Dark Mode?
+Dark mode has become a popular feature across various platforms due to its aesthetic appeal and reduced eye strain in low-light environments. Automatically switching your website's theme based on the user's preference can enhance the overall user experience.
+### Detecting Dark Mode in JavaScript
+JavaScript provides a straightforward way to detect if the user has enabled dark mode using the \`window.matchMedia()\` method.
+\`\`\`javascript
+const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+console.log(\`System Dark Mode: \${isDarkMode}');
+\`\`\`
+The \`prefers-color-scheme\` media query checks the user's system preference, and \`.matches\` returns \`true\` if dark mode is enabled.
+### Listening for Dark Mode Changes
+Users can switch between light and dark mode at any time. To ensure your website adapts dynamically, listen for changes using the \`addEventListener\` method:
+\`\`\`javascript
+const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+mediaQuery.addEventListener('change', (event) => {
+    if (event.matches) {
+        console.log('Dark mode is ON');
+        document.body.classList.add('dark');
+    } else {
+        console.log('Dark mode is OFF');
+        document.body.classList.remove('dark');
+    }
+});
+\`\`\`
+### Applying Styles Dynamically
+Combine the detection logic with CSS classes to apply dark mode styles dynamically:
+\`\`\`css
+body.dark {
+    background-color: #121212;
+    color: #ffffff;
+}
+body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+\`\`\`
+![img](https://picsum.photos/1200)
+### Best Practices
+- Use \`transition\` properties to create smooth visual effects.
+- Allow users to override system preferences with manual toggle switches.
+- Test your implementation on different devices and browsers.
+### Conclusion
+Detecting and applying system dark mode in JavaScript is a simple yet effective way to enhance user experience. By combining media queries, event listeners, and dynamic class manipulation, you can create a visually adaptive website that caters to user preferences.
+Implement this feature in your projects to provide a modern and user-friendly interface.`;
+
     function isDarkMode() {
         return (
             window.matchMedia &&
@@ -31,7 +79,7 @@ const ViewPost = ({ postId }) => {
 
     // Sample data - in a real app, this would come from props or API
     const post = {
-        title: "Understanding Modern Web Development Workflows",
+        title: "How to Detect System Dark Mode in JavaScript",
         content:
             "Learn how to use the latest tools and techniques to build performant web applications that scale efficiently...",
         author: {
@@ -84,9 +132,50 @@ const ViewPost = ({ postId }) => {
             author: "David Chen",
         },
     ];
+
+    const schemaData = {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        // headline: { title },
+        // image: ["https://opencanvas.blog/photos/1x1/photo.jpg"],
+        datePublished: {},
+        dateModified: {},
+        author: {
+            "@type": "Person",
+            name: {},
+        },
+        publisher: {
+            "@type": "Organization",
+            name: "Opencanvas",
+            logo: {
+                "@type": "ImageObject",
+                url: "https://opencanvas.blog/logo.png",
+            },
+        },
+        description:
+            "A sample article description goes here, summarizing the main content of the article.",
+        mainEntityOfPage: {
+            "@type": "WebPage",
+            "@id": "https://opencanvas.blog/sample-article",
+        },
+        keywords:
+            "SEO, keywords, search engine optimization, blog, web development",
+    };
+
     return (
         <>
-            <Helmet></Helmet>
+            <Helmet>
+                {/* <title>{title} • OpenCanvas</title> */}
+                {/* <meta name="description" content={title} /> */}
+                <meta
+                    name="keywords"
+                    content="technology, blog, javascript, SEO, web development"
+                />
+                <script type="application/ld+json">
+                    {JSON.stringify(schemaData)}
+                </script>
+            </Helmet>
+
             <div className="w-full h-full grid place-items-center bg-white dark:bg-[#111] overflow-x-hidden pt-20">
                 <Header noBlur={true} ballClr={"text-gray-300"} />
                 <div className="flex flex-col md:flex-row max-w-screen-xl mx-auto bg-white dark:bg-[#111] text-gray-900 dark:text-gray-100">
@@ -138,25 +227,31 @@ const ViewPost = ({ postId }) => {
                                     <div>
                                         {post.publishedAt} · {post.readTime}
                                     </div>
-                                    <div className="flex items-center justify-center">
-                                        {/* <Separator /> */}
-                                        {[
-                                            Heart,
-                                            Save,
-                                            Share,
-                                            MoreHorizontal,
-                                        ].map((item, index) => (
-                                            <item
-                                                key={index}
-                                                className="size-4"
-                                            />
-                                        ))}
+                                    <div className="flex items-center justify-center mt-2 text-white">
+                                        <Heart className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] hover:text-white dark:hover:bg-[#eee] dark:hover:text-black text-red-600" />
+                                        <span className="w-px h-[15px] dark:bg-[#ccc]/60 bg-[#444]/60" />
+                                        <Bookmark className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
+                                        <span className="w-px h-[15px] dark:bg-[#ccc]/60 bg-[#444]/60" />
+                                        <Share2 className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
+                                        <span className="w-px h-[15px] dark:bg-[#ccc]/60 bg-[#444]/60" />
+                                        <MoreHorizontal className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
                                     </div>
                                 </div>
                             </div>
-                            <h1 className="text-4xl font-bold mb-4">
+                            <h1 className="text-4xl font-bold mb-4 md:mt-2">
                                 {post.title}
                             </h1>
+                        </div>
+
+                        {/* Article content */}
+                        <div className="prose dark:prose-invert max-w-none pt-4 mb-16 text-[18px] md:text-[28px] leading-[28px] md:leading-[32px]">
+                            <MarkdownPreview
+                                content={data}
+                                isDark={isDarkMode()}
+                                darkBg="bg-[#111]"
+                                textAlignment="left"
+                                insidePost={true}
+                            />
                             <div className="flex flex-wrap gap-2 mb-6">
                                 {post.tags.map((tag, index) => (
                                     <span
@@ -169,16 +264,6 @@ const ViewPost = ({ postId }) => {
                             </div>
                         </div>
 
-                        {/* Article content */}
-                        <div className="prose dark:prose-invert max-w-none mb-12 leading-[1.5]">
-                            <MarkdownPreview
-                                content={data}
-                                isDark={isDarkMode()}
-                                darkBg="bg-[#111]"
-                                textAlignment="left"
-                            />
-                        </div>
-
                         {/* Engagement section */}
                         <div className="flex items-center justify-between border-t border-b py-4 mb-8 dark:border-[#333] border-gray-200">
                             <div className="flex items-center gap-4">
@@ -187,20 +272,7 @@ const ViewPost = ({ postId }) => {
                                     size="sm"
                                     className="flex items-center gap-2"
                                 >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        className="text-red-500"
-                                    >
-                                        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-                                    </svg>
+                                    <Heart className="size-4 text-red-600" />
                                     <span>{post.likes}</span>
                                 </Button>
                                 <Button
@@ -208,54 +280,16 @@ const ViewPost = ({ postId }) => {
                                     size="sm"
                                     className="flex items-center gap-2"
                                 >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    >
-                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                                    </svg>
+                                    <MessageSquareText className="size-4" />
                                     <span>{post.comments}</span>
                                 </Button>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Button variant="ghost" size="sm">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    >
-                                        <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
-                                    </svg>
+                                    <Bookmark className="size-4" />
                                 </Button>
                                 <Button variant="ghost" size="sm">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    >
-                                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-                                        <polyline points="16 6 12 2 8 6" />
-                                        <line x1="12" y1="2" x2="12" y2="15" />
-                                    </svg>
+                                    <Share2 className="size-4" />
                                 </Button>
                             </div>
                         </div>
