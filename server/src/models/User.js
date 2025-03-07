@@ -1,34 +1,5 @@
-// a collection is like youtube playlist that can be made with anyones posts
-/*
-{
-  "_id": ObjectId("60f6a2b4a2e8c2a123456789"),
-  "username": "axbycz",
-  "fullName": "Mr. axbycz",
-  "email": "axbycz@example.com",
-  "passwordHash": "$2b$10$KIX./t56W2exampleHashString",
-  "profilePicture": "https://example.com/profiles/axbycz.jpg", // or give a default one at first
-  "ipAddress": "203.0.113.42",
-  "lastFiveLogin": [
-    {
-      "loginTime": ISODate("2025-02-26T10:00:00Z"),
-      "deviceInfo": "Chrome on Windows 10"
-    },
-  ],
-  "createdAt": ISODate("2025-02-20T08:15:00Z"),
-  "noOfFollowers": 0,
-  "noOfFollowing": 0,
-  "totalLikes": 0,
-  "savedPosts": [],
-  "lovedPosts": [],
-  "posts": [], // post _id s
-  "collections": [], collection _id s
-  "featuredItems": [] // upto 4 posts/collection _id can be featured
-}
-*/
-
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-
 const userSchema = new Schema(
     {
         username: {
@@ -36,11 +7,15 @@ const userSchema = new Schema(
             required: true,
             unique: true,
             trim: true,
+            minlength: [4, "Username must be at least 4 characters long"],
+            maxlength: [16, "Username can be 16 characters long at max"],
         },
         fullName: {
             type: String,
             required: false,
             trim: true,
+            minlength: [4, "Fullname must be at least 4 characters long"],
+            maxlength: [32, "Fullname can be 32 characters long at max"],
         },
         email: {
             type: String,
@@ -55,16 +30,36 @@ const userSchema = new Schema(
         },
         profilePicture: {
             type: String,
-            default: "https://example.com/defaults/profile.jpeg",
+            default: "https://opencanvas.blog/defaults/profile.jpeg",
         },
-        tagline: {
+        // <<<<>>>>
+        role: {
             type: String,
-            maxlength: [32, "Tagline must be 32 characters or less"],
+            default: "user",
+            enum: ["user", "admin", "moderator"],
+            maxlength: [32, "Role can be 32 characters or less"],
         },
         aboutMe: {
             type: String,
+            default: "",
             maxlength: [300, "Bio must be 300 characters or less"],
         },
+        premiumUser: {
+            type: Boolean,
+            default: false,
+            subscriptionType: {
+                type: String,
+                enum: ["none", "basic", "pro", "premium"],
+                default: "none",
+            },
+            subscriptionStartDate: {
+                type: Date,
+            },
+            subscriptionEndDate: {
+                type: Date,
+            },
+        },
+        // <<<<>>>>
         ipAddress: {
             type: String,
         },
@@ -83,42 +78,37 @@ const userSchema = new Schema(
             type: Date,
             default: Date.now,
         },
-        noOfFollowers: {
-            type: Number,
-            default: 0,
-        },
-        noOfFollowing: {
-            type: Number,
-            default: 0,
-        },
+        // <<<<>>>>
+        // total likes earned through all posts
         totalLikes: {
             type: Number,
             default: 0,
         },
-        savedPosts: [
-            {
-                type: Schema.Types.ObjectId,
-                ref: "Post",
-            },
-        ],
-        lovedPosts: [
-            {
-                type: Schema.Types.ObjectId,
-                ref: "Post",
-            },
-        ],
         posts: [
             {
                 type: Schema.Types.ObjectId,
                 ref: "Post",
             },
         ],
+        // totalPosts:{}, //not needed that much
+        savedPosts: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Post",
+            },
+        ],
+        totalSavedPosts: {
+            type: Number,
+            default: 0,
+        },
+        // no need to store loved/liked posts
         collections: [
             {
                 type: Schema.Types.ObjectId,
                 ref: "Collection",
             },
         ],
+        // featured post or collection, max 8 featured items
         featuredItems: [
             {
                 itemId: {
@@ -131,14 +121,32 @@ const userSchema = new Schema(
                 },
             },
         ],
+        followers: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
+        following: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
+        totalFollowers: {
+            type: Number,
+            default: 0,
+        },
+        totalFollowing: {
+            type: Number,
+            default: 0,
+        },
     },
     { timestamps: true },
 );
-
-// Limit featured items to 4
+// Limit featured items to 8
 userSchema.path("featuredItems").validate(function (value) {
-    return value.length <= 4;
-}, "Featured items cannot exceed 4");
-
+    return value.length <= 8;
+}, "Featured items cannot exceed 8");
 const User = mongoose.model("User", userSchema);
 module.exports = User;

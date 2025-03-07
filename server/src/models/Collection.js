@@ -1,13 +1,3 @@
-/*
-{
-    "_id": ObjectId("60f6a2c8b2e8c2a123456780"),
-    "title": "Understanding NoSQL for Modern Blogs",
-    "authorId": ObjectId("60f6a2b4a2e8c2a123456789"),
-    "tags": ["MongoDB", "NoSQL", "Blog"],
-    "posts": [],
-}
-*/
-
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
@@ -24,6 +14,7 @@ const collectionSchema = new Schema(
             required: true,
         },
         tags: [
+            // add max 5 limit, default "regular", so 4 more possible
             {
                 type: String,
                 trim: true,
@@ -46,6 +37,13 @@ const collectionSchema = new Schema(
         isPrivate: {
             type: Boolean,
             default: false,
+        },
+        // collections will be promoted through tags similarities of insider posts, their own tags
+        // & upvotes
+        // ai based content scanning can be implemented also
+        upvotes: {
+            type: Number,
+            default: 0,
         },
     },
     { timestamps: true },
