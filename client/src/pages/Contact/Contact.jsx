@@ -36,7 +36,7 @@ const ContactPage = ({ bgClr = "bg-cream-light" }) => {
         <div
             className={`min-h-screen ${bgClr} dark:bg-black dark:text-white pt-8`}
         >
-            <Header />
+            <Header exclude="/contact" />
 
             <main className="max-w-2xl mx-auto px-6 py-16">
                 {/* Header Section */}

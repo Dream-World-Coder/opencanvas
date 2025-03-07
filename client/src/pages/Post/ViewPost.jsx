@@ -228,13 +228,13 @@ Implement this feature in your projects to provide a modern and user-friendly in
                                         {post.publishedAt} · {post.readTime}
                                     </div>
                                     <div className="flex items-center justify-center mt-2 text-white">
-                                        <Heart className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] hover:text-white dark:hover:bg-[#eee] dark:hover:text-black text-red-600" />
+                                        <Heart className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] text-red-600 hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
                                         <span className="w-px h-[15px] dark:bg-[#ccc]/60 bg-[#444]/60" />
-                                        <Bookmark className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
+                                        <Bookmark className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] text-black hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
                                         <span className="w-px h-[15px] dark:bg-[#ccc]/60 bg-[#444]/60" />
-                                        <Share2 className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
+                                        <Share2 className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] text-black hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
                                         <span className="w-px h-[15px] dark:bg-[#ccc]/60 bg-[#444]/60" />
-                                        <MoreHorizontal className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
+                                        <MoreHorizontal className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] text-black hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
                                     </div>
                                 </div>
                             </div>
