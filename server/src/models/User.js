@@ -28,6 +28,11 @@ const userSchema = new Schema(
             type: String,
             required: true,
         },
+        provider: {
+            type: String,
+            enum: ["google", "opencanvas"],
+            required: true,
+        },
         profilePicture: {
             type: String,
             default: "https://opencanvas.blog/defaults/profile.jpeg",

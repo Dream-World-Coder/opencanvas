@@ -32,15 +32,15 @@ passport.use(
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
-                // Find if user already exists
+                // checking if user already exists
                 let user = await User.findOne({
                     email: profile.emails[0].value,
                 });
 
                 if (user) {
-                    // Update login info
+                    // login info update
                     if (user.lastFiveLogin.length >= 5) {
-                        user.lastFiveLogin.pop(); // pop oldest
+                        user.lastFiveLogin.pop(); // oldest popped
                     }
 
                     user.lastFiveLogin.unshift({
@@ -52,16 +52,15 @@ passport.use(
 
                     await user.save();
                 } else {
-                    // Create new user
+                    // new user creating
                     const newUser = new User({
                         username:
                             profile.emails[0].value.split("@")[0].slice(0, 4) +
                             generateRandomAlphanumeric(4),
-                        fullName: profile.displayName || "Google User",
+                        fullName: profile.displayName || "User",
                         email: profile.emails[0].value,
-                        passwordHash:
-                            "google-auth-" +
-                            bcrypt.hashSync(Math.random().toString(), 10), // Random password
+                        passwordHash: "google-hash",
+                        provider: "google",
                         profilePicture:
                             profile.photos[0]?.value ||
                             "https://opencanvas.blog/defaults/profile.png",
@@ -86,7 +85,7 @@ passport.use(
     ),
 );
 
-// Serialize and deserialize user
+// serialize and deserialize user
 passport.serializeUser((user, done) => {
     done(null, user.id);
 });
