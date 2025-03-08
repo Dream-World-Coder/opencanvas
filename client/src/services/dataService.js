@@ -1,4 +1,3 @@
-// src/services/dataService.js
 import { useAuth } from "../contexts/AuthContext";
 
 export const useDataService = () => {

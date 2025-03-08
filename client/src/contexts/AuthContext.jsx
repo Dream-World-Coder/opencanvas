@@ -1,5 +1,3 @@
-// src/contexts/AuthContext.js
-
 import { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
@@ -18,8 +16,7 @@ export const AuthProvider = ({ children }) => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 
-    // API URL
-    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    const API_URL = import.meta.env.BACKEND_API_URL || "http://localhost:3000";
 
     // Setup axios instance with auth headers
     const authAxios = axios.create({
@@ -72,6 +69,8 @@ export const AuthProvider = ({ children }) => {
         loadUser();
     }, []);
 
+    // not needed now
+    /*
     // Register with email/password
     const register = async (userData) => {
         setError(null);
@@ -113,8 +112,9 @@ export const AuthProvider = ({ children }) => {
             return false;
         }
     };
+    */
 
-    // Handle Google Auth success
+    // hangle google-auth success
     const handleGoogleAuthSuccess = async () => {
         const token = searchParams.get("token");
 
@@ -138,7 +138,7 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // Load user data using token
+    // load user data from /auth/user route of backend
     const loadUserData = async (token) => {
         try {
             const config = {
@@ -155,20 +155,18 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // Logout
     const logout = () => {
         localStorage.removeItem("authToken");
         setCurrentUser(null);
         navigate("/login");
     };
 
-    // Value object to provide through context
     const value = {
         currentUser,
         loading,
         error,
-        register,
-        login,
+        // register,
+        // login,
         logout,
         handleGoogleAuthSuccess,
         authAxios,

@@ -11,7 +11,7 @@ import {
     Bookmark,
     Share2,
     MoreHorizontal,
-    Heart,
+    ThumbsUp,
     MessageSquareText,
 } from "lucide-react";
 
@@ -39,51 +39,9 @@ function useDarkMode() {
 
 const ViewPost = ({ postId }) => {
     const isDark = useDarkMode();
-    const data = `In modern web development, providing a seamless user experience is crucial. One way to achieve this is by aligning your website's appearance with the user's system preferences, such as dark mode. This blog will guide you through detecting system dark mode using pure JavaScript and applying dynamic styles accordingly.
-### Why Detect Dark Mode?
-> Dark mode has become a popular feature across various platforms due to its aesthetic appeal and reduced eye strain in low-light environments. Automatically switching your website's theme based on the user's preference can enhance the overall user experience.
-### Detecting Dark Mode in JavaScript
-JavaScript provides a straightforward way to detect if the user has enabled dark mode using the \`window.matchMedia()\` method.
-\`\`\`javascript
-const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-console.log(\`System Dark Mode: \${isDarkMode}');
-\`\`\`
-The \`prefers-color-scheme\` media query checks the user's system preference, and \`.matches\` returns \`true\` if dark mode is enabled.
-### Listening for Dark Mode Changes
-Users can switch between light and dark mode at any time. To ensure your website adapts dynamically, listen for changes using the \`addEventListener\` method:
-\`\`\`javascript
-const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-mediaQuery.addEventListener('change', (event) => {
-    if (event.matches) {
-        console.log('Dark mode is ON');
-        document.body.classList.add('dark');
-    } else {
-        console.log('Dark mode is OFF');
-        document.body.classList.remove('dark');
-    }
-});
-\`\`\`
-### Applying Styles Dynamically
-Combine the detection logic with CSS classes to apply dark mode styles dynamically:
-\`\`\`css
-body.dark {
-    background-color: #121212;
-    color: #ffffff;
-}
-body {
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-\`\`\`
-![img](https://picsum.photos/1200)
-### Best Practices
+    const data = ``;
 
-- Use \`transition\` properties to create smooth visual effects.
-- Allow users to override system preferences with manual toggle switches.
-- Test your implementation on different devices and browsers.
-
-### Conclusion
-Detecting and applying system dark mode in JavaScript is a simple yet effective way to enhance user experience. By combining media queries, event listeners, and dynamic class manipulation, you can create a visually adaptive website that caters to user preferences.
-Implement this feature in your projects to provide a modern and user-friendly interface.`;
+    const [focusMode, setFocusMode] = useState(!false);
 
     const readOptions = [
         { name: "Home", href: "#" },
@@ -193,29 +151,46 @@ Implement this feature in your projects to provide a modern and user-friendly in
             </Helmet>
 
             <div className="w-full h-full grid place-items-center bg-white dark:bg-[#111] overflow-x-hidden pt-20">
-                <Header noBlur={true} ballClr={"text-gray-300"} />
+                <Header
+                    noBlur={true}
+                    ballClr={"text-gray-300"}
+                    exclude={[
+                        "/about",
+                        "/contact",
+                        "/gallery/photos",
+                        "/gallery/literature",
+                    ]}
+                />
                 <div className="flex flex-col md:flex-row max-w-screen-xl mx-auto bg-white dark:bg-[#111] text-gray-900 dark:text-gray-100">
                     {/* Left sidebar - Read Options or folder structure in case of collection */}
-                    <aside className="w-full md:w-64 p-4 border-r border-gray-200 dark:border-[#333] hidden md:block">
-                        <div className="sticky top-4">
-                            <div className="font-bold mb-4">Read Options</div>
-                            {/* big-small font, yellow color bg, serif, modern -- tooltip like */}
-                            <nav className="space-y-2">
-                                {readOptions.map((link, index) => (
-                                    <a
-                                        key={index}
-                                        href={link.href}
-                                        className="block p-2 rounded hover:bg-gray-100 dark:hover:bg-[#222] transition duration-0"
-                                    >
-                                        {link.name}
-                                    </a>
-                                ))}
-                            </nav>
-                        </div>
+                    <aside
+                        className={`w-full md:w-64 p-4 ${!focusMode ? "border-r border-gray-200 dark:border-[#333]" : ""} hidden md:block`}
+                    >
+                        {!focusMode && (
+                            <div className="sticky top-4">
+                                <div className="font-bold mb-4">
+                                    Read Options
+                                </div>
+                                {/* big-small font, yellow color bg, serif, modern -- tooltip like */}
+                                <nav className="space-y-2">
+                                    {readOptions.map((link, index) => (
+                                        <a
+                                            key={index}
+                                            href={link.href}
+                                            className="block p-2 rounded hover:bg-gray-100 dark:hover:bg-[#222] transition duration-0"
+                                        >
+                                            {link.name}
+                                        </a>
+                                    ))}
+                                </nav>
+                            </div>
+                        )}
                     </aside>
 
                     {/* Main content */}
-                    <main className="flex-1 p-4 md:p-6 lg:p-8 min-h-screen border-r border-gray-200 dark:border-[#333]">
+                    <main
+                        className={`flex-1 p-4 md:p-6 lg:p-8 min-h-screen ${!focusMode ? "border-r border-gray-200 dark:border-[#333]" : ""}`}
+                    >
                         {/* Article header */}
                         <div className="mb-8">
                             <div className="flex items-center mb-4">
@@ -244,7 +219,7 @@ Implement this feature in your projects to provide a modern and user-friendly in
                                         {post.publishedAt} · {post.readTime}
                                     </div>
                                     <div className="flex items-center justify-center mt-2 text-white">
-                                        <Heart className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] text-red-600 hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
+                                        <ThumbsUp className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] text-blue-600 hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
                                         <span className="w-px h-[15px] dark:bg-[#ccc]/60 bg-[#444]/60" />
                                         <Bookmark className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] dark:text-white text-black hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
                                         <span className="w-px h-[15px] dark:bg-[#ccc]/60 bg-[#444]/60" />
@@ -288,7 +263,7 @@ Implement this feature in your projects to provide a modern and user-friendly in
                                     size="sm"
                                     className="flex items-center gap-2"
                                 >
-                                    <Heart className="size-4 text-red-600" />
+                                    <ThumbsUp className="size-4 text-blue-600" />
                                     <span>{post.likes}</span>
                                 </Button>
                                 <Button

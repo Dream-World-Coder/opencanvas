@@ -11,11 +11,7 @@ const Header = ({ filters }) => {
     const [createMenuOpen, setCreateMenuOpen] = useState(false);
     const { currentUser } = useAuth();
 
-    let navLinks = [
-        { name: "Photos", href: "/gallery/photos" },
-        { name: "About", href: "/about" },
-        { name: "Contact", href: "/contact" },
-    ];
+    let navLinks = [];
     if (!currentUser) {
         navLinks.push({ name: "Login", href: "/login" });
     }
@@ -24,14 +20,14 @@ const Header = ({ filters }) => {
     }
 
     return (
-        <header className="fixed top-0 w-full bg-white/20 backdrop-blur-md z-50 border-none border-gray-100 dark:bg-[#111] dark:border-none dark:text-white">
-            <div className="max-w-[1400px] mx-auto px-6 py-6">
-                <div className="flex flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
-                    <h1 className="text-2xl font-stardom font-semibold tracking-tight">
+        <header className="fixed top-0 w-full bg-white z-50 border-b border-gray-100 dark:bg-[#111] dark:border-[#222] dark:text-white">
+            <div className="max-w-7xl mx-auto px-3 py-0 md:px-0 md:py-2">
+                <div className="flex flex-row justify-between items-center">
+                    <h1 className="text-lg md:text-2xl font-stardom font-semibold tracking-tight">
                         Literature Gallery
-                        {/* Filters */}
-                        <div className="flex items-center space-x-6">
-                            <div className="hidden md:flex items-center space-x-4">
+                        {/* desktop filters */}
+                        <div className="hidden md:flex items-center space-x-6">
+                            <div className="items-center space-x-4">
                                 {filters.map((filter) => (
                                     <button
                                         key={filter}
@@ -48,35 +44,13 @@ const Header = ({ filters }) => {
                                     </button>
                                 ))}
                             </div>
-                            <Filter
-                                className="md:hidden"
-                                onClick={() => {
-                                    setMobileFilterOpen(!mobileFilterOpen);
-                                }}
-                            />
                         </div>
-                        {mobileFilterOpen && (
-                            <div className="flex flex-col md:hidden items-start justify-center space-x-4 border-t border-[#888]">
-                                {filters.map((filter) => (
-                                    <button
-                                        key={filter}
-                                        onClick={() =>
-                                            setSelectedFilter(filter)
-                                        }
-                                        className={`text-lg font-sans capitalize ${
-                                            selectedFilter === filter
-                                                ? "text-black font-medium dark:text-[#fff]"
-                                                : "text-gray-400 hover:text-gray-600 font-thind dark:text-[#f1f1f1] dark:hover:text-[#f1f1f1]"
-                                        }`}
-                                    >
-                                        {filter}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
                     </h1>
+
+                    {/* desktop search & create */}
                     <div className="hidden md:flex items-center space-x-2">
-                        <SearchBar />
+                        <SearchBar round={true} hideSubmitBtn={true} />
+
                         {navLinks.map((link, index) => (
                             <React.Fragment key={index}>
                                 <a
@@ -102,6 +76,7 @@ const Header = ({ filters }) => {
                                 )}
                             </React.Fragment>
                         ))}
+
                         {/* Create Button with Dropdown */}
                         <div className="relative">
                             <button
@@ -151,59 +126,84 @@ const Header = ({ filters }) => {
                         </div>
                     </div>
 
-                    <div className="md:hidden flex items-center justify-center gap-2">
+                    {/* mobile options */}
+                    <div className="flex md:hidden items-center justify-center gap-3">
+                        <Filter
+                            className="md:hidden size-4"
+                            onClick={() => {
+                                setMobileFilterOpen(!mobileFilterOpen);
+                            }}
+                        />
+
                         {/* Mobile Create Button */}
                         <button
                             onClick={() => setCreateMenuOpen(!createMenuOpen)}
-                            className="w-fit p-1 flex items-center justify-center bg-black text-white rounded-full hover:bg-stone-800/90 transition-colors"
+                            className="text-black dark:text-white"
                         >
                             {createMenuOpen ? (
-                                <X className="w-4 h-4" />
+                                <X className="size-5" />
                             ) : (
-                                <Plus className="w-4 h-4" />
+                                <Plus className="size-5" />
                             )}
                         </button>
 
                         {/* Mobile Menu Button */}
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="md:hidden p-2 hover:bg-white/50 rounded-sm transition-colors"
+                            className="md:hidden hover:bg-white/50 rounded-sm transition-colors"
                             aria-label="Toggle menu"
                         >
                             {isMenuOpen ? (
-                                <X className="h-6 w-6 text-stone-600" />
+                                <X className="size-5 text-stone-600" />
                             ) : (
-                                <Menu className="h-6 w-6 text-stone-600" />
+                                <Menu className="size-5 text-stone-600" />
                             )}
                         </button>
-
-                        {createMenuOpen && (
-                            <div className="absolute top-20 right-0 w-64 bg-white border border-gray-100 rounded-lg shadow-lg py-2 z-50">
-                                {createOptions.map((option) => (
-                                    <a
-                                        key={option.id}
-                                        className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
-                                        onClick={() => {
-                                            setCreateMenuOpen(false);
-                                            localStorage.removeItem("blogPost");
-                                        }}
-                                        href={option.href}
-                                    >
-                                        <div
-                                            className={`p-2 rounded-full ${option.color}`}
-                                        >
-                                            <option.icon className="w-4 h-4 text-white" />
-                                        </div>
-                                        <span className="flex items-center justify-center gap-3">
-                                            {option.label}{" "}
-                                            <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700" />
-                                        </span>
-                                    </a>
-                                ))}
-                            </div>
-                        )}
                     </div>
                 </div>
+
+                {mobileFilterOpen && (
+                    <div className="flex flex-col md:hidden items-center justify-center space-x-4">
+                        {filters.map((filter) => (
+                            <button
+                                key={filter}
+                                onClick={() => setSelectedFilter(filter)}
+                                className={`text-lg font-sans capitalize ${
+                                    selectedFilter === filter
+                                        ? "text-black font-medium dark:text-[#fff]"
+                                        : "text-gray-400 hover:text-gray-600 font-thind dark:text-[#f1f1f1] dark:hover:text-[#f1f1f1]"
+                                }`}
+                            >
+                                {filter}
+                            </button>
+                        ))}
+                    </div>
+                )}
+                {createMenuOpen && (
+                    <div className="flex flex-col md:hidden w-64 bg-white border border-gray-100 rounded-lg shadow-lg py-2 z-50">
+                        {createOptions.map((option) => (
+                            <a
+                                key={option.id}
+                                className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
+                                onClick={() => {
+                                    setCreateMenuOpen(false);
+                                    localStorage.removeItem("blogPost");
+                                }}
+                                href={option.href}
+                            >
+                                <div
+                                    className={`p-2 rounded-full ${option.color}`}
+                                >
+                                    <option.icon className="w-4 h-4 text-white" />
+                                </div>
+                                <span className="flex items-center justify-center gap-3">
+                                    {option.label}{" "}
+                                    <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700" />
+                                </span>
+                            </a>
+                        ))}
+                    </div>
+                )}
                 <div
                     className={`md:hidden absolute left-0 right-0 bg-white backdrop-blur-md
                         border-b border-stone-200/50 transition-all duration-300 ease-in-out ${
@@ -213,7 +213,7 @@ const Header = ({ filters }) => {
                         }`}
                 >
                     <div className="px-4 py-6 space-y-6">
-                        {/* Mobile Nav Links */}
+                        {/* mobile nav links */}
                         <div className="flex flex-col">
                             {navLinks.map((link, index) => (
                                 <a

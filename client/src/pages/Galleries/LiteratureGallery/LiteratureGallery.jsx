@@ -1,15 +1,21 @@
 import { useState, useEffect } from "react";
-import { Heart, Bookmark, ArrowRight } from "lucide-react";
+import { Heart, MessageSquareText, ArrowRight } from "lucide-react";
 import stories from "./Stories";
 // import Footer from "../../../components/Footer/GalleryFooter";
 import Header from "../../../components/Header/GalleryHeader";
-import vineSvg from "../../../assets/icons/vine.svg";
+// import vineSvg from "../../../assets/icons/vine.svg";
 
 const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
     const [scrollY, setScrollY] = useState(0);
-    const [hoveredId, setHoveredId] = useState(null);
 
-    const filters = ["all", "stories", "poems", "romance", "experience"];
+    const filters = [
+        "all",
+        "romance",
+        "experience",
+        "horror",
+        "sad",
+        "fantasy",
+    ];
 
     useEffect(() => {
         const isMobile = /Mobi|Android/i.test(navigator.userAgent);
@@ -30,13 +36,8 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
             className={`min-h-screen ${bgClr} dark:bg-black dark:text-[#f2f2f2] pt-24`}
         >
             <Header filters={filters} />
-
-            {/* Top / Hero */}
-            {/* ----------------------------------- */}
-            {/* Replace some portions with various filters, and no love/save/author viewing form here, its just preview */}
-            {/* ----------------------------------- */}
-            <div
-                className={`relative h-32 md:h-72 overflow-hidden bg-inherit border-b border-gray-200 dark:border-[#333]`}
+            {/* <div
+                className={`relative h-32 md:h-52 overflow-hidden bg-inherit border-b border-gray-200 dark:border-[#333]`}
                 style={{
                     transform: `translateY(${scrollY * 0.2}px)`,
                 }}
@@ -45,39 +46,27 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
                     <div className="text-center px-6">
                         <h1 className="text-3xl text-stone-800 mb-3 tracking-wide font-scribe pointer-events-none md:pointer-events-auto">
                             <span className="relative px-4 pt-3 dark:invert">
-                                Literary Collection
+                                A gathering of thoughts, verses, and tales
                                 <img
-                                    className="hidden md:block object-cover w-16 absolute opacity-70 top-[-28%] left-[110%]"
+                                    className="hidden md:block object-cover w-16 absolute opacity-70 top-[-32%] left-[100%]"
                                     src={vineSvg}
                                     alt=""
                                 />
                             </span>
                         </h1>
-                        <p
-                            className="hidden md:flex flex-col text-sm text-stone-600 tracking-wide font-bold
-                            items-center justify-center dark:text-[#f5f5f5]
-                            md:font-light font-serif pointer-events-none md:pointer-events-auto"
-                        >
-                            A gathering of thoughts, verses, and tales
-                        </p>
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             {/* Main Content */}
-            <div className="max-w-3xl mx-auto px-4 py-16 border-x border-gray-200 dark:border-[#333]">
-                <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+            <div className="max-w-3xl mx-auto pb-24">
+                <div className="grid grid-cols-1 w-full">
                     {stories.map((story, index) => (
-                        <article
-                            key={index}
-                            className=""
-                            onMouseEnter={() => setHoveredId(story.id)}
-                            onMouseLeave={() => setHoveredId(null)}
-                        >
+                        <article key={index} className="w-full">
                             <div
-                                className={`bg-gradient-to-br ${story.gradient} p-8 border-b border-stone-200
+                                className={`p-8 border-b border-stone-200
                                     hover:border-stone-300 transition-all duration-500 group
-                                    hover:shadow-lg hover:shadow-stone-100/50 rounded dark:shadow-none dark:border-[#333] dark:hover:shadow-none dark:hover:border-[#333]`}
+                                    hover:shadow-lg hover:shadow-stone-100/50 dark:shadow-none dark:border-[#333] dark:hover:shadow-none dark:hover:border-[#333]`}
                             >
                                 <header className="mb-6">
                                     <div className="flex justify-between items-center mb-4">
@@ -103,9 +92,9 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
                                 </header>
 
                                 <div className="mb-6">
-                                    <p className="text-md leading-relaxed text-stone-700 whitespace-pre-line font-light dark:text-gray-300">
-                                        {story.excerpt.length > 150
-                                            ? `${story.excerpt.slice(0, 150)}...`
+                                    <p className="text-base leading-relaxed text-stone-700 whitespace-pre-line font-light dark:text-gray-300">
+                                        {story.excerpt.length > 300
+                                            ? `${story.excerpt.slice(0, 300)}...`
                                             : story.excerpt}
                                     </p>
                                 </div>
@@ -117,7 +106,7 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
                                             <span>{story.likes}</span>
                                         </button>
                                         <button className="flex items-center space-x-1 text-xs hover:text-stone-700 transition-colors cursor-auto dark:text-gray-200 dark:hover:text-gray-200">
-                                            <Bookmark size={14} />
+                                            <MessageSquareText size={14} />
                                             <span>{story.saves}</span>
                                         </button>
                                     </div>

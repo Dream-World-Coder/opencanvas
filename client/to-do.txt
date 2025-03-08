@@ -122,3 +122,23 @@ show articles instead of literature gallery
 // img options are for pdf export only
 
 -- in profile prevent remap of existing elements when more are loaded
+
+-- dark mode in imgUpload page
+
+-- last 5 logins in /profile/settings
+
+
+-- no need of photo gallery, its simply not for that level of photography
+-- remove photography from keywords
+
+-- mailly ffor written art
+images in articles and thumbnails
+
+-- 1 blog browser : only aericles
+-- 2 written posts : literature gallery
+
+else focus will be gone by browsing different sections, here browse one type of thing
+
+and in the feed, imgs will not be recommended or will be less recommended, they will be in the profile only
+
+collections, imgs, books etc will not be in feed, will only gen when searched for.

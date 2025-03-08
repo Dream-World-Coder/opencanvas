@@ -100,7 +100,7 @@ export default function App() {
 
                             <Route path="/markdown2pdf" element={<Md2Pdf />} />
 
-                            <Route path="/vp" element={<ViewPost />} />
+                            <Route path="/p/:postId" element={<ViewPost />} />
                             <Route
                                 path="/u/:username"
                                 element={<PublicProfile bgClr="bg-white" />}

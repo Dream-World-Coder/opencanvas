@@ -7,7 +7,7 @@ import SearchBar from "../SearchBar";
 const Header = ({
     noBlur = false,
     ballClr = "text-lime-300",
-    exclude = "",
+    exclude = [""],
 }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [createMenuOpen, setCreateMenuOpen] = useState(false);
@@ -46,14 +46,14 @@ const Header = ({
                                 opencanvas
                             </span>
                         </a>
-                        <SearchBar />
+                        <SearchBar round={true} hideSubmitBtn={true} />
                     </div>
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center space-x-2">
                         {navLinks.map((link, index) => (
                             <React.Fragment key={index}>
-                                {link.href !== exclude && (
+                                {!exclude.includes(link.href) && (
                                     <>
                                         <a
                                             href={link.href}
