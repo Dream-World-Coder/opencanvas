@@ -6,8 +6,8 @@ export function useWritingPad({ postId, frontendOnly }) {
     const [content, setContent] = useState("");
     const [twoColumn, setTwoColumn] = useState(false);
     const [isSaved, setIsSaved] = useState(true);
-    const [lastSynced, setLastSynced] = useState(null);
-    const [syncStatus, setSyncStatus] = useState("synced"); // 'synced', 'saving', 'offline'
+    // const [lastSynced, setLastSynced] = useState(null);
+    // const [syncStatus, setSyncStatus] = useState("synced"); // 'synced', 'saving', 'offline'
     const [showUnsavedAlert, setShowUnsavedAlert] = useState(false);
     const [tags, setTags] = useState(["regular"]);
     const [isPublic, setIsPublic] = useState(true);
@@ -38,11 +38,11 @@ export function useWritingPad({ postId, frontendOnly }) {
 
         // device online check
         if (!navigator.onLine) {
-            setSyncStatus("offline");
+            // setSyncStatus("offline");
             return;
         }
 
-        setSyncStatus("saving");
+        // setSyncStatus("saving");
 
         try {
             // title must not be empty
@@ -82,7 +82,7 @@ export function useWritingPad({ postId, frontendOnly }) {
             if (data.success) {
                 setIsSaved(true);
                 setSyncStatus("synced");
-                setLastSynced(new Date());
+                // setLastSynced(new Date());
                 toast.success("Post saved successfully", {
                     style: {
                         backgroundColor: "#f5f5f5",
@@ -113,7 +113,7 @@ export function useWritingPad({ postId, frontendOnly }) {
         // tmp api handling for backend
         setTimeout(() => {
             setSyncStatus("synced");
-            setLastSynced(new Date());
+            // setLastSynced(new Date());
             return;
         }, 200);
 
@@ -180,7 +180,7 @@ export function useWritingPad({ postId, frontendOnly }) {
                             JSON.parse(localDraft);
                         setTitle(title);
                         setContent(content);
-                        setSyncStatus("offline");
+                        // setSyncStatus("offline");
                     }
                 }
             }
@@ -230,12 +230,12 @@ export function useWritingPad({ postId, frontendOnly }) {
      */
     useEffect(() => {
         const handleOnline = () => {
-            setSyncStatus("synced");
+            // setSyncStatus("synced");
             syncPendingChanges();
         };
 
         const handleOffline = () => {
-            setSyncStatus("offline");
+            // setSyncStatus("offline");
         };
 
         window.addEventListener("online", handleOnline);
@@ -303,8 +303,8 @@ export function useWritingPad({ postId, frontendOnly }) {
         setContent,
         isSaved,
         setIsSaved,
-        syncStatus,
-        lastSynced,
+        // syncStatus,
+        // lastSynced,
         showUnsavedAlert,
         setShowUnsavedAlert,
         handleSave,
