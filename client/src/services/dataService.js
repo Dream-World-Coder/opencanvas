@@ -1,4 +1,5 @@
 import { useAuth } from "../contexts/AuthContext";
+import { toast } from "sonner";
 
 export const useDataService = () => {
     const { authAxios } = useAuth();
@@ -15,15 +16,20 @@ export const useDataService = () => {
     };
 
     // Post related functions
-    const createPost = async (postData) => {
+    const getNewPostId = async () => {
         try {
-            const response = await authAxios.post("/posts", postData);
-            return response.data;
+            const response = await authAxios.post("/newpost/written/getId");
+            console.log(response);
+            console.log(response.data.newPostId);
+            return response.data.newPostId;
         } catch (error) {
             console.error("Error creating post:", error);
+            toast("Error getting post id");
             throw error;
         }
     };
+
+    // createPost
 
     const getUserPosts = async (userId) => {
         try {
@@ -65,7 +71,7 @@ export const useDataService = () => {
         }
     };
 
-    const lovePost = async (postId) => {
+    const likePost = async (postId) => {
         try {
             const response = await authAxios.post(`/posts/${postId}/love`);
             return response.data;
@@ -175,12 +181,12 @@ export const useDataService = () => {
         getUserProfile,
 
         // Posts
-        createPost,
+        getNewPostId,
         getUserPosts,
         getPostById,
         updatePost,
         deletePost,
-        lovePost,
+        likePost,
         savePost,
 
         // Collections

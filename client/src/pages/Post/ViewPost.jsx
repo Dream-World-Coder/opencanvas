@@ -41,7 +41,7 @@ const ViewPost = ({ postId }) => {
     const isDark = useDarkMode();
     const data = ``;
 
-    const [focusMode, setFocusMode] = useState(!false);
+    const [focusMode, setFocusMode] = useState(false);
 
     const readOptions = [
         { name: "Home", href: "#" },

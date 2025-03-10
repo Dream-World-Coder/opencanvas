@@ -46,11 +46,24 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 import {
     MarkdownPreview,
     LinkInsertButton,
     ImageUploadButton,
     ScrollToBottomButton,
+    TagInputComponent,
+    ThumbnailUploader,
+    PublicPreferenceInput,
     formattingButtons,
     rawText,
 } from "./WritingComponents";
@@ -61,21 +74,26 @@ import { useEditorFormatting } from "./hooks/useEditorFormatting";
 import { useEditorAppearance } from "./hooks/useEditorAppearance";
 import { useExport } from "./hooks/useExport";
 
+import { useAuth } from "../../../contexts/AuthContext";
+import { useDataService } from "../../../services/dataService";
+
 /**
  • supports latex && easy to use + image upload, easily give gap, cuz supports html
  • ^%SOS# for unTested code
  • post click : edit preview settings
  */
 const WritingPad = ({ artType = "article" }) => {
+    const { getNewPostId } = useDataService();
+    const { currentUser } = useAuth();
+
     const navigate = useNavigate();
 
     const [postId, setPostId] = useState("");
     useEffect(() => {
-        const id = ObjectId();
-        setPostId(id.toString());
+        setPostId(getNewPostId());
     }, []);
 
-    const [frontendOnly, setFrontendOnly] = useState(false);
+    const [frontendOnly, _] = useState(false);
 
     // Core writing pad functionality
     const {
@@ -92,6 +110,10 @@ const WritingPad = ({ artType = "article" }) => {
         handleSave,
         twoColumn,
         setTwoColumn,
+        tags,
+        setTags,
+        isPublic,
+        setIsPublic,
     } = useWritingPad({ postId, frontendOnly });
 
     // Editor formatting functionality
@@ -198,13 +220,13 @@ const WritingPad = ({ artType = "article" }) => {
                                         }
                                         navigate("/profile");
                                     }}
-                                    className="hover:opacity-70 transition-opacity"
+                                    className="hover:opacity-70 transition-opacity p-1 border rounded-full"
                                 >
                                     <ArrowLeft className="w-5 h-5" />
                                 </button>
                                 <div className="hidden md:flex items-center space-x-2">
                                     <button
-                                        className={`px-3 py-1 rounded-full text-sm ${isDark ? "bg-white text-black hover:text-green-600" : "bg-[#222] text-white hover:text-green-300"}`}
+                                        className={`text-base hover:text-green-600 underline underline-offset-2 decoration-lime-300/60 decoration-4 ${isDark ? "text-white" : "text-black"}`}
                                     >
                                         {artType}
                                     </button>
@@ -213,18 +235,52 @@ const WritingPad = ({ artType = "article" }) => {
 
                             {/* options */}
                             <div className="flex items-center space-x-3 md:space-x-4">
-                                {/* save btn */}
-                                <button
-                                    className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm ${
-                                        isSaved
-                                            ? "text-gray-400"
-                                            : "bg-[#222] text-white"
-                                    }`}
-                                    onClick={handleSave}
-                                >
-                                    <Save className="size-4" />
-                                    <span>{isSaved ? "Saved" : "Save"}</span>
-                                </button>
+                                {/* publish btn */}
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <button
+                                            className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm bg-lime-500 text-white`}
+                                        >
+                                            publish
+                                        </button>
+                                    </DialogTrigger>
+                                    <DialogContent className="max-w-6xl h-screen md:h-auto">
+                                        <DialogHeader>
+                                            <DialogTitle>
+                                                Publish {artType}
+                                            </DialogTitle>
+                                            <DialogDescription>
+                                                account: {currentUser.email}
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="flex  flex-col md:flex-row items-start justify-center gap-4 md:gap-16 p-4">
+                                            <div>
+                                                <TagInputComponent
+                                                    tags={tags}
+                                                    setTags={setTags}
+                                                />
+                                                <PublicPreferenceInput
+                                                    isPublic={isPublic}
+                                                    setIsPublic={setIsPublic}
+                                                />
+                                            </div>
+                                            <ThumbnailUploader
+                                                artType={artType}
+                                                maxSize={5}
+                                            />
+                                        </div>
+
+                                        <DialogFooter>
+                                            <Button
+                                                type="submit"
+                                                onClick={handleSave}
+                                                className="bg-lime-500 rounded-full hover:bg-lime-500"
+                                            >
+                                                Publish
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
 
                                 {/* preview btn */}
                                 {!twoColumn && (
@@ -253,35 +309,6 @@ const WritingPad = ({ artType = "article" }) => {
                                         )}
                                     </button>
                                 )}
-
-                                {/* sync btn */}
-                                <button className="hidden md:flex items-center space-x-2 text-sm size-auto z-50">
-                                    {syncStatus === "offline" ? (
-                                        <>
-                                            <WifiOff className="size-3 md:size-4 text-yellow-500" />
-                                            <span className="text-yellow-500">
-                                                Offline
-                                            </span>
-                                        </>
-                                    ) : syncStatus === "saving" ? (
-                                        <>
-                                            <Wifi className="size-3 md:size-4 text-blue-500" />
-                                            <span className="text-blue-500">
-                                                Saving...
-                                            </span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Wifi className="size-3 md:size-4 text-green-600" />
-                                            <span className="text-green-600">
-                                                Synced{" "}
-                                                {lastSynced
-                                                    ? `at ${lastSynced.toLocaleTimeString()}`
-                                                    : ""}
-                                            </span>
-                                        </>
-                                    )}
-                                </button>
 
                                 {/* export dropdown */}
                                 <DropdownMenu>
@@ -551,7 +578,7 @@ const WritingPad = ({ artType = "article" }) => {
                     </div>
                 </div>
 
-                {/* Custom Unsaved Changes Alert */}
+                {/* unsaved changes alert */}
                 {showUnsavedAlert && (
                     <div className="fixed inset-0 bg-[#222] bg-opacity-20 flex items-center justify-center z-20">
                         <Alert className="w-96 relative">
@@ -579,9 +606,10 @@ const WritingPad = ({ artType = "article" }) => {
                                             Save Changes
                                         </button>
                                         <button
-                                            onClick={() =>
-                                                setShowUnsavedAlert(false)
-                                            }
+                                            onClick={() => {
+                                                setShowUnsavedAlert(false);
+                                                window.history.back();
+                                            }}
                                             className="px-3 py-1.5 border border-gray-300 rounded-md text-sm hover:bg-gray-50 transition-colors"
                                         >
                                             Dismiss

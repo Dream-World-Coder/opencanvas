@@ -16,6 +16,7 @@ import {
     FileJson,
     LetterText,
     X,
+    Upload,
 } from "lucide-react";
 import PropTypes from "prop-types";
 // ***************************************************
@@ -919,6 +920,293 @@ ScrollToBottomButton.propTypes = {
     rounded: PropTypes.string,
     size: PropTypes.string,
     isDark: PropTypes.bool,
+};
+
+export const TagInputComponent = ({
+    tags,
+    setTags,
+    MAX_TAGS = 4,
+    MAX_TAG_LENGTH = 30,
+}) => {
+    const [inputValue, setInputValue] = useState("");
+    const [error, setError] = useState("");
+
+    const validateTags = (tagArray) => {
+        // Remove empty tags and trim whitespace
+        const processedTags = tagArray
+            .map((tag) => tag.trim())
+            .filter((tag) => tag.length > 0);
+
+        // Check for maximum number of tags
+        if (processedTags.length > MAX_TAGS) {
+            setError(`Maximum ${MAX_TAGS} tags allowed`);
+            return false;
+        }
+
+        // Check for tag length
+        for (const tag of processedTags) {
+            if (tag.length > MAX_TAG_LENGTH) {
+                setError(
+                    `Tag "${tag}" exceeds maximum length of ${MAX_TAG_LENGTH} characters`,
+                );
+                return false;
+            }
+
+            // Check for spaces within tags
+            if (tag.includes(" ")) {
+                setError(`Tag "${tag}" contains spaces, which are not allowed`);
+                return false;
+            }
+        }
+
+        // Check for duplicates
+        const uniqueTags = new Set(processedTags);
+        if (uniqueTags.size !== processedTags.length) {
+            // Find which tag is duplicated
+            const seen = new Set();
+            for (const tag of processedTags) {
+                if (seen.has(tag)) {
+                    setError(`Duplicate tag "${tag}" is not allowed`);
+                    return false;
+                }
+                seen.add(tag);
+            }
+        }
+
+        setError("");
+        return processedTags;
+    };
+
+    const handleInputChange = (e) => {
+        setInputValue(e.target.value);
+        const newTags = e.target.value.split(",");
+        const validTags = validateTags(newTags);
+
+        if (validTags) {
+            setTags(validTags);
+        }
+    };
+
+    return (
+        <div className="p-2">
+            <h2 className="mb-3">
+                Add relevant tags for your article separated by comma. [up to{" "}
+                {MAX_TAGS} tags]
+            </h2>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+                {/* <Label htmlFor="tags" className="text-left">
+                    Tags:
+                </Label> */}
+                <Input
+                    id="tags"
+                    value={inputValue}
+                    placeholder="Ex: history, physics, deeplearning"
+                    className="col-span-4"
+                    onChange={handleInputChange}
+                />
+            </div>
+
+            {error && (
+                <Alert variant="destructive" className="mt-2">
+                    <AlertDescription>{error}</AlertDescription>
+                </Alert>
+            )}
+
+            <div className="mb-6 mt-4 flex items-start justify-start flex-wrap gap-2">
+                {tags.map((tag) => {
+                    {
+                        return (
+                            tag !== "regular" && (
+                                <span
+                                    key={tag}
+                                    className="px-2 py-1 rounded-full bg-black text-white text-sm"
+                                >
+                                    {tag}
+                                </span>
+                            )
+                        );
+                    }
+                })}
+            </div>
+        </div>
+    );
+};
+
+export const ThumbnailUploader = ({ artType = "article", maxSize = 5 }) => {
+    const [thumbnail, setThumbnail] = useState(null);
+    const [thumbnailURL, setThumbnailURL] = useState("");
+    const [error, setError] = useState("");
+    const [isDragging, setIsDragging] = useState(false);
+    const fileInputRef = useRef(null);
+
+    const MAX_FILE_SIZE = maxSize * 1024 * 1024; // 5MB in bytes
+    const ALLOWED_EXTENSIONS = ["png", "jpeg", "jpg", "webp"];
+
+    const validateFile = (file) => {
+        // Check if file exists
+        if (!file) {
+            setError("Please select a file");
+            return false;
+        }
+
+        // Check file size
+        if (file.size > MAX_FILE_SIZE) {
+            setError(
+                `File size exceeds maximum limit of 5MB. Your file is ${(file.size / (1024 * 1024)).toFixed(2)}MB`,
+            );
+            return false;
+        }
+
+        // Check file extension
+        const extension = file.name.split(".").pop().toLowerCase();
+        if (!ALLOWED_EXTENSIONS.includes(extension)) {
+            setError(
+                `Unsupported file format. Please upload ${ALLOWED_EXTENSIONS.join(", ")} files only`,
+            );
+            return false;
+        }
+
+        setError("");
+        return true;
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+
+        if (validateFile(file)) {
+            setThumbnail(file);
+            const objectUrl = URL.createObjectURL(file);
+            setThumbnailURL(objectUrl);
+        } else {
+            // Reset the input if validation fails
+            e.target.value = "";
+            setThumbnail(null);
+            setThumbnailURL("");
+        }
+    };
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = (e) => {
+        e.preventDefault();
+        setIsDragging(false);
+    };
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        setIsDragging(false);
+
+        const file = e.dataTransfer.files[0];
+        if (validateFile(file)) {
+            setThumbnail(file);
+            const objectUrl = URL.createObjectURL(file);
+            setThumbnailURL(objectUrl);
+
+            // Update the file input for consistency
+            if (fileInputRef.current) {
+                // This is a workaround as we can't directly set the files property
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                fileInputRef.current.files = dataTransfer.files;
+            }
+        }
+    };
+
+    const handleClickUpload = () => {
+        fileInputRef.current?.click();
+    };
+
+    return (
+        <div className="p-2">
+            <h2 className="mb-3">
+                Add a suitable thumbnail for your {artType} to engage more
+                readers.
+            </h2>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+                <div className="col-span-4">
+                    <Input
+                        id="thumbnail"
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
+                        accept=".png,.jpg,.jpeg,.webp"
+                        onChange={handleFileChange}
+                    />
+
+                    <div
+                        className={`w-full border-2 border-dashed rounded-md p-6 text-center ${isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300"}`}
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                        onClick={handleClickUpload}
+                    >
+                        {thumbnailURL ? (
+                            <div className="flex flex-col items-center">
+                                <img
+                                    src={thumbnailURL}
+                                    alt="Thumbnail preview"
+                                    className="max-h-40 mb-2 rounded-md"
+                                />
+                                <p className="text-sm text-gray-500">
+                                    {thumbnail?.name} (
+                                    {(thumbnail?.size / (1024 * 1024)).toFixed(
+                                        2,
+                                    )}
+                                    MB)
+                                </p>
+                                <p className="text-xs text-gray-400 mt-2">
+                                    Click or drag to replace
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center w-full">
+                                <Upload className="h-12 w-12 text-gray-400 mb-2" />
+                                <p className="text-sm font-medium">
+                                    Click to upload or drag and drop
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                    PNG, JPG, JPEG or WebP (max. 5MB)
+                                </p>
+                            </div>
+                        )}
+                    </div>
+
+                    {error && (
+                        <Alert variant="destructive" className="mt-2">
+                            <AlertDescription>{error}</AlertDescription>
+                        </Alert>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export const PublicPreferenceInput = ({ isPublic, setIsPublic }) => {
+    return (
+        <div className="p-2">
+            <h2 className="mb-1">Publish publicly or keep private?</h2>
+            <RadioGroup
+                value={isPublic}
+                onValueChange={setIsPublic}
+                className="flex items-center gap-4"
+            >
+                <div className="flex items-center gap-2">
+                    <RadioGroupItem value={true} id="public" />
+                    <Label htmlFor="public">Public</Label>
+                </div>
+                <div className="flex items-center gap-2">
+                    <RadioGroupItem value={false} id="private" />
+                    <Label htmlFor="private">Link only</Label>
+                </div>
+            </RadioGroup>
+        </div>
+    );
 };
 
 /*

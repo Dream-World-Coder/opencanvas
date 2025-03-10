@@ -9,12 +9,15 @@ export function useWritingPad({ postId, frontendOnly }) {
     const [lastSynced, setLastSynced] = useState(null);
     const [syncStatus, setSyncStatus] = useState("synced"); // 'synced', 'saving', 'offline'
     const [showUnsavedAlert, setShowUnsavedAlert] = useState(false);
-    const [tags, setTags] = useState(["general"]);
-    // const [isPublic, setIsPublic] = useState(true);
+    const [tags, setTags] = useState(["regular"]);
+    const [isPublic, setIsPublic] = useState(true);
     const [media, setMedia] = useState([]);
 
-    const id = ObjectId().toString();
-    if (!postId) postId = id;
+    if (!postId) {
+        console.error("postId not found");
+        postId = localStorage.getItem("newPostId", "");
+    }
+
     const saveDraftLocally = () => {
         const draft = {
             id: postId,
@@ -309,5 +312,9 @@ export function useWritingPad({ postId, frontendOnly }) {
         syncWithBackend,
         twoColumn,
         setTwoColumn,
+        tags,
+        setTags,
+        isPublic,
+        setIsPublic,
     };
 }
