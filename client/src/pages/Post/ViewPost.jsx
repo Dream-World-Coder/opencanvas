@@ -1,12 +1,12 @@
-// Its the public view --> add options like link share
-
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
-import Header from "../../components/Header/Header"; // add prop to implement non blur & color of *
+import Header from "../../components/Header/Header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents"; // add prop: in edit: for image pop regulate
+import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
+import { useDataService } from "../../services/dataService";
+import { useParams } from "react-router-dom";
 import {
     Bookmark,
     Share2,
@@ -14,6 +14,8 @@ import {
     ThumbsUp,
     MessageSquareText,
 } from "lucide-react";
+import { moreFromAuthor, relatedPosts } from "./data";
+import { toast } from "sonner";
 
 function useDarkMode() {
     const getDarkMode = () =>
@@ -37,11 +39,71 @@ function useDarkMode() {
     return isDark;
 }
 
-const ViewPost = ({ postId }) => {
-    const isDark = useDarkMode();
-    const data = ``;
+function sharePost(post) {
+    const baseUrl = window.location.origin;
+    const postUrl = `${baseUrl}/p/${post._id}`;
 
-    const [focusMode, setFocusMode] = useState(false);
+    navigator.clipboard
+        .writeText(postUrl)
+        .then(() => {
+            toast.success("Link copied to clipboard!");
+        })
+        .catch((err) => {
+            console.error("Failed to copy link:", err);
+            toast.error("Faild to copy link");
+        });
+}
+
+const ViewPost = () => {
+    const { postId } = useParams();
+    const { getPostById } = useDataService();
+    const isDark = useDarkMode();
+    const [focusMode, _] = useState(false);
+
+    const [post, setPost] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    /* It works because of the loading state,
+    the rendering is starting before the useEffect completion,
+    thus post.title is undefined. -> not acctually,
+    i mean many be the return() executes first before postId gets to change and ask for an re-render
+    But with loading on, the return statement is only a simple html, so it works */
+
+    useEffect(() => {
+        async function fetchPost() {
+            setLoading(true);
+            try {
+                const postData = await getPostById(postId);
+                setPost(postData);
+            } catch (err) {
+                setError("Failed to load post");
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchPost();
+    }, [postId]);
+
+    // use skeleton later
+    if (loading)
+        return (
+            <div className="flex justify-center items-center h-screen">
+                Loading post...
+            </div>
+        );
+    if (error)
+        return (
+            <div className="flex justify-center items-center h-screen">
+                {error}
+            </div>
+        );
+    if (!post)
+        return (
+            <div className="flex justify-center items-center h-screen">
+                No post found
+            </div>
+        );
 
     const readOptions = [
         { name: "Home", href: "#" },
@@ -51,67 +113,21 @@ const ViewPost = ({ postId }) => {
         { name: "My Feed", href: "#" },
     ];
 
-    // Sample data - in a real app, this would come from props or API
-    const post = {
-        title: "How to Detect System Dark Mode in JavaScript",
-        content:
-            "Learn how to use the latest tools and techniques to build performant web applications that scale efficiently...",
-        author: {
-            name: "Jane Smith",
-            avatar: "/api/placeholder/40/40",
-            role: "Senior Developer",
-        },
-        publishedAt: "March 3, 2025",
-        readTime: "5 min read",
-        tags: ["Web Development", "JavaScript", "React"],
-        likes: 243,
-        comments: 42,
-    };
-
-    const moreFromAuthor = [
-        {
-            id: 1,
-            title: "Getting Started with TypeScript in 2025",
-            readTime: "4 min read",
-        },
-        {
-            id: 2,
-            title: "Building Accessible UIs with React and Tailwind",
-            readTime: "7 min read",
-        },
-        {
-            id: 3,
-            title: "State Management Patterns for Modern Applications",
-            readTime: "6 min read",
-        },
-    ];
-
-    const relatedPosts = [
-        {
-            id: 1,
-            title: "Optimizing React Performance with Memo and Callbacks",
-            readTime: "8 min read",
-            author: "Alex Johnson",
-        },
-        {
-            id: 2,
-            title: "CSS Grid vs Flexbox: When to Use Each",
-            readTime: "5 min read",
-            author: "Maria Garcia",
-        },
-        {
-            id: 3,
-            title: "Building a Design System from Scratch",
-            readTime: "10 min read",
-            author: "David Chen",
-        },
-    ];
+    function formatDate(dt) {
+        const date = new Date(dt);
+        const formattedDate = date.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+        });
+        return formattedDate;
+    }
 
     const schemaData = {
         "@context": "https://schema.org",
         "@type": "Article",
-        // headline: { title },
-        // image: ["https://opencanvas.blog/photos/1x1/photo.jpg"],
+        headline: post.title,
+        image: [`https://opencanvas.blog${post.thumbnailUrl}`],
         datePublished: {},
         dateModified: {},
         author: {
@@ -139,8 +155,8 @@ const ViewPost = ({ postId }) => {
     return (
         <>
             <Helmet>
-                {/* <title>{title} • OpenCanvas</title> */}
-                {/* <meta name="description" content={title} /> */}
+                <title>{post.title} • OpenCanvas</title>
+                <meta name="description" content={post.title} />
                 <meta
                     name="keywords"
                     content="technology, blog, javascript, SEO, web development"
@@ -193,51 +209,59 @@ const ViewPost = ({ postId }) => {
                     >
                         {/* Article header */}
                         <div className="mb-8">
-                            <div className="flex items-center mb-4">
-                                <Avatar className="h-10 w-10 mr-3">
-                                    <AvatarImage
-                                        src={post.author.avatar}
-                                        alt={post.author.name}
-                                    />
-                                    <AvatarFallback>
-                                        {post.author.name.charAt(0)}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div>
-                                    <div className="font-medium flex items-center justify-center gap-2">
-                                        {post.author.name}
-                                        <button className="px-1 rounded bg-black text-white dark:invert text-xs cursor-pointer">
-                                            Follow
-                                        </button>
-                                    </div>
-                                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                                        {post.author.role}
+                            <div className="flex flex-col md:flex-row items-start md:items-center justify-between space-y-2 md:space-y-0 mb-4">
+                                <div className="flex items-center">
+                                    <Avatar className="h-10 w-10 mr-3">
+                                        <AvatarImage
+                                            src={post.author.profilePicture}
+                                            alt={post.author.name}
+                                        />
+                                        <AvatarFallback>
+                                            {post.author.name.charAt(0)}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div className="">
+                                        <div className="font-medium flex items-center justify-center gap-2">
+                                            {post.author.name}
+                                            <button className="px-1 rounded bg-black text-white dark:invert text-xs cursor-pointer">
+                                                Follow
+                                            </button>
+                                        </div>
+                                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                                            {post.author.role}
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="ml-auto text-sm text-gray-500 dark:text-gray-400">
+                                <div
+                                    className="text-sm text-gray-500 dark:text-gray-400 flex flex-row md:flex-col
+                                    justify-between md:justify-center gap-2 md:gap-0 w-full md:w-fit mt-2 md:mt-0"
+                                >
                                     <div>
-                                        {post.publishedAt} · {post.readTime}
+                                        {formatDate(post.publishedAt)} ·{" "}
+                                        {post.readTime || "2 min read"}
                                     </div>
-                                    <div className="flex items-center justify-center mt-2 text-white">
+                                    <div className="flex items-center justify-center text-white">
                                         <ThumbsUp className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] text-blue-600 hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
                                         <span className="w-px h-[15px] dark:bg-[#ccc]/60 bg-[#444]/60" />
                                         <Bookmark className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] dark:text-white text-black hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
                                         <span className="w-px h-[15px] dark:bg-[#ccc]/60 bg-[#444]/60" />
-                                        <Share2 className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] dark:text-white text-black hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
+                                        <Share2
+                                            className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] dark:text-white text-black hover:text-white dark:hover:bg-[#eee] dark:hover:text-black"
+                                            onClick={() => sharePost(post)}
+                                        />
                                         <span className="w-px h-[15px] dark:bg-[#ccc]/60 bg-[#444]/60" />
                                         <MoreHorizontal className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] dark:text-white text-black hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
                                     </div>
                                 </div>
                             </div>
-                            <h1 className="font-serif text-4xl font-bold leading-tight tracking-tight mb-4 md:mt-2">
-                                {post.title}
-                            </h1>
                         </div>
 
                         {/* Article content */}
                         <div className="prose dark:prose-invert max-w-none pt-4 mb-16">
                             <MarkdownPreview
-                                content={data}
+                                title={post.title}
+                                content={post.content}
+                                thumbnailUrl={post.thumbnailUrl}
                                 isDark={isDark}
                                 darkBg="bg-[#111]"
                                 textAlignment="left"
@@ -264,7 +288,7 @@ const ViewPost = ({ postId }) => {
                                     className="flex items-center gap-2"
                                 >
                                     <ThumbsUp className="size-4 text-blue-600" />
-                                    <span>{post.likes}</span>
+                                    <span>{post.totalLikes}</span>
                                 </Button>
                                 <Button
                                     variant="ghost"
@@ -272,14 +296,18 @@ const ViewPost = ({ postId }) => {
                                     className="flex items-center gap-2"
                                 >
                                     <MessageSquareText className="size-4" />
-                                    <span>{post.comments}</span>
+                                    <span>{post.totalComments}</span>
                                 </Button>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Button variant="ghost" size="sm">
                                     <Bookmark className="size-4" />
                                 </Button>
-                                <Button variant="ghost" size="sm">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => sharePost(post)}
+                                >
                                     <Share2 className="size-4" />
                                 </Button>
                             </div>

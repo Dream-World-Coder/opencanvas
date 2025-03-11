@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-// no nested comments
-
 const commentSchema = new Schema(
     {
         content: {
@@ -19,6 +17,27 @@ const commentSchema = new Schema(
             ref: "Post",
             required: true,
         },
+        // Field to indicate if this is a parent comment or a reply
+        isReply: {
+            type: Boolean,
+            default: false,
+        },
+        // Reference to parent comment if this is a reply
+        parentId: {
+            type: Schema.Types.ObjectId,
+            ref: "Comment",
+            // Only required if it's a reply
+            required: function () {
+                return this.isReply === true;
+            },
+        },
+        // Array to store reply IDs for parent comments
+        replies: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Comment",
+            },
+        ],
         createdAt: {
             type: Date,
             default: Date.now,
@@ -26,6 +45,9 @@ const commentSchema = new Schema(
     },
     { timestamps: true },
 );
+
+// Index for faster lookups
+commentSchema.index({ postId: 1, parentId: 1 });
 
 const Comment = mongoose.model("Comment", commentSchema);
 module.exports = Comment;

@@ -6,11 +6,15 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-const { generateRandomAlphanumeric } = require("../utils/helper");
+const {
+    generateRandomAlphanumeric,
+    generateRandomThumbnail,
+} = require("../utils/helper");
 
 const {
     handleAuthErrors,
     authenticateToken,
+    checkUserExists,
 } = require("../middlewares/authorisation");
 
 require("dotenv").config();
@@ -61,9 +65,9 @@ passport.use(
                         email: profile.emails[0].value,
                         passwordHash: "google-hash",
                         provider: "google",
-                        profilePicture:
-                            profile.photos[0]?.value ||
-                            "https://opencanvas.blog/defaults/profile.png",
+                        profilePicture: generateRandomThumbnail("profile"),
+                        // profile.photos[0]?.value ||
+                        // "https://opencanvas.blog/defaults/profile.png",
                         lastFiveLogin: [
                             {
                                 loginTime: new Date(),
@@ -309,7 +313,102 @@ router.get("/user", authenticateToken, async (req, res) => {
     }
 });
 
+router.put(
+    "/update-user",
+    authenticateToken,
+    checkUserExists,
+    async (req, res) => {
+        try {
+            const user = req.user;
+            const { username, fullName, role, aboutMe } = req.body;
+
+            // Check if username is being changed
+            if (username && username !== user.username) {
+                // Check for username uniqueness
+                const existingUser = await User.findOne({ username });
+                if (existingUser) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Username already taken",
+                    });
+                }
+
+                // Validate username length
+                if (username.length < 4) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Username must be at least 4 characters long",
+                    });
+                }
+
+                if (username.length > 16) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Username can be 16 characters long at max",
+                    });
+                }
+
+                user.username = username;
+            }
+
+            // Validate and update fullName if provided
+            if (fullName !== undefined) {
+                if (fullName && (fullName.length < 4 || fullName.length > 32)) {
+                    return res.status(400).json({
+                        success: false,
+                        message:
+                            fullName.length < 4
+                                ? "Fullname must be at least 4 characters long"
+                                : "Fullname can be 32 characters long at max",
+                    });
+                }
+                user.fullName = fullName;
+            }
+
+            if (role !== undefined) {
+                if (role.length > 32) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Role can be 32 characters or less",
+                    });
+                }
+                user.role = role;
+            }
+
+            // Update aboutMe if provided
+            if (aboutMe !== undefined) {
+                if (aboutMe && aboutMe.length > 300) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Bio must be 300 characters or less",
+                    });
+                }
+                user.aboutMe = aboutMe;
+            }
+
+            const savedUser = await user.save();
+
+            return res.status(200).json({
+                success: true,
+                message: "Profile updated successfully",
+                user: savedUser,
+            });
+        } catch (error) {
+            console.error("Update user error:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Failed to update user data",
+                error:
+                    process.env.NODE_ENV === "development"
+                        ? error.message
+                        : "Server error",
+            });
+        }
+    },
+);
+
 // public profile view
+// need to set it as id
 router.get("/u/:username", async (req, res) => {
     try {
         const user = await User.findOne({

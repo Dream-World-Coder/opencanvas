@@ -13,8 +13,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+// import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import {
     BellIcon,
     LockIcon,
@@ -26,18 +27,22 @@ import {
     UserPlusIcon,
     ShieldIcon,
     GlobeIcon,
+    Loader2,
 } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContext";
+import { useDataService } from "../../services/dataService";
 
 const ProfileSettings = () => {
+    const { currentUser } = useAuth();
     const [darkMode, setDarkMode] = useState(false);
     const [activeTab, setActiveTab] = useState("general");
     const [formValues, setFormValues] = useState({
-        username: "alexjohnson",
-        fullName: "Alex Johnson",
-        email: "alex.johnson@example.com",
-        bio: "UI/UX Designer & Developer",
+        username: currentUser.username || "",
+        fullName: currentUser.fullName || "",
+        role: currentUser.role || "user",
+        aboutMe: currentUser.aboutMe || "",
         notifications: {
-            email: true,
+            aboutYou: true,
             push: true,
             sms: false,
         },
@@ -45,6 +50,25 @@ const ProfileSettings = () => {
         twoFactorEnabled: true,
     });
 
+    const { updateUserProfile } = useDataService();
+    const [loading, setLoading] = useState(false);
+
+    async function updateUser() {
+        setLoading(true);
+        try {
+            const result = await updateUserProfile(formValues);
+            toast.success(
+                "Your profile information has been updated successfully.",
+            );
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message ||
+                    "Something went wrong while updating your profile.",
+            );
+        } finally {
+            setLoading(false);
+        }
+    }
     /*
         // Effect to initialize dark mode from localStorage
         useEffect(() => {
@@ -97,10 +121,12 @@ const ProfileSettings = () => {
                     <div className="flex flex-col items-center gap-2">
                         <Avatar className="h-24 w-24  dark:text-black">
                             <AvatarImage
-                                src="/api/placeholder/150/150"
+                                src={currentUser.profilePicture}
                                 alt="Profile picture"
                             />
-                            <AvatarFallback>AJ</AvatarFallback>
+                            <AvatarFallback>
+                                {currentUser.fullName.slice(0, 2).toUpperCase()}
+                            </AvatarFallback>
                         </Avatar>
                         <Button
                             variant="outline"
@@ -144,15 +170,14 @@ const ProfileSettings = () => {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="email">Email</Label>
+                            <Label htmlFor="role">Role</Label>
                             <Input
-                                id="email"
-                                type="email"
-                                value={formValues.email}
+                                id="role"
+                                value={formValues.role}
                                 onChange={(e) =>
                                     setFormValues({
                                         ...formValues,
-                                        email: e.target.value,
+                                        role: e.target.value,
                                     })
                                 }
                                 className="dark:bg-black dark:text-white dark:border-gray-800"
@@ -160,14 +185,15 @@ const ProfileSettings = () => {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="bio">Bio</Label>
+                            <Label htmlFor="aboutMe">About</Label>
                             <Input
-                                id="bio"
-                                value={formValues.bio}
+                                id="aboutMe"
+                                type="aboutMe"
+                                value={formValues.aboutMe}
                                 onChange={(e) =>
                                     setFormValues({
                                         ...formValues,
-                                        bio: e.target.value,
+                                        aboutMe: e.target.value,
                                     })
                                 }
                                 className="dark:bg-black dark:text-white dark:border-gray-800"
@@ -196,13 +222,18 @@ const ProfileSettings = () => {
 
                 <div className="flex justify-end gap-2">
                     <Button
-                        variant="outline"
-                        className="dark:bg-gray-900 dark:hover:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white"
+                        onClick={updateUser}
+                        disabled={loading}
+                        className="bg-lime-600 hover:bg-lime-700 dark:bg-lime-700 dark:hover:bg-lime-800 text-white"
                     >
-                        Cancel
-                    </Button>
-                    <Button className="bg-lime-600 hover:bg-lime-700 dark:bg-lime-700 dark:hover:bg-lime-800 text-white">
-                        Save Changes
+                        {loading ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Saving...
+                            </>
+                        ) : (
+                            "Save Changes"
+                        )}
                     </Button>
                 </div>
             </div>
@@ -215,7 +246,9 @@ const ProfileSettings = () => {
         icon: <LockIcon className="h-4 w-4" />,
         content: (
             <div className="space-y-6 dark:text-white">
-                <div className="space-y-4 dark:text-white">
+                {/* password */}
+                {/* ------------ */}
+                {/* <div className="space-y-4 dark:text-white">
                     <h3 className="text-lg font-medium dark:text-white">
                         Password &amp; Security
                     </h3>
@@ -254,9 +287,11 @@ const ProfileSettings = () => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> */}
 
-                <div className="space-y-4">
+                {/* 2FA */}
+                {/* ------------- */}
+                {/* <div className="space-y-4">
                     <div className="flex items-center justify-between">
                         <div>
                             <h3 className="text-lg font-medium">
@@ -295,9 +330,11 @@ const ProfileSettings = () => {
                             </div>
                         </div>
                     )}
-                </div>
+                </div> */}
 
-                <div className="space-y-4">
+                {/* sessions */}
+                {/* ------------- */}
+                {/* <div className="space-y-4">
                     <h3 className="text-lg font-medium">Sessions</h3>
                     <div className="rounded-lg border p-4 dark:border-gray-800 dark:bg-gray-900">
                         <div className="flex items-center justify-between">
@@ -314,9 +351,10 @@ const ProfileSettings = () => {
                             </Badge>
                         </div>
                     </div>
-                </div>
+                </div> */}
 
-                <div className="flex justify-end gap-2">
+                {/* save-cancel buttons */}
+                {/* <div className="flex justify-end gap-2">
                     <Button
                         variant="outline"
                         className="dark:bg-gray-900 dark:hover:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white"
@@ -326,7 +364,7 @@ const ProfileSettings = () => {
                     <Button className="bg-lime-600 hover:bg-lime-700 dark:bg-lime-700 dark:hover:bg-lime-800 text-white">
                         Save Changes
                     </Button>
-                </div>
+                </div> */}
 
                 <Card className="border border-red-200 dark:border-red-900 dark:bg-black dark:text-white">
                     <CardHeader>
@@ -488,6 +526,7 @@ const ProfileSettings = () => {
         ),
     };
 
+    /*
     const privacy = {
         id: "privacy",
         label: "Privacy",
@@ -610,7 +649,8 @@ const ProfileSettings = () => {
                 </div>
             </div>
         ),
-    };
+        };
+        */
 
     const pro = {
         id: "pro",
@@ -705,7 +745,7 @@ const ProfileSettings = () => {
         ),
     };
 
-    const settingsSections = [general, account, notifications, privacy, pro];
+    const settingsSections = [general, account, notifications, pro];
 
     return (
         <>
@@ -714,6 +754,9 @@ const ProfileSettings = () => {
                 <div className="mx-auto max-w-4xl mt-20 px-4 py-8 dark:bg-black">
                     <h1 className="text-3xl font-bold mb-6 dark:text-white">
                         Profile Settings
+                        <div className="text-sm font-thin">
+                            {currentUser.email}
+                        </div>
                     </h1>
 
                     <div className="mb-4 block sm:hidden">
@@ -740,14 +783,16 @@ const ProfileSettings = () => {
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                                     <div>
                                         <CardTitle className="dark:text-white">
-                                            Settings
+                                            Public Url
                                         </CardTitle>
                                         <CardDescription className="dark:text-gray-400">
-                                            Manage your account settings and
-                                            preferences.
+                                            https://www.opencanvas.blog/u/
+                                            {currentUser.username}
                                         </CardDescription>
                                     </div>
-                                    <TabsList className="hidden sm:grid grid-cols-5 gap-1 dark:bg-gray-900">
+                                    <TabsList
+                                        className={`hidden sm:grid grid-cols-${settingsSections.length} gap-1 dark:bg-gray-900`}
+                                    >
                                         {settingsSections.map((section) => (
                                             <TabsTrigger
                                                 key={section.id}

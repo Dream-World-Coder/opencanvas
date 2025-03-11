@@ -1,34 +1,50 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
-    X,
-    SquareArrowOutUpRight,
+    // X,
+    // SquareArrowOutUpRight,
     Share2,
     Grid,
     Rows,
     Camera,
-    Heart,
+    ThumbsUp,
     MessageCircle,
+    Eye,
+    Edit,
+    Trash2,
+    MoreHorizontal,
 } from "lucide-react";
 import ProfileHeader from "../../components/Header/ProfileHeader";
 // import ProfileFooter from "../../components/Footer/ProfileFooter";
 import { useAuth } from "../../contexts/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
+// import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
 
 // in posts also hide details like deletehash for public options
 
+function sharePost(post) {
+    const baseUrl = window.location.origin;
+    const postUrl = `${baseUrl}/p/${post._id}`;
+
+    navigator.clipboard
+        .writeText(postUrl)
+        .then(() => {
+            toast.success("Link copied to clipboard!");
+        })
+        .catch((err) => {
+            console.error("Failed to copy link:", err);
+            toast.error("Faild to copy link");
+        });
+}
 const Profile = () => {
+    const navigate = useNavigate();
     const { currentUser } = useAuth();
     const [viewMode, setViewMode] = useState("grid");
     const [activeTab, setActiveTab] = useState("all");
-    const [previewPost, setPreviewPost] = useState({});
     const [posts, setPosts] = useState([]);
     const [postsToFetch, setPostsToFetch] = useState(0);
-    const [previewVisible, setPreviewVisible] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const userStats = [
@@ -43,7 +59,7 @@ const Profile = () => {
         collections = currentUser.collections;
     }
 
-    // Function to fetch posts from user's postIds array
+    // fetch posts from user's postIds array
     const fetchUserPosts = async () => {
         try {
             setLoading(true);
@@ -104,31 +120,6 @@ const Profile = () => {
         }
     }, [currentUser]);
 
-    async function showPostPreview(postId) {
-        try {
-            const response = await fetch(`http://127.0.0.1:3000/p/${postId}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                const post = data.currentPost;
-                setPreviewPost(post);
-                setPreviewVisible(true);
-            } else {
-                console.error("Error:", data.message);
-                toast("Error:", data.message);
-            }
-        } catch (error) {
-            console.error("Fetch Error:", error);
-            toast("Fetch Error:", error);
-        }
-    }
-
     return (
         <div
             className={`min-h-screen bg-white dark:bg-black dark:text-white font-sans`} //bg-cream-light
@@ -147,7 +138,7 @@ const Profile = () => {
                                     <div className="relative group">
                                         <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100 dark:bg-[#222]">
                                             <img
-                                                src={`/defaults/profile.jpeg`} // currentUser.profilePicture
+                                                src={currentUser.profilePicture}
                                                 alt="Profile"
                                                 className="w-full h-full object-cover"
                                             />
@@ -170,7 +161,7 @@ const Profile = () => {
                                         >
                                             {currentUser.fullName}
                                             <span className="block text-2xl md:text-5xl font-bold md:font-normal tracking-normal md:tracking-tighter italic capitalize leading-[1.7rem] dark:text-[#e0e0e0]">
-                                                {currentUser.tagline}
+                                                {currentUser.role}
                                             </span>
                                         </h1>
                                     )}
@@ -224,46 +215,6 @@ const Profile = () => {
                                   ))}
                         </div>
                     </div>
-
-                    {/* preview */}
-                    {previewVisible && (
-                        <Card
-                            data-lenis-prevent
-                            className="w-full md:w-[50%] max-h-screen bg-white dark:bg-[#222] fixed right-0 top-24 md:overflow-y-scroll overflow-x-hidden"
-                        >
-                            <CardHeader className="flex flex-row items-center justify-between">
-                                <CardTitle>
-                                    <Badge className="bg-lime-600 hover:bg-lime-500">
-                                        Preview
-                                    </Badge>
-                                </CardTitle>
-                                <div className="z-20 flex items-center justify-center gap-3">
-                                    <SquareArrowOutUpRight
-                                        className="cursor-pointer hover:bg-lime-300/30 rounded-md box-content p-1 size-5"
-                                        onClick={() => {
-                                            // setPreviewVisible(previewPost._id);
-                                        }}
-                                    />
-                                    <X
-                                        className="cursor-pointer hover:bg-lime-300/30 rounded-md box-content p-1 size-6"
-                                        onClick={() => {
-                                            setPreviewVisible(false);
-                                        }}
-                                    />
-                                </div>
-                            </CardHeader>
-                            <CardContent>
-                                <MarkdownPreview
-                                    title={previewPost.title}
-                                    content={previewPost.content}
-                                    isVisible={previewVisible}
-                                    isDark={false}
-                                    textAlignment={"lefts"}
-                                    lightModeBg={"bg-white"}
-                                />
-                            </CardContent>
-                        </Card>
-                    )}
 
                     {/* Collections Carousel */}
                     {collections.length > 0 && (
@@ -327,7 +278,7 @@ const Profile = () => {
                                     onClick={() => setActiveTab("all")}
                                     className={`pb-2 dark:text-[#e0e0e0] ${activeTab === "all" ? "border-b-2 border-black dark:border-[#f0f0f0]" : ""}`}
                                 >
-                                    All Works
+                                    All Posts
                                 </button>
                                 <button
                                     onClick={() => setActiveTab("photos")}
@@ -389,9 +340,6 @@ const Profile = () => {
                                   ))
                             : posts.map((post) => (
                                   <div
-                                      onClick={() => {
-                                          showPostPreview(post._id);
-                                      }}
                                       key={post._id}
                                       className="group cursor-pointer"
                                   >
@@ -427,21 +375,76 @@ const Profile = () => {
                                           </div>
                                       ) : (
                                           // Text Post
-                                          <div className="p-6 border border-gray-100 dark:border-[#222] hover:border-gray-200 dark:hover:border-[#333] transition-colors duration-300 dark:bg-[#111]">
+                                          <div className="p-6 border border-gray-100 dark:border-[#222] hover:border-gray-200 dark:hover:border-[#333] transition-colors duration-300 dark:bg-[#111] relative group">
                                               <div className="flex justify-between items-start mb-4">
                                                   <h3 className="font-medium dark:text-[#e8e8e8] capitalize">
                                                       {post.title}
                                                   </h3>
                                                   <div className="flex items-center space-x-4 text-sm text-gray-400 dark:text-[#999]">
                                                       <div className="flex items-center">
-                                                          <Heart className="w-4 h-4 mr-1" />
-                                                          {post.totalLoves}
+                                                          <ThumbsUp className="w-4 h-4 mr-1" />
+                                                          {post.totalLikes}
                                                       </div>
                                                       <div className="flex items-center">
                                                           <MessageCircle className="w-4 h-4 mr-1" />
-                                                          {post.comments || ""}
-                                                          {/* post.comments.length */}
+                                                          {post.totalComments}
                                                       </div>
+                                                  </div>
+                                              </div>
+
+                                              {post.thumbnailUrl && (
+                                                  <div className="mb-4 overflow-hidden rounded-md aspect-video">
+                                                      <img
+                                                          src={
+                                                              post.thumbnailUrl
+                                                          }
+                                                          alt={post.title}
+                                                          className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+                                                      />
+                                                  </div>
+                                              )}
+
+                                              {/* Hover Actions Menu */}
+                                              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                  <div className="bg-white dark:bg-gray-800 shadow-md rounded-md flex">
+                                                      <button
+                                                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-l-md"
+                                                          title="View"
+                                                          onClick={() => {
+                                                              navigate(
+                                                                  `/p/${post._id}`,
+                                                              );
+                                                          }}
+                                                      >
+                                                          <Eye className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                                                      </button>
+                                                      <button
+                                                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                                          title="Edit"
+                                                      >
+                                                          <Edit className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                                                      </button>
+                                                      <button
+                                                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                                          title="Delete"
+                                                      >
+                                                          <Trash2 className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                                                      </button>
+                                                      <button
+                                                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                                          title="Share"
+                                                          onClick={() => {
+                                                              sharePost(post);
+                                                          }}
+                                                      >
+                                                          <Share2 className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                                                      </button>
+                                                      <button
+                                                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-r-md"
+                                                          title="More"
+                                                      >
+                                                          <MoreHorizontal className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                                                      </button>
                                                   </div>
                                               </div>
                                           </div>

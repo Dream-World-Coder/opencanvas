@@ -3,6 +3,7 @@ import { X, Menu, Plus, ChevronUp, ChevronDown, Filter } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { createOptions } from "./createOptions";
 import SearchBar from "../SearchBar";
+import { useDataService } from "../../services/dataService";
 
 const Header = ({ filters }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -10,6 +11,22 @@ const Header = ({ filters }) => {
     const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
     const [createMenuOpen, setCreateMenuOpen] = useState(false);
     const { currentUser } = useAuth();
+    const { getNewPostId } = useDataService();
+    const [loading, setLoading] = useState(false);
+
+    async function handlePostCreate(option) {
+        setLoading(true);
+        localStorage.removeItem("blogPost");
+        localStorage.removeItem("newPostId");
+        setCreateMenuOpen(false);
+        let newPostId = await getNewPostId();
+        localStorage.setItem("newPostId", newPostId);
+
+        setTimeout(() => {
+            window.location.href = option.href;
+        }, 300);
+        setLoading(false);
+    }
 
     let navLinks = [];
     if (!currentUser) {
@@ -63,7 +80,7 @@ const Header = ({ filters }) => {
                                         link.name
                                     ) : (
                                         <img
-                                            src="/defaults/profile.jpeg"
+                                            src={currentUser.profilePicture}
                                             className="size-6 md:size-8 rounded-full overflow-hidden object-cover block cursor-pointer"
                                             alt=""
                                         />
@@ -100,24 +117,29 @@ const Header = ({ filters }) => {
                                     {createOptions.map((option) => (
                                         <button
                                             key={option.id}
-                                            className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-[#333] transition-colors group"
+                                            className={`w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-[#333] transition-colors group
+                                                ${loading ? "pointer-events-none opacity-70" : ""}`}
                                             onClick={() => {
-                                                localStorage.removeItem(
-                                                    "blogPost",
-                                                );
-                                                setCreateMenuOpen(false);
-                                                window.location.href =
-                                                    option.href;
+                                                handlePostCreate(option);
                                             }}
+                                            disabled={loading}
                                         >
                                             <div
                                                 className={`p-2 rounded-full ${option.color}`}
                                             >
-                                                <option.icon className="w-4 h-4 text-white" />
+                                                {loading ? (
+                                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                                ) : (
+                                                    <option.icon className="w-4 h-4 text-white" />
+                                                )}
                                             </div>
                                             <span className="flex items-center justify-center gap-3">
-                                                {option.label}{" "}
-                                                <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700 dark:text-stone-200" />
+                                                {loading
+                                                    ? "Loading..."
+                                                    : option.label}{" "}
+                                                {!loading && (
+                                                    <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700 dark:text-stone-200" />
+                                                )}
                                             </span>
                                         </button>
                                     ))}
@@ -182,25 +204,31 @@ const Header = ({ filters }) => {
                 {createMenuOpen && (
                     <div className="flex flex-col md:hidden w-64 bg-white border border-gray-100 rounded-lg shadow-lg py-2 z-50">
                         {createOptions.map((option) => (
-                            <a
+                            <button
                                 key={option.id}
-                                className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors group"
+                                className={`w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50
+                                dark:hover:bg-[#333] transition-colors group ${loading ? "pointer-events-none opacity-70" : ""}`}
                                 onClick={() => {
-                                    setCreateMenuOpen(false);
-                                    localStorage.removeItem("blogPost");
+                                    handlePostCreate(option);
                                 }}
-                                href={option.href}
+                                disabled={loading}
                             >
                                 <div
                                     className={`p-2 rounded-full ${option.color}`}
                                 >
-                                    <option.icon className="w-4 h-4 text-white" />
+                                    {loading ? (
+                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                    ) : (
+                                        <option.icon className="w-4 h-4 text-white" />
+                                    )}
                                 </div>
                                 <span className="flex items-center justify-center gap-3">
-                                    {option.label}{" "}
-                                    <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700" />
+                                    {loading ? "Loading..." : option.label}{" "}
+                                    {!loading && (
+                                        <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700 dark:text-stone-200" />
+                                    )}
                                 </span>
-                            </a>
+                            </button>
                         ))}
                     </div>
                 )}

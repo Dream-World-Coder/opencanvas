@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+// import { useDataService } from "../../../../services/dataService";
 
-export function useWritingPad({ postId, frontendOnly }) {
+export function useWritingPad({ postId, frontendOnly, artType }) {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [twoColumn, setTwoColumn] = useState(false);
@@ -11,12 +13,26 @@ export function useWritingPad({ postId, frontendOnly }) {
     const [showUnsavedAlert, setShowUnsavedAlert] = useState(false);
     const [tags, setTags] = useState(["regular"]);
     const [isPublic, setIsPublic] = useState(true);
+    const [thumbnailUrl, setThumbnailUrl] = useState("");
     const [media, setMedia] = useState([]);
+    const navigate = useNavigate();
 
-    if (!postId) {
-        console.error("postId not found");
-        postId = localStorage.getItem("newPostId", "");
-    }
+    // else not getting it in the first chance, postId
+    postId = localStorage.getItem("newPostId", "");
+
+    console.log(`newPostId 1: ${postId}`);
+    useEffect(() => {
+        if (!postId) {
+            console.log(`newPostId 2: ${postId}`);
+
+            console.error("postId not found");
+            toast.error("postId not found");
+            // window.location.href = "/profile";
+
+            console.log(`newPostId 3: ${postId}`);
+        }
+    }, [postId]);
+    console.log(`newPostId 4: ${postId}`);
 
     const saveDraftLocally = () => {
         const draft = {
@@ -29,7 +45,7 @@ export function useWritingPad({ postId, frontendOnly }) {
         localStorage.setItem(`blogPost`, JSON.stringify(draft));
 
         if (frontendOnly) {
-            setIsSaved(true); // st saved only when saved in db
+            setIsSaved(true); // else saved only when saved in db
         }
     };
 
@@ -47,24 +63,25 @@ export function useWritingPad({ postId, frontendOnly }) {
         try {
             // title must not be empty
             if (!title || title.trim() === "") {
-                setSyncStatus("offline");
+                // setSyncStatus("offline");
                 toast("Title is required");
                 return;
             }
 
-            // Prepare post data
             const postData = {
                 id: postId,
                 title,
                 content,
                 tags,
+                isPublic,
+                artType,
+                thumbnailUrl,
+                readTime: `${Math.ceil((content.split(" ").length * 0.8) / 300)} min read`,
                 media,
             };
 
-            // Get auth token - assuming you store it in localStorage or similar
             const token = localStorage.getItem("authToken");
 
-            // Make API call to backend
             const response = await fetch(
                 "http://127.0.0.1:3000/savepost/written",
                 {
@@ -81,20 +98,21 @@ export function useWritingPad({ postId, frontendOnly }) {
 
             if (data.success) {
                 setIsSaved(true);
-                setSyncStatus("synced");
+                // setSyncStatus("synced");
                 // setLastSynced(new Date());
                 toast.success("Post saved successfully", {
                     style: {
                         backgroundColor: "#f5f5f5",
                     },
                 });
+                navigate("/profile");
             } else {
-                setSyncStatus("offline");
+                // setSyncStatus("offline");
                 toast.error(data.message || "Failed to save post in server");
             }
         } catch (error) {
             console.error("Error saving post:", error);
-            setSyncStatus("offline");
+            // setSyncStatus("offline");
             toast.error("Failed to connect to server", {
                 style: {
                     backgroundColor: "red",
@@ -112,7 +130,7 @@ export function useWritingPad({ postId, frontendOnly }) {
 
         // tmp api handling for backend
         setTimeout(() => {
-            setSyncStatus("synced");
+            // setSyncStatus("synced");
             // setLastSynced(new Date());
             return;
         }, 200);
@@ -170,7 +188,7 @@ export function useWritingPad({ postId, frontendOnly }) {
                         const post = await response.json();
                         setTitle(post.title);
                         setContent(post.content);
-                        setLastSynced(new Date());
+                        // setLastSynced(new Date());
                     }
                 } catch (error) {
                     // If backend fails, try loading from local draft
@@ -276,14 +294,15 @@ export function useWritingPad({ postId, frontendOnly }) {
             }
         };
 
-        // Local autosave every 5 seconds
+        // local autosave every 5 sec
         const localAutosaveInterval = setInterval(() => {
             if (!isSaved) {
                 saveDraftLocally();
             }
         }, 5000);
 
-        // Backend sync every 5 mins if online && not frontendOnly
+        // backend sync every 5 mins if online && not frontendOnly
+        // also check if content has changed or not -- done already by !isSaved check in performAutosave
         if (navigator.onLine && !frontendOnly) {
             autosaveInterval = setInterval(performAutosave, 300000);
         }

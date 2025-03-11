@@ -336,6 +336,7 @@ LinkInsertButton.propTypes = {
 export const MarkdownPreview = ({
     title,
     content,
+    thumbnailUrl = null,
     isVisible = true,
     isDark = false,
     textAlignment = "left",
@@ -398,16 +399,25 @@ export const MarkdownPreview = ({
             >
                 <CardContent className="p-0">
                     <div id="export" className="prose prose-slate max-w-none">
-                        {/* Title Rendering */}
+                        {/* title */}
                         {title && (
-                            <div
-                                className={`mb-6 border-b pb-4 text-4xl font-bold ${isDark ? "border-[#444]" : "border-gray-300"}`}
-                            >
+                            <div className="font-serif text-4xl font-bold mb-6 leading-tight tracking-tight">
                                 {title}
                             </div>
                         )}
 
-                        {/* Markdown Content */}
+                        {/* thumbnail */}
+                        {thumbnailUrl && (
+                            <div className="relative mb-8 rounded-lg overflow-hidden shadow-md">
+                                <img
+                                    src={thumbnailUrl}
+                                    alt={title || "Article thumbnail"}
+                                    className="w-full h-auto object-cover"
+                                    loading="lazy"
+                                />
+                            </div>
+                        )}
+                        {/* markdown content */}
                         <ReactMarkdown
                             remarkPlugins={[
                                 remarkGfm,
@@ -418,7 +428,7 @@ export const MarkdownPreview = ({
                             components={{
                                 img(props) {
                                     const { node, src, alt, ...rest } = props;
-                                    // Create unique ID for each image based on src and alt
+                                    // unique ID for each image based on src and alt
                                     const imageId =
                                         `img-${src || ""}${alt || ""}`.replace(
                                             /[^a-zA-Z0-9]/g,
@@ -1202,7 +1212,7 @@ export const PublicPreferenceInput = ({ isPublic, setIsPublic }) => {
                 </div>
                 <div className="flex items-center gap-2">
                     <RadioGroupItem value={false} id="private" />
-                    <Label htmlFor="private">Link only</Label>
+                    <Label htmlFor="private">Private</Label>
                 </div>
             </RadioGroup>
         </div>

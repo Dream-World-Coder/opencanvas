@@ -75,7 +75,7 @@ export const Navbar = ({ bg }) => {
                                     link.name
                                 ) : (
                                     <img
-                                        src="/defaults/profile.jpeg"
+                                        src={currentUser.profilePicture}
                                         className="size-6 md:size-8 rounded-full overflow-hidden object-cover block cursor-pointer"
                                         alt=""
                                     />

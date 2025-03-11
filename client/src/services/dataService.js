@@ -15,12 +15,25 @@ export const useDataService = () => {
         }
     };
 
+    const updateUserProfile = async (formValues) => {
+        try {
+            const response = await authAxios.put(`/auth/update-user`, {
+                username: formValues.username,
+                fullName: formValues.fullName,
+                role: formValues.role,
+                aboutMe: formValues.aboutMe,
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Error updating user profile:", error);
+            throw error;
+        }
+    };
+
     // Post related functions
     const getNewPostId = async () => {
         try {
             const response = await authAxios.post("/newpost/written/getId");
-            console.log(response);
-            console.log(response.data.newPostId);
             return response.data.newPostId;
         } catch (error) {
             console.error("Error creating post:", error);
@@ -29,24 +42,14 @@ export const useDataService = () => {
         }
     };
 
-    // createPost
-
-    const getUserPosts = async (userId) => {
-        try {
-            const response = await authAxios.get(`/posts/user/${userId}`);
-            return response.data.posts;
-        } catch (error) {
-            console.error("Error fetching user posts:", error);
-            throw error;
-        }
-    };
-
+    // fix errors if not found
     const getPostById = async (postId) => {
         try {
-            const response = await authAxios.get(`/posts/${postId}`);
+            const response = await authAxios.get(`/p/${postId}`);
             return response.data.post;
         } catch (error) {
             console.error("Error fetching post:", error);
+            toast.error("Error getting post");
             throw error;
         }
     };
@@ -179,10 +182,10 @@ export const useDataService = () => {
     return {
         // User
         getUserProfile,
+        updateUserProfile,
 
         // Posts
         getNewPostId,
-        getUserPosts,
         getPostById,
         updatePost,
         deletePost,

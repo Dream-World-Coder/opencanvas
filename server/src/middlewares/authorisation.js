@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
 require("dotenv").config();
 
@@ -42,7 +43,32 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
+// user exists check
+const checkUserExists = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.userId);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+        req.user = user;
+        next();
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            error:
+                process.env.NODE_ENV === "development"
+                    ? err.message
+                    : "Server error",
+        });
+    }
+};
+
 module.exports = {
     handleAuthErrors,
     authenticateToken,
+    checkUserExists,
 };

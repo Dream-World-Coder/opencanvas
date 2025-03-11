@@ -55,7 +55,6 @@ const LoginPage = ({ bgClr = "bg-cream-light" }) => {
                             className="w-full flex items-center justify-center space-x-3 bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 p-6"
                             variant="outline"
                             onClick={() => {
-                                // navigate("/auth/google");
                                 window.location.href =
                                     "http://127.0.0.1:3000/auth/google";
                             }}

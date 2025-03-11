@@ -33,9 +33,14 @@ const postSchema = new Schema(
             ref: "User",
             required: true,
         },
+        author: {
+            name: { type: String, required: true },
+            profilePicture: { type: String },
+            role: { type: String },
+        },
         thumbnailUrl: { type: String, default: "" },
         premiumPost: { type: Boolean, default: false }, // will be set by the user not me, if premium i will take some charge
-        createdAt: { type: Date, default: Date.now },
+        publishedAt: { type: Date, default: Date.now },
         tags: {
             // max 5, default: "regular",
             // in images -> pre added tags,
@@ -59,10 +64,15 @@ const postSchema = new Schema(
         },
         isEdited: { type: Boolean, default: false },
         isPublic: { type: Boolean, default: true },
+        readTime: {
+            type: String,
+            default: "",
+            maxlength: [16, "read time must be 16 characters or less"],
+        },
         type: {
             type: String,
             default: "written",
-            enum: ["written", "article"],
+            enum: ["written", "article", "poem", "story"],
         },
 
         media: [mediaSchema],

@@ -3,15 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import {
     ArrowLeft,
-    Save,
     Sun,
     Moon,
     Undo,
     Redo,
     MoreHorizontal,
     AlertTriangle,
-    Wifi,
-    WifiOff,
     Eye,
     Edit,
     X,
@@ -73,29 +70,39 @@ import { useWritingPad } from "./hooks/useWritingPad";
 import { useEditorFormatting } from "./hooks/useEditorFormatting";
 import { useEditorAppearance } from "./hooks/useEditorAppearance";
 import { useExport } from "./hooks/useExport";
-
+import useSingleTab from "./hooks/useSingleTab";
 import { useAuth } from "../../../contexts/AuthContext";
-import { useDataService } from "../../../services/dataService";
 
 /**
  • supports latex && easy to use + image upload, easily give gap, cuz supports html
- • ^%SOS# for unTested code
+ • ^%SOS# for unTested code -- no more exists
  • post click : edit preview settings
  */
 const WritingPad = ({ artType = "article" }) => {
-    const { getNewPostId } = useDataService();
     const { currentUser } = useAuth();
 
     const navigate = useNavigate();
 
     const [postId, setPostId] = useState("");
+    console.log(`postID writingPad 1: ${postId}`);
     useEffect(() => {
-        setPostId(getNewPostId());
-    }, []);
+        setPostId(localStorage.getItem("newPostId", ""));
+        console.log(`postID writingPad 2: ${postId}`);
+    }, [postId]);
+    console.log(`postID writingPad 3: ${postId}`);
 
     const [frontendOnly, _] = useState(false);
 
-    // Core writing pad functionality
+    const isActiveTab = useSingleTab();
+    // customized  redirect path:
+    // const isActiveTab = useSingleTab({
+    //   redirectPath: "/dashboard",
+    //   messageText: "Editor is already open. Redirecting to dashboard..."
+    // });
+    //
+    // or
+
+    // main writing pad functionality
     const {
         title,
         setTitle,
@@ -114,7 +121,7 @@ const WritingPad = ({ artType = "article" }) => {
         setTags,
         isPublic,
         setIsPublic,
-    } = useWritingPad({ postId, frontendOnly });
+    } = useWritingPad({ postId, frontendOnly, artType });
 
     // Editor formatting functionality
     const {
@@ -157,6 +164,10 @@ const WritingPad = ({ artType = "article" }) => {
         handleTxtExport,
         handleCopy,
     } = useExport(title, content);
+
+    if (!isActiveTab) {
+        return <div>Redirecting...</div>;
+    }
 
     const schemaData = {
         "@context": "https://schema.org",
@@ -226,10 +237,19 @@ const WritingPad = ({ artType = "article" }) => {
                                 </button>
                                 <div className="hidden md:flex items-center space-x-2">
                                     <button
-                                        className={`text-base hover:text-green-600 underline underline-offset-2 decoration-lime-300/60 decoration-4 ${isDark ? "text-white" : "text-black"}`}
+                                        className={`text-base mr-4 hover:text-green-600 underline underline-offset-2 decoration-lime-300/60 decoration-4 ${isDark ? "text-white" : "text-black"}`}
                                     >
                                         {artType}
                                     </button>
+                                    <span
+                                        className={
+                                            isDark
+                                                ? "text-[#555]"
+                                                : "text-gray-400"
+                                        }
+                                    >
+                                        {isSaved ? "saved" : "unsaved"}
+                                    </span>
                                 </div>
                             </div>
 

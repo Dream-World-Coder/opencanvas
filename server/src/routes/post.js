@@ -1,102 +1,146 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const User = require("../models/User");
 const Post = require("../models/Post");
+const Comment = require("../models/Comment");
 const { v4: uuidv4 } = require("uuid");
-const { authenticateToken } = require("../middlewares/authorisation");
+const {
+    authenticateToken,
+    checkUserExists,
+} = require("../middlewares/authorisation");
+const { generateRandomThumbnail } = require("../utils/helper");
+
+// in js {} & [] are true value
+
+// send generated _id for new post
+router.post(
+    "/newpost/written/getId",
+    authenticateToken,
+    // checkUserExists, // no need, user will be authenticated
+    async (req, res) => {
+        try {
+            const newPostId = new mongoose.Types.ObjectId().toString();
+            res.status(200).json({
+                success: true,
+                newPostId: newPostId,
+            });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({
+                success: false,
+                error:
+                    process.env.NODE_ENV === "development"
+                        ? error.message
+                        : "Server error",
+            });
+        }
+    },
+);
 
 // save written post
-router.post("/savepost/written", authenticateToken, async (req, res) => {
-    try {
-        const user = await User.findById(req.userId);
+router.post(
+    "/savepost/written",
+    authenticateToken,
+    checkUserExists,
+    async (req, res) => {
+        try {
+            let user = req.user;
 
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found",
-            });
-        }
-
-        // now if user exists go towards post
-        let postData = req.body;
-        if (!postData) {
-            return res.status(404).json({
-                success: false,
-                message: "post not found",
-            });
-        }
-
-        const currentPost = await Post.findById(postData.id);
-        let savedPost = {};
-
-        if (currentPost) {
-            if (currentPost.authorId.toString() !== user._id.toString()) {
-                return res.status(403).json({
+            let postData = req.body;
+            if (!postData) {
+                return res.status(404).json({
                     success: false,
-                    message: "Unauthorized to update this post",
+                    message: "post not found",
                 });
             }
 
-            currentPost.title = postData.title;
-            currentPost.content = postData.content;
-            currentPost.tags = postData.tags;
-            currentPost.isPublic = postData.isPublic ?? true;
-            currentPost.isEdited = true;
-            currentPost.media = postData.media || [];
-            savedPost = await currentPost.save();
-        } else {
-            const post = new Post({
-                _id: postData.id,
-                title: postData.title,
-                content: postData.content,
-                authorId: user._id,
-                tags: postData.tags,
-                postDeleteHash: uuidv4(),
-                isEdited: false,
-                isPublic: true,
-                type: "written",
-                media: postData.media || [],
+            const currentPost = await Post.findById(postData.id);
+            let savedPost = {};
+
+            if (currentPost) {
+                if (currentPost.authorId.toString() !== user._id.toString()) {
+                    return res.status(403).json({
+                        success: false,
+                        message: "Unauthorized to update this post",
+                    });
+                }
+
+                currentPost.title = postData.title;
+                currentPost.content = postData.content;
+                currentPost.tags = postData.tags;
+                currentPost.isEdited = true;
+                currentPost.isPublic = postData.isPublic ?? true; // nullish coalescing operator
+                currentPost.thumbnailUrl =
+                    postData.thumbnailUrl || currentPost.thumbnailUrl;
+                currentPost.media = postData.media || [];
+
+                savedPost = await currentPost.save();
+            } else {
+                const post = new Post({
+                    _id: postData.id,
+                    title: postData.title,
+                    content: postData.content,
+                    authorId: user._id,
+                    author: {
+                        name: user.fullName,
+                        profilePicture: user.profilePicture,
+                        role: user.role,
+                    },
+                    tags: postData.tags,
+                    postDeleteHash: uuidv4(),
+                    isEdited: false,
+                    isPublic: postData.isPublic ?? true,
+                    type: postData.artType ?? "written", // artType cannot be changed, its fixed
+                    thumbnailUrl:
+                        postData.thumbnailUrl ||
+                        generateRandomThumbnail(postData.artType),
+                    readTime: postData.readTime,
+                    media: postData.media,
+                });
+
+                savedPost = await post.save(); // returns the post
+            }
+
+            // append _id of post to user
+            if (!user.posts.includes(savedPost._id)) {
+                user.posts.push(savedPost._id);
+            }
+            await user.save();
+
+            return res.status(200).json({
+                success: true,
+                message: "posted successfully",
+                postId: savedPost._id,
             });
-
-            savedPost = await post.save(); // returns the post
+        } catch (error) {
+            console.error("Get post[written] upload error:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Failed to upload post",
+                error:
+                    process.env.NODE_ENV === "development"
+                        ? error.message
+                        : "Server error",
+            });
         }
-
-        // append _id of post to user
-        if (!user.posts.includes(savedPost._id)) {
-            user.posts.push(savedPost._id);
-        }
-        await user.save();
-
-        return res.status(200).json({
-            success: true,
-            message: "posted successfully",
-            postId: savedPost._id,
-        });
-    } catch (error) {
-        console.error("Get post[written] upload error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to upload post[written]",
-            error:
-                process.env.NODE_ENV === "development"
-                    ? error.message
-                    : "Server error",
-        });
-    }
-});
+    },
+);
 
 // post page
-// do not share all details
 router.get("/p/:postId", async (req, res) => {
     try {
         const { postId } = req.params;
-        const currentPost = await Post.findById(postId).select({
+
+        if (!mongoose.Types.ObjectId.isValid(postId)) {
+            return res.status(400).json({ error: "Invalid post ID" });
+        }
+
+        const post = await Post.findById(postId).select({
             postDeleteHash: 0,
             imgDeleteHash: 0,
         });
 
-        if (!currentPost) {
+        if (!post) {
             return res.status(404).json({
                 success: false,
                 message: "Post not found",
@@ -105,7 +149,7 @@ router.get("/p/:postId", async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            currentPost,
+            post,
         });
     } catch (error) {
         console.error("Get post[written] error:", error);

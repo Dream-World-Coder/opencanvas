@@ -38,10 +38,10 @@ const userSchema = new Schema(
             default: "https://opencanvas.blog/defaults/profile.jpeg",
         },
         // <<<<>>>>
+        // its not traditional role, i have used 'relationship' for that
         role: {
             type: String,
             default: "user",
-            enum: ["user", "admin", "moderator"],
             maxlength: [32, "Role can be 32 characters or less"],
         },
         aboutMe: {

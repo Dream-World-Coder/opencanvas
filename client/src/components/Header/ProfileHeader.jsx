@@ -12,6 +12,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useDataService } from "../../services/dataService";
 
 const navLinks = [
     { href: "/gallery/photos", label: "Gallery" },
@@ -23,6 +24,22 @@ const navLinks = [
 export default function ProfileHeader() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [createMenuOpen, setCreateMenuOpen] = useState(false);
+    const { getNewPostId } = useDataService();
+    const [loading, setLoading] = useState(false);
+
+    async function handlePostCreate(option) {
+        setLoading(true);
+        localStorage.removeItem("blogPost");
+        localStorage.removeItem("newPostId");
+        setCreateMenuOpen(false);
+        let newPostId = await getNewPostId();
+        localStorage.setItem("newPostId", newPostId);
+
+        console.log(`newPostId writingPad: ${newPostId}`);
+
+        window.location.href = option.href;
+        setLoading(false);
+    }
 
     return (
         <nav className="fixed top-0 w-full bg-white dark:bg-[#111] dark:text-white z-50 border-b border-gray-100 dark:border-[#222]">
@@ -106,21 +123,29 @@ export default function ProfileHeader() {
                                 {createOptions.map((option) => (
                                     <button
                                         key={option.id}
-                                        className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-[#333] transition-colors group"
+                                        className={`w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-[#333] transition-colors group
+                                            ${loading ? "pointer-events-none opacity-70" : ""}`}
                                         onClick={() => {
-                                            localStorage.removeItem("blogPost");
-                                            setCreateMenuOpen(false);
-                                            window.location.href = option.href;
+                                            handlePostCreate(option);
                                         }}
+                                        disabled={loading}
                                     >
                                         <div
                                             className={`p-2 rounded-full ${option.color}`}
                                         >
-                                            <option.icon className="w-4 h-4 text-white" />
+                                            {loading ? (
+                                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                            ) : (
+                                                <option.icon className="w-4 h-4 text-white" />
+                                            )}
                                         </div>
                                         <span className="flex items-center justify-center gap-3">
-                                            {option.label}{" "}
-                                            <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700 dark:text-stone-200" />
+                                            {loading
+                                                ? "Loading..."
+                                                : option.label}{" "}
+                                            {!loading && (
+                                                <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700 dark:text-stone-200" />
+                                            )}
                                         </span>
                                     </button>
                                 ))}
@@ -159,26 +184,31 @@ export default function ProfileHeader() {
                             rounded-lg shadow-lg py-2 z-50 dark:bg-[#111] dark:border-[#333]"
                         >
                             {createOptions.map((option) => (
-                                <a
+                                <button
                                     key={option.id}
-                                    className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50
-                                    dark:hover:bg-[#333] transition-colors group"
+                                    className={`w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50
+                                    dark:hover:bg-[#333] transition-colors group ${loading ? "pointer-events-none opacity-70" : ""}`}
                                     onClick={() => {
-                                        setCreateMenuOpen(false);
-                                        localStorage.removeItem("blogPost");
+                                        handlePostCreate(option);
                                     }}
-                                    href={option.href}
+                                    disabled={loading}
                                 >
                                     <div
                                         className={`p-2 rounded-full ${option.color}`}
                                     >
-                                        <option.icon className="w-4 h-4 text-white" />
+                                        {loading ? (
+                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                        ) : (
+                                            <option.icon className="w-4 h-4 text-white" />
+                                        )}
                                     </div>
                                     <span className="flex items-center justify-center gap-3">
-                                        {option.label}{" "}
-                                        <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700 dark:text-stone-200" />
+                                        {loading ? "Loading..." : option.label}{" "}
+                                        {!loading && (
+                                            <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700 dark:text-stone-200" />
+                                        )}
                                     </span>
-                                </a>
+                                </button>
                             ))}
                         </div>
                     )}
