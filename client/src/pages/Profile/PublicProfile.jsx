@@ -140,9 +140,9 @@ const PublicProfile = () => {
 
     const userStats = [
         { name: "POSTS", amount: currentProfile.posts.length },
-        { name: "TOTAL LIKES", amount: currentProfile.totalLikes },
-        { name: "FOLLOWERS", amount: currentProfile.noOfFollowers },
-        { name: "FOLLOWING", amount: currentProfile.noOfFollowing },
+        // { name: "TOTAL LIKES", amount: currentProfile.totalLikes },
+        { name: "FOLLOWERS", amount: currentProfile.followers.length },
+        { name: "FOLLOWING", amount: currentProfile.following.length },
     ];
 
     let collections = [];
@@ -369,76 +369,108 @@ const PublicProfile = () => {
                             : posts.map((post) => (
                                   <div
                                       key={post._id}
-                                      className="group cursor-pointer"
+                                      className="group cursor-auto transition-all duration-300"
                                   >
                                       {post.type === "image" ? (
-                                          // Photo Post
-                                          <div className="space-y-4">
+                                          // Photo Post - Enhanced Design
+                                          <div className="space-y-3 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
                                               <div className="relative aspect-[4/3] overflow-hidden">
                                                   <img
                                                       src={post.image}
                                                       alt={post.title}
-                                                      className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+                                                      className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+                                                      loading="lazy"
                                                   />
-                                                  <div className="absolute inset-0 bg-black/20 dark:bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                                                      <Share2 className="w-6 h-6 text-white" />
+                                                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                                      <div className="absolute bottom-0 w-full p-4 flex justify-end">
+                                                          <Share2 className="w-5 h-5 text-white drop-shadow-md" />
+                                                      </div>
                                                   </div>
                                               </div>
-                                              <div className="flex justify-between items-center">
-                                                  <h3 className="font-medium dark:text-[#e8e8e8]">
+                                              <div className="p-4">
+                                                  <h3 className="font-medium text-lg mb-2 line-clamp-2 dark:text-[#f0f0f0]">
                                                       {post.title}
                                                   </h3>
-                                                  <div className="flex items-center space-x-4 text-sm text-gray-400 dark:text-[#999]">
-                                                      <div className="flex items-center">
-                                                          <Heart className="w-4 h-4 mr-1" />
-                                                          {post.likes}
+                                                  <div className="flex items-center justify-between">
+                                                      <div className="flex items-center space-x-1">
+                                                          <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                                                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                                                              {post.author
+                                                                  ?.name ||
+                                                                  "Anonymous"}
+                                                          </span>
                                                       </div>
-                                                      <div className="flex items-center">
-                                                          <MessageCircle className="w-4 h-4 mr-1" />
-                                                          {post.comments}
-                                                          {/* //post.comments.length */}
+                                                      <div className="flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400">
+                                                          <div className="flex items-center">
+                                                              <Heart className="w-4 h-4 mr-1 text-rose-500" />
+                                                              <span>
+                                                                  {post.likes}
+                                                              </span>
+                                                          </div>
+                                                          <div className="flex items-center">
+                                                              <MessageCircle className="w-4 h-4 mr-1 text-blue-500" />
+                                                              <span>
+                                                                  {
+                                                                      post.comments
+                                                                  }
+                                                              </span>
+                                                          </div>
                                                       </div>
                                                   </div>
                                               </div>
                                           </div>
                                       ) : (
                                           // Text Post
-                                          <div className="p-6 border border-gray-100 dark:border-[#222] hover:border-gray-200 dark:hover:border-[#333] transition-colors duration-300 dark:bg-[#111] relative group">
+                                          <div className="p-6 rounded-xl border border-gray-100 dark:border-[#222] bg-white dark:bg-[#111] shadow-sm hover:shadow-md transition-all duration-300 relative">
                                               <div className="flex justify-between items-start mb-4">
-                                                  <h3 className="font-medium dark:text-[#e8e8e8] capitalize">
+                                                  <h3 className="font-medium text-lg dark:text-[#f0f0f0] capitalize">
                                                       {post.title}
                                                   </h3>
-                                                  <div className="flex items-center space-x-4 text-sm text-gray-400 dark:text-[#999]">
-                                                      <div className="flex items-center">
-                                                          <ThumbsUp className="w-4 h-4 mr-1" />
-                                                          {post.totalLikes}
-                                                      </div>
-                                                      <div className="flex items-center">
-                                                          <MessageCircle className="w-4 h-4 mr-1" />
-                                                          {post.totalComments}
-                                                      </div>
-                                                  </div>
                                               </div>
 
                                               {post.thumbnailUrl && (
-                                                  <div className="mb-4 overflow-hidden rounded-md aspect-video">
+                                                  <div className="mb-4 overflow-hidden rounded-lg aspect-video">
                                                       <img
                                                           src={
                                                               post.thumbnailUrl
                                                           }
                                                           alt={post.title}
-                                                          className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+                                                          className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
+                                                          loading="lazy"
                                                       />
                                                   </div>
                                               )}
 
-                                              {/* Hover Actions Menu */}
-                                              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                                  <div className="bg-white dark:bg-gray-800 shadow-md rounded-md flex">
+                                              <div className="flex items-center justify-between border-t border-gray-100 dark:border-[#222] pt-4 mt-2">
+                                                  <div className="flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400">
+                                                      <div className="flex items-center">
+                                                          <ThumbsUp className="w-4 h-4 mr-1 text-gray-500" />
+                                                          <span>
+                                                              {post.totalLikes}
+                                                          </span>
+                                                      </div>
+                                                      <div className="flex items-center">
+                                                          <MessageCircle className="w-4 h-4 mr-1 text-gray-500" />
+                                                          <span>
+                                                              {
+                                                                  post.totalComments
+                                                              }
+                                                          </span>
+                                                      </div>
+                                                  </div>
+                                                  <div className="text-sm">
+                                                      {post.readTime}
+                                                  </div>
+                                              </div>
+
+                                              {/* Hover Actions Menu - Improved */}
+                                              <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                                                  <div className="bg-white/90 dark:bg-gray-800/90 shadow-lg rounded-lg backdrop-blur-sm flex">
                                                       <button
-                                                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-l-md"
+                                                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-l-lg"
                                                           title="View"
-                                                          onClick={() => {
+                                                          onClick={(e) => {
+                                                              e.stopPropagation();
                                                               navigate(
                                                                   `/p/${post._id}`,
                                                               );
@@ -449,7 +481,8 @@ const PublicProfile = () => {
                                                       <button
                                                           className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                                                           title="Share"
-                                                          onClick={() => {
+                                                          onClick={(e) => {
+                                                              e.stopPropagation();
                                                               sharePost(post);
                                                           }}
                                                       >
