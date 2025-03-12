@@ -44,25 +44,25 @@ const userSchema = new Schema(
             default: "user",
             maxlength: [32, "Role can be 32 characters or less"],
         },
+        relationship: {
+            type: String,
+            enum: ["user", "moderator", "admin", "super-admin"],
+            default: "user",
+        },
         aboutMe: {
             type: String,
             default: "",
             maxlength: [300, "Bio must be 300 characters or less"],
         },
         premiumUser: {
-            type: Boolean,
-            default: false,
+            isPremium: { type: Boolean, default: false },
             subscriptionType: {
                 type: String,
                 enum: ["none", "basic", "pro", "premium"],
                 default: "none",
             },
-            subscriptionStartDate: {
-                type: Date,
-            },
-            subscriptionEndDate: {
-                type: Date,
-            },
+            subscriptionStartDate: { type: Date },
+            subscriptionEndDate: { type: Date },
         },
         // <<<<>>>>
         ipAddress: {
@@ -83,30 +83,38 @@ const userSchema = new Schema(
             type: Date,
             default: Date.now,
         },
-        // <<<<>>>>
-        // total likes earned through all posts
-        totalLikes: {
-            type: Number,
-            default: 0,
+        notifications: {
+            // type
+            emailNotification: { type: Boolean, default: true },
+            pushNotification: { type: Boolean, default: true },
+
+            // category
+            mentionNotification: { type: Boolean, default: true },
+            followNotification: { type: Boolean, default: true },
+            commentNotification: { type: Boolean, default: false },
+            messageNotification: { type: Boolean, default: true },
         },
+        // <<<<>>>>
         posts: [
             {
                 type: Schema.Types.ObjectId,
                 ref: "Post",
             },
         ],
-        // totalPosts:{}, //not needed that much
         savedPosts: [
             {
                 type: Schema.Types.ObjectId,
                 ref: "Post",
             },
         ],
-        totalSavedPosts: {
-            type: Number,
-            default: 0,
-        },
-        // no need to store loved/liked posts
+        likedPosts: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Post",
+            },
+        ],
+        // no need to store posts, totalSavedPosts & totalLikedPosts just use .length,
+        // cuz the array has to be loaded anyway, when we load currentUser
         collections: [
             {
                 type: Schema.Types.ObjectId,
@@ -138,14 +146,6 @@ const userSchema = new Schema(
                 ref: "User",
             },
         ],
-        totalFollowers: {
-            type: Number,
-            default: 0,
-        },
-        totalFollowing: {
-            type: Number,
-            default: 0,
-        },
     },
     { timestamps: true },
 );

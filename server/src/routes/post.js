@@ -87,7 +87,6 @@ router.post(
                         role: user.role,
                     },
                     tags: postData.tags,
-                    postDeleteHash: uuidv4(),
                     isEdited: false,
                     isPublic: postData.isPublic ?? true,
                     type: postData.artType ?? "written", // artType cannot be changed, its fixed
@@ -135,10 +134,10 @@ router.get("/p/:postId", async (req, res) => {
             return res.status(400).json({ error: "Invalid post ID" });
         }
 
-        const post = await Post.findById(postId).select({
-            postDeleteHash: 0,
-            imgDeleteHash: 0,
-        });
+        const post = await Post.findById(postId);
+        //     .select({
+        //     imgDeleteHash: 0,
+        // });
 
         if (!post) {
             return res.status(404).json({
@@ -192,10 +191,9 @@ router.post("/u/posts/byids", authenticateToken, async (req, res) => {
         const posts = await Post.find({
             _id: { $in: postIds },
         })
-            .select({
-                postDeleteHash: 0,
-                imgDeleteHash: 0,
-            })
+            // .select({
+            //     imgDeleteHash: 0,
+            // })
             .sort({ createdAt: -1 }); // newest first
 
         return res.status(200).json({

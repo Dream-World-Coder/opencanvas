@@ -25,11 +25,8 @@ const imageSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        // if i use imgur, else use _id
         imgDeleteHash: {
-            type: String,
-            required: true,
-        },
-        postDeleteHash: {
             type: String,
             required: true,
         },

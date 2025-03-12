@@ -20,6 +20,8 @@ const mediaSchema = new Schema({
     deleteHash: { type: String, required: true },
 });
 
+// postDeleteHash: _id
+
 const postSchema = new Schema(
     {
         title: {
@@ -55,12 +57,6 @@ const postSchema = new Schema(
                 },
                 message: "Maximum 5 tags are allowed.",
             },
-        },
-        postDeleteHash: {
-            type: String,
-            unique: true,
-            required: true,
-            // default: uuidv4, -> in the routes
         },
         isEdited: { type: Boolean, default: false },
         isPublic: { type: Boolean, default: true },

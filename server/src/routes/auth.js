@@ -320,7 +320,8 @@ router.put(
     async (req, res) => {
         try {
             const user = req.user;
-            const { username, fullName, role, aboutMe } = req.body;
+            const { username, fullName, role, aboutMe, notifications } =
+                req.body;
 
             // Check if username is being changed
             if (username && username !== user.username) {
@@ -386,6 +387,23 @@ router.put(
                 user.aboutMe = aboutMe;
             }
 
+            // Update notifications choices if provided
+            if (notifications !== undefined) {
+                if (notifications && typeof notifications !== "object") {
+                    return res.status(400).json({
+                        success: false,
+                        message: "error setting notification settings",
+                    });
+                }
+                user.notifications.emailNotification = notifications.email;
+                user.notifications.pushNotification = notifications.push;
+
+                user.notifications.mentionNotification = notifications.mentions;
+                user.notifications.followNotification = notifications.follows;
+                user.notifications.commentNotification = notifications.comments;
+                user.notifications.messageNotification = notifications.messages;
+            }
+
             const savedUser = await user.save();
 
             return res.status(200).json({
@@ -421,7 +439,7 @@ router.get("/u/:username", async (req, res) => {
             ipAddress: 0,
             lastFiveLogin: 0,
             savedPosts: 0,
-            totalSavedPosts: 0,
+            likedPosts: 0,
         });
 
         if (!user) {
