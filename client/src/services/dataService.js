@@ -22,6 +22,7 @@ export const useDataService = () => {
                 fullName: formValues.fullName,
                 role: formValues.role,
                 aboutMe: formValues.aboutMe,
+                notifications: formValues.notifications,
             });
             return response.data;
         } catch (error) {

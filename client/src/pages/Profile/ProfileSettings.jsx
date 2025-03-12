@@ -43,12 +43,13 @@ const ProfileSettings = () => {
         role: currentUser.role || "user",
         aboutMe: currentUser.aboutMe || "",
         notifications: {
-            aboutYou: true,
+            email: true,
             push: true,
-            sms: false,
+            mentions: true,
+            follows: true,
+            comments: false,
+            messages: true,
         },
-        privacy: "friends",
-        twoFactorEnabled: true,
     });
 
     const { updateUserProfile } = useDataService();
@@ -294,69 +295,39 @@ const ProfileSettings = () => {
                     </div>
                 </div> */}
 
-                {/* 2FA */}
+                {/* sessions / lastFiveLogin */}
                 {/* ------------- */}
-                {/* <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h3 className="text-lg font-medium">
-                                Two-Factor Authentication
-                            </h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                                Add an extra layer of security to your account
-                            </p>
-                        </div>
-                        <Switch
-                            id="twoFactorEnabled"
-                            checked={formValues.twoFactorEnabled}
-                            onCheckedChange={(checked) =>
-                                setFormValues({
-                                    ...formValues,
-                                    twoFactorEnabled: checked,
-                                })
-                            }
-                        />
+                <div className="space-y-4">
+                    <div className="text-sm font-thin">
+                        Joined:{" "}
+                        {new Date(currentUser.createdAt).toLocaleDateString(
+                            "en-GB",
+                        )}
                     </div>
-
-                    {formValues.twoFactorEnabled && (
-                        <div className="rounded-lg border p-4 mt-2 dark:border-gray-800 dark:bg-gray-900">
-                            <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-medium">Sessions</h3>
+                    <div className="rounded-lg border p-4 dark:border-gray-800 dark:bg-gray-900">
+                        {currentUser.lastFiveLogin.map((item, index) => (
+                            <div
+                                key={index}
+                                className="flex items-center justify-between"
+                            >
                                 <div className="space-y-1">
                                     <p className="text-sm font-medium">
-                                        Authenticator App
+                                        {item.deviceInfo}
                                     </p>
                                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                                        Using Google Authenticator or Authy
+                                        {new Date(
+                                            item.loginTime,
+                                        ).toLocaleDateString("en-GB")}
                                     </p>
                                 </div>
-                                <Badge className="bg-lime-600 dark:bg-lime-700 text-white">
+                                <Badge className="bg-green-600 text-white">
                                     Active
                                 </Badge>
                             </div>
-                        </div>
-                    )}
-                </div> */}
-
-                {/* sessions */}
-                {/* ------------- */}
-                {/* <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Sessions</h3>
-                    <div className="rounded-lg border p-4 dark:border-gray-800 dark:bg-gray-900">
-                        <div className="flex items-center justify-between">
-                            <div className="space-y-1">
-                                <p className="text-sm font-medium">
-                                    Current Device • Chrome on macOS
-                                </p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">
-                                    Last active: Just now
-                                </p>
-                            </div>
-                            <Badge className="bg-green-600 text-white">
-                                Active
-                            </Badge>
-                        </div>
+                        ))}
                     </div>
-                </div> */}
+                </div>
 
                 {/* save-cancel buttons */}
                 {/* <div className="flex justify-end gap-2">
@@ -439,7 +410,7 @@ const ProfileSettings = () => {
         content: (
             <div className="space-y-6 dark:text-white">
                 <div className="space-y-4">
-                    {["email", "push", "sms"].map((type) => {
+                    {["email", "push"].map((type) => {
                         const label =
                             type.charAt(0).toUpperCase() + type.slice(1);
                         return (
@@ -456,8 +427,6 @@ const ProfileSettings = () => {
                                             "Receive updates via email"}
                                         {type === "push" &&
                                             "Get notifications on your device"}
-                                        {type === "sms" &&
-                                            "Receive text messages for important updates"}
                                     </p>
                                 </div>
                                 <Switch
@@ -483,7 +452,7 @@ const ProfileSettings = () => {
                         Notification Categories
                     </h3>
 
-                    {["mentions", "comments", "follows", "messages"].map(
+                    {["mentions", "follows", "messages", "comments"].map(
                         (category) => {
                             const label =
                                 category.charAt(0).toUpperCase() +
@@ -508,7 +477,19 @@ const ProfileSettings = () => {
                                     </div>
                                     <Switch
                                         id={`${category}Notifications`}
-                                        defaultChecked={true}
+                                        // defaultChecked={true}
+                                        checked={
+                                            formValues.notifications[category]
+                                        }
+                                        onCheckedChange={(checked) =>
+                                            setFormValues({
+                                                ...formValues,
+                                                notifications: {
+                                                    ...formValues.notifications,
+                                                    [category]: checked,
+                                                },
+                                            })
+                                        }
                                     />
                                 </div>
                             );
@@ -516,14 +497,11 @@ const ProfileSettings = () => {
                     )}
                 </div>
 
-                <div className="flex justify-end gap-2">
+                <div className="flex justify-end">
                     <Button
-                        variant="outline"
-                        className="dark:bg-gray-900 dark:hover:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white"
+                        onClick={updateUser}
+                        className="bg-lime-600 hover:bg-lime-700 dark:bg-lime-700 dark:hover:bg-lime-800 text-white"
                     >
-                        Reset to Default
-                    </Button>
-                    <Button className="bg-lime-600 hover:bg-lime-700 dark:bg-lime-700 dark:hover:bg-lime-800 text-white">
                         Save Changes
                     </Button>
                 </div>
@@ -536,126 +514,9 @@ const ProfileSettings = () => {
         id: "privacy",
         label: "Privacy",
         icon: <ShieldIcon className="h-4 w-4" />,
-        content: (
-            <div className="space-y-6 dark:text-white">
-                <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Profile Visibility</h3>
-                    <RadioGroup
-                        value={formValues.privacy}
-                        onValueChange={(value) =>
-                            setFormValues({ ...formValues, privacy: value })
-                        }
-                        className="space-y-2"
-                    >
-                        {[
-                            {
-                                value: "public",
-                                label: "Public",
-                                description:
-                                    "Anyone can see your profile and posts",
-                            },
-                            {
-                                value: "friends",
-                                label: "Friends Only",
-                                description:
-                                    "Only people you follow can see your posts",
-                            },
-                            {
-                                value: "private",
-                                label: "Private",
-                                description: "Only you can see your posts",
-                            },
-                        ].map((option) => (
-                            <div
-                                key={option.value}
-                                className="flex items-center space-x-2 rounded-lg border p-4 dark:border-gray-800 dark:bg-gray-900 dark:text-white"
-                            >
-                                <RadioGroupItem
-                                    value={option.value}
-                                    id={option.value}
-                                    className="dark:text-white dark:fill-white dark:bg-black"
-                                />
-                                <div className="flex-1">
-                                    <Label
-                                        htmlFor={option.value}
-                                        className="text-sm font-medium cursor-pointer"
-                                    >
-                                        {option.label}
-                                    </Label>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                                        {option.description}
-                                    </p>
-                                </div>
-                            </div>
-                        ))}
-                    </RadioGroup>
-                </div>
-
-                <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Data & Privacy</h3>
-
-                    <div className="space-y-2">
-                        {[
-                            {
-                                id: "activityStatus",
-                                label: "Show Activity Status",
-                                description:
-                                    "Let others see when you were last active",
-                            },
-                            {
-                                id: "readReceipts",
-                                label: "Read Receipts",
-                                description:
-                                    "Let others know when you've seen their messages",
-                            },
-                            {
-                                id: "dataCollection",
-                                label: "Data Collection",
-                                description:
-                                    "Allow us to collect usage data to improve your experience",
-                            },
-                        ].map((setting) => (
-                            <div
-                                key={setting.id}
-                                className="flex items-center justify-between rounded-lg border p-4 dark:border-gray-800 dark:bg-gray-900"
-                            >
-                                <div>
-                                    <Label
-                                        htmlFor={setting.id}
-                                        className="text-sm font-medium cursor-pointer"
-                                    >
-                                        {setting.label}
-                                    </Label>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                                        {setting.description}
-                                    </p>
-                                </div>
-                                <Switch
-                                    id={setting.id}
-                                    defaultChecked={
-                                        setting.id !== "dataCollection"
-                                    }
-                                />
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="flex justify-end gap-2">
-                    <Button
-                        variant="outline"
-                        className="dark:bg-gray-900 dark:hover:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white"
-                    >
-                        Cancel
-                    </Button>
-                    <Button className="bg-lime-600 hover:bg-lime-700 dark:bg-lime-700 dark:hover:bg-lime-800 text-white">
-                        Save Changes
-                    </Button>
-                </div>
-            </div>
-        ),
-        };
-        */
+        "Allow us to collect usage data to improve your experience",
+    }
+    */
 
     const pro = {
         id: "pro",
@@ -754,7 +615,10 @@ const ProfileSettings = () => {
 
     return (
         <>
-            <Header noBlur={true} />
+            <Header
+                noBlur={true}
+                exclude={["/about", "/contact", "/gallery/photos"]}
+            />
             <div className="w-full h-full bg-white dark:bg-black dark:text-white">
                 <div className="mx-auto max-w-4xl mt-20 px-4 py-8 dark:bg-black">
                     <h1 className="text-3xl font-bold mb-6 dark:text-white">
@@ -787,7 +651,7 @@ const ProfileSettings = () => {
                             <CardHeader className="pb-2">
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                                     <div>
-                                        <CardTitle className="dark:text-white flex items-center justify-between">
+                                        <CardTitle className="dark:text-white flex items-center justify-between mb-1">
                                             Public Profile Link
                                             <Copy
                                                 className="size-4 cursor-pointer"
