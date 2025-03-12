@@ -142,3 +142,11 @@ else focus will be gone by browsing different sections, here browse one type of 
 and in the feed, imgs will not be recommended or will be less recommended, they will be in the profile only
 
 collections, imgs, books etc will not be in feed, will only gen when searched for.
+
+
+issue: in md2pdf when in 2 window mode isPreview must always be false, but if we use the export during that time, then it will be turned on, so it will be better to close the the 2 window view first, when export pressed
+
+
+msg+contact info add in profile settings
+
+saved posts profile nav

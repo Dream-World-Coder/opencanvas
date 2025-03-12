@@ -15,10 +15,12 @@ import {
 import { useDataService } from "../../services/dataService";
 
 const navLinks = [
-    { href: "/gallery/photos", label: "Gallery" },
-    { href: "/gallery/literature", label: "Stories" },
-    { href: "/about", label: "About" },
-    { href: "/contact", label: "Contact" },
+    // { href: "/gallery/photos", label: "Gallery" },
+    { href: "/gallery/literature", label: "Literature" },
+    { href: "/articles", label: "Articles" },
+    // { href: "/about", label: "About" },
+    // { href: "/contact", label: "Contact" },
+    { href: "/saved", label: "Saved" },
 ];
 
 export default function ProfileHeader() {
@@ -117,7 +119,7 @@ export default function ProfileHeader() {
                             )}
                         </button>
 
-                        {/* Create Menu Dropdown */}
+                        {/* Create Menu Dropdown --desktop */}
                         {createMenuOpen && (
                             <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#111] border border-gray-100 dark:border-[#333] rounded-lg shadow-lg py-2 z-50">
                                 {createOptions.map((option) => (
@@ -178,6 +180,8 @@ export default function ProfileHeader() {
                             <Menu className="w-6 h-6" />
                         )}
                     </button>
+
+                    {/* mobile */}
                     {createMenuOpen && (
                         <div
                             className="absolute top-20 right-0 w-64 bg-white border border-gray-100

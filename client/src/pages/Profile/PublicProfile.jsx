@@ -156,17 +156,17 @@ const PublicProfile = () => {
         >
             <ProfileHeader />
 
-            <main className="pt-32 px-8">
+            <main className="pt-32 px-2 md:px-8">
                 <div className="max-w-[1400px] mx-auto pb-[20vh]">
                     <div className="grid md:grid-cols-[1.6fr,1fr] gap-16 mb-24">
                         {/* Left Column with Profile Pic */}
                         <div className="space-y-8">
-                            <div className="flex items-center space-x-8">
+                            <div className="flex items-start md:items-center space-x-8">
                                 {loading ? (
-                                    <Skeleton className="w-24 h-24 rounded-full" />
+                                    <Skeleton className="size-16 md:size-24 rounded-full" />
                                 ) : (
                                     <div className="relative group">
-                                        <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100 dark:bg-[#222]">
+                                        <div className="size-16 md:size-24 rounded-full overflow-hidden bg-gray-100 dark:bg-[#222]">
                                             <img
                                                 src={
                                                     currentProfile.profilePicture
@@ -185,11 +185,11 @@ const PublicProfile = () => {
                                         </div>
                                     ) : (
                                         <h1
-                                            className="text-5xl md:text-7xl font-boska leading-[0.95] tracking-tighter
+                                            className="text-4xl md:text-6xl font-boska leading-[0.95] tracking-tighter
                                             pointer-events-none md:pointer-events-auto uppercase dark:text-[#f8f8f8]"
                                         >
                                             {currentProfile.fullName}
-                                            <span className="block text-2xl md:text-5xl font-bold md:font-normal tracking-normal md:tracking-tighter italic capitalize leading-[1.7rem] dark:text-[#e0e0e0]">
+                                            <span className="block text-xl md:text-4xl font-normal tracking-normal md:tracking-tighter italic capitalize leading-[1.7rem] dark:text-[#e0e0e0]">
                                                 {currentProfile.role}
                                             </span>
                                         </h1>

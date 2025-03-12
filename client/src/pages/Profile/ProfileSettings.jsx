@@ -28,6 +28,7 @@ import {
     ShieldIcon,
     GlobeIcon,
     Loader2,
+    Copy,
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useDataService } from "../../services/dataService";
@@ -131,7 +132,7 @@ const ProfileSettings = () => {
                         <Button
                             variant="outline"
                             size="sm"
-                            className="mt-2 dark:text-black"
+                            className="mt-2 dark:text-black cursor-not-allowed"
                         >
                             Change Photo
                         </Button>
@@ -208,8 +209,12 @@ const ProfileSettings = () => {
                             id="darkMode"
                             checked={darkMode}
                             // onCheckedChange={toggleDarkMode}
+                            className="cursor-not-allowed"
                         />
-                        <Label htmlFor="darkMode" className="cursor-pointer">
+                        <Label
+                            htmlFor="darkMode"
+                            className="cursor-not-allowed"
+                        >
                             Dark Mode
                         </Label>
                         {darkMode ? (
@@ -782,12 +787,21 @@ const ProfileSettings = () => {
                             <CardHeader className="pb-2">
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                                     <div>
-                                        <CardTitle className="dark:text-white">
-                                            Public Url
+                                        <CardTitle className="dark:text-white flex items-center justify-between">
+                                            Public Profile Link
+                                            <Copy
+                                                className="size-4 cursor-pointer"
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(
+                                                        `https://www.opencanvas.blog/u/${formValues.username}`,
+                                                    );
+                                                    toast.success("copied!");
+                                                }}
+                                            />
                                         </CardTitle>
                                         <CardDescription className="dark:text-gray-400">
-                                            https://www.opencanvas.blog/u/
-                                            {currentUser.username}
+                                            opencanvas.blog/u/
+                                            {formValues.username}
                                         </CardDescription>
                                     </div>
                                     <TabsList

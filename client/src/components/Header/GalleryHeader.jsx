@@ -38,7 +38,7 @@ const Header = ({ filters }) => {
 
     return (
         <header className="fixed top-0 w-full bg-white z-50 border-b border-gray-100 dark:bg-[#111] dark:border-[#222] dark:text-white">
-            <div className="max-w-7xl mx-auto px-3 py-0 md:px-0 md:py-2">
+            <div className="max-w-7xl mx-auto px-3 py-3 md:px-0 md:py-2">
                 <div className="flex flex-row justify-between items-center">
                     <h1 className="text-lg md:text-2xl font-stardom font-semibold tracking-tight">
                         Literature Gallery
@@ -111,7 +111,7 @@ const Header = ({ filters }) => {
                                 )}
                             </button>
 
-                            {/* Create Menu Dropdown */}
+                            {/* create menu dropdown -- desktop */}
                             {createMenuOpen && (
                                 <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#111] border border-gray-100 dark:border-[#333] rounded-lg shadow-lg py-2 z-50">
                                     {createOptions.map((option) => (
@@ -172,13 +172,13 @@ const Header = ({ filters }) => {
                         {/* Mobile Menu Button */}
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="md:hidden hover:bg-white/50 rounded-sm transition-colors"
+                            className="md:hidden hover:bg-white/50 rounded-sm transition-colors dark:hover:bg-[#333]/50"
                             aria-label="Toggle menu"
                         >
                             {isMenuOpen ? (
-                                <X className="size-5 text-stone-600" />
+                                <X className="size-5 text-stone-600 dark:text-gray-300" />
                             ) : (
-                                <Menu className="size-5 text-stone-600" />
+                                <Menu className="size-5 text-stone-600 dark:text-gray-300" />
                             )}
                         </button>
                     </div>
@@ -201,13 +201,14 @@ const Header = ({ filters }) => {
                         ))}
                     </div>
                 )}
+                {/* mobile create menu open */}
                 {createMenuOpen && (
-                    <div className="flex flex-col md:hidden w-64 bg-white border border-gray-100 rounded-lg shadow-lg py-2 z-50">
+                    <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#111] border border-gray-100 dark:border-[#333] rounded-lg shadow-lg py-2 z-50">
                         {createOptions.map((option) => (
                             <button
                                 key={option.id}
-                                className={`w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50
-                                dark:hover:bg-[#333] transition-colors group ${loading ? "pointer-events-none opacity-70" : ""}`}
+                                className={`w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-[#333] transition-colors group
+                                    ${loading ? "pointer-events-none opacity-70" : ""}`}
                                 onClick={() => {
                                     handlePostCreate(option);
                                 }}
@@ -233,21 +234,21 @@ const Header = ({ filters }) => {
                     </div>
                 )}
                 <div
-                    className={`md:hidden absolute left-0 right-0 bg-white backdrop-blur-md
-                        border-b border-stone-200/50 transition-all duration-300 ease-in-out ${
+                    className={`md:hidden absolute left-0 right-0 bg-white dark:bg-[#111] backdrop-blur-md
+                        border-b border-stone-200/50 dark:border-stone-700/50 transition-all duration-300 ease-in-out ${
                             isMenuOpen
                                 ? "opacity-100 translate-y-0"
                                 : "opacity-0 -translate-y-2 pointer-events-none"
                         }`}
                 >
-                    <div className="px-4 py-6 space-y-6">
+                    <div className="px-4 py-2 space-y-2">
                         {/* mobile nav links */}
                         <div className="flex flex-col">
                             {navLinks.map((link, index) => (
                                 <a
                                     key={index}
                                     href={link.href}
-                                    className="py-2 pl-4 rounded-lg text-stone-600 hover:text-stone-800 hover:bg-gray-300/30 transition-colors"
+                                    className="py-2 pl-4 rounded-lg text-stone-600 dark:text-gray-300 hover:text-stone-800 hover:bg-gray-300/30 transition-colors"
                                     onClick={() => setIsMenuOpen(false)}
                                 >
                                     {link.name}

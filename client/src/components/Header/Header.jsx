@@ -118,7 +118,7 @@ const Header = ({
                                 )}
                             </button>
 
-                            {/* Create Menu Dropdown */}
+                            {/* Create Menu Dropdown --desktop */}
                             {createMenuOpen && (
                                 <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#111] border border-gray-100 dark:border-[#333] rounded-lg shadow-lg py-2 z-50">
                                     {createOptions.map((option) => (
@@ -159,7 +159,7 @@ const Header = ({
                         {/* Mobile Create Button */}
                         <button
                             onClick={() => setCreateMenuOpen(!createMenuOpen)}
-                            className="w-fit p-1 flex items-center justify-center bg-black text-white rounded-full hover:bg-stone-800/90 transition-colors"
+                            className="w-fit p-1 flex items-center justify-center bg-black text-white rounded-full hover:bg-stone-800/90 transition-colors dark:invert"
                         >
                             {createMenuOpen ? (
                                 <X className="w-4 h-4" />
@@ -171,18 +171,22 @@ const Header = ({
                         {/* Mobile Menu Button */}
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="md:hidden p-2 hover:bg-white/50 rounded-sm transition-colors"
+                            className="md:hidden p-2 hover:bg-white/50 rounded-sm transition-colors dark:hover:bg-[#222]/50"
                             aria-label="Toggle menu"
                         >
                             {isMenuOpen ? (
-                                <X className="h-6 w-6 text-stone-600" />
+                                <X className="h-6 w-6 text-stone-600 dark:text-gray-200" />
                             ) : (
-                                <Menu className="h-6 w-6 text-stone-600" />
+                                <Menu className="h-6 w-6 text-stone-600 dark:text-gray-200" />
                             )}
                         </button>
 
+                        {/* mobile phones */}
                         {createMenuOpen && (
-                            <div className="absolute top-20 right-0 w-64 bg-white border border-gray-100 rounded-lg shadow-lg py-2 z-50">
+                            <div
+                                className="absolute top-20 right-0 w-64 bg-white border border-gray-100
+                                rounded-lg shadow-lg py-2 z-50 dark:bg-[#111] dark:border-[#333]"
+                            >
                                 {createOptions.map((option) => (
                                     <button
                                         key={option.id}
@@ -219,7 +223,7 @@ const Header = ({
 
                 {/* Mobile Menu */}
                 <div
-                    className={`md:hidden absolute left-0 right-0 bg-white backdrop-blur-md border-b border-stone-200/50 transition-all duration-300 ease-in-out ${
+                    className={`md:hidden absolute left-0 right-0 bg-white dark:bg-[#111] backdrop-blur-md border-b border-stone-200/50 dark:border-stone-700/50 transition-all duration-300 ease-in-out ${
                         isMenuOpen
                             ? "opacity-100 translate-y-0"
                             : "opacity-0 -translate-y-2 pointer-events-none"
@@ -232,7 +236,7 @@ const Header = ({
                                 <a
                                     key={index}
                                     href={link.href}
-                                    className="py-2 pl-4 rounded-lg text-stone-600 hover:text-stone-800 hover:bg-lime-300/50 transition-colors"
+                                    className="py-2 pl-4 rounded-lg text-stone-600 dark:text-gray-300 hover:text-stone-800 dark:hover:text-gray-200 hover:bg-lime-300/50 transition-colors"
                                     onClick={() => setIsMenuOpen(false)}
                                 >
                                     {link.name}

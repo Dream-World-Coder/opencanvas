@@ -25,7 +25,7 @@ const ViewPost = lazy(() => import("./pages/Post/ViewPost"));
 const AboutPage = lazy(() => import("./pages/About/About"));
 const ContactPage = lazy(() => import("./pages/Contact/Contact"));
 
-const WritingPad = lazy(() => import("./pages/CreatePosts/Writing/WritingPad"));
+// const WritingPad = lazy(() => import("./pages/CreatePosts/Writing/WritingPad"));
 const PoemPad = lazy(() => import("./pages/CreatePosts/WritePoem"));
 const StoryPad = lazy(() => import("./pages/CreatePosts/WriteStory"));
 const ArticlePad = lazy(() => import("./pages/CreatePosts/WriteArticle"));
@@ -105,6 +105,14 @@ export default function App() {
                                 path="/u/:username"
                                 element={<PublicProfile bgClr="bg-white" />}
                             />
+
+                            {/* ---------------- remove later */}
+                            <Route
+                                path="/p"
+                                element={<Profile bgClr="bg-white" />}
+                            />
+                            <Route path="/p/s" element={<ProfileSettings />} />
+                            {/* ---------------- */}
 
                             {/* protected */}
                             <Route element={<ProtectedRoute />}>
