@@ -150,3 +150,7 @@ issue: in md2pdf when in 2 window mode isPreview must always be false, but if we
 msg+contact info add in profile settings
 
 saved posts profile nav
+
+-- may be in Markdown preview 'p' tags, some space is getting left in the RHS
+-- link to writer in the post page
+-- in edit just save the same id as post id in loocalstorage, use different url/route though, else will be messy

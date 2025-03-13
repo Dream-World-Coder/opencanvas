@@ -46,7 +46,7 @@ function sharePost(post) {
     navigator.clipboard
         .writeText(postUrl)
         .then(() => {
-            toast.success("Link copied to clipboard!");
+            toast.success("Link copied to clipboard");
         })
         .catch((err) => {
             console.error("Failed to copy link:", err);

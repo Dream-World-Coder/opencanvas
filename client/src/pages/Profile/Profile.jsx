@@ -31,7 +31,7 @@ function sharePost(post) {
     navigator.clipboard
         .writeText(postUrl)
         .then(() => {
-            toast.success("Link copied to clipboard!");
+            toast.success("Link copied to clipboard");
         })
         .catch((err) => {
             console.error("Failed to copy link:", err);
@@ -42,14 +42,13 @@ const Profile = () => {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
     const [viewMode, setViewMode] = useState("grid");
-    const [activeTab, setActiveTab] = useState("all");
+    const [activeTab, setActiveTab] = useState("written");
     const [posts, setPosts] = useState([]);
     const [postsToFetch, setPostsToFetch] = useState(0);
     const [loading, setLoading] = useState(false);
 
     const userStats = [
         { name: "POSTS", amount: currentUser.posts.length },
-        // { name: "TOTAL LIKES", amount: currentUser.totalLikes },
         { name: "FOLLOWERS", amount: currentUser.followers.length },
         { name: "FOLLOWING", amount: currentUser.following.length },
     ];
@@ -282,16 +281,16 @@ const Profile = () => {
                                 </button> */}
                                 {/* pic post seperately */}
                                 <button
+                                    onClick={() => setActiveTab("written")}
+                                    className={`pb-2 dark:text-[#e0e0e0] ${activeTab === "written" ? "border-b-2 border-black dark:border-[#f0f0f0]" : ""}`}
+                                >
+                                    Written
+                                </button>
+                                <button
                                     onClick={() => setActiveTab("photos")}
                                     className={`pb-2 dark:text-[#e0e0e0] ${activeTab === "photos" ? "border-b-2 border-black dark:border-[#f0f0f0]" : ""}`}
                                 >
                                     Photos
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab("stories")}
-                                    className={`pb-2 dark:text-[#e0e0e0] ${activeTab === "stories" ? "border-b-2 border-black dark:border-[#f0f0f0]" : ""}`}
-                                >
-                                    Written
                                 </button>
                             </div>
                             <div className="hidden md:flex space-x-4">

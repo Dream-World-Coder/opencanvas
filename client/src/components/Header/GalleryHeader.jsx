@@ -113,7 +113,7 @@ const Header = ({ filters }) => {
 
                             {/* create menu dropdown -- desktop */}
                             {createMenuOpen && (
-                                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#111] border border-gray-100 dark:border-[#333] rounded-lg shadow-lg py-2 z-50">
+                                <div className="hidden md:block absolute right-0 mt-2 w-64 bg-white dark:bg-[#111] border border-gray-100 dark:border-[#333] rounded-lg shadow-lg py-2 z-50">
                                     {createOptions.map((option) => (
                                         <button
                                             key={option.id}
@@ -203,7 +203,7 @@ const Header = ({ filters }) => {
                 )}
                 {/* mobile create menu open */}
                 {createMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#111] border border-gray-100 dark:border-[#333] rounded-lg shadow-lg py-2 z-50">
+                    <div className="md:hidden absolute right-0 mt-2 w-64 bg-white dark:bg-[#111] border border-gray-100 dark:border-[#333] rounded-lg shadow-lg py-2 z-50">
                         {createOptions.map((option) => (
                             <button
                                 key={option.id}
