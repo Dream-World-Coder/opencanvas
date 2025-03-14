@@ -35,7 +35,10 @@ const postSchema = new Schema(
             ref: "User",
             required: true,
         },
+        // shall i store it ? or cuz i have to fetch the writer anyway to see his posts
+        // for " more from writer " section.
         author: {
+            // authorId
             name: { type: String, required: true },
             profilePicture: { type: String },
             role: { type: String },

@@ -50,6 +50,10 @@ const ProfileSettings = () => {
             comments: false,
             messages: true,
         },
+        contactInformation: {
+            // name
+            // link - array
+        },
     });
 
     const { updateUserProfile } = useDataService();

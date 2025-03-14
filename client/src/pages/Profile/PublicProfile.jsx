@@ -8,11 +8,23 @@ import {
     MessageCircle,
     Eye,
     Heart,
+    BadgeInfo,
 } from "lucide-react";
 import ProfileHeader from "../../components/Header/ProfileHeader";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 // Use Helmet & schema data
 // ---------------------------
@@ -140,7 +152,6 @@ const PublicProfile = () => {
 
     const userStats = [
         { name: "POSTS", amount: currentProfile.posts.length },
-        // { name: "TOTAL LIKES", amount: currentProfile.totalLikes },
         { name: "FOLLOWERS", amount: currentProfile.followers.length },
         { name: "FOLLOWING", amount: currentProfile.following.length },
     ];
@@ -186,9 +197,32 @@ const PublicProfile = () => {
                                     ) : (
                                         <h1
                                             className="text-4xl md:text-6xl font-boska leading-[0.95] tracking-tighter
-                                            pointer-events-none md:pointer-events-auto uppercase dark:text-[#f8f8f8]"
+                                            pointer-events-none md:pointer-events-auto uppercase dark:text-[#f8f8f8] group"
                                         >
-                                            {currentProfile.fullName}
+                                            <div className="flex gap-3 items-start">
+                                                {currentProfile.fullName}
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger>
+                                                        <BadgeInfo className="size-5 opacity-0 group-hover:opacity-100 transition-all duration-200" />
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>
+                                                                Contact
+                                                                Information
+                                                            </AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                {}
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel>
+                                                                Close
+                                                            </AlertDialogCancel>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
+                                            </div>
                                             <span className="block text-xl md:text-4xl font-normal tracking-normal md:tracking-tighter italic capitalize leading-[1.7rem] dark:text-[#e0e0e0]">
                                                 {currentProfile.role}
                                             </span>

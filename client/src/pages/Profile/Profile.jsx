@@ -142,7 +142,13 @@ const Profile = () => {
                                                 className="w-full h-full object-cover"
                                             />
                                         </div>
-                                        <button className="absolute bottom-0 right-0 bg-black dark:bg-[#333] text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button
+                                            className="absolute bottom-0 right-0 bg-black dark:bg-[#333] text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                            onClick={() => {
+                                                window.location.href =
+                                                    "/profile/settings";
+                                            }}
+                                        >
                                             <Camera className="w-4 h-4" />
                                         </button>
                                     </div>

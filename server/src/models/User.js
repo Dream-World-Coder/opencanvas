@@ -83,6 +83,7 @@ const userSchema = new Schema(
             type: Date,
             default: Date.now,
         },
+        contactInformation: {},
         notifications: {
             // type
             emailNotification: { type: Boolean, default: true },
