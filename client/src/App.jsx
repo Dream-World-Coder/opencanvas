@@ -25,10 +25,10 @@ const ViewPost = lazy(() => import("./pages/Post/ViewPost"));
 const AboutPage = lazy(() => import("./pages/About/About"));
 const ContactPage = lazy(() => import("./pages/Contact/Contact"));
 
-// const WritingPad = lazy(() => import("./pages/CreatePosts/Writing/WritingPad"));
-const PoemPad = lazy(() => import("./pages/CreatePosts/WritePoem"));
-const StoryPad = lazy(() => import("./pages/CreatePosts/WriteStory"));
-const ArticlePad = lazy(() => import("./pages/CreatePosts/WriteArticle"));
+const WritingPad = lazy(() => import("./pages/CreatePosts/Writing/WritingPad"));
+// const PoemPad = lazy(() => import("./pages/CreatePosts/WritePoem"));
+// const StoryPad = lazy(() => import("./pages/CreatePosts/WriteStory"));
+// const ArticlePad = lazy(() => import("./pages/CreatePosts/WriteArticle"));
 const Md2Pdf = lazy(() => import("./pages/CreatePosts/Writing/Md2pdf"));
 
 const ImageUploadPage = lazy(() => import("./pages/CreatePosts/UploadImage"));
@@ -106,7 +106,7 @@ export default function App() {
                                 element={<PublicProfile bgClr="bg-white" />}
                             />
 
-                            {/* ---------------- remove later */}
+                            {/* ---------------- remove later /}
                             <Route
                                 path="/p"
                                 element={<Profile bgClr="bg-white" />}
@@ -126,21 +126,24 @@ export default function App() {
                                 />
                                 <Route
                                     path="/createpost/poem"
-                                    element={<PoemPad />}
+                                    element={<WritingPad artType={"poem"} />}
                                 />
                                 <Route
                                     path="/createpost/story"
-                                    element={<StoryPad />}
+                                    element={<WritingPad artType={"story"} />}
                                 />
                                 <Route
                                     path="/createpost/article"
-                                    element={<ArticlePad />}
+                                    element={<WritingPad artType={"article"} />}
                                 />
                                 <Route
                                     path="/createpost/image"
                                     element={<ImageUploadPage />}
                                 />
-                                {/* <Route path="/my-posts" element={<UserPosts />} /> */}
+                                <Route
+                                    path="/edit-post"
+                                    element={<WritingPad artType={"edit"} />}
+                                />
                             </Route>
 
                             {/* others */}

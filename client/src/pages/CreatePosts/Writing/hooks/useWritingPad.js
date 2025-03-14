@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 // import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-// import { useDataService } from "../../../../services/dataService";
+import { useDataService } from "../../../../services/dataService";
 
 export function useWritingPad({ postId, frontendOnly, artType }) {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [twoColumn, setTwoColumn] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [isSaved, setIsSaved] = useState(true);
     // const [lastSynced, setLastSynced] = useState(null);
     // const [syncStatus, setSyncStatus] = useState("synced"); // 'synced', 'saving', 'offline'
@@ -15,6 +16,8 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
     const [isPublic, setIsPublic] = useState(true);
     const [thumbnailUrl, setThumbnailUrl] = useState("");
     const [media, setMedia] = useState([]);
+
+    const { getPostById } = useDataService();
     // const navigate = useNavigate();
 
     // else not getting it in the first chance, postId
@@ -174,75 +177,68 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
     };
 
     /**
-     * Load existing post or draft : simple version is fine
+     * Load existing post or draft
      */
-    /*
     useEffect(() => {
-        const loadPost = async () => {
-            if (postId) {
+        if (artType === "edit") {
+            async function fetchPost() {
+                setLoading(true);
                 try {
-                    // Try loading from backend first
-                    const response = await fetch(
-                        `localhost:5050/posts/${postId}`,
-                    );
-                    if (response.ok) {
-                        const post = await response.json();
-                        setTitle(post.title);
-                        setContent(post.content);
-                        // setLastSynced(new Date());
+                    const postData = await getPostById(postId);
+                    setTitle(postData.title);
+                    setContent(postData.content);
+
+                    await new Promise((resolve) => setTimeout(resolve, 300));
+                    const txtArea = document.getElementById("txtArea");
+                    if (!txtArea) return;
+
+                    let v1 = txtArea.value;
+                    await new Promise((resolve) => setTimeout(resolve, 200));
+                    txtArea.value = v1;
+                    txtArea.style.height = "auto";
+                    txtArea.style.height = txtArea.scrollHeight + "px";
+                } catch (err) {
+                    console.log("failed to load post", err);
+                    toast.error("Failed to load post");
+                } finally {
+                    setLoading(false);
+                }
+            }
+            fetchPost();
+        } else {
+            const loadSaved = async () => {
+                try {
+                    const savedPost = localStorage.getItem("blogPost");
+                    if (savedPost) {
+                        const { title: savedTitle, content: savedContent } =
+                            JSON.parse(savedPost);
+                        setTitle(savedTitle);
+                        setContent(savedContent);
                     }
+
+                    // Wait for React state updates to complete
+                    await new Promise((resolve) => setTimeout(resolve, 300));
+
+                    // Get textarea value
+                    const txtArea = document.getElementById("txtArea");
+                    if (!txtArea) return;
+
+                    let v1 = txtArea.value;
+
+                    // Modify textarea value asynchronously
+                    await new Promise((resolve) => setTimeout(resolve, 200)); // Ensures line-by-line execution
+                    txtArea.value = v1;
+                    txtArea.style.height = "auto";
+                    txtArea.style.height = txtArea.scrollHeight + "px"; // it was not working if i didn't use async
                 } catch (error) {
-                    // If backend fails, try loading from local draft
-                    const localDraft = localStorage.getItem(`draft-${postId}`);
-                    if (localDraft) {
-                        const { title, content, lastSaved } =
-                            JSON.parse(localDraft);
-                        setTitle(title);
-                        setContent(content);
-                        // setSyncStatus("offline");
-                    }
+                    console.error("Error loading saved blog post:", error);
+                    toast.error("Error loading saved blog post:", error);
                 }
-            }
-        };
-        loadPost();
-    }, [postId]);
-    */
-    // not needed now, backend not ready, so:
-    // loadPost();
-    // instead there is a simple version:
-    useEffect(() => {
-        const loadSaved = async () => {
-            try {
-                const savedPost = localStorage.getItem("blogPost");
-                if (savedPost) {
-                    const { title: savedTitle, content: savedContent } =
-                        JSON.parse(savedPost);
-                    setTitle(savedTitle);
-                    setContent(savedContent);
-                }
+            };
 
-                // Wait for React state updates to complete
-                await new Promise((resolve) => setTimeout(resolve, 300));
-
-                // Get textarea value
-                const txtArea = document.getElementById("txtArea");
-                if (!txtArea) return;
-
-                let v1 = txtArea.value;
-
-                // Modify textarea value asynchronously
-                await new Promise((resolve) => setTimeout(resolve, 200)); // Ensures line-by-line execution
-                txtArea.value = v1;
-                txtArea.style.height = "auto";
-                txtArea.style.height = txtArea.scrollHeight + "px"; // it was not working if i didn't use async
-            } catch (error) {
-                console.error("Error loading saved blog post:", error);
-                toast.error("Error loading saved blog post:", error);
-            }
-        };
-
-        loadSaved();
-    }, []);
+            loadSaved();
+        }
+    }, [artType]);
 
     /**
      * Network status monitoring

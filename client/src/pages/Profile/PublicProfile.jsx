@@ -94,8 +94,20 @@ const PublicProfile = () => {
         }
     }, [currentProfile]);
 
-    if (isLoading) return <div>Loading...</div>;
-    if (!currentProfile) return <div>Profile Not found...</div>;
+    if (isLoading)
+        return (
+            <div className="flex justify-center items-center h-screen">
+                Loading...
+            </div>
+        );
+
+    // navigating, but still,
+    if (!currentProfile)
+        return (
+            <div className="flex justify-center items-center h-screen">
+                Profile Not found...
+            </div>
+        );
 
     // fetch posts from user's postIds array
     const fetchUserPosts = async () => {

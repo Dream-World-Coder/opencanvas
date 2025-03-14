@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-    // X,
-    // SquareArrowOutUpRight,
     Share2,
     Grid,
     Rows,
@@ -15,11 +13,11 @@ import {
     MoreHorizontal,
 } from "lucide-react";
 import ProfileHeader from "../../components/Header/ProfileHeader";
+import { useDataService } from "../../services/dataService";
 // import ProfileFooter from "../../components/Footer/ProfileFooter";
 import { useAuth } from "../../contexts/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-// import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
 import { toast } from "sonner";
 // import ShareButton from "../../components/ShareButton";
 // in posts also hide details like deletehash for public options
@@ -38,15 +36,16 @@ function sharePost(post) {
             toast.error("Faild to copy link");
         });
 }
+
 const Profile = () => {
     const navigate = useNavigate();
-    const { currentUser } = useAuth();
+    const { currentUser, setCurrentUser } = useAuth();
     const [viewMode, setViewMode] = useState("grid");
     const [activeTab, setActiveTab] = useState("written");
     const [posts, setPosts] = useState([]);
     const [postsToFetch, setPostsToFetch] = useState(0);
     const [loading, setLoading] = useState(false);
-
+    const { deletePost } = useDataService();
     const userStats = [
         { name: "POSTS", amount: currentUser.posts.length },
         { name: "FOLLOWERS", amount: currentUser.followers.length },
@@ -407,7 +406,14 @@ const Profile = () => {
                                               </div>
 
                                               {post.thumbnailUrl && (
-                                                  <div className="mb-4 overflow-hidden rounded-lg aspect-video">
+                                                  <div
+                                                      onClick={() => {
+                                                          navigate(
+                                                              `/p/${post._id}`,
+                                                          );
+                                                      }}
+                                                      className="mb-4 overflow-hidden rounded-lg aspect-video cursor-pointer"
+                                                  >
                                                       <img
                                                           src={
                                                               post.thumbnailUrl
@@ -459,18 +465,45 @@ const Profile = () => {
                                                       <button
                                                           className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                                                           title="Edit"
-                                                          onClick={(e) =>
-                                                              e.stopPropagation()
-                                                          }
+                                                          onClick={(e) => {
+                                                              e.stopPropagation();
+                                                              localStorage.setItem(
+                                                                  "newPostId",
+                                                                  post._id.toString(),
+                                                              );
+                                                              window.location.href =
+                                                                  "/edit-post";
+                                                          }}
                                                       >
                                                           <Edit className="w-4 h-4 text-gray-600 dark:text-gray-300" />
                                                       </button>
                                                       <button
                                                           className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                                                           title="Delete"
-                                                          onClick={(e) =>
-                                                              e.stopPropagation()
-                                                          }
+                                                          onClick={async (
+                                                              e,
+                                                          ) => {
+                                                              e.stopPropagation();
+                                                              try {
+                                                                  let res =
+                                                                      await deletePost(
+                                                                          post._id,
+                                                                      );
+                                                                  toast(
+                                                                      res.message,
+                                                                  );
+                                                                  setCurrentUser(
+                                                                      res.user,
+                                                                  );
+                                                              } catch (error) {
+                                                                  console.error(
+                                                                      error,
+                                                                  );
+                                                                  toast(
+                                                                      "Failed to delete post.",
+                                                                  );
+                                                              }
+                                                          }}
                                                       >
                                                           <Trash2 className="w-4 h-4 text-gray-600 dark:text-gray-300" />
                                                       </button>

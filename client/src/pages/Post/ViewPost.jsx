@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import Header from "../../components/Header/Header";
 import { Card, CardContent } from "@/components/ui/card";
@@ -55,6 +56,7 @@ function sharePost(post) {
 }
 
 const ViewPost = () => {
+    const navigate = useNavigate();
     const { postId } = useParams();
     const { getPostById } = useDataService();
     const isDark = useDarkMode();
@@ -62,7 +64,6 @@ const ViewPost = () => {
 
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
 
     /* It works because of the loading state,
     the rendering is starting before the useEffect completion,
@@ -77,7 +78,8 @@ const ViewPost = () => {
                 const postData = await getPostById(postId);
                 setPost(postData);
             } catch (err) {
-                setError("Failed to load post");
+                console.error("Failed to load post", err);
+                navigate("/404");
             } finally {
                 setLoading(false);
             }
@@ -92,16 +94,12 @@ const ViewPost = () => {
                 Loading post...
             </div>
         );
-    if (error)
-        return (
-            <div className="flex justify-center items-center h-screen">
-                {error}
-            </div>
-        );
+
+    // navigated, but still
     if (!post)
         return (
             <div className="flex justify-center items-center h-screen">
-                No post found
+                Post not found
             </div>
         );
 

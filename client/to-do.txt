@@ -157,8 +157,12 @@ msg+contact info add in profile settings
 
 -- check the order of the posts in profile, should be : newest -> oldest
 
--- center the 'profile not found' message
+-- [x] center the 'profile not found' message;
 
 -- saved >> liked & other collections
 
 -- may be add navigate features to post thumbnails of /profile posts also, like public profile
+
+
+-- big loader in the writing pad and profile settings
+-- gelmet in profile

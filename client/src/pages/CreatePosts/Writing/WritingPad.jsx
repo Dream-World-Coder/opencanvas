@@ -70,7 +70,7 @@ import { useWritingPad } from "./hooks/useWritingPad";
 import { useEditorFormatting } from "./hooks/useEditorFormatting";
 import { useEditorAppearance } from "./hooks/useEditorAppearance";
 import { useExport } from "./hooks/useExport";
-import useSingleTab from "./hooks/useSingleTab";
+// import useSingleTab from "./hooks/useSingleTab";
 import { useAuth } from "../../../contexts/AuthContext";
 
 /**
@@ -93,7 +93,7 @@ const WritingPad = ({ artType = "article" }) => {
 
     const [frontendOnly, _] = useState(false);
 
-    const isActiveTab = useSingleTab();
+    // const isActiveTab = useSingleTab();
     // customized  redirect path:
     // const isActiveTab = useSingleTab({
     //   redirectPath: "/dashboard",
@@ -165,9 +165,9 @@ const WritingPad = ({ artType = "article" }) => {
         handleCopy,
     } = useExport(title, content);
 
-    if (!isActiveTab) {
-        return <div>Redirecting...</div>;
-    }
+    // if (!isActiveTab) {
+    //     return <div>Redirecting...</div>;
+    // }
 
     const schemaData = {
         "@context": "https://schema.org",

@@ -33,6 +33,7 @@ export const useDataService = () => {
     };
 
     // Post related functions
+    // -------------------------------------------------------------------------------------------
     const getNewPostId = async () => {
         try {
             const response = await authAxios.post("/newpost/written/getId");
@@ -44,7 +45,7 @@ export const useDataService = () => {
         }
     };
 
-    // fix errors if not found
+    // handle errors if post not found
     const getPostById = async (postId) => {
         try {
             const response = await authAxios.get(`/p/${postId}`);
@@ -56,19 +57,12 @@ export const useDataService = () => {
         }
     };
 
-    const updatePost = async (postId, postData) => {
-        try {
-            const response = await authAxios.put(`/posts/${postId}`, postData);
-            return response.data;
-        } catch (error) {
-            console.error("Error updating post:", error);
-            throw error;
-        }
-    };
-
+    // would have been betten if could do these in bulk
     const deletePost = async (postId) => {
         try {
-            const response = await authAxios.delete(`/posts/${postId}`);
+            const response = await authAxios.delete(
+                `/delete-post?postId=${postId}`,
+            );
             return response.data;
         } catch (error) {
             console.error("Error deleting post:", error);
@@ -189,7 +183,6 @@ export const useDataService = () => {
         // Posts
         getNewPostId,
         getPostById,
-        updatePost,
         deletePost,
         likePost,
         savePost,

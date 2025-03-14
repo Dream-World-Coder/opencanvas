@@ -1,8 +1,11 @@
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/GalleryFooter";
+import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 
 const NotFoundPage = ({ bgClr = "bg-cream-light" }) => {
+    const navigate = useNavigate();
+
     return (
         <>
             <Header noBlur={true} />
@@ -17,7 +20,7 @@ const NotFoundPage = ({ bgClr = "bg-cream-light" }) => {
                 <button
                     className="rounded-md bg-cream hover:bg-cream-dark box-content px-4 py-2 text-stone-600/80 flex items-center justify-center gap-2"
                     onClick={() => {
-                        window.history.back();
+                        navigate("/profile");
                     }}
                 >
                     <ChevronLeft className="size-6" />
