@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import {
     ArrowLeft,
@@ -81,7 +81,7 @@ import { useAuth } from "../../../contexts/AuthContext";
 const WritingPad = ({ artType = "article" }) => {
     const { currentUser } = useAuth();
 
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     const [postId, setPostId] = useState("");
     console.log(`postID writingPad 1: ${postId}`);
@@ -229,7 +229,9 @@ const WritingPad = ({ artType = "article" }) => {
                                             setShowUnsavedAlert(true);
                                             return;
                                         }
-                                        navigate("/profile");
+                                        localStorage.removeItem("newPostId");
+                                        // navigate("/profile");
+                                        window.location.href = "/profile";
                                     }}
                                     className="hover:opacity-70 transition-opacity p-1 border rounded-full"
                                 >
@@ -628,6 +630,9 @@ const WritingPad = ({ artType = "article" }) => {
                                         <button
                                             onClick={() => {
                                                 setShowUnsavedAlert(false);
+                                                localStorage.removeItem(
+                                                    "newPostId",
+                                                );
                                                 window.history.back();
                                             }}
                                             className="px-3 py-1.5 border border-gray-300 rounded-md text-sm hover:bg-gray-50 transition-colors"

@@ -23,6 +23,7 @@ export const useDataService = () => {
                 role: formValues.role,
                 aboutMe: formValues.aboutMe,
                 notifications: formValues.notifications,
+                contactInformation: formValues.contactInformation,
             });
             return response.data;
         } catch (error) {

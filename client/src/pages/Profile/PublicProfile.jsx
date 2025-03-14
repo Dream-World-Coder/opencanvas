@@ -9,6 +9,7 @@ import {
     Eye,
     Heart,
     BadgeInfo,
+    Copy,
 } from "lucide-react";
 import ProfileHeader from "../../components/Header/ProfileHeader";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -51,7 +52,7 @@ const PublicProfile = () => {
     const navigate = useNavigate();
 
     const [viewMode, setViewMode] = useState("grid");
-    const [activeTab, setActiveTab] = useState("all");
+    const [activeTab, setActiveTab] = useState("written");
 
     const [posts, setPosts] = useState([]);
     const [postsToFetch, setPostsToFetch] = useState(0);
@@ -212,7 +213,43 @@ const PublicProfile = () => {
                                                                 Information
                                                             </AlertDialogTitle>
                                                             <AlertDialogDescription>
-                                                                {}
+                                                                {currentProfile.contactInformation.map(
+                                                                    (
+                                                                        item,
+                                                                        index,
+                                                                    ) => (
+                                                                        <div
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                            className="mb-3"
+                                                                        >
+                                                                            <h3 className="flex items-center justify-between font-semibold text-[#111]">
+                                                                                {
+                                                                                    item.title
+                                                                                }
+
+                                                                                <button
+                                                                                    onClick={() => {
+                                                                                        navigator.clipboard.writeText(
+                                                                                            item.url,
+                                                                                        );
+                                                                                        toast.success(
+                                                                                            "url copied to clipboard",
+                                                                                        );
+                                                                                    }}
+                                                                                >
+                                                                                    <Copy />
+                                                                                </button>
+                                                                            </h3>
+                                                                            <div className="text-xs">
+                                                                                {
+                                                                                    item.url
+                                                                                }
+                                                                            </div>
+                                                                        </div>
+                                                                    ),
+                                                                )}
                                                             </AlertDialogDescription>
                                                         </AlertDialogHeader>
                                                         <AlertDialogFooter>
@@ -337,23 +374,23 @@ const PublicProfile = () => {
                     {posts.length > 0 && (
                         <div className="flex justify-between items-center mb-8">
                             <div className="flex space-x-8">
-                                <button
+                                {/* <button
                                     onClick={() => setActiveTab("all")}
                                     className={`pb-2 dark:text-[#e0e0e0] ${activeTab === "all" ? "border-b-2 border-black dark:border-[#f0f0f0]" : ""}`}
                                 >
                                     All Posts
+                                </button> */}
+                                <button
+                                    onClick={() => setActiveTab("written")}
+                                    className={`pb-2 dark:text-[#e0e0e0] ${activeTab === "written" ? "border-b-2 border-black dark:border-[#f0f0f0]" : ""}`}
+                                >
+                                    Written
                                 </button>
                                 <button
                                     onClick={() => setActiveTab("photos")}
                                     className={`pb-2 dark:text-[#e0e0e0] ${activeTab === "photos" ? "border-b-2 border-black dark:border-[#f0f0f0]" : ""}`}
                                 >
                                     Photos
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab("stories")}
-                                    className={`pb-2 dark:text-[#e0e0e0] ${activeTab === "stories" ? "border-b-2 border-black dark:border-[#f0f0f0]" : ""}`}
-                                >
-                                    Written
                                 </button>
                             </div>
                             <div className="hidden md:flex space-x-4">
@@ -400,134 +437,157 @@ const PublicProfile = () => {
                                           </div>
                                       </div>
                                   ))
-                            : posts.map((post) => (
-                                  <div
-                                      key={post._id}
-                                      className="group cursor-auto transition-all duration-300"
-                                  >
-                                      {post.type === "image" ? (
-                                          // Photo Post - Enhanced Design
-                                          <div className="space-y-3 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
-                                              <div className="relative aspect-[4/3] overflow-hidden">
-                                                  <img
-                                                      src={post.image}
-                                                      alt={post.title}
-                                                      className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
-                                                      loading="lazy"
-                                                  />
-                                                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                                      <div className="absolute bottom-0 w-full p-4 flex justify-end">
-                                                          <Share2 className="w-5 h-5 text-white drop-shadow-md" />
-                                                      </div>
-                                                  </div>
-                                              </div>
-                                              <div className="p-4">
-                                                  <h3 className="font-medium text-lg mb-2 line-clamp-2 dark:text-[#f0f0f0]">
-                                                      {post.title}
-                                                  </h3>
-                                                  <div className="flex items-center justify-between">
-                                                      <div className="flex items-center space-x-1">
-                                                          <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700"></div>
-                                                          <span className="text-sm text-gray-500 dark:text-gray-400">
-                                                              {post.author
-                                                                  ?.name ||
-                                                                  "Anonymous"}
-                                                          </span>
-                                                      </div>
-                                                      <div className="flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400">
-                                                          <div className="flex items-center">
-                                                              <Heart className="w-4 h-4 mr-1 text-rose-500" />
-                                                              <span>
-                                                                  {post.likes}
-                                                              </span>
-                                                          </div>
-                                                          <div className="flex items-center">
-                                                              <MessageCircle className="w-4 h-4 mr-1 text-blue-500" />
-                                                              <span>
-                                                                  {
-                                                                      post.comments
-                                                                  }
-                                                              </span>
+                            : posts.map(
+                                  (post) =>
+                                      post.isPublic && (
+                                          <div
+                                              key={post._id}
+                                              className="group cursor-auto transition-all duration-300"
+                                          >
+                                              {post.type === "image" ? (
+                                                  // Photo Post - Enhanced Design
+                                                  <div className="space-y-3 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
+                                                      <div className="relative aspect-[4/3] overflow-hidden">
+                                                          <img
+                                                              src={post.image}
+                                                              alt={post.title}
+                                                              className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+                                                              loading="lazy"
+                                                          />
+                                                          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                                              <div className="absolute bottom-0 w-full p-4 flex justify-end">
+                                                                  <Share2 className="w-5 h-5 text-white drop-shadow-md" />
+                                                              </div>
                                                           </div>
                                                       </div>
+                                                      <div className="p-4">
+                                                          <h3 className="font-medium text-lg mb-2 line-clamp-2 dark:text-[#f0f0f0]">
+                                                              {post.title}
+                                                          </h3>
+                                                          <div className="flex items-center justify-between">
+                                                              <div className="flex items-center space-x-1">
+                                                                  <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                                                                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                                                                      {post
+                                                                          .author
+                                                                          ?.name ||
+                                                                          "Anonymous"}
+                                                                  </span>
+                                                              </div>
+                                                              <div className="flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400">
+                                                                  <div className="flex items-center">
+                                                                      <Heart className="w-4 h-4 mr-1 text-rose-500" />
+                                                                      <span>
+                                                                          {
+                                                                              post.likes
+                                                                          }
+                                                                      </span>
+                                                                  </div>
+                                                                  <div className="flex items-center">
+                                                                      <MessageCircle className="w-4 h-4 mr-1 text-blue-500" />
+                                                                      <span>
+                                                                          {
+                                                                              post.comments
+                                                                          }
+                                                                      </span>
+                                                                  </div>
+                                                              </div>
+                                                          </div>
+                                                      </div>
                                                   </div>
-                                              </div>
-                                          </div>
-                                      ) : (
-                                          // Text Post
-                                          <div className="p-6 rounded-xl border border-gray-100 dark:border-[#222] bg-white dark:bg-[#111] shadow-sm hover:shadow-md transition-all duration-300 relative">
-                                              <div className="flex justify-between items-start mb-4">
-                                                  <h3 className="font-medium text-lg dark:text-[#f0f0f0] capitalize">
-                                                      {post.title}
-                                                  </h3>
-                                              </div>
+                                              ) : (
+                                                  // Text Post
+                                                  <div className="p-6 rounded-xl border border-gray-100 dark:border-[#222] bg-white dark:bg-[#111] shadow-sm hover:shadow-md transition-all duration-300 relative">
+                                                      <div className="flex justify-between items-start mb-4">
+                                                          <h3 className="font-medium text-lg dark:text-[#f0f0f0] capitalize">
+                                                              {post.title}
+                                                          </h3>
+                                                      </div>
 
-                                              {post.thumbnailUrl && (
-                                                  <div className="mb-4 overflow-hidden rounded-lg aspect-video">
-                                                      <img
-                                                          src={
-                                                              post.thumbnailUrl
-                                                          }
-                                                          alt={post.title}
-                                                          className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
-                                                          loading="lazy"
-                                                      />
+                                                      {post.thumbnailUrl && (
+                                                          <div
+                                                              onClick={() => {
+                                                                  navigate(
+                                                                      `/p/${post._id}`,
+                                                                  );
+                                                              }}
+                                                              className="mb-4 overflow-hidden rounded-lg aspect-video cursor-pointer"
+                                                          >
+                                                              <img
+                                                                  src={
+                                                                      post.thumbnailUrl
+                                                                  }
+                                                                  alt={
+                                                                      post.title
+                                                                  }
+                                                                  className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
+                                                                  loading="lazy"
+                                                              />
+                                                          </div>
+                                                      )}
+
+                                                      <div className="flex items-center justify-between border-t border-gray-100 dark:border-[#222] pt-4 mt-2">
+                                                          <div className="flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400">
+                                                              <div className="flex items-center">
+                                                                  <ThumbsUp className="w-4 h-4 mr-1 text-gray-500" />
+                                                                  <span>
+                                                                      {
+                                                                          post.totalLikes
+                                                                      }
+                                                                  </span>
+                                                              </div>
+                                                              <div className="flex items-center">
+                                                                  <MessageCircle className="w-4 h-4 mr-1 text-gray-500" />
+                                                                  <span>
+                                                                      {
+                                                                          post.totalComments
+                                                                      }
+                                                                  </span>
+                                                              </div>
+                                                          </div>
+                                                          <div className="text-sm">
+                                                              {post.readTime}
+                                                          </div>
+                                                      </div>
+
+                                                      {/* Hover Actions Menu - Improved */}
+                                                      <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                                                          <div className="bg-white/90 dark:bg-gray-800/90 shadow-lg rounded-lg backdrop-blur-sm flex">
+                                                              <button
+                                                                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-l-lg"
+                                                                  title="View"
+                                                                  onClick={(
+                                                                      e,
+                                                                  ) => {
+                                                                      e.stopPropagation();
+                                                                      navigate(
+                                                                          `/p/${post._id}`,
+                                                                      );
+                                                                  }}
+                                                              >
+                                                                  <Eye className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                                                              </button>
+                                                              <button
+                                                                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                                                  title="Share"
+                                                                  onClick={(
+                                                                      e,
+                                                                  ) => {
+                                                                      e.stopPropagation();
+                                                                      sharePost(
+                                                                          post,
+                                                                      );
+                                                                  }}
+                                                              >
+                                                                  <Share2 className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                                                              </button>
+                                                          </div>
+                                                      </div>
                                                   </div>
                                               )}
-
-                                              <div className="flex items-center justify-between border-t border-gray-100 dark:border-[#222] pt-4 mt-2">
-                                                  <div className="flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400">
-                                                      <div className="flex items-center">
-                                                          <ThumbsUp className="w-4 h-4 mr-1 text-gray-500" />
-                                                          <span>
-                                                              {post.totalLikes}
-                                                          </span>
-                                                      </div>
-                                                      <div className="flex items-center">
-                                                          <MessageCircle className="w-4 h-4 mr-1 text-gray-500" />
-                                                          <span>
-                                                              {
-                                                                  post.totalComments
-                                                              }
-                                                          </span>
-                                                      </div>
-                                                  </div>
-                                                  <div className="text-sm">
-                                                      {post.readTime}
-                                                  </div>
-                                              </div>
-
-                                              {/* Hover Actions Menu - Improved */}
-                                              <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
-                                                  <div className="bg-white/90 dark:bg-gray-800/90 shadow-lg rounded-lg backdrop-blur-sm flex">
-                                                      <button
-                                                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-l-lg"
-                                                          title="View"
-                                                          onClick={(e) => {
-                                                              e.stopPropagation();
-                                                              navigate(
-                                                                  `/p/${post._id}`,
-                                                              );
-                                                          }}
-                                                      >
-                                                          <Eye className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                                                      </button>
-                                                      <button
-                                                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                                          title="Share"
-                                                          onClick={(e) => {
-                                                              e.stopPropagation();
-                                                              sharePost(post);
-                                                          }}
-                                                      >
-                                                          <Share2 className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                                                      </button>
-                                                  </div>
-                                              </div>
                                           </div>
-                                      )}
-                                  </div>
-                              ))}
+                                      ),
+                              )}
                     </div>
                     {currentProfile.posts.length > postsToFetch && (
                         <div className="w-[100%] flex items-center justify-center">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 // import { useDataService } from "../../../../services/dataService";
 
@@ -15,7 +15,7 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
     const [isPublic, setIsPublic] = useState(true);
     const [thumbnailUrl, setThumbnailUrl] = useState("");
     const [media, setMedia] = useState([]);
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     // else not getting it in the first chance, postId
     postId = localStorage.getItem("newPostId", "");
@@ -105,7 +105,8 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
                         backgroundColor: "#f5f5f5",
                     },
                 });
-                navigate("/profile");
+                // navigate("/profile"); // no reload
+                window.location.href = "/profile";
             } else {
                 // setSyncStatus("offline");
                 toast.error(data.message || "Failed to save post in server");

@@ -29,6 +29,8 @@ import {
     GlobeIcon,
     Loader2,
     Copy,
+    Trash2,
+    PlusCircle,
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useDataService } from "../../services/dataService";
@@ -50,10 +52,12 @@ const ProfileSettings = () => {
             comments: false,
             messages: true,
         },
-        contactInformation: {
-            // name
-            // link - array
-        },
+        contactInformation: currentUser.contactInformation || [
+            {
+                title: "Opencanvas",
+                url: `https://www.opencanvas.blog/u/${currentUser.username}`,
+            },
+        ],
     });
 
     const { updateUserProfile } = useDataService();
@@ -75,10 +79,11 @@ const ProfileSettings = () => {
             setLoading(false);
         }
     }
+
     /*
-        // Effect to initialize dark mode from localStorage
+        // effect to initialize dark mode from localStorage
         useEffect(() => {
-            // Check localStorage for dark mode preference
+            // check localStorage for dark mode preference
             const savedDarkMode = localStorage.getItem("darkMode");
             const initialDarkMode = savedDarkMode
                 ? JSON.parse(savedDarkMode)
@@ -92,7 +97,7 @@ const ProfileSettings = () => {
             applyDarkMode(initialDarkMode);
         }, []);
 
-        // Function to toggle dark mode
+        // toggle dark mode
         const toggleDarkMode = (value) => {
             setDarkMode(value);
             setFormValues((prevValues) => ({
@@ -100,14 +105,13 @@ const ProfileSettings = () => {
                 darkMode: value,
             }));
 
-            // Save to localStorage
             localStorage.setItem("darkMode", JSON.stringify(value));
 
-            // Apply dark mode to document
+            // apply dark mode to document
             applyDarkMode(value);
         };
 
-        // Apply dark mode to HTML element
+        // apply dark mode to html element
         const applyDarkMode = (isDark) => {
             if (isDark) {
                 document.documentElement.classList.add("dark");
@@ -116,6 +120,41 @@ const ProfileSettings = () => {
             }
         };
     */
+
+    const handleContactInfoChange = (index, field, value) => {
+        const updatedContactInfo = [...formValues.contactInformation];
+        updatedContactInfo[index] = {
+            ...updatedContactInfo[index],
+            [field]: value,
+        };
+
+        setFormValues({
+            ...formValues,
+            contactInformation: updatedContactInfo,
+        });
+    };
+
+    // Add new contact information field
+    const addContactInfoField = () => {
+        setFormValues({
+            ...formValues,
+            contactInformation: [
+                ...formValues.contactInformation,
+                { title: "", url: "" },
+            ],
+        });
+    };
+
+    // Remove contact information field
+    const removeContactInfoField = (index) => {
+        const updatedContactInfo = [...formValues.contactInformation];
+        updatedContactInfo.splice(index, 1);
+
+        setFormValues({
+            ...formValues,
+            contactInformation: updatedContactInfo,
+        });
+    };
 
     const general = {
         id: "general",
@@ -145,6 +184,7 @@ const ProfileSettings = () => {
 
                     <div className="flex-1 space-y-4 w-full">
                         <div className="grid gap-4 sm:grid-cols-2">
+                            {/* username */}
                             <div className="space-y-2">
                                 <Label htmlFor="username">Username</Label>
                                 <Input
@@ -159,6 +199,8 @@ const ProfileSettings = () => {
                                     className="dark:bg-black dark:text-white dark:border-gray-800"
                                 />
                             </div>
+
+                            {/* full name */}
                             <div className="space-y-2">
                                 <Label htmlFor="fullName">Full Name</Label>
                                 <Input
@@ -175,8 +217,9 @@ const ProfileSettings = () => {
                             </div>
                         </div>
 
+                        {/* Tagline */}
                         <div className="space-y-2">
-                            <Label htmlFor="role">Role</Label>
+                            <Label htmlFor="role">Tagline</Label>
                             <Input
                                 id="role"
                                 value={formValues.role}
@@ -190,6 +233,7 @@ const ProfileSettings = () => {
                             />
                         </div>
 
+                        {/* About */}
                         <div className="space-y-2">
                             <Label htmlFor="aboutMe">About</Label>
                             <Input
@@ -204,6 +248,78 @@ const ProfileSettings = () => {
                                 }
                                 className="dark:bg-black dark:text-white dark:border-gray-800"
                             />
+                        </div>
+
+                        {/* Contact Information */}
+                        <div className="space-y-2">
+                            <Label htmlFor="contactInfo">
+                                Contact Information
+                            </Label>
+
+                            {formValues.contactInformation.map(
+                                (contact, index) => (
+                                    <div
+                                        key={index}
+                                        className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+                                    >
+                                        <Input
+                                            // id={`contact-title-${index}`}
+                                            placeholder="Title, eg: GitHub"
+                                            value={contact.title}
+                                            onChange={(e) =>
+                                                handleContactInfoChange(
+                                                    index,
+                                                    "title",
+                                                    e.target.value,
+                                                )
+                                            }
+                                        />
+
+                                        <div className="space-y-0 flex items-end gap-2">
+                                            <Input
+                                                // id={`contact-url-${index}`}
+                                                placeholder="eg: https://github.com/username"
+                                                value={contact.url}
+                                                onChange={(e) =>
+                                                    handleContactInfoChange(
+                                                        index,
+                                                        "url",
+                                                        e.target.value,
+                                                    )
+                                                }
+                                            />
+
+                                            {formValues.contactInformation
+                                                .length > 1 && (
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() =>
+                                                        removeContactInfoField(
+                                                            index,
+                                                        )
+                                                    }
+                                                    className="mb-2"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </div>
+                                ),
+                            )}
+
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="mt-2"
+                                onClick={addContactInfoField}
+                            >
+                                <PlusCircle className="h-4 w-4 mr-2" />
+                                Add More
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -309,12 +425,12 @@ const ProfileSettings = () => {
                         )}
                     </div>
                     <h3 className="text-lg font-medium">Sessions</h3>
-                    <div className="rounded-lg border p-4 dark:border-gray-800 dark:bg-gray-900">
-                        {currentUser.lastFiveLogin.map((item, index) => (
-                            <div
-                                key={index}
-                                className="flex items-center justify-between"
-                            >
+                    {currentUser.lastFiveLogin.reverse().map((item, index) => (
+                        <div
+                            key={index}
+                            className="rounded-lg border p-4 dark:border-gray-800 dark:bg-gray-900"
+                        >
+                            <div className="flex items-center justify-between">
                                 <div className="space-y-1">
                                     <p className="text-sm font-medium">
                                         {item.deviceInfo}
@@ -325,12 +441,15 @@ const ProfileSettings = () => {
                                         ).toLocaleDateString("en-GB")}
                                     </p>
                                 </div>
-                                <Badge className="bg-green-600 text-white">
-                                    Active
-                                </Badge>
+                                {index ===
+                                    currentUser.lastFiveLogin.length - 1 && (
+                                    <Badge className="bg-green-600 text-white">
+                                        Active
+                                    </Badge>
+                                )}
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    ))}
                 </div>
 
                 {/* save-cancel buttons */}
