@@ -160,3 +160,5 @@ msg+contact info add in profile settings
 -- center the 'profile not found' message
 
 -- saved >> liked & other collections
+
+-- may be add navigate features to post thumbnails of /profile posts also, like public profile

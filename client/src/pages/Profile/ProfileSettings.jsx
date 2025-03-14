@@ -40,19 +40,19 @@ const ProfileSettings = () => {
     const [darkMode, setDarkMode] = useState(false);
     const [activeTab, setActiveTab] = useState("general");
     const [formValues, setFormValues] = useState({
-        username: currentUser.username || "",
-        fullName: currentUser.fullName || "",
-        role: currentUser.role || "user",
-        aboutMe: currentUser.aboutMe || "",
+        username: currentUser.username ?? "null",
+        fullName: currentUser.fullName ?? "",
+        role: currentUser.role ?? "user",
+        aboutMe: currentUser.aboutMe ?? "",
         notifications: {
-            email: true,
-            push: true,
-            mentions: true,
-            follows: true,
-            comments: false,
-            messages: true,
+            email: currentUser.notifications.emailNotification,
+            push: currentUser.notifications.pushNotification,
+            mentions: currentUser.notifications.mentionNotification,
+            follows: currentUser.notifications.followNotification,
+            comments: currentUser.notifications.commentNotification,
+            messages: currentUser.notifications.messageNotification,
         },
-        contactInformation: currentUser.contactInformation || [
+        contactInformation: currentUser.contactInformation ?? [
             {
                 title: "Opencanvas",
                 url: `https://www.opencanvas.blog/u/${currentUser.username}`,
@@ -425,7 +425,7 @@ const ProfileSettings = () => {
                         )}
                     </div>
                     <h3 className="text-lg font-medium">Sessions</h3>
-                    {currentUser.lastFiveLogin.reverse().map((item, index) => (
+                    {currentUser.lastFiveLogin.map((item, index) => (
                         <div
                             key={index}
                             className="rounded-lg border p-4 dark:border-gray-800 dark:bg-gray-900"
@@ -441,8 +441,7 @@ const ProfileSettings = () => {
                                         ).toLocaleDateString("en-GB")}
                                     </p>
                                 </div>
-                                {index ===
-                                    currentUser.lastFiveLogin.length - 1 && (
+                                {index === 0 && (
                                     <Badge className="bg-green-600 text-white">
                                         Active
                                     </Badge>
