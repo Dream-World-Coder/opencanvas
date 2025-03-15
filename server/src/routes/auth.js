@@ -320,8 +320,14 @@ router.put(
     async (req, res) => {
         try {
             const user = req.user;
-            const { username, fullName, role, aboutMe, notifications } =
-                req.body;
+            const {
+                username,
+                fullName,
+                role,
+                aboutMe,
+                notifications,
+                contactInformation,
+            } = req.body;
 
             // Check if username is being changed
             if (username && username !== user.username) {
@@ -395,6 +401,7 @@ router.put(
                         message: "error setting notification settings",
                     });
                 }
+                // console.log(notifications);
                 user.notifications.emailNotification = notifications.email;
                 user.notifications.pushNotification = notifications.push;
 
@@ -402,6 +409,10 @@ router.put(
                 user.notifications.followNotification = notifications.follows;
                 user.notifications.commentNotification = notifications.comments;
                 user.notifications.messageNotification = notifications.messages;
+            }
+
+            if (contactInformation !== undefined) {
+                user.contactInformation = contactInformation;
             }
 
             const savedUser = await user.save();
@@ -432,7 +443,7 @@ router.get("/u/:username", async (req, res) => {
         const user = await User.findOne({
             username: req.params.username,
         }).select({
-            _id: 0,
+            _id: 0, // its ok to know the id, but still ...
             passwordHash: 0,
             email: 0,
             provider: 0,
@@ -458,6 +469,45 @@ router.get("/u/:username", async (req, res) => {
         return res.status(500).json({
             success: false,
             message: "Failed to retrieve user data",
+            error:
+                process.env.NODE_ENV === "development"
+                    ? error.message
+                    : "Server error",
+        });
+    }
+});
+
+// get author by id -- limited data like public profile, but getting by id instead username
+router.get("/author/:id", async (req, res) => {
+    try {
+        const author = await User.findOne({
+            _id: req.params.id,
+        }).select({
+            passwordHash: 0,
+            email: 0,
+            provider: 0,
+            ipAddress: 0,
+            lastFiveLogin: 0,
+            savedPosts: 0,
+            likedPosts: 0,
+        });
+
+        if (!author) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            author,
+        });
+    } catch (error) {
+        console.error("Get author error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to retrieve author data",
             error:
                 process.env.NODE_ENV === "development"
                     ? error.message

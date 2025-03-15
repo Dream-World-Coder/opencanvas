@@ -1,9 +1,11 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const crypto = require("crypto");
 
 require("dotenv").config();
 
-const JWT_SECRET = process.env.JWT_SECRET || "238238d68905djd5efd689059jK5ef";
+const JWT_SECRET = process.env.JWT_SECRET;
+// console.log(`authorisation.js 7`, JWT_SECRET);
 
 // Middleware to handle authentication errors
 const handleAuthErrors = (err, req, res, next) => {
@@ -18,7 +20,6 @@ const handleAuthErrors = (err, req, res, next) => {
     });
 };
 
-// Authentication middleware for protected routes
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
@@ -67,8 +68,47 @@ const checkUserExists = async (req, res, next) => {
     }
 };
 
+// Fingerprinting middleware
+const fingerprintMiddleware = async (req, res, next) => {
+    // Get user ID if authenticated
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+
+    if (token) {
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            req.userId = decoded.id;
+            req.visitorIdentifier = `user_${decoded.id}`;
+        } catch (err) {
+            req.visitorIdentifier = null;
+        }
+    }
+
+    // If no authenticated user, use fingerprinting
+    if (!req.visitorIdentifier) {
+        // Get fingerprint from headers or generate one
+        const clientIp =
+            req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+        const userAgent = req.headers["user-agent"] || "unknown";
+
+        // Create a unique identifier using available data
+        const fingerprintData = `${clientIp}_${userAgent}`;
+
+        // Fixed crypto usage
+        const fingerprint = crypto
+            .createHash("md5")
+            .update(fingerprintData)
+            .digest("hex");
+
+        req.visitorIdentifier = `anon_${fingerprint}`;
+    }
+
+    next();
+};
+
 module.exports = {
     handleAuthErrors,
     authenticateToken,
     checkUserExists,
+    fingerprintMiddleware,
 };

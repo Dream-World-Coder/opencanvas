@@ -1,5 +1,14 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+
+const ContactInfoSchema = new Schema({
+    title: { type: String, required: true, default: "OpenCanvas" },
+    url: {
+        type: String,
+        required: true,
+    },
+});
+
 const userSchema = new Schema(
     {
         username: {
@@ -64,6 +73,19 @@ const userSchema = new Schema(
             subscriptionStartDate: { type: Date },
             subscriptionEndDate: { type: Date },
         },
+        interestedIn: {
+            // max 8, default: "any",
+            type: [String],
+            trim: true,
+            default: ["any"],
+            required: true,
+            validate: {
+                validator: function (interestedIn) {
+                    return interestedIn.length <= 8;
+                },
+                message: "Maximum 8 topics are allowed.",
+            },
+        },
         // <<<<>>>>
         ipAddress: {
             type: String,
@@ -83,7 +105,7 @@ const userSchema = new Schema(
             type: Date,
             default: Date.now,
         },
-        contactInformation: {},
+        contactInformation: [ContactInfoSchema],
         notifications: {
             // type
             emailNotification: { type: Boolean, default: true },
@@ -150,9 +172,21 @@ const userSchema = new Schema(
     },
     { timestamps: true },
 );
+
 // Limit featured items to 8
 userSchema.path("featuredItems").validate(function (value) {
     return value.length <= 8;
 }, "Featured items cannot exceed 8");
+
+// Pre-save hook to set the default URL dynamically
+userSchema.pre("save", function (next) {
+    if (this.contactInformation.length === 0) {
+        this.contactInformation.push({
+            url: `https://www.opencanvas.blog/u/${this.username}`,
+        });
+    }
+    next();
+});
+
 const User = mongoose.model("User", userSchema);
 module.exports = User;

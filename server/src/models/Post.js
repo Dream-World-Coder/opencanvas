@@ -15,6 +15,7 @@ const Schema = mongoose.Schema;
 
 // the additional media uploaded, like images in a article
 // no need to be unique
+// needed only if i use imgur, else delete by _id
 const mediaSchema = new Schema({
     url: { type: String, required: true },
     deleteHash: { type: String, required: true },
@@ -37,15 +38,17 @@ const postSchema = new Schema(
         },
         // shall i store it ? or cuz i have to fetch the writer anyway to see his posts
         // for " more from writer " section.
-        author: {
-            // authorId
-            name: { type: String, required: true },
-            profilePicture: { type: String },
-            role: { type: String },
-        },
+        // author: {
+        //     name: { type: String, required: true },
+        //     profilePicture: { type: String },
+        //     role: { type: String },
+        // },
         thumbnailUrl: { type: String, default: "" },
         premiumPost: { type: Boolean, default: false }, // will be set by the user not me, if premium i will take some charge
+
         publishedAt: { type: Date, default: Date.now },
+        modifiedAt: { type: Date, default: Date.now },
+
         tags: {
             // max 5, default: "regular",
             // in images -> pre added tags,
@@ -82,10 +85,18 @@ const postSchema = new Schema(
             },
         ],
         totalComments: { type: Number, default: 0 },
+
         totalViews: { type: Number, default: 0 },
+        viewedBy: [
+            {
+                identifier: String, // ID or fingerprint
+                viewCount: { type: Number, default: 0 },
+                lastViewed: { type: Date, default: Date.now },
+            },
+        ],
+
         totalLikes: { type: Number, default: 0 },
-        totalSaves: { type: Number, default: 0 },
-        totalShares: { type: Number, default: 0 },
+        totalDislikes: { type: Number, default: 0 },
     },
     { timestamps: true },
 );

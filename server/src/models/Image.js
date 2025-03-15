@@ -7,6 +7,7 @@ const imageSchema = new mongoose.Schema(
             ref: "User",
             required: true,
         },
+        isPublic: { type: Boolean, default: true },
         tags: {
             regular: {
                 type: String,
