@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
-import { jwtDecode } from "jwt-decode";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import axios from "axios";
 
 const AuthContext = createContext();
 

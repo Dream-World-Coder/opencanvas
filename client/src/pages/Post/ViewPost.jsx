@@ -1,44 +1,27 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import Header from "../../components/Header/Header";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
-import { useDataService } from "../../services/dataService";
-import { useParams } from "react-router-dom";
 import {
+    Eye,
     Bookmark,
     Share2,
     MoreHorizontal,
     ThumbsUp,
     MessageSquareText,
 } from "lucide-react";
-import { moreFromAuthor, relatedPosts } from "./data";
+
+import Header from "../../components/Header/Header";
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-function useDarkMode() {
-    const getDarkMode = () =>
-        window.matchMedia &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-    const [isDark, setIsDark] = useState(getDarkMode());
-
-    useEffect(() => {
-        const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-
-        const handleChange = (e) => setIsDark(e.matches);
-
-        // Add event listener
-        mediaQuery.addEventListener("change", handleChange);
-
-        // Cleanup event listener on component unmount
-        return () => mediaQuery.removeEventListener("change", handleChange);
-    }, []);
-
-    return isDark;
-}
+import { useAuth } from "../../contexts/AuthContext";
+import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
+import { useDataService } from "../../services/dataService";
+import { useDarkMode } from "../../components/Hooks/darkMode";
+import { useViewTracker } from "../../components/Hooks/viewCount";
+import { moreFromAuthor, relatedPosts } from "./data";
 
 function sharePost(post) {
     const baseUrl = window.location.origin;
@@ -57,13 +40,19 @@ function sharePost(post) {
 
 const ViewPost = () => {
     const navigate = useNavigate();
+    const { currentUser } = useAuth();
     const { postId } = useParams();
-    const { getPostById } = useDataService();
+    const { getPostById, likePost } = useDataService();
     const isDark = useDarkMode();
     const [focusMode, _] = useState(false);
 
     const [post, setPost] = useState(null);
+    const [likes, setLikes] = useState(0);
+    const [comments, setComments] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [isLiked, setIsLiked] = useState(false);
+
+    const viewCounted = useViewTracker(postId);
 
     /* It works because of the loading state,
     the rendering is starting before the useEffect completion,
@@ -77,6 +66,11 @@ const ViewPost = () => {
             try {
                 const postData = await getPostById(postId);
                 setPost(postData);
+                setLikes(postData.totalLikes);
+                setIsLiked(
+                    !!currentUser &&
+                        !!currentUser.likedPosts.includes(postData._id),
+                );
             } catch (err) {
                 console.error("Failed to load post", err);
                 navigate("/404");
@@ -86,6 +80,20 @@ const ViewPost = () => {
         }
         fetchPost();
     }, [postId]);
+
+    async function handleLike(postId) {
+        let res = await likePost(postId);
+        if (res.success) {
+            toast.success(res.message);
+            if (res.increase === "increase") {
+                setLikes(likes + 1);
+            } else {
+                setLikes(likes - 1);
+            }
+        } else {
+            toast.error(res.message);
+        }
+    }
 
     // use skeleton later
     if (loading)
@@ -239,8 +247,6 @@ const ViewPost = () => {
                                         {post.readTime || "2 min read"}
                                     </div>
                                     <div className="flex items-center justify-center text-white">
-                                        <ThumbsUp className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] text-blue-600 hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
-                                        <span className="w-px h-[15px] dark:bg-[#ccc]/60 bg-[#444]/60" />
                                         <Bookmark className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] dark:text-white text-black hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
                                         <span className="w-px h-[15px] dark:bg-[#ccc]/60 bg-[#444]/60" />
                                         <Share2
@@ -283,10 +289,30 @@ const ViewPost = () => {
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="flex items-center gap-2"
+                                    className="flex items-center gap-2 cursor-not-allowed"
                                 >
-                                    <ThumbsUp className="size-4 text-blue-600" />
-                                    <span>{post.totalLikes}</span>
+                                    <Eye className="size-4" />
+                                    <span>{post.totalViews}</span>
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="flex items-center gap-2"
+                                    onClick={() => {
+                                        if (!currentUser) {
+                                            toast.error(
+                                                "you need to log in first to like",
+                                            );
+                                        } else {
+                                            handleLike(post._id);
+                                            setIsLiked(!isLiked);
+                                        }
+                                    }}
+                                >
+                                    <ThumbsUp
+                                        className={`size-4 text-blue-600 ${isLiked ? "fill-blue-600" : ""}`}
+                                    />
+                                    <span>{likes}</span>
                                 </Button>
                                 <Button
                                     variant="ghost"

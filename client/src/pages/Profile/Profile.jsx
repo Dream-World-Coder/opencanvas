@@ -20,7 +20,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 // import ShareButton from "../../components/ShareButton";
-// in posts also hide details like deletehash for public options
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 function sharePost(post) {
     const baseUrl = window.location.origin;
@@ -37,15 +47,22 @@ function sharePost(post) {
         });
 }
 
+function hideDiv(id) {
+    const elementToHide = document.getElementById(id);
+    if (elementToHide) {
+        elementToHide.style.display = "none";
+    }
+}
+
 const Profile = () => {
     const navigate = useNavigate();
-    const { currentUser, setCurrentUser } = useAuth();
+    const { currentUser } = useAuth();
     const [viewMode, setViewMode] = useState("grid");
     const [activeTab, setActiveTab] = useState("written");
     const [posts, setPosts] = useState([]);
     const [postsToFetch, setPostsToFetch] = useState(0);
     const [loading, setLoading] = useState(false);
-    const { deletePost } = useDataService();
+    const { deletePost, changePostVisibility } = useDataService();
     const userStats = [
         { name: "POSTS", amount: currentUser.posts.length },
         { name: "FOLLOWERS", amount: currentUser.followers.length },
@@ -144,8 +161,7 @@ const Profile = () => {
                                         <button
                                             className="absolute bottom-0 right-0 bg-black dark:bg-[#333] text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                                             onClick={() => {
-                                                window.location.href =
-                                                    "/profile/settings";
+                                                navigate("/profile/settings");
                                             }}
                                         >
                                             <Camera className="w-4 h-4" />
@@ -346,6 +362,7 @@ const Profile = () => {
                             : posts.map((post) => (
                                   <div
                                       key={post._id}
+                                      id={post._id}
                                       className="group cursor-auto transition-all duration-300"
                                   >
                                       {post.type === "image" ? (
@@ -379,7 +396,7 @@ const Profile = () => {
                                                       </div>
                                                       <div className="flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400">
                                                           <div className="flex items-center">
-                                                              <Heart className="w-4 h-4 mr-1 text-rose-500" />
+                                                              <ThumbsUp className="w-4 h-4 mr-1 text-rose-500" />
                                                               <span>
                                                                   {post.likes}
                                                               </span>
@@ -480,32 +497,69 @@ const Profile = () => {
                                                       <button
                                                           className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                                                           title="Delete"
-                                                          onClick={async (
-                                                              e,
-                                                          ) => {
-                                                              e.stopPropagation();
-                                                              try {
-                                                                  let res =
-                                                                      await deletePost(
-                                                                          post._id,
-                                                                      );
-                                                                  toast(
-                                                                      res.message,
-                                                                  );
-                                                                  setCurrentUser(
-                                                                      res.user,
-                                                                  );
-                                                              } catch (error) {
-                                                                  console.error(
-                                                                      error,
-                                                                  );
-                                                                  toast(
-                                                                      "Failed to delete post.",
-                                                                  );
-                                                              }
-                                                          }}
                                                       >
-                                                          <Trash2 className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                                                          <AlertDialog>
+                                                              <AlertDialogTrigger>
+                                                                  <Trash2 className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                                                              </AlertDialogTrigger>
+                                                              <AlertDialogContent>
+                                                                  <AlertDialogHeader>
+                                                                      <AlertDialogTitle>
+                                                                          Are
+                                                                          you
+                                                                          absolutely
+                                                                          sure?
+                                                                      </AlertDialogTitle>
+                                                                      <AlertDialogDescription>
+                                                                          This
+                                                                          action
+                                                                          cannot
+                                                                          be
+                                                                          undone.
+                                                                          This
+                                                                          will
+                                                                          permanently
+                                                                          delete
+                                                                          the
+                                                                          post.
+                                                                      </AlertDialogDescription>
+                                                                  </AlertDialogHeader>
+                                                                  <AlertDialogFooter>
+                                                                      <AlertDialogCancel>
+                                                                          Cancel
+                                                                      </AlertDialogCancel>
+                                                                      <AlertDialogAction
+                                                                          title="Delete"
+                                                                          onClick={async (
+                                                                              e,
+                                                                          ) => {
+                                                                              e.stopPropagation();
+                                                                              try {
+                                                                                  let res =
+                                                                                      await deletePost(
+                                                                                          post._id,
+                                                                                      );
+                                                                                  toast(
+                                                                                      res.message,
+                                                                                  );
+                                                                                  hideDiv(
+                                                                                      post._id,
+                                                                                  );
+                                                                              } catch (error) {
+                                                                                  console.error(
+                                                                                      error,
+                                                                                  );
+                                                                                  toast(
+                                                                                      "Failed to delete post.",
+                                                                                  );
+                                                                              }
+                                                                          }}
+                                                                      >
+                                                                          Continue
+                                                                      </AlertDialogAction>
+                                                                  </AlertDialogFooter>
+                                                              </AlertDialogContent>
+                                                          </AlertDialog>
                                                       </button>
                                                       <button
                                                           className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700"

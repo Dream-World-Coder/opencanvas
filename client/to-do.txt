@@ -76,10 +76,11 @@ show articles instead of literature gallery
 2. change username profile picture
 
 -- add topics you are interseted in
--- add contact information in public profile
--- delete account
--- always keep the post write option
--- copy link to public profile
+
+-- [x] add contact information in public profile
+-- [x] delete account
+-- [x] always keep the post write option
+-- [x] copy link to public profile
 
 -- profeatures
 1.
@@ -92,13 +93,13 @@ show articles instead of literature gallery
 
 
 -- use pop over instead of sheet in the writing-pad
--- localhost for saving id
+-- [x] localhost for saving id
 -- md2pdf route and public profile
--- profile settings
--- post & article view
+-- [x] profile settings
+-- [x] post & article view
 
 
--- in private profile view options for post: 1.view[public view] 2.edit 3.delete
+-- [x] in private profile view options for post: 1.view[public view] 2.edit 3.delete
 
 
 -- store postTitle, shortDescription also anong with it's id in currentUser.posts[], it will reduce db query a lot
@@ -131,10 +132,10 @@ show articles instead of literature gallery
 -- no need of photo gallery, its simply not for that level of photography
 -- remove photography from keywords
 
--- mailly ffor written art
+-- mainly for written art
 images in articles and thumbnails
 
--- 1 blog browser : only aericles
+-- 1 blog browser : only articles
 -- 2 written posts : literature gallery
 
 else focus will be gone by browsing different sections, here browse one type of thing
@@ -147,7 +148,7 @@ collections, imgs, books etc will not be in feed, will only gen when searched fo
 issue: in md2pdf when in 2 window mode isPreview must always be false, but if we use the export during that time, then it will be turned on, so it will be better to close the the 2 window view first, when export pressed
 
 
-msg+contact info add in profile settings
+- [x] msg+contact info add in profile settings
 
 -- [x] saved posts profile nav
 
@@ -155,14 +156,24 @@ msg+contact info add in profile settings
 -- link to writer in the post page
 -- in edit just save the same id as post id in loocalstorage, use different url/route though, else will be messy
 
--- check the order of the posts in profile, should be : newest -> oldest
+-- [x] check the order of the posts in profile, should be : newest -> oldest
 
 -- [x] center the 'profile not found' message;
 
 -- saved >> liked & other collections
 
--- may be add navigate features to post thumbnails of /profile posts also, like public profile
+-- [x] may be add navigate features to post thumbnails of /profile posts also, like public profile
 
 
 -- big loader in the writing pad and profile settings
--- gelmet in profile
+-- helmet in profile
+
+
+-- interested topics add in settings
+
+-- remove author from post, fetch the author
+
+:post{
+ -removed(totalshares & totalSaves)
+ -added(dislikes)
+ }

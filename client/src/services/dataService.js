@@ -70,12 +70,25 @@ export const useDataService = () => {
         }
     };
 
-    const likePost = async (postId) => {
+    const changePostVisibility = async (postId, isPublic) => {
         try {
-            const response = await authAxios.post(`/posts/${postId}/love`);
+            const response = await authAxios.put(
+                `/post-visibility-change?postId=${postId}`,
+                { isPublic },
+            );
             return response.data;
         } catch (error) {
-            console.error("Error loving post:", error);
+            console.error("Error changing visibility of the post:", error);
+            throw error;
+        }
+    };
+
+    const likePost = async (postId) => {
+        try {
+            const response = await authAxios.put(`/like-post?postId=${postId}`);
+            return response.data;
+        } catch (error) {
+            console.error("Error liking post:", error);
             throw error;
         }
     };
@@ -186,6 +199,7 @@ export const useDataService = () => {
         deletePost,
         likePost,
         savePost,
+        changePostVisibility,
 
         // Collections
         createCollection,

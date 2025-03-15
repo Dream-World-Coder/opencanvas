@@ -7,7 +7,7 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [twoColumn, setTwoColumn] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [postLoading, setPostLoading] = useState(false);
     const [isSaved, setIsSaved] = useState(true);
     // const [lastSynced, setLastSynced] = useState(null);
     // const [syncStatus, setSyncStatus] = useState("synced"); // 'synced', 'saving', 'offline'
@@ -182,7 +182,7 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
     useEffect(() => {
         if (artType === "edit") {
             async function fetchPost() {
-                setLoading(true);
+                setPostLoading(true);
                 try {
                     const postData = await getPostById(postId);
                     setTitle(postData.title);
@@ -201,7 +201,7 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
                     console.log("failed to load post", err);
                     toast.error("Failed to load post");
                 } finally {
-                    setLoading(false);
+                    setPostLoading(false);
                 }
             }
             fetchPost();
@@ -238,7 +238,7 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
 
             loadSaved();
         }
-    }, [artType]);
+    }, [artType, postId]);
 
     /**
      * Network status monitoring

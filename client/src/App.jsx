@@ -10,6 +10,7 @@ import { Toaster } from "@/components/ui/sonner";
 
 // Loaded with main bundle
 import LandingPage from "./pages/LandingPage/LandingPage";
+// import "./services/fingerprintService";
 
 // Lazy loaded components
 const LoginPage = lazy(() => import("./pages/Auth/Login"));
