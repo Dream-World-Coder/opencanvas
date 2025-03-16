@@ -2,13 +2,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const passport = require("passport");
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const { router: authRoutes } = require("./routes/auth");
 const { router: postRoutes } = require("./routes/post");
 const { router: errorHandler } = require("./middlewares/errorHandler.js");
-const { authenticateToken } = require("./middlewares/authorisation.js");
+// const { authenticateToken } = require("./middlewares/authorisation.js");
 
 require("dotenv").config();
 
@@ -25,14 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
     cors({
-        origin: [
-            "http://127.0.0.1:5173",
-            "http://127.0.0.1:3000",
-            "http://127.0.0.1:5500",
-            "http://localhost:5173",
-            "http://localhost:3000",
-            "http://localhost:5500",
-        ],
+        origin: ["http://127.0.0.1:5173", "http://127.0.0.1:3000"],
         credentials: true,
     }),
 );
@@ -43,12 +37,21 @@ app.use(morgan("dev")); // logger
 // Session configuration
 app.use(
     session({
-        secret: process.env.SESSION_SECRET || "nhed9rbv749j3Snek",
+        secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
+        store: MongoStore.create({
+            mongoUrl:
+                process.env.MONGODB_URI ||
+                "mongodb://localhost:27017/opencanvas",
+            ttl: 14 * 24 * 60 * 60, // sessions expire in 14 days
+            autoRemove: "native",
+        }),
         cookie: {
-            secure: process.env.NODE_ENV === "production", // Use secure cookies in production
-            maxAge: 24 * 60 * 60 * 1000, // 24 hours
+            secure: process.env.NODE_ENV === "production", // secure cookies in production
+            httpOnly: true, // Prevents client-side access to cookies
+            sameSite: "strict", // csrf
+            maxAge: 24 * 60 * 60 * 1000, // 1 day session duration
         },
     }),
 );
@@ -66,7 +69,10 @@ app.use("/auth", authRoutes);
 app.use(postRoutes);
 
 app.get("/", (req, res) => {
-    res.json({ message: "Welcome to OpenCanvas API" });
+    res.json({
+        message: "Welcome to OpenCanvas API",
+        environment: process.env.NODE_ENV.toString(),
+    });
 });
 
 app.listen(PORT, () => {
