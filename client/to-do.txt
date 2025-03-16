@@ -180,4 +180,6 @@ issue: in md2pdf when in 2 window mode isPreview must always be false, but if we
 
 -- [x] fetch author in article page
 
--- dynamic sitemap
+-- make dynamic sitemap
+
+-- make the username an index alongside _id

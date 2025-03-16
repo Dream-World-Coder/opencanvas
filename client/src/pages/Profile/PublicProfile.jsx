@@ -27,8 +27,8 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-// Use Helmet & schema data
-// ---------------------------
+import { useDataService } from "../../services/dataService";
+import { useAuth } from "../../contexts/AuthContext";
 
 function sharePost(post) {
     const baseUrl = window.location.origin;
@@ -50,6 +50,8 @@ const PublicProfile = () => {
     const [isLoading, setIsLoading] = useState(true);
     const { username } = useParams();
     const navigate = useNavigate();
+    const { currentUser } = useAuth();
+    const { followUser } = useDataService();
 
     const [viewMode, setViewMode] = useState("grid");
     const [activeTab, setActiveTab] = useState("written");
@@ -57,6 +59,7 @@ const PublicProfile = () => {
     const [posts, setPosts] = useState([]);
     const [postsToFetch, setPostsToFetch] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [following, setFollowing] = useState(false);
 
     useEffect(() => {
         async function fetchCurrentProfile(username) {
@@ -78,6 +81,12 @@ const PublicProfile = () => {
 
                 const data = await res.json();
                 setCurrentProfile(data.user);
+                setFollowing(
+                    !!currentUser &&
+                        !!currentUser.following
+                            .map((item) => item.userId)
+                            .includes(data.user._id),
+                );
             } catch (err) {
                 console.error(err);
             } finally {
@@ -86,34 +95,12 @@ const PublicProfile = () => {
         }
 
         fetchCurrentProfile(username);
-    }, [username, navigate]);
-
-    useEffect(() => {
-        if (currentProfile) {
-            fetchUserPosts();
-        }
-    }, [currentProfile]);
-
-    if (isLoading)
-        return (
-            <div className="flex justify-center items-center h-screen">
-                Loading...
-            </div>
-        );
-
-    // navigating, but still,
-    if (!currentProfile)
-        return (
-            <div className="flex justify-center items-center h-screen">
-                Profile Not found...
-            </div>
-        );
+    }, [username, navigate, currentUser]);
 
     // fetch posts from user's postIds array
     const fetchUserPosts = async () => {
         try {
             setLoading(true);
-            const token = localStorage.getItem("authToken");
             if (
                 !currentProfile ||
                 !currentProfile.posts ||
@@ -161,6 +148,38 @@ const PublicProfile = () => {
             setLoading(false);
         }
     };
+
+    // fetching posts
+    useEffect(() => {
+        if (currentProfile) {
+            fetchUserPosts();
+        }
+    }, [currentProfile]);
+
+    async function handleFollow(personToFollow) {
+        let res = await followUser(personToFollow);
+        if (res.success) {
+            setFollowing(!following);
+            toast.success(res.message);
+        } else {
+            toast.error(res.message);
+        }
+    }
+
+    if (isLoading)
+        return (
+            <div className="flex justify-center items-center h-screen">
+                Loading...
+            </div>
+        );
+
+    // navigating, but still,
+    if (!currentProfile)
+        return (
+            <div className="flex justify-center items-center h-screen">
+                Profile Not found...
+            </div>
+        );
 
     const userStats = [
         { name: "POSTS", amount: currentProfile.posts.length },
@@ -331,6 +350,29 @@ const PublicProfile = () => {
                                                             </AlertDialogFooter>
                                                         </AlertDialogContent>
                                                     </AlertDialog>
+                                                    {currentUser?._id?.toString() !==
+                                                        currentProfile._id?.toString() && (
+                                                        <button
+                                                            onClick={async () => {
+                                                                if (
+                                                                    !currentUser
+                                                                ) {
+                                                                    toast.error(
+                                                                        "you need to log in first to follow",
+                                                                    );
+                                                                    return;
+                                                                }
+                                                                await handleFollow(
+                                                                    currentProfile._id,
+                                                                );
+                                                            }}
+                                                            className={`px-1 w-fit rounded font-sans text-sm tracking-normal cursor-pointer dark:invert ${following ? "bg-white text-black" : "bg-black text-white"}`}
+                                                        >
+                                                            {following
+                                                                ? "Following"
+                                                                : "Follow"}
+                                                        </button>
+                                                    )}
                                                 </div>
                                                 <span className="block text-xl md:text-4xl font-normal tracking-normal md:tracking-tighter italic capitalize leading-[1.7rem] dark:text-[#e0e0e0]">
                                                     {currentProfile.role}

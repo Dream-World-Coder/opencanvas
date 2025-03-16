@@ -20,7 +20,19 @@ export const useDataService = () => {
             const response = await authAxios.get(`/auth/author/${authorId}`);
             return response.data.author;
         } catch (error) {
-            console.error("Error fetching user profile:", error);
+            console.error("Error fetching author profile:", error);
+            throw error;
+        }
+    };
+
+    const followUser = async (followId) => {
+        try {
+            const response = await authAxios.put(
+                `/auth/follow-user?followId=${followId}`,
+            );
+            return response.data;
+        } catch (error) {
+            console.error("Error following user:", error);
             throw error;
         }
     };
@@ -28,7 +40,7 @@ export const useDataService = () => {
     const updateUserProfile = async (formValues) => {
         try {
             const response = await authAxios.put(`/auth/update-user`, {
-                username: formValues.username,
+                username: formValues.username.toLowerCase(),
                 fullName: formValues.fullName,
                 role: formValues.role,
                 aboutMe: formValues.aboutMe,
@@ -105,7 +117,7 @@ export const useDataService = () => {
 
     const savePost = async (postId) => {
         try {
-            const response = await authAxios.post(`/posts/${postId}/save`);
+            const response = await authAxios.put(`/save-post?postId=${postId}`);
             return response.data;
         } catch (error) {
             console.error("Error saving post:", error);
@@ -203,6 +215,7 @@ export const useDataService = () => {
         // getUserProfile,
         getAuthorProfile,
         updateUserProfile,
+        followUser,
 
         // Posts
         getNewPostId,

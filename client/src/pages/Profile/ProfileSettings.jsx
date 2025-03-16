@@ -41,7 +41,7 @@ const ProfileSettings = () => {
     const [darkMode, setDarkMode] = useState(false);
     const [activeTab, setActiveTab] = useState("general");
     const [formValues, setFormValues] = useState({
-        username: currentUser.username ?? "null",
+        username: currentUser.username.toLowerCase() ?? "null",
         fullName: currentUser.fullName ?? "",
         role: currentUser.role ?? "user",
         aboutMe: currentUser.aboutMe ?? "",
@@ -56,7 +56,7 @@ const ProfileSettings = () => {
         contactInformation: currentUser.contactInformation ?? [
             {
                 title: "Opencanvas",
-                url: `${baseUrl}/u/${currentUser.username}`,
+                url: `${baseUrl}/u/${currentUser.username.toLowerCase()}`,
             },
         ],
     });
@@ -190,11 +190,12 @@ const ProfileSettings = () => {
                                 <Label htmlFor="username">Username</Label>
                                 <Input
                                     id="username"
-                                    value={formValues.username}
+                                    value={formValues.username.toLowerCase()}
                                     onChange={(e) =>
                                         setFormValues({
                                             ...formValues,
-                                            username: e.target.value,
+                                            username:
+                                                e.target.value.toLowerCase(),
                                         })
                                     }
                                     className="dark:bg-black dark:text-white dark:border-gray-800"
@@ -804,7 +805,7 @@ const ProfileSettings = () => {
                                                 "",
                                             )}
                                             /u/
-                                            {formValues.username}
+                                            {formValues.username.toLowerCase()}
                                         </CardDescription>
                                     </div>
                                     <TabsList

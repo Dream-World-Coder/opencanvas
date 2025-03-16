@@ -33,7 +33,7 @@ export const RelatedPostsDropdown = () => {
     return (
         <div className="mb-8">
             <div
-                className="flex items-center justify-between cursor-pointer mb-2 bg-gray-50 dark:bg-gray-800 p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                className="flex items-center justify-between cursor-pointer mb-2 bg-gray-50 dark:bg-[#222] p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-[#333] transition-colors"
                 onClick={toggleDropdown}
             >
                 <h3 className="text-xl font-bold">Related Posts</h3>

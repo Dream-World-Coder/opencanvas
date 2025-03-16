@@ -42,7 +42,8 @@ const ViewPost = () => {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
     const { postId } = useParams();
-    const { getPostById, getAuthorProfile, likePost } = useDataService();
+    const { getPostById, getAuthorProfile, likePost, savePost, followUser } =
+        useDataService();
     const isDark = useDarkMode();
     const [focusMode, _] = useState(!false);
 
@@ -50,8 +51,10 @@ const ViewPost = () => {
     const [likes, setLikes] = useState(0);
     const [author, setAuthor] = useState(null);
     const [comments, setComments] = useState(0);
+    const [following, setFollowing] = useState(false);
     const [loading, setLoading] = useState(true);
     const [isLiked, setIsLiked] = useState(false);
+    const [isSaved, setIsSaved] = useState(false);
 
     const viewCounted = useViewTracker(postId);
 
@@ -71,6 +74,16 @@ const ViewPost = () => {
                 setIsLiked(
                     !!currentUser &&
                         !!currentUser.likedPosts.includes(postData._id),
+                );
+                setIsSaved(
+                    !!currentUser &&
+                        !!currentUser.savedPosts.includes(postData._id),
+                );
+                setFollowing(
+                    !!currentUser &&
+                        !!currentUser.following
+                            .map((item) => item.userId)
+                            .includes(postData.authorId),
                 );
 
                 // fetch author
@@ -101,6 +114,25 @@ const ViewPost = () => {
             } else {
                 setLikes(likes - 1);
             }
+            setIsLiked(!isLiked);
+        } else {
+            toast.error(res.message);
+        }
+    }
+    async function handleSave(postId) {
+        let res = await savePost(postId);
+        if (res.success) {
+            setIsSaved(!isSaved);
+            toast.success(res.message);
+        } else {
+            toast.error(res.message);
+        }
+    }
+    async function handleFollow(personToFollow) {
+        let res = await followUser(personToFollow);
+        if (res.success) {
+            setFollowing(!following);
+            toast.success(res.message);
         } else {
             toast.error(res.message);
         }
@@ -144,7 +176,7 @@ const ViewPost = () => {
     const readOptions = [
         { name: "Home", href: "#" },
         { name: "Discover", href: "#" },
-        { name: "Bookmarks", href: "#" },
+        { name: "B-ookmarks", href: "#" },
         { name: "Profile", href: "#" },
         { name: "My Feed", href: "#" },
     ];
@@ -293,11 +325,30 @@ const ViewPost = () => {
                                         </AvatarFallback>
                                     </Avatar>
                                     <div className="">
-                                        <div className="font-medium flex items-center justify-center gap-2">
+                                        <div className="font-medium flex items-center justify-start gap-2">
                                             {author.fullName}
-                                            <button className="px-1 rounded bg-black text-white dark:invert text-xs cursor-pointer">
-                                                Follow
-                                            </button>
+
+                                            {currentUser?._id?.toString() !==
+                                                post.authorId?.toString() && (
+                                                <button
+                                                    onClick={async () => {
+                                                        if (!currentUser) {
+                                                            toast.error(
+                                                                "you need to log in first to follow",
+                                                            );
+                                                            return;
+                                                        }
+                                                        await handleFollow(
+                                                            post.authorId,
+                                                        );
+                                                    }}
+                                                    className={`px-1 rounded text-xs cursor-pointer dark:invert ${following ? "bg-white text-black" : "bg-black text-white"}`}
+                                                >
+                                                    {following
+                                                        ? "Following"
+                                                        : "Follow"}
+                                                </button>
+                                            )}
                                         </div>
                                         <div className="text-sm text-gray-500 dark:text-gray-400">
                                             {author.role}
@@ -313,7 +364,18 @@ const ViewPost = () => {
                                         {post.readTime || "2 min read"}
                                     </div>
                                     <div className="flex items-center justify-center text-white">
-                                        <Bookmark className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] dark:text-white text-black hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
+                                        <Bookmark
+                                            className={`size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111]  hover:text-white dark:hover:bg-[#eee] dark:hover:text-black ${isSaved ? "fill-lime-500 text-lime-500" : "dark:text-white text-black"}`}
+                                            onClick={async () => {
+                                                if (!currentUser) {
+                                                    toast.error(
+                                                        "you need to log in first to save post",
+                                                    );
+                                                } else {
+                                                    await handleSave(post._id);
+                                                }
+                                            }}
+                                        />
                                         <span className="w-px h-[15px] dark:bg-[#ccc]/60 bg-[#444]/60" />
                                         <Share2
                                             className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] dark:text-white text-black hover:text-white dark:hover:bg-[#eee] dark:hover:text-black"
@@ -362,14 +424,13 @@ const ViewPost = () => {
                                     variant="ghost"
                                     size="sm"
                                     className="flex items-center gap-2"
-                                    onClick={() => {
+                                    onClick={async () => {
                                         if (!currentUser) {
                                             toast.error(
                                                 "you need to log in first to like",
                                             );
                                         } else {
-                                            handleLike(post._id);
-                                            setIsLiked(!isLiked);
+                                            await handleLike(post._id);
                                         }
                                     }}
                                 >
@@ -388,8 +449,22 @@ const ViewPost = () => {
                                 </Button>
                             </div>
                             <div className="flex items-center gap-2">
-                                <Button variant="ghost" size="sm">
-                                    <Bookmark className="size-4" />
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={async () => {
+                                        if (!currentUser) {
+                                            toast.error(
+                                                "you need to log in first to save post",
+                                            );
+                                        } else {
+                                            await handleSave(post._id);
+                                        }
+                                    }}
+                                >
+                                    <Bookmark
+                                        className={`size-4 ${isSaved ? "fill-lime-500 text-lime-500" : ""}`}
+                                    />
                                 </Button>
                                 <Button
                                     variant="ghost"
