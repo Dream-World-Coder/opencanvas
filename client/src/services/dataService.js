@@ -5,10 +5,20 @@ export const useDataService = () => {
     const { authAxios } = useAuth();
 
     // User related functions
-    const getUserProfile = async (userId) => {
+    // const getUserProfile = async (userId) => {
+    //     try {
+    //         const response = await authAxios.get(`/users/${userId}`);
+    //         return response.data;
+    //     } catch (error) {
+    //         console.error("Error fetching user profile:", error);
+    //         throw error;
+    //     }
+    // };
+
+    const getAuthorProfile = async (authorId) => {
         try {
-            const response = await authAxios.get(`/users/${userId}`);
-            return response.data;
+            const response = await authAxios.get(`/auth/author/${authorId}`);
+            return response.data.author;
         } catch (error) {
             console.error("Error fetching user profile:", error);
             throw error;
@@ -190,7 +200,8 @@ export const useDataService = () => {
 
     return {
         // User
-        getUserProfile,
+        // getUserProfile,
+        getAuthorProfile,
         updateUserProfile,
 
         // Posts

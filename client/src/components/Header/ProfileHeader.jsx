@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ChevronUp, ChevronDown, Plus, Menu, X, Settings } from "lucide-react";
 import { createOptions } from "./createOptions";
 import {
@@ -24,6 +25,7 @@ const navLinks = [
 ];
 
 export default function ProfileHeader() {
+    const navigate = useNavigate();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [createMenuOpen, setCreateMenuOpen] = useState(false);
     const { getNewPostId } = useDataService();
@@ -59,7 +61,7 @@ export default function ProfileHeader() {
                         <button
                             key={index}
                             onClick={() => {
-                                window.location.href = link.href;
+                                navigate(link.href);
                             }}
                             className={`px-3 py-1 box-content rounded-md hover:opacity-70 dark:hover:opacity-100 hover:bg-lime-300 dark:hover:bg-[#333]`}
                         >
@@ -86,7 +88,7 @@ export default function ProfileHeader() {
                                 <AlertDialogAction
                                     className="bg-red-600 hover:bg-red-500"
                                     onClick={() => {
-                                        window.location.href = "/logout";
+                                        navigate("/logout");
                                     }}
                                 >
                                     Continue
@@ -98,7 +100,7 @@ export default function ProfileHeader() {
                     <button
                         className="size-6"
                         onClick={() => {
-                            window.location.href = "/profile/settings";
+                            navigate("/profile/settings");
                         }}
                     >
                         <Settings />

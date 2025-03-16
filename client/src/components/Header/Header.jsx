@@ -103,20 +103,22 @@ const Header = ({
                         ))}
                         {/* Create Button with Dropdown */}
                         <div className="relative">
-                            <button
-                                onClick={() =>
-                                    setCreateMenuOpen(!createMenuOpen)
-                                }
-                                className="flex items-center space-x-2 bg-black dark:bg-[#333] text-white px-4 py-2 rounded-full hover:bg-stone-800/90 transition-colors"
-                            >
-                                <span>Create</span>
-                                {!createMenuOpen && (
-                                    <ChevronDown className="w-4 h-4" />
-                                )}
-                                {createMenuOpen && (
-                                    <ChevronUp className="w-4 h-4" />
-                                )}
-                            </button>
+                            {currentUser && (
+                                <button
+                                    onClick={() =>
+                                        setCreateMenuOpen(!createMenuOpen)
+                                    }
+                                    className="flex items-center space-x-2 bg-black dark:bg-[#333] text-white px-4 py-2 rounded-full hover:bg-stone-800/90 transition-colors"
+                                >
+                                    <span>Create</span>
+                                    {!createMenuOpen && (
+                                        <ChevronDown className="w-4 h-4" />
+                                    )}
+                                    {createMenuOpen && (
+                                        <ChevronUp className="w-4 h-4" />
+                                    )}
+                                </button>
+                            )}
 
                             {/* Create Menu Dropdown --desktop */}
                             {createMenuOpen && (
@@ -157,16 +159,20 @@ const Header = ({
 
                     <div className="md:hidden flex items-center justify-center gap-2">
                         {/* Mobile Create Button */}
-                        <button
-                            onClick={() => setCreateMenuOpen(!createMenuOpen)}
-                            className="w-fit p-1 flex items-center justify-center bg-black text-white rounded-full hover:bg-stone-800/90 transition-colors dark:invert"
-                        >
-                            {createMenuOpen ? (
-                                <X className="w-4 h-4" />
-                            ) : (
-                                <Plus className="w-4 h-4" />
-                            )}
-                        </button>
+                        {currentUser && (
+                            <button
+                                onClick={() =>
+                                    setCreateMenuOpen(!createMenuOpen)
+                                }
+                                className="w-fit p-1 flex items-center justify-center bg-black text-white rounded-full hover:bg-stone-800/90 transition-colors dark:invert"
+                            >
+                                {createMenuOpen ? (
+                                    <X className="w-4 h-4" />
+                                ) : (
+                                    <Plus className="w-4 h-4" />
+                                )}
+                            </button>
+                        )}
 
                         {/* Mobile Menu Button */}
                         <button

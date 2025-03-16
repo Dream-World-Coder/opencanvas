@@ -96,20 +96,22 @@ const Header = ({ filters }) => {
 
                         {/* Create Button with Dropdown */}
                         <div className="relative">
-                            <button
-                                onClick={() =>
-                                    setCreateMenuOpen(!createMenuOpen)
-                                }
-                                className="flex items-center space-x-2 bg-black dark:bg-[#333] text-white px-4 py-2 rounded-full hover:bg-stone-800/90 transition-colors"
-                            >
-                                <span>Create</span>
-                                {!createMenuOpen && (
-                                    <ChevronDown className="w-4 h-4" />
-                                )}
-                                {createMenuOpen && (
-                                    <ChevronUp className="w-4 h-4" />
-                                )}
-                            </button>
+                            {currentUser && (
+                                <button
+                                    onClick={() =>
+                                        setCreateMenuOpen(!createMenuOpen)
+                                    }
+                                    className="flex items-center space-x-2 bg-black dark:bg-[#333] text-white px-4 py-2 rounded-full hover:bg-stone-800/90 transition-colors"
+                                >
+                                    <span>Create</span>
+                                    {!createMenuOpen && (
+                                        <ChevronDown className="w-4 h-4" />
+                                    )}
+                                    {createMenuOpen && (
+                                        <ChevronUp className="w-4 h-4" />
+                                    )}
+                                </button>
+                            )}
 
                             {/* create menu dropdown -- desktop */}
                             {createMenuOpen && (
@@ -158,16 +160,20 @@ const Header = ({ filters }) => {
                         />
 
                         {/* Mobile Create Button */}
-                        <button
-                            onClick={() => setCreateMenuOpen(!createMenuOpen)}
-                            className="text-black dark:text-white"
-                        >
-                            {createMenuOpen ? (
-                                <X className="size-5" />
-                            ) : (
-                                <Plus className="size-5" />
-                            )}
-                        </button>
+                        {currentUser && (
+                            <button
+                                onClick={() =>
+                                    setCreateMenuOpen(!createMenuOpen)
+                                }
+                                className="text-black dark:text-white"
+                            >
+                                {createMenuOpen ? (
+                                    <X className="size-5" />
+                                ) : (
+                                    <Plus className="size-5" />
+                                )}
+                            </button>
+                        )}
 
                         {/* Mobile Menu Button */}
                         <button

@@ -10,18 +10,18 @@ import {
     MessageSquareText,
 } from "lucide-react";
 
-import Header from "../../components/Header/Header";
-import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-import { useAuth } from "../../contexts/AuthContext";
+import Header from "../../components/Header/Header";
 import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
+import { AuthorPostsDropdown } from "./AuthorPostsDropdown";
+import { RelatedPostsDropdown } from "./RelatedPostsDropdown";
+import { useAuth } from "../../contexts/AuthContext";
 import { useDataService } from "../../services/dataService";
 import { useDarkMode } from "../../components/Hooks/darkMode";
 import { useViewTracker } from "../../components/Hooks/viewCount";
-import { moreFromAuthor, relatedPosts } from "./data";
 
 function sharePost(post) {
     const baseUrl = window.location.origin;
@@ -42,12 +42,13 @@ const ViewPost = () => {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
     const { postId } = useParams();
-    const { getPostById, likePost } = useDataService();
+    const { getPostById, getAuthorProfile, likePost } = useDataService();
     const isDark = useDarkMode();
-    const [focusMode, _] = useState(false);
+    const [focusMode, _] = useState(!false);
 
     const [post, setPost] = useState(null);
     const [likes, setLikes] = useState(0);
+    const [author, setAuthor] = useState(null);
     const [comments, setComments] = useState(0);
     const [loading, setLoading] = useState(true);
     const [isLiked, setIsLiked] = useState(false);
@@ -71,6 +72,10 @@ const ViewPost = () => {
                     !!currentUser &&
                         !!currentUser.likedPosts.includes(postData._id),
                 );
+
+                // fetch author
+                const authorProfile = await getAuthorProfile(postData.authorId);
+                setAuthor(authorProfile);
             } catch (err) {
                 console.error("Failed to load post", err);
                 navigate("/404");
@@ -80,6 +85,12 @@ const ViewPost = () => {
         }
         fetchPost();
     }, [postId]);
+
+    useEffect(() => {
+        if (viewCounted) {
+            post.totalViews += 1;
+        }
+    }, [viewCounted]);
 
     async function handleLike(postId) {
         let res = await likePost(postId);
@@ -98,7 +109,7 @@ const ViewPost = () => {
     // use skeleton later
     if (loading)
         return (
-            <div className="flex justify-center items-center h-screen">
+            <div className="flex justify-center items-center h-screen text-black dark:text-white">
                 Loading post...
             </div>
         );
@@ -106,8 +117,27 @@ const ViewPost = () => {
     // navigated, but still
     if (!post)
         return (
-            <div className="flex justify-center items-center h-screen">
+            <div className="flex justify-center items-center h-screen text-black dark:text-white">
                 Post not found
+            </div>
+        );
+
+    if (!post.isPublic)
+        return (
+            <div className="w-full h-full grid place-items-center bg-white dark:bg-[#111] overflow-x-hidden pt-20">
+                <Header
+                    noBlur={true}
+                    ballClr={"text-gray-300"}
+                    exclude={[
+                        "/about",
+                        "/contact",
+                        "/gallery/photos",
+                        "/gallery/literature",
+                    ]}
+                />
+                <div className="flex justify-center items-center h-screen text-black dark:text-white">
+                    This Post is Private
+                </div>
             </div>
         );
 
@@ -129,16 +159,20 @@ const ViewPost = () => {
         return formattedDate;
     }
 
+    function formatSchemaDate(date) {
+        return new Date(date).toISOString();
+    }
+
     const schemaData = {
         "@context": "https://schema.org",
         "@type": "Article",
         headline: post.title,
-        image: [`https://opencanvas.blog${post.thumbnailUrl}`],
-        datePublished: {},
-        dateModified: {},
+        image: [`${window.location.origin}${post.thumbnailUrl}`],
+        datePublished: formatSchemaDate(post.publishedAt),
+        dateModified: formatSchemaDate(post.modifiedAt),
         author: {
             "@type": "Person",
-            name: {},
+            name: author.fullName,
         },
         publisher: {
             "@type": "Organization",
@@ -148,24 +182,51 @@ const ViewPost = () => {
                 url: "https://opencanvas.blog/logo.png",
             },
         },
-        description:
-            "A sample article description goes here, summarizing the main content of the article.",
+        description: post.title,
         mainEntityOfPage: {
             "@type": "WebPage",
-            "@id": "https://opencanvas.blog/sample-article",
+            "@id": `${window.location.origin}/p/${post._id}`,
         },
-        keywords:
-            "SEO, keywords, search engine optimization, blog, web development",
+        keywords: [...post.tags],
     };
 
     return (
         <>
             <Helmet>
-                <title>{post.title} • OpenCanvas</title>
+                <title>{post.title} | OpenCanvas</title>
                 <meta name="description" content={post.title} />
                 <meta
                     name="keywords"
-                    content="technology, blog, javascript, SEO, web development"
+                    content={[
+                        ...new Set(
+                            post.title
+                                .toLowerCase()
+                                .split(/\s+/)
+                                .filter(
+                                    (word) =>
+                                        ![
+                                            "a",
+                                            "an",
+                                            "the",
+                                            "and",
+                                            "or",
+                                            "but",
+                                            "is",
+                                            "to",
+                                            "of",
+                                            "in",
+                                            "on",
+                                            "at",
+                                            "with",
+                                            "for",
+                                            "from",
+                                            "by",
+                                        ].includes(word),
+                                ),
+                        ),
+                        ...post.tags,
+                        "opencanvas",
+                    ].join(", ")}
                 />
                 <script type="application/ld+json">
                     {JSON.stringify(schemaData)}
@@ -217,24 +278,29 @@ const ViewPost = () => {
                         <div className="mb-8">
                             <div className="flex flex-col md:flex-row items-start md:items-center justify-between space-y-2 md:space-y-0 mb-4">
                                 <div className="flex items-center">
-                                    <Avatar className="h-10 w-10 mr-3">
+                                    <Avatar
+                                        className="h-10 w-10 mr-3 cursor-pointer"
+                                        onClick={() => {
+                                            navigate(`/u/${author.username}`);
+                                        }}
+                                    >
                                         <AvatarImage
-                                            src={post.author.profilePicture}
-                                            alt={post.author.name}
+                                            src={author.profilePicture}
+                                            alt={author.fullName}
                                         />
                                         <AvatarFallback>
-                                            {post.author.name.charAt(0)}
+                                            {author.fullName.charAt(0)}
                                         </AvatarFallback>
                                     </Avatar>
                                     <div className="">
                                         <div className="font-medium flex items-center justify-center gap-2">
-                                            {post.author.name}
+                                            {author.fullName}
                                             <button className="px-1 rounded bg-black text-white dark:invert text-xs cursor-pointer">
                                                 Follow
                                             </button>
                                         </div>
                                         <div className="text-sm text-gray-500 dark:text-gray-400">
-                                            {post.author.role}
+                                            {author.role}
                                         </div>
                                     </div>
                                 </div>
@@ -259,7 +325,6 @@ const ViewPost = () => {
                                 </div>
                             </div>
                         </div>
-
                         {/* Article content */}
                         <div className="prose dark:prose-invert max-w-none pt-4 mb-16">
                             <MarkdownPreview
@@ -282,7 +347,6 @@ const ViewPost = () => {
                                 ))}
                             </div>
                         </div>
-
                         {/* Engagement section */}
                         <div className="flex items-center justify-between border-t border-b py-4 mb-8 dark:border-[#333] border-gray-200">
                             <div className="flex items-center gap-4">
@@ -338,63 +402,18 @@ const ViewPost = () => {
                         </div>
 
                         {/* More from author section */}
-                        <div className="mb-12">
-                            <h3 className="text-xl font-bold mb-4">
-                                More from {post.author.name}
-                            </h3>
-                            <div className="grid gap-4">
-                                {moreFromAuthor.map((item) => (
-                                    <Card
-                                        key={item.id}
-                                        className="hover:shadow-md transition duration-200 shadow-none dark:bg-[#222] dark:text-[#fff] dark:border-none"
-                                    >
-                                        <CardContent className="p-4">
-                                            <h4 className="font-medium text-lg mb-2">
-                                                {item.title}
-                                            </h4>
-                                            <div className="text-sm text-gray-500 dark:text-gray-400">
-                                                {item.readTime}
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
-                        </div>
+                        <AuthorPostsDropdown
+                            author={author}
+                            currentPostId={post._id.toString()}
+                        />
 
                         {/* Related posts section */}
-                        <div className="mb-8">
-                            <h3 className="text-xl font-bold mb-4">
-                                Related Posts
-                            </h3>
-                            <div className="grid gap-4">
-                                {relatedPosts.map((item) => (
-                                    <Card
-                                        key={item.id}
-                                        className="hover:shadow-md transition duration-200 shadow-none dark:bg-[#222] dark:text-[#fff] dark:border-none"
-                                    >
-                                        <CardContent className="p-4">
-                                            <h4 className="font-medium text-lg mb-2">
-                                                {item.title}
-                                            </h4>
-                                            <div className="flex justify-between text-sm">
-                                                <span>{item.author}</span>
-                                                <span className="text-gray-500 dark:text-gray-400">
-                                                    {item.readTime}
-                                                </span>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
-                        </div>
+                        <RelatedPostsDropdown />
                     </main>
 
-                    {/* Right sidebar - Empty as requested */}
+                    {/* Right sidebar - empty */}
                     <aside className="w-full md:w-64 p-4 hidden lg:block">
-                        <div className="sticky top-4">
-                            {/* This section is intentionally left empty as per requirements */}
-                            {/* You can add content here in the future */}
-                        </div>
+                        <div className="sticky top-4"></div>
                     </aside>
                 </div>
             </div>

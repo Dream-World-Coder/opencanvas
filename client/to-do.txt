@@ -166,14 +166,16 @@ issue: in md2pdf when in 2 window mode isPreview must always be false, but if we
 
 
 -- big loader in the writing pad and profile settings
--- helmet in profile
+-- [x] helmet in profile
 
 
 -- interested topics add in settings
 
--- remove author from post, fetch the author
+-- [x] remove author from post, fetch the author
 
 :post{
  -removed(totalshares & totalSaves)
  -added(dislikes)
  }
+
+-- [x] fetch author in article page

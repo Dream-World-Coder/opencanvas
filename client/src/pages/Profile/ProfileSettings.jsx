@@ -36,6 +36,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useDataService } from "../../services/dataService";
 
 const ProfileSettings = () => {
+    const baseUrl = window.location.origin;
     const { currentUser } = useAuth();
     const [darkMode, setDarkMode] = useState(false);
     const [activeTab, setActiveTab] = useState("general");
@@ -55,7 +56,7 @@ const ProfileSettings = () => {
         contactInformation: currentUser.contactInformation ?? [
             {
                 title: "Opencanvas",
-                url: `https://www.opencanvas.blog/u/${currentUser.username}`,
+                url: `${baseUrl}/u/${currentUser.username}`,
             },
         ],
     });
@@ -217,9 +218,9 @@ const ProfileSettings = () => {
                             </div>
                         </div>
 
-                        {/* Tagline */}
+                        {/* Designation */}
                         <div className="space-y-2">
-                            <Label htmlFor="role">Tagline</Label>
+                            <Label htmlFor="role">Designation</Label>
                             <Input
                                 id="role"
                                 value={formValues.role}
@@ -265,6 +266,7 @@ const ProfileSettings = () => {
                                         <Input
                                             // id={`contact-title-${index}`}
                                             placeholder="Title, eg: GitHub"
+                                            className="dark:border-gray-800"
                                             value={contact.title}
                                             onChange={(e) =>
                                                 handleContactInfoChange(
@@ -276,9 +278,18 @@ const ProfileSettings = () => {
                                         />
 
                                         <div className="space-y-0 flex items-end gap-2">
+                                            {/* const isValidURL = (url) => {
+                                                try {
+                                                    new URL(url);
+                                                    return true;
+                                                } catch (e) {
+                                                    return false;
+                                                }
+                                            }; */}
                                             <Input
                                                 // id={`contact-url-${index}`}
                                                 placeholder="eg: https://github.com/username"
+                                                className="dark:border-gray-800"
                                                 value={contact.url}
                                                 onChange={(e) =>
                                                     handleContactInfoChange(
@@ -314,7 +325,7 @@ const ProfileSettings = () => {
                                 type="button"
                                 variant="outline"
                                 size="sm"
-                                className="mt-2"
+                                className="mt-2 dark:bg-white dark:text-black"
                                 onClick={addContactInfoField}
                             >
                                 <PlusCircle className="h-4 w-4 mr-2" />
@@ -323,6 +334,8 @@ const ProfileSettings = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* Interested fields & topics -- for articles */}
 
                 <div className="flex items-center justify-between dark:text-white">
                     <div className="flex items-center space-x-2">
@@ -779,14 +792,18 @@ const ProfileSettings = () => {
                                                 className="size-4 cursor-pointer"
                                                 onClick={() => {
                                                     navigator.clipboard.writeText(
-                                                        `https://www.opencanvas.blog/u/${formValues.username}`,
+                                                        `${baseUrl}/u/${formValues.username}`,
                                                     );
                                                     toast.success("copied!");
                                                 }}
                                             />
                                         </CardTitle>
                                         <CardDescription className="dark:text-gray-400">
-                                            opencanvas.blog/u/
+                                            {baseUrl.replace(
+                                                /^https?:\/\//,
+                                                "",
+                                            )}
+                                            /u/
                                             {formValues.username}
                                         </CardDescription>
                                     </div>

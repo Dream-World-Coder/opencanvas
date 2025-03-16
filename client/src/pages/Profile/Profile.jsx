@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import {
     Share2,
     Grid,
@@ -8,6 +9,7 @@ import {
     ThumbsUp,
     MessageCircle,
     Eye,
+    EyeOff,
     Edit,
     Trash2,
     MoreHorizontal,
@@ -31,8 +33,18 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 function sharePost(post) {
+    if (!post.isPublic) {
+        toast.error("This post is private");
+        return;
+    }
     const baseUrl = window.location.origin;
     const postUrl = `${baseUrl}/p/${post._id}`;
 
@@ -135,266 +147,333 @@ const Profile = () => {
         }
     }, [currentUser]);
 
-    return (
-        <div
-            className={`min-h-screen bg-white dark:bg-black dark:text-white font-sans`} //bg-cream-light
-        >
-            <ProfileHeader />
+    const schemaData = {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        name: currentUser.fullName,
+        image: `${window.location.origin}${currentUser.profilePicture}`,
+        description: currentUser.aboutMe,
+        url: `${window.location.origin}/u/${currentUser.username}`,
+        sameAs: currentUser.contactInformation.map((contact) => contact.url),
+        // Array of social media links (Twitter, LinkedIn, etc.)
+        jobTitle: currentUser.role,
+        mainEntityOfPage: {
+            "@type": "WebPage",
+            "@id": `${window.location.origin}/u/${currentUser.username}`,
+        },
+    };
 
-            <main className="pt-32 px-2 md:px-8">
-                <div className="max-w-[1400px] mx-auto pb-[20vh]">
-                    <div className="grid md:grid-cols-[1.6fr,1fr] gap-16 mb-24">
-                        {/* Left Column with Profile Pic */}
-                        <div className="space-y-8">
-                            <div className="flex items-start md:items-center space-x-8">
-                                {loading ? (
-                                    <Skeleton className="size-16 md:size-24 rounded-full" />
-                                ) : (
-                                    <div className="relative group">
-                                        <div className="size-16 md:size-24 rounded-full overflow-hidden bg-gray-100 dark:bg-[#222]">
-                                            <img
-                                                src={currentUser.profilePicture}
-                                                alt="Profile"
-                                                className="w-full h-full object-cover"
-                                            />
-                                        </div>
-                                        <button
-                                            className="absolute bottom-0 right-0 bg-black dark:bg-[#333] text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                            onClick={() => {
-                                                navigate("/profile/settings");
-                                            }}
-                                        >
-                                            <Camera className="w-4 h-4" />
-                                        </button>
-                                    </div>
-                                )}
-                                <div className="flex-1">
+    return (
+        <>
+            <Helmet>
+                <title>{currentUser.fullName} | OpenCanvas</title>
+                <meta
+                    name="description"
+                    content={`OpenCanvas profile page of ${currentUser.fullName}`}
+                />
+                <meta
+                    name="keywords"
+                    content={[
+                        ...new Set([
+                            currentUser.fullName,
+                            currentUser.fullName.split(" ")[0],
+                            ...currentUser.role
+                                .toLowerCase()
+                                .split(/\s+/)
+                                .filter(
+                                    (word) =>
+                                        ![
+                                            "a",
+                                            "an",
+                                            "the",
+                                            "and",
+                                            "or",
+                                            "but",
+                                            "is",
+                                            "to",
+                                            "of",
+                                            "in",
+                                            "on",
+                                            "at",
+                                            "with",
+                                            "for",
+                                            "from",
+                                            "by",
+                                        ].includes(word),
+                                ),
+                        ]),
+                        "opencanvas",
+                    ].join(", ")}
+                />
+                <script type="application/ld+json">
+                    {JSON.stringify(schemaData)}
+                </script>
+            </Helmet>
+            <div
+                className={`min-h-screen bg-white dark:bg-black dark:text-white font-sans`} //bg-cream-light
+            >
+                <ProfileHeader />
+
+                <main className="pt-32 px-2 md:px-8">
+                    <div className="max-w-[1400px] mx-auto pb-[20vh]">
+                        <div className="grid md:grid-cols-[1.6fr,1fr] gap-16 mb-24">
+                            {/* Left Column with Profile Pic */}
+                            <div className="space-y-8">
+                                <div className="flex items-start md:items-center space-x-8">
                                     {loading ? (
-                                        <div className="space-y-2">
-                                            <Skeleton className="h-10 w-3/4" />
-                                            <Skeleton className="h-6 w-1/2" />
-                                        </div>
+                                        <Skeleton className="size-16 md:size-24 rounded-full" />
                                     ) : (
-                                        <h1
-                                            className="text-4xl md:text-6xl font-boska leading-[0.95] tracking-tighter
-                                            pointer-events-none md:pointer-events-auto uppercase dark:text-[#f8f8f8]"
-                                        >
-                                            {currentUser.fullName}
-                                            <span className="block text-xl md:text-4xl font-normal tracking-normal md:tracking-tighter italic capitalize leading-[1.7rem] dark:text-[#e0e0e0]">
-                                                {currentUser.role}
-                                            </span>
-                                        </h1>
+                                        <div className="relative group">
+                                            <div className="size-16 md:size-24 rounded-full overflow-hidden bg-gray-100 dark:bg-[#222]">
+                                                <img
+                                                    src={
+                                                        currentUser.profilePicture
+                                                    }
+                                                    alt="Profile"
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                            <button
+                                                className="absolute bottom-0 right-0 bg-black dark:bg-[#333] text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                                onClick={() => {
+                                                    navigate(
+                                                        "/profile/settings",
+                                                    );
+                                                }}
+                                            >
+                                                <Camera className="w-4 h-4" />
+                                            </button>
+                                        </div>
                                     )}
+                                    <div className="flex-1">
+                                        {loading ? (
+                                            <div className="space-y-2">
+                                                <Skeleton className="h-10 w-3/4" />
+                                                <Skeleton className="h-6 w-1/2" />
+                                            </div>
+                                        ) : (
+                                            <h1
+                                                className="text-4xl md:text-6xl font-boska leading-[0.95] tracking-tighter
+                                            pointer-events-none md:pointer-events-auto uppercase dark:text-[#f8f8f8]"
+                                            >
+                                                {currentUser.fullName}
+                                                <span className="block text-xl md:text-4xl font-normal tracking-normal md:tracking-tighter italic capitalize leading-[1.7rem] dark:text-[#e0e0e0]">
+                                                    {currentUser.role}
+                                                </span>
+                                            </h1>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                            {loading ? (
-                                <div className="space-y-2">
-                                    <Skeleton className="h-4 w-full" />
-                                    <Skeleton className="h-4 w-5/6" />
-                                    <Skeleton className="h-4 w-4/6" />
-                                </div>
-                            ) : (
-                                currentUser.aboutMe && (
-                                    <p
-                                        className="text-stone-700 dark:text-[#b0b0b0] font-boskaLight font-bold md:font-normal
+                                {loading ? (
+                                    <div className="space-y-2">
+                                        <Skeleton className="h-4 w-full" />
+                                        <Skeleton className="h-4 w-5/6" />
+                                        <Skeleton className="h-4 w-4/6" />
+                                    </div>
+                                ) : (
+                                    currentUser.aboutMe && (
+                                        <p
+                                            className="text-stone-700 dark:text-[#b0b0b0] font-boskaLight font-bold md:font-normal
                                     text-lg md:text-2xl leading-tight tracking-normal
                                     max-w-xl pointer-events-none md:pointer-events-auto"
-                                    >
-                                        &quot; {currentUser.aboutMe} &quot;
-                                    </p>
-                                )
-                            )}
-                        </div>
+                                        >
+                                            &quot; {currentUser.aboutMe} &quot;
+                                        </p>
+                                    )
+                                )}
+                            </div>
 
-                        {/* Right Column - Quick Stats */}
-                        <div className="space-y-3 pt-4">
-                            {loading
-                                ? Array(4)
-                                      .fill(0)
-                                      .map((_, i) => (
-                                          <div
-                                              key={i}
-                                              className="flex justify-between items-center py-3 pr-4"
-                                          >
-                                              <Skeleton className="h-4 w-24" />
-                                              <Skeleton className="h-4 w-12" />
-                                          </div>
-                                      ))
-                                : userStats.map((item, index) => (
-                                      <div
-                                          key={index}
-                                          className="flex justify-between items-center border-b border-gray-200 dark:border-[#333] py-3 pr-4"
-                                      >
-                                          <span className="text-gray-500 dark:text-[#999] text-sm md:text-md">
-                                              {item.name}
-                                          </span>
-                                          <span className="dark:text-[#e0e0e0]">
-                                              {item.amount}
-                                          </span>
-                                      </div>
-                                  ))}
-                        </div>
-                    </div>
-
-                    {/* Collections Carousel */}
-                    {collections.length > 0 && (
-                        <div className="mb-24">
-                            <h2 className="text-2xl font-semibold tracking-tight mb-8 dark:text-[#f0f0f0]">
-                                <span className="bg-inherit dark:bg-inherit hover:bg-lime-100 dark:hover:bg-[#222] rounded-md box-content px-2 py-1">
-                                    Featured Works
-                                </span>
-                            </h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {/* Right Column - Quick Stats */}
+                            <div className="space-y-3 pt-4">
                                 {loading
                                     ? Array(4)
                                           .fill(0)
                                           .map((_, i) => (
                                               <div
                                                   key={i}
-                                                  className="space-y-3"
+                                                  className="flex justify-between items-center py-3 pr-4"
                                               >
-                                                  <Skeleton className="aspect-square w-full" />
-                                                  <Skeleton className="h-5 w-3/4" />
-                                                  <Skeleton className="h-4 w-1/3" />
+                                                  <Skeleton className="h-4 w-24" />
+                                                  <Skeleton className="h-4 w-12" />
                                               </div>
                                           ))
-                                    : collections.map((collection) => (
+                                    : userStats.map((item, index) => (
                                           <div
-                                              key={collection.id}
-                                              className="group cursor-pointer"
+                                              key={index}
+                                              className="flex justify-between items-center border-b border-gray-200 dark:border-[#333] py-3 pr-4"
                                           >
-                                              <div className="relative aspect-square overflow-hidden mb-4">
-                                                  <img
-                                                      src={collection.cover}
-                                                      alt={collection.title}
-                                                      className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
-                                                  />
-                                                  {/* dark inset on hover */}
-                                                  <div className="absolute inset-0 bg-black/20 dark:bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                                                      {/* <Share2 className="w-6 h-6 text-white" /> */}
-                                                  </div>
-                                              </div>
-                                              <h3 className="text-lg font-medium mb-1 flex justify-between dark:text-[#e8e8e8]">
-                                                  {collection.title}
-                                                  <Share2 className="w-6 h-6 text-black dark:text-white rounded-lg p-1 hover:bg-yellow-200 dark:hover:bg-[#2c2c2c]" />
-                                              </h3>
-                                              <p className="text-sm text-gray-400 dark:text-[#888]">
-                                                  {collection.items}{" "}
-                                                  {collection.type === "album"
-                                                      ? "photos"
-                                                      : "pieces"}
-                                              </p>
+                                              <span className="text-gray-500 dark:text-[#999] text-sm md:text-md">
+                                                  {item.name}
+                                              </span>
+                                              <span className="dark:text-[#e0e0e0]">
+                                                  {item.amount}
+                                              </span>
                                           </div>
                                       ))}
                             </div>
                         </div>
-                    )}
 
-                    {/* post viewing options */}
-                    {posts.length > 0 && (
-                        <div className="flex justify-between items-center mb-8">
-                            <div className="flex space-x-8">
-                                {/* <button
+                        {/* Collections Carousel */}
+                        {collections.length > 0 && (
+                            <div className="mb-24">
+                                <h2 className="text-2xl font-semibold tracking-tight mb-8 dark:text-[#f0f0f0]">
+                                    <span className="bg-inherit dark:bg-inherit hover:bg-lime-100 dark:hover:bg-[#222] rounded-md box-content px-2 py-1">
+                                        Featured Works
+                                    </span>
+                                </h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    {loading
+                                        ? Array(4)
+                                              .fill(0)
+                                              .map((_, i) => (
+                                                  <div
+                                                      key={i}
+                                                      className="space-y-3"
+                                                  >
+                                                      <Skeleton className="aspect-square w-full" />
+                                                      <Skeleton className="h-5 w-3/4" />
+                                                      <Skeleton className="h-4 w-1/3" />
+                                                  </div>
+                                              ))
+                                        : collections.map((collection) => (
+                                              <div
+                                                  key={collection.id}
+                                                  className="group cursor-pointer"
+                                              >
+                                                  <div className="relative aspect-square overflow-hidden mb-4">
+                                                      <img
+                                                          src={collection.cover}
+                                                          alt={collection.title}
+                                                          className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+                                                      />
+                                                      {/* dark inset on hover */}
+                                                      <div className="absolute inset-0 bg-black/20 dark:bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                                          {/* <Share2 className="w-6 h-6 text-white" /> */}
+                                                      </div>
+                                                  </div>
+                                                  <h3 className="text-lg font-medium mb-1 flex justify-between dark:text-[#e8e8e8]">
+                                                      {collection.title}
+                                                      <Share2 className="w-6 h-6 text-black dark:text-white rounded-lg p-1 hover:bg-yellow-200 dark:hover:bg-[#2c2c2c]" />
+                                                  </h3>
+                                                  <p className="text-sm text-gray-400 dark:text-[#888]">
+                                                      {collection.items}{" "}
+                                                      {collection.type ===
+                                                      "album"
+                                                          ? "photos"
+                                                          : "pieces"}
+                                                  </p>
+                                              </div>
+                                          ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* post viewing options */}
+                        {posts.length > 0 && (
+                            <div className="flex justify-between items-center mb-8">
+                                <div className="flex space-x-8">
+                                    {/* <button
                                     onClick={() => setActiveTab("all")}
                                     className={`pb-2 dark:text-[#e0e0e0] ${activeTab === "all" ? "border-b-2 border-black dark:border-[#f0f0f0]" : ""}`}
                                 >
                                     All Posts
                                 </button> */}
-                                {/* pic post seperately */}
-                                <button
-                                    onClick={() => setActiveTab("written")}
-                                    className={`pb-2 dark:text-[#e0e0e0] ${activeTab === "written" ? "border-b-2 border-black dark:border-[#f0f0f0]" : ""}`}
-                                >
-                                    Written
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab("photos")}
-                                    className={`pb-2 dark:text-[#e0e0e0] ${activeTab === "photos" ? "border-b-2 border-black dark:border-[#f0f0f0]" : ""}`}
-                                >
-                                    Photos
-                                </button>
+                                    {/* pic post seperately */}
+                                    <button
+                                        onClick={() => setActiveTab("written")}
+                                        className={`pb-2 dark:text-[#e0e0e0] ${activeTab === "written" ? "border-b-2 border-black dark:border-[#f0f0f0]" : ""}`}
+                                    >
+                                        Written
+                                    </button>
+                                    <button
+                                        onClick={() => setActiveTab("photos")}
+                                        className={`pb-2 dark:text-[#e0e0e0] ${activeTab === "photos" ? "border-b-2 border-black dark:border-[#f0f0f0]" : ""}`}
+                                    >
+                                        Photos
+                                    </button>
+                                </div>
+                                <div className="hidden md:flex space-x-4">
+                                    <button
+                                        onClick={() => setViewMode("grid")}
+                                        className={`p-2 ${
+                                            viewMode === "grid"
+                                                ? "bg-black dark:bg-[#333] text-white"
+                                                : "text-gray-400 dark:text-[#999]"
+                                        }`}
+                                    >
+                                        <Grid className="w-5 h-5" />
+                                    </button>
+                                    <button
+                                        onClick={() => setViewMode("rows")}
+                                        className={`p-2 ${
+                                            viewMode === "rows"
+                                                ? "bg-black dark:bg-[#333] text-white"
+                                                : "text-gray-400 dark:text-[#999]"
+                                        }`}
+                                    >
+                                        <Rows className="w-5 h-5" />
+                                    </button>
+                                </div>
                             </div>
-                            <div className="hidden md:flex space-x-4">
-                                <button
-                                    onClick={() => setViewMode("grid")}
-                                    className={`p-2 ${
-                                        viewMode === "grid"
-                                            ? "bg-black dark:bg-[#333] text-white"
-                                            : "text-gray-400 dark:text-[#999]"
-                                    }`}
-                                >
-                                    <Grid className="w-5 h-5" />
-                                </button>
-                                <button
-                                    onClick={() => setViewMode("rows")}
-                                    className={`p-2 ${
-                                        viewMode === "rows"
-                                            ? "bg-black dark:bg-[#333] text-white"
-                                            : "text-gray-400 dark:text-[#999]"
-                                    }`}
-                                >
-                                    <Rows className="w-5 h-5" />
-                                </button>
-                            </div>
-                        </div>
-                    )}
+                        )}
 
-                    {/* Here i am remapping entire posts, need to find method for partial map, only map the newwly fetched posts */}
-                    {/* posts */}
-                    <div
-                        className={`grid gap-8 mb-24 ${viewMode === "grid" ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"}`}
-                    >
-                        {loading
-                            ? Array(6)
-                                  .fill(0)
-                                  .map((_, i) => (
-                                      <div key={i} className="space-y-4">
-                                          <Skeleton className="aspect-[4/3] w-full" />
-                                          <div className="flex justify-between">
-                                              <Skeleton className="h-5 w-32" />
-                                              <div className="flex gap-4">
-                                                  <Skeleton className="h-5 w-12" />
-                                                  <Skeleton className="h-5 w-12" />
-                                              </div>
-                                          </div>
-                                      </div>
-                                  ))
-                            : posts.map((post) => (
-                                  <div
-                                      key={post._id}
-                                      id={post._id}
-                                      className="group cursor-auto transition-all duration-300"
-                                  >
-                                      {post.type === "image" ? (
-                                          // Photo Post - Enhanced Design
-                                          <div className="space-y-3 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
-                                              <div className="relative aspect-[4/3] overflow-hidden">
-                                                  <img
-                                                      src={post.image}
-                                                      alt={post.title}
-                                                      className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
-                                                      loading="lazy"
-                                                  />
-                                                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                                      <div className="absolute bottom-0 w-full p-4 flex justify-end">
-                                                          <Share2 className="w-5 h-5 text-white drop-shadow-md" />
-                                                      </div>
+                        {/* Here i am remapping entire posts, need to find method for partial map, only map the newwly fetched posts */}
+                        {/* posts */}
+                        <div
+                            className={`grid gap-8 mb-24 ${viewMode === "grid" ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"}`}
+                        >
+                            {loading
+                                ? Array(6)
+                                      .fill(0)
+                                      .map((_, i) => (
+                                          <div key={i} className="space-y-4">
+                                              <Skeleton className="aspect-[4/3] w-full" />
+                                              <div className="flex justify-between">
+                                                  <Skeleton className="h-5 w-32" />
+                                                  <div className="flex gap-4">
+                                                      <Skeleton className="h-5 w-12" />
+                                                      <Skeleton className="h-5 w-12" />
                                                   </div>
                                               </div>
-                                              <div className="p-4">
-                                                  <h3 className="font-medium text-lg mb-2 line-clamp-2 dark:text-[#f0f0f0]">
-                                                      {post.title}
-                                                  </h3>
-                                                  <div className="flex items-center justify-between">
-                                                      <div className="flex items-center space-x-1">
-                                                          <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700"></div>
-                                                          <span className="text-sm text-gray-500 dark:text-gray-400">
-                                                              {post.author
-                                                                  ?.name ||
-                                                                  "Anonymous"}
-                                                          </span>
+                                          </div>
+                                      ))
+                                : posts.map((post) => (
+                                      <div
+                                          key={post._id}
+                                          id={post._id}
+                                          className="group cursor-auto transition-all duration-300"
+                                      >
+                                          {post.type === "image" ? (
+                                              // Photo Post - Enhanced Design
+                                              <div className="space-y-3 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
+                                                  <div className="relative aspect-[4/3] overflow-hidden">
+                                                      <img
+                                                          src={post.image}
+                                                          alt={post.title}
+                                                          className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+                                                          loading="lazy"
+                                                      />
+                                                      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                                          <div className="absolute bottom-0 w-full p-4 flex justify-end">
+                                                              <Share2 className="w-5 h-5 text-white drop-shadow-md" />
+                                                          </div>
                                                       </div>
-                                                      <div className="flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400">
+                                                  </div>
+                                                  <div className="p-4">
+                                                      <h3 className="font-medium text-lg mb-2 line-clamp-2 dark:text-[#f0f0f0]">
+                                                          {post.title}
+                                                      </h3>
+                                                      <div className="flex items-center justify-between">
+                                                          <div className="flex items-center space-x-1">
+                                                              <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                                                              <span className="text-sm text-gray-500 dark:text-gray-400">
+                                                                  {post.author
+                                                                      ?.name ||
+                                                                      "Anonymous"}
+                                                              </span>
+                                                          </div>
+                                                          {/* no need in image */}
+                                                          {/* <div className="flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400">
                                                           <div className="flex items-center">
                                                               <ThumbsUp className="w-4 h-4 mr-1 text-rose-500" />
                                                               <span>
@@ -409,97 +488,109 @@ const Profile = () => {
                                                                   }
                                                               </span>
                                                           </div>
+                                                      </div> */}
                                                       </div>
                                                   </div>
                                               </div>
-                                          </div>
-                                      ) : (
-                                          // Text Post
-                                          <div className="p-6 rounded-xl border border-gray-100 dark:border-[#222] bg-white dark:bg-[#111] shadow-sm hover:shadow-md transition-all duration-300 relative">
-                                              <div className="flex justify-between items-start mb-4">
-                                                  <h3 className="font-medium text-lg dark:text-[#f0f0f0] capitalize">
-                                                      {post.title}
-                                                  </h3>
-                                              </div>
-
-                                              {post.thumbnailUrl && (
-                                                  <div
-                                                      onClick={() => {
-                                                          navigate(
-                                                              `/p/${post._id}`,
-                                                          );
-                                                      }}
-                                                      className="mb-4 overflow-hidden rounded-lg aspect-video cursor-pointer"
-                                                  >
-                                                      <img
-                                                          src={
-                                                              post.thumbnailUrl
-                                                          }
-                                                          alt={post.title}
-                                                          className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
-                                                          loading="lazy"
-                                                      />
+                                          ) : (
+                                              // Text Post
+                                              <div className="p-6 rounded-xl border border-gray-100 dark:border-[#222] bg-white dark:bg-[#111] shadow-sm hover:shadow-md transition-all duration-300 relative">
+                                                  <div className="flex justify-between items-start mb-4">
+                                                      <h3 className="font-medium text-lg dark:text-[#f0f0f0] capitalize">
+                                                          {post.title}
+                                                      </h3>
                                                   </div>
-                                              )}
 
-                                              <div className="flex items-center justify-between border-t border-gray-100 dark:border-[#222] pt-4 mt-2">
-                                                  <div className="flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400">
-                                                      <div className="flex items-center">
-                                                          <ThumbsUp className="w-4 h-4 mr-1 text-gray-500" />
-                                                          <span>
-                                                              {post.totalLikes}
-                                                          </span>
-                                                      </div>
-                                                      <div className="flex items-center">
-                                                          <MessageCircle className="w-4 h-4 mr-1 text-gray-500" />
-                                                          <span>
-                                                              {
-                                                                  post.totalComments
+                                                  {post.thumbnailUrl && (
+                                                      <div className="mb-4 overflow-hidden rounded-lg aspect-video">
+                                                          <img
+                                                              src={
+                                                                  post.thumbnailUrl
                                                               }
-                                                          </span>
+                                                              alt={post.title}
+                                                              className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
+                                                              loading="lazy"
+                                                          />
+                                                      </div>
+                                                  )}
+
+                                                  <div className="flex items-center justify-between border-t border-gray-100 dark:border-[#222] pt-4 mt-2">
+                                                      <div className="flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400">
+                                                          {post.isPublic && (
+                                                              <>
+                                                                  <div className="flex items-center">
+                                                                      <Eye className="w-4 h-4 mr-1 text-gray-500" />
+                                                                      <span>
+                                                                          {
+                                                                              post.totalViews
+                                                                          }
+                                                                      </span>
+                                                                  </div>
+                                                                  <div className="flex items-center">
+                                                                      <ThumbsUp className="w-4 h-4 mr-1 text-gray-500" />
+                                                                      <span>
+                                                                          {
+                                                                              post.totalLikes
+                                                                          }
+                                                                      </span>
+                                                                  </div>
+                                                                  <div className="flex items-center">
+                                                                      <MessageCircle className="w-4 h-4 mr-1 text-gray-500" />
+                                                                      <span>
+                                                                          {
+                                                                              post.totalComments
+                                                                          }
+                                                                      </span>
+                                                                  </div>
+                                                              </>
+                                                          )}
+                                                          {!post.isPublic && (
+                                                              <div className="flex items-center">
+                                                                  <EyeOff className="w-4 h-4 mr-1 text-gray-500" />
+                                                                  <span>
+                                                                      private
+                                                                  </span>
+                                                              </div>
+                                                          )}
+                                                      </div>
+                                                      <div className="text-sm">
+                                                          {post.readTime}
                                                       </div>
                                                   </div>
-                                                  <div className="text-sm">
-                                                      {post.readTime}
-                                                  </div>
-                                              </div>
 
-                                              {/* Hover Actions Menu - Improved */}
-                                              <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
-                                                  <div className="bg-white/90 dark:bg-gray-800/90 shadow-lg rounded-lg backdrop-blur-sm flex">
-                                                      <button
-                                                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-l-lg"
-                                                          title="View"
-                                                          onClick={(e) => {
-                                                              e.stopPropagation();
-                                                              navigate(
-                                                                  `/p/${post._id}`,
-                                                              );
-                                                          }}
-                                                      >
-                                                          <Eye className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                                                      </button>
-                                                      <button
-                                                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                                          title="Edit"
-                                                          onClick={(e) => {
-                                                              e.stopPropagation();
-                                                              localStorage.setItem(
-                                                                  "newPostId",
-                                                                  post._id.toString(),
-                                                              );
-                                                              window.location.href =
-                                                                  "/edit-post";
-                                                          }}
-                                                      >
-                                                          <Edit className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                                                      </button>
-                                                      <button
-                                                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                                          title="Delete"
-                                                      >
-                                                          <AlertDialog>
-                                                              <AlertDialogTrigger>
+                                                  {/* Hover Actions Menu  */}
+                                                  <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                                                      <div className="bg-white/90 dark:bg-gray-800/90 shadow-lg rounded-lg backdrop-blur-sm flex items-center">
+                                                          <div
+                                                              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-l-lg"
+                                                              title="View"
+                                                              onClick={(e) => {
+                                                                  e.stopPropagation();
+                                                                  navigate(
+                                                                      `/p/${post._id}`,
+                                                                  );
+                                                              }}
+                                                          >
+                                                              <Eye className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                                                          </div>
+                                                          <div
+                                                              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                                              title="Edit"
+                                                              onClick={(e) => {
+                                                                  e.stopPropagation();
+                                                                  localStorage.setItem(
+                                                                      "newPostId",
+                                                                      post._id.toString(),
+                                                                  );
+                                                                  window.location.href =
+                                                                      "/edit-post";
+                                                              }}
+                                                          >
+                                                              <Edit className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                                                          </div>
+
+                                                          <AlertDialog title="Delete">
+                                                              <AlertDialogTrigger className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                                   <Trash2 className="w-4 h-4 text-gray-600 dark:text-gray-300" />
                                                               </AlertDialogTrigger>
                                                               <AlertDialogContent>
@@ -560,52 +651,100 @@ const Profile = () => {
                                                                   </AlertDialogFooter>
                                                               </AlertDialogContent>
                                                           </AlertDialog>
-                                                      </button>
-                                                      <button
-                                                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                                          title="Share"
-                                                          onClick={(e) => {
-                                                              e.stopPropagation();
-                                                              sharePost(post);
-                                                          }}
-                                                      >
-                                                          <Share2 className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                                                      </button>
-                                                      <button
-                                                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-r-lg"
-                                                          title="More"
-                                                          onClick={(e) =>
-                                                              e.stopPropagation()
-                                                          }
-                                                      >
-                                                          <MoreHorizontal className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                                                      </button>
+
+                                                          <div
+                                                              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                                              title="Share"
+                                                              onClick={(e) => {
+                                                                  e.stopPropagation();
+                                                                  sharePost(
+                                                                      post,
+                                                                  );
+                                                              }}
+                                                          >
+                                                              <Share2 className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                                                          </div>
+                                                          <DropdownMenu
+                                                              className="size-6 grid place-items-center rounded-r-lg overflow-hidden"
+                                                              title="More"
+                                                              onClick={(e) =>
+                                                                  e.stopPropagation()
+                                                              }
+                                                          >
+                                                              <DropdownMenuTrigger className="p-2 box-content hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                                  <MoreHorizontal className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                                                              </DropdownMenuTrigger>
+                                                              <DropdownMenuContent>
+                                                                  <DropdownMenuItem>
+                                                                      <button
+                                                                          onClick={async () => {
+                                                                              let tmp =
+                                                                                  await changePostVisibility(
+                                                                                      post._id,
+                                                                                      !post.isPublic,
+                                                                                  );
+                                                                              if (
+                                                                                  tmp.success
+                                                                              ) {
+                                                                                  toast.success(
+                                                                                      tmp.message,
+                                                                                  );
+                                                                                  setPosts(
+                                                                                      (
+                                                                                          prevPosts,
+                                                                                      ) =>
+                                                                                          prevPosts.map(
+                                                                                              (
+                                                                                                  p,
+                                                                                              ) =>
+                                                                                                  p._id ===
+                                                                                                  post._id
+                                                                                                      ? {
+                                                                                                            ...p,
+                                                                                                            isPublic:
+                                                                                                                !post.isPublic,
+                                                                                                        }
+                                                                                                      : p,
+                                                                                          ),
+                                                                                  );
+                                                                              }
+                                                                          }}
+                                                                          className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
+                                                                      >
+                                                                          make{" "}
+                                                                          {post.isPublic
+                                                                              ? "private"
+                                                                              : "public"}
+                                                                      </button>
+                                                                  </DropdownMenuItem>
+                                                              </DropdownMenuContent>
+                                                          </DropdownMenu>
+                                                      </div>
                                                   </div>
                                               </div>
-                                          </div>
-                                      )}
-                                  </div>
-                              ))}
-                    </div>
-                    {currentUser.posts.length > postsToFetch && (
-                        <div className="w-[100%] flex items-center justify-center">
-                            <Button
-                                className="mx-auto z-20 dark:invert"
-                                onClick={() => {
-                                    if (currentUser && currentUser.posts) {
-                                        fetchUserPosts();
-                                    }
-                                }}
-                            >
-                                Load More
-                            </Button>
+                                          )}
+                                      </div>
+                                  ))}
                         </div>
-                    )}
-                </div>
-            </main>
-
-            {/* <ProfileFooter /> */}
-        </div>
+                        {currentUser.posts.length > postsToFetch && (
+                            <div className="w-[100%] flex items-center justify-center">
+                                <Button
+                                    className="mx-auto z-20 dark:invert"
+                                    onClick={() => {
+                                        if (currentUser && currentUser.posts) {
+                                            fetchUserPosts();
+                                        }
+                                    }}
+                                >
+                                    Load More
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+                </main>
+                {/* <ProfileFooter /> */}
+            </div>
+        </>
     );
 };
 

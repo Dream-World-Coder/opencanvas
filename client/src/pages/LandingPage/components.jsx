@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { X, Menu } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export const Circle = ({
     radius = "300px",
@@ -23,10 +24,11 @@ export const Circle = ({
 };
 
 export const SlidingButton = ({ href, children }) => {
+    const navigate = useNavigate();
     return (
         <button
             onClick={() => {
-                window.location.href = href;
+                navigate(href);
             }}
             className="relative font-[Handlee] italic text-xl md:text-xl py-1 px-3 md:py-2 rounded-md
                  border border-[#d2d4d0] overflow-hidden bg-sky-200/20 md:bg-sky-100/20 group
