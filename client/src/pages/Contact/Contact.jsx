@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import { Mail, Globe, BookOpen, Send } from "lucide-react";
 import LinkedinIcon from "../../components/CustomIcons/LinkedIn";
 import GitHubIcon from "../../components/CustomIcons/Github";
