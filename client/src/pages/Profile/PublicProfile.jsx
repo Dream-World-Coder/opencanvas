@@ -134,11 +134,10 @@ const PublicProfile = () => {
             setPostsToFetch(postsToFetch + 10);
 
             const response = await fetch(
-                `http://127.0.0.1:3000/u/posts/byids`,
+                `http://127.0.0.1:3000/author/posts/byids`,
                 {
                     method: "POST",
                     headers: {
-                        Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({

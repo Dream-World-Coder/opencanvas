@@ -69,6 +69,7 @@ router.post(
                 currentPost.title = postData.title;
                 currentPost.content = postData.content;
                 currentPost.tags = postData.tags;
+                currentPost.readTime = postData.readTime;
                 currentPost.modifiedAt = Date.now();
                 currentPost.isEdited = true;
                 currentPost.isPublic = postData.isPublic ?? true; // nullish coalescing
@@ -472,6 +473,51 @@ router.post("/u/posts/byids", authenticateToken, async (req, res) => {
             //     imgDeleteHash: 0,
             // })
             .sort({ createdAt: -1 }); // newest first
+
+        return res.status(200).json({
+            success: true,
+            posts: posts,
+        });
+    } catch (error) {
+        console.error("Error fetching posts by IDs:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch posts",
+            error:
+                process.env.NODE_ENV === "development"
+                    ? error.message
+                    : "Server error",
+        });
+    }
+});
+
+router.post("/author/posts/byids", async (req, res) => {
+    try {
+        // Get the post IDs from the query string
+        const data = req.body;
+
+        if (!data) {
+            return res.status(400).json({
+                success: false,
+                message: "No post IDs provided",
+            });
+        }
+
+        // Split the comma-separated IDs and ensure they're valid ObjectIDs
+        const postIds = data.postIds
+            .split(",")
+            .filter((id) => mongoose.Types.ObjectId.isValid(id));
+
+        if (postIds.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "No valid post IDs provided",
+            });
+        }
+
+        const posts = await Post.find({
+            _id: { $in: postIds },
+        }).sort({ createdAt: -1 }); // newest first
 
         return res.status(200).json({
             success: true,

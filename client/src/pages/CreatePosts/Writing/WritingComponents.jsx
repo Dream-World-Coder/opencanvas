@@ -398,10 +398,13 @@ export const MarkdownPreview = ({
                 ${textAlignment === "center" ? "text-center" : "text-left"}`}
             >
                 <CardContent className="p-0">
-                    <div id="export" className="prose prose-slate max-w-none">
+                    <div
+                        id="export"
+                        className="prose prose-slate max-w-none montserrat-regular"
+                    >
                         {/* title */}
                         {title && (
-                            <div className="font-serif text-4xl font-bold mb-6 leading-tight tracking-tight">
+                            <div className="font-serif text-4xl md:text-5xl font-bold mt-2 mb-10 leading-tight tracking-tight">
                                 {title}
                             </div>
                         )}
@@ -563,8 +566,7 @@ export const MarkdownPreview = ({
                                     return (
                                         <blockquote
                                             className={`border-l-4 px-4 py-1 my-4 italic rounded-md shadow
-                                                ${isDark ? "border-[#999] bg-[#999]/10 text-[#ddd]" : "border-gray-400 bg-gray-100 text-gray-700"}
-                                              `}
+                                                ${isDark ? "border-[#999] bg-[#999]/10 text-[#ddd]" : "border-gray-400 bg-gray-100 text-gray-700"}`}
                                             // className={`border-l-4 pl-4 italic ${isDark ? "border-[#888] text-[#999]" : "border-gray-500 text-gray-600"}`}
                                         >
                                             {children}
@@ -572,38 +574,39 @@ export const MarkdownPreview = ({
                                     );
                                 },
 
+                                /*
                                 h1: ({ children }) => (
-                                    <h1 className="font-serif text-4xl font-bold mt-12 mb-6 leading-tight tracking-tight">
+                                    <h1 className="font-serif text-4xl md:text-5xl font-bold mt-12 mb-6 leading-tight tracking-tight">
                                         {children}
                                     </h1>
                                 ),
                                 h2: ({ children }) => (
-                                    <h2 className="font-serif text-3xl font-bold mt-10 mb-5 leading-tight tracking-tight">
+                                    <h2 className="font-serif text-3xl md:text-4xl font-bold mt-10 mb-5 leading-tight tracking-tight">
                                         {children}
                                     </h2>
                                 ),
                                 h3: ({ children }) => (
-                                    <h3 className="font-serif text-2xl font-bold mt-8 mb-4 leading-tight">
+                                    <h3 className="font-serif text-2xl md:text-3xl font-bold mt-8 mb-4 leading-snug">
                                         {children}
                                     </h3>
                                 ),
                                 h4: ({ children }) => (
-                                    <h4 className="font-sans text-xl font-semibold mt-6 mb-3 leading-snug">
+                                    <h4 className="font-sans text-xl md:text-2xl font-semibold mt-6 mb-3 leading-snug">
                                         {children}
                                     </h4>
                                 ),
                                 h5: ({ children }) => (
-                                    <h5 className="font-sans text-lg font-semibold mt-5 mb-3 leading-snug">
+                                    <h5 className="font-sans text-lg md:text-xl font-semibold mt-5 mb-3 leading-snug">
                                         {children}
                                     </h5>
                                 ),
                                 h6: ({ children }) => (
-                                    <h6 className="font-sans text-base font-semibold mt-4 mb-2 uppercase tracking-wider">
+                                    <h6 className="font-sans text-base md:text-lg font-semibold mt-4 mb-2 uppercase tracking-wider">
                                         {children}
                                     </h6>
                                 ),
                                 p: ({ children }) => (
-                                    <p className="font-sans text-base leading-relaxed my-5 max-w-prose">
+                                    <p className="font-sans text-base md:text-lg leading-relaxed my-5 max-w-prose">
                                         {children}
                                     </p>
                                 ),
@@ -638,17 +641,99 @@ export const MarkdownPreview = ({
                                     </a>
                                 ),
                                 ul: ({ children }) => (
-                                    <ul className="list-disc pl-8 my-5 space-y-2">
+                                    <ul className="list-disc pl-6 md:pl-8 my-5 space-y-2">
                                         {children}
                                     </ul>
                                 ),
                                 ol: ({ children }) => (
-                                    <ol className="list-decimal pl-8 my-5 space-y-2">
+                                    <ol className="list-decimal pl-6 md:pl-8 my-5 space-y-2">
                                         {children}
                                     </ol>
                                 ),
                                 li: ({ children }) => (
-                                    <li className="leading-relaxed text-base">
+                                    <li className="leading-relaxed text-base md:text-lg">
+                                        {children}
+                                    </li>
+                                ),
+                                */
+
+                                h1: ({ children }) => (
+                                    <h1 className="font-serif text-4xl md:text-5xl font-bold mt-12 mb-6 leading-tight tracking-tight">
+                                        {children}
+                                    </h1>
+                                ),
+                                h2: ({ children }) => (
+                                    <h2 className="font-serif text-3xl md:text-4xl font-bold mt-10 mb-5 leading-tight tracking-tight">
+                                        {children}
+                                    </h2>
+                                ),
+                                h3: ({ children }) => (
+                                    <h3 className="font-serif text-2xl md:text-3xl font-bold mt-8 mb-4 leading-snug">
+                                        {children}
+                                    </h3>
+                                ),
+                                h4: ({ children }) => (
+                                    <h4 className="montserrat-regular text-xl md:text-2xl font-semibold mt-6 mb-3 leading-snug">
+                                        {children}
+                                    </h4>
+                                ),
+                                h5: ({ children }) => (
+                                    <h5 className="montserrat-regular text-lg md:text-xl font-semibold mt-5 mb-3 leading-snug">
+                                        {children}
+                                    </h5>
+                                ),
+                                h6: ({ children }) => (
+                                    <h6 className="montserrat-regular text-base md:text-lg font-semibold mt-4 mb-2 uppercase tracking-wider">
+                                        {children}
+                                    </h6>
+                                ),
+                                p: ({ children }) => (
+                                    <p className="text-base md:text-lg leading-relaxed my-5 max-w-prose">
+                                        {children}
+                                    </p>
+                                ),
+                                strong: ({ children }) => (
+                                    <strong className="font-semibold montserrat-bold">
+                                        {children}
+                                    </strong>
+                                ),
+                                em: ({ children }) => (
+                                    <em className="italic">{children}</em>
+                                ),
+                                a: ({ href, children }) => (
+                                    <a
+                                        href={href}
+                                        className={`border-b border-current pb-0.5 font-medium montserrat-regular transition-colors duration-200 ${
+                                            isDark
+                                                ? "text-blue-300 hover:text-blue-400"
+                                                : "text-blue-600 hover:text-blue-800"
+                                        }`}
+                                        target={
+                                            href.startsWith("http")
+                                                ? "_blank"
+                                                : "_self"
+                                        }
+                                        rel={
+                                            href.startsWith("http")
+                                                ? "noopener noreferrer"
+                                                : ""
+                                        }
+                                    >
+                                        {children}
+                                    </a>
+                                ),
+                                ul: ({ children }) => (
+                                    <ul className="montserrat-regular list-disc pl-6 md:pl-8 my-5 space-y-2">
+                                        {children}
+                                    </ul>
+                                ),
+                                ol: ({ children }) => (
+                                    <ol className="montserrat-regular list-decimal pl-6 md:pl-8 my-5 space-y-2">
+                                        {children}
+                                    </ol>
+                                ),
+                                li: ({ children }) => (
+                                    <li className="montserrat-regular leading-relaxed text-base md:text-lg">
                                         {children}
                                     </li>
                                 ),
@@ -677,21 +762,21 @@ export const MarkdownPreview = ({
                                 ),
                                 th: ({ children }) => (
                                     <th
-                                        className={`border ${isDark ? "border-[#ddd]" : "border-gray-300"} px-4 py-2 bg-gray-100`}
+                                        className={`border montserrat-bold ${isDark ? "border-[#ddd]" : "border-gray-300"} px-4 py-2 bg-gray-100`}
                                     >
                                         {children}
                                     </th>
                                 ),
                                 td: ({ children }) => (
-                                    <td className="border border-gray-300 px-4 py-2">
+                                    <td className="border montserrat-regular border-gray-300 px-4 py-2">
                                         {children}
                                     </td>
                                 ),
                             }}
                             className="prose-base prose-p:my-4 prose-headings:font-semibold prose-a:text-blue-600
-                        hover:prose-a:text-blue-800 prose-blockquote:border-l-4 prose-blockquote:pl-4
-                        prose-blockquote:italic prose-blockquote:text-gray-600 prose-code:bg-gray-100
-                        prose-code:px-1 prose-code:py-0.5 prose-code:rounded"
+                            hover:prose-a:text-blue-800 prose-blockquote:border-l-4 prose-blockquote:pl-4
+                            prose-blockquote:italic prose-blockquote:text-gray-600 prose-code:bg-gray-100
+                            prose-code:px-1 prose-code:py-0.5 prose-code:rounded"
                         >
                             {content}
                         </ReactMarkdown>

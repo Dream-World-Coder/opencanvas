@@ -187,6 +187,9 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
                     const postData = await getPostById(postId);
                     setTitle(postData.title);
                     setContent(postData.content);
+                    setTags(postData.tags);
+                    setIsPublic(postData.isPublic);
+                    setThumbnailUrl(postData.thumbnailUrl);
 
                     await new Promise((resolve) => setTimeout(resolve, 300));
                     const txtArea = document.getElementById("txtArea");
