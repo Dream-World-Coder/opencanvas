@@ -1,25 +1,27 @@
 /*
 {
-  // "media": update as soon as an image is inserted, at least in the localStorage, and later in the database
-  // else would not find if any image is deleted while editing,
-  // delete these in bulk when post is deleted [for less api calls to imgur],
-  // [no need to delete on every post delete, store deleteHashes of multiple deleted posts in an array, then delete in bulk]
+  "media": update as soon as an image is inserted, at least in the localStorage, and later in the database
+  else would not find if any image is deleted while editing,
+  delete these in bulk when post is deleted [for less api calls to imgur],
+  [no need to delete on every post delete, store deleteHashes of multiple deleted posts, then delete in bulk]
   "media": [{
-      "url": "https://example.com/uploads/image1.jpg",
-      "deleteHash": "abc"
+      // "url": "https://example.com/uploads/image1.jpg",
+      "deleteHash": "abc" // only deleteHash is fine
     },],
 }
 */
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-// the additional media uploaded, like images in a article
-// no need to be unique
-// needed only if i use imgur, else delete by _id
+/*
+-- the additional media uploaded, like images in an article
+-- no need to be unique
+-- needed only if i use imgur, else delete by _id
 const mediaSchema = new Schema({
     url: { type: String, required: true },
     deleteHash: { type: String, required: true },
 });
+*/
 
 // postDeleteHash: _id
 
@@ -77,7 +79,9 @@ const postSchema = new Schema(
             enum: ["written", "article", "poem", "story"],
         },
 
-        media: [mediaSchema],
+        // array of deleteHash
+        media: [{ type: String }],
+
         comments: [
             {
                 type: Schema.Types.ObjectId,

@@ -3,7 +3,6 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Post = require("../models/Post");
 const Comment = require("../models/Comment");
-// const { v4: uuidv4 } = require("uuid");
 const {
     authenticateToken,
     checkUserExists,
@@ -13,7 +12,10 @@ const { generateRandomThumbnail } = require("../utils/helper");
 
 // in js {} & [] are true value
 
-// send generated _id for new post
+/**
+ * send generated _id for new post
+ * no db Query
+ */
 router.post(
     "/newpost/written/getId",
     authenticateToken,
@@ -38,7 +40,9 @@ router.post(
     },
 );
 
-// save / update written post
+/**
+ * save / update written post
+ */
 router.post(
     "/savepost/written",
     authenticateToken,
@@ -128,7 +132,9 @@ router.post(
     },
 );
 
-// delete-post
+/**
+ * delete-post
+ */
 router.delete(
     "/delete-post",
     authenticateToken,
@@ -180,7 +186,9 @@ router.delete(
     },
 );
 
-// change visibility to public or private
+/**
+ * change visibility to public or private
+ */
 router.put(
     "/post-visibility-change",
     authenticateToken,
@@ -232,7 +240,10 @@ router.put(
     },
 );
 
-// post page
+/**
+ * Get post by ID,
+ * @for public post page
+ */
 router.get("/p/:postId", async (req, res) => {
     try {
         const { postId } = req.params;
@@ -267,7 +278,9 @@ router.get("/p/:postId", async (req, res) => {
     }
 });
 
-// update post views
+/**
+ * update post views
+ */
 router.put(
     "/update-post-views/:postId",
     fingerprintMiddleware,
@@ -372,7 +385,9 @@ router.put(
     },
 );
 
-// like/remove-like post
+/**
+ * like / remove-like a post
+ */
 router.put(
     "/like-post",
     authenticateToken,
@@ -439,12 +454,79 @@ router.put(
     },
 );
 
-// save post
+/**
+ * save post in user's savedPosts array
+ * @for saving post in a collection
+ * only User query
+ */
+router.put(
+    "/save-post-for-user",
+    authenticateToken,
+    checkUserExists,
+    async (req, res) => {
+        try {
+            const user = req.user;
+            const { postId } = req.query;
 
-// Route to get posts by IDs -- public -- do not show all data, make a new route for that
+            if (!postId) {
+                return res.status(404).json({
+                    success: false,
+                    message: "post id not found",
+                });
+            }
+
+            if (!mongoose.Types.ObjectId.isValid(postId)) {
+                return res
+                    .status(400)
+                    .json({ success: false, message: "Invalid post ID" });
+            }
+
+            /*
+            const post = await Post.findById(postId);
+            if (!post) {
+                return res
+                    .status(400)
+                    .json({ success: false, message: "post not found" });
+            }
+            */
+
+            if (user.savedPosts.includes(postId)) {
+                user.savedPosts = user.savedPosts.filter(
+                    (id) => id.toString() !== postId.toString(),
+                );
+                await user.save();
+
+                return res.status(200).json({
+                    success: true,
+                    message: "unsaved post",
+                });
+            }
+
+            user.savedPosts.push(postId);
+            await user.save();
+
+            return res.status(200).json({
+                success: true,
+                message: "saved post",
+            });
+        } catch (err) {
+            console.log("Error saving post", err);
+            return res.status(500).json({
+                success: false,
+                message: "Internal server error",
+            });
+        }
+    },
+);
+
+/**
+ * Route to get posts by IDs query string
+ * gives every detail of post
+ * @for the private /profile route
+ */
 router.post("/u/posts/byids", authenticateToken, async (req, res) => {
     try {
-        // Get the post IDs from the query string
+        // query string, need to split
         const data = req.body;
 
         if (!data) {
@@ -454,7 +536,7 @@ router.post("/u/posts/byids", authenticateToken, async (req, res) => {
             });
         }
 
-        // Split the comma-separated IDs and ensure they're valid ObjectIDs
+        // splitting query str _ids & valid Object ids check
         const postIds = data.postIds
             .split(",")
             .filter((id) => mongoose.Types.ObjectId.isValid(id));
@@ -468,11 +550,7 @@ router.post("/u/posts/byids", authenticateToken, async (req, res) => {
 
         const posts = await Post.find({
             _id: { $in: postIds },
-        })
-            // .select({
-            //     imgDeleteHash: 0,
-            // })
-            .sort({ createdAt: -1 }); // newest first
+        }).sort({ createdAt: -1 }); // newest first
 
         return res.status(200).json({
             success: true,
@@ -491,10 +569,14 @@ router.post("/u/posts/byids", authenticateToken, async (req, res) => {
     }
 });
 
+/**
+ * Route to get posts by IDs query string
+ * gives limited detail of post
+ * @for the public /profile route
+ */
 router.post("/author/posts/byids", async (req, res) => {
     try {
-        // Get the post IDs from the query string
-        const data = req.body;
+        const data = req.body; // query string
 
         if (!data) {
             return res.status(400).json({
@@ -503,7 +585,6 @@ router.post("/author/posts/byids", async (req, res) => {
             });
         }
 
-        // Split the comma-separated IDs and ensure they're valid ObjectIDs
         const postIds = data.postIds
             .split(",")
             .filter((id) => mongoose.Types.ObjectId.isValid(id));
@@ -517,7 +598,9 @@ router.post("/author/posts/byids", async (req, res) => {
 
         const posts = await Post.find({
             _id: { $in: postIds },
-        }).sort({ createdAt: -1 }); // newest first
+        })
+            .select("-totalDislikes -viewedBy -media")
+            .sort({ createdAt: -1 }); // new first
 
         return res.status(200).json({
             success: true,

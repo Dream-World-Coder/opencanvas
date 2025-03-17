@@ -1,13 +1,24 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const ContactInfoSchema = new Schema({
-    title: { type: String, required: true, default: "OpenCanvas" },
-    url: {
-        type: String,
-        required: true,
+const ContactInfoSchema = new Schema(
+    {
+        title: { type: String, required: true, default: "OpenCanvas" },
+        url: {
+            type: String,
+            required: true,
+        },
     },
-});
+    { _id: false },
+);
+
+const followerSchema = new Schema(
+    {
+        userId: { type: Schema.Types.ObjectId, ref: "User" },
+        since: { type: Date, default: Date.now },
+    },
+    { _id: false },
+);
 
 const userSchema = new Schema(
     {
@@ -124,6 +135,8 @@ const userSchema = new Schema(
                 ref: "Post",
             },
         ],
+        // only an linear array will suffice because, user can create collections if needed to store similar type of rticles,
+        // so no need to make this an array of object, like savedPosts.readLater etc
         savedPosts: [
             {
                 type: Schema.Types.ObjectId,
@@ -157,18 +170,8 @@ const userSchema = new Schema(
                 },
             },
         ],
-        followers: [
-            {
-                type: Schema.Types.ObjectId,
-                ref: "User",
-            },
-        ],
-        following: [
-            {
-                type: Schema.Types.ObjectId,
-                ref: "User",
-            },
-        ],
+        followers: [followerSchema],
+        following: [followerSchema],
     },
     { timestamps: true },
 );

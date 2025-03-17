@@ -6,9 +6,13 @@ const MongoStore = require("connect-mongo");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
+
 const { router: authRoutes } = require("./routes/auth");
+const { router: userRoutes } = require("./routes/user");
 const { router: postRoutes } = require("./routes/post");
+const { router: followerRoutes } = require("./routes/follower");
 const { router: errorHandler } = require("./middlewares/errorHandler.js");
+
 // const { authenticateToken } = require("./middlewares/authorisation.js");
 
 require("dotenv").config();
@@ -66,7 +70,9 @@ app.use(errorHandler);
 
 // routes
 app.use("/auth", authRoutes);
+app.use(userRoutes);
 app.use(postRoutes);
+app.use(followerRoutes);
 
 app.get("/", (req, res) => {
     res.json({

@@ -1,9 +1,7 @@
-// auth.js - Authentication routes
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const {
@@ -14,12 +12,10 @@ const {
 const {
     handleAuthErrors,
     authenticateToken,
-    checkUserExists,
 } = require("../middlewares/authorisation");
 
 require("dotenv").config();
 
-// in production need to use dotenv
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -60,7 +56,7 @@ passport.use(
                     const newUser = new User({
                         username:
                             profile.emails[0].value.split("@")[0].slice(0, 4) +
-                            generateRandomAlphanumeric(4), // total 8 chars
+                            generateRandomAlphanumeric(4).toLowerCase(), // total 8 chars
                         fullName: profile.displayName.slice(0, 32) || "User",
                         email: profile.emails[0].value,
                         passwordHash: "google-hash",
@@ -103,7 +99,72 @@ passport.deserializeUser(async (id, done) => {
     }
 });
 
-// not needed for now
+// Google authentication routes
+router.get(
+    "/google",
+    passport.authenticate("google", {
+        scope: ["profile", "email"],
+    }),
+);
+
+router.get(
+    "/google/callback",
+    passport.authenticate("google", {
+        failureRedirect: `${FRONTEND_URL}/login?error=google_auth_failed`,
+        session: false,
+    }),
+    (req, res) => {
+        try {
+            // Generate JWT token
+            const token = jwt.sign(
+                { userId: req.user._id, email: req.user.email },
+                JWT_SECRET,
+                { expiresIn: "7d" },
+            );
+
+            // Redirect to frontend with token
+            res.redirect(`${FRONTEND_URL}/auth/success?token=${token}`);
+        } catch (error) {
+            console.error("Google callback error:", error);
+            res.redirect(`${FRONTEND_URL}/login?error=server_error`);
+        }
+    },
+);
+
+router.get("/user", authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.userId).select(
+            "-passwordHash -provider -ipAddress",
+        );
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            user,
+        });
+    } catch (error) {
+        console.error("Get user error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to retrieve user data",
+            error:
+                process.env.NODE_ENV === "development"
+                    ? error.message
+                    : "Server error",
+        });
+    }
+});
+
+router.use(handleAuthErrors);
+
+module.exports = { router };
+
 /*
 router.post("/register", async (req, res) => {
     try {
@@ -250,274 +311,3 @@ router.post("/login", async (req, res) => {
     }
 });
 */
-
-// Google authentication routes
-router.get(
-    "/google",
-    passport.authenticate("google", {
-        scope: ["profile", "email"],
-    }),
-);
-
-router.get(
-    "/google/callback",
-    passport.authenticate("google", {
-        failureRedirect: `${FRONTEND_URL}/login?error=google_auth_failed`,
-        session: false,
-    }),
-    (req, res) => {
-        try {
-            // Generate JWT token
-            const token = jwt.sign(
-                { userId: req.user._id, email: req.user.email },
-                JWT_SECRET,
-                { expiresIn: "7d" },
-            );
-
-            // Redirect to frontend with token
-            res.redirect(`${FRONTEND_URL}/auth/success?token=${token}`);
-        } catch (error) {
-            console.error("Google callback error:", error);
-            res.redirect(`${FRONTEND_URL}/login?error=server_error`);
-        }
-    },
-);
-
-router.get("/user", authenticateToken, async (req, res) => {
-    try {
-        const user = await User.findById(req.userId).select(
-            "-passwordHash -provider -ipAddress",
-        );
-
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found",
-            });
-        }
-
-        return res.status(200).json({
-            success: true,
-            user,
-        });
-    } catch (error) {
-        console.error("Get user error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to retrieve user data",
-            error:
-                process.env.NODE_ENV === "development"
-                    ? error.message
-                    : "Server error",
-        });
-    }
-});
-
-router.put(
-    "/update-user",
-    authenticateToken,
-    checkUserExists,
-    async (req, res) => {
-        try {
-            const user = req.user;
-            const {
-                username,
-                fullName,
-                role,
-                aboutMe,
-                notifications,
-                contactInformation,
-            } = req.body;
-
-            // Check if username is being changed
-            if (username && username !== user.username) {
-                // Check for username uniqueness
-                const existingUser = await User.findOne({ username });
-                if (existingUser) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Username already taken",
-                    });
-                }
-
-                // Validate username length
-                if (username.length < 4) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Username must be at least 4 characters long",
-                    });
-                }
-
-                if (username.length > 16) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Username can be 16 characters long at max",
-                    });
-                }
-
-                user.username = username;
-            }
-
-            // Validate and update fullName if provided
-            if (fullName !== undefined) {
-                if (fullName && (fullName.length < 4 || fullName.length > 32)) {
-                    return res.status(400).json({
-                        success: false,
-                        message:
-                            fullName.length < 4
-                                ? "Fullname must be at least 4 characters long"
-                                : "Fullname can be 32 characters long at max",
-                    });
-                }
-                user.fullName = fullName;
-            }
-
-            if (role !== undefined) {
-                if (role.length > 32) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Role can be 32 characters or less",
-                    });
-                }
-                user.role = role;
-            }
-
-            // Update aboutMe if provided
-            if (aboutMe !== undefined) {
-                if (aboutMe && aboutMe.length > 300) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Bio must be 300 characters or less",
-                    });
-                }
-                user.aboutMe = aboutMe;
-            }
-
-            // Update notifications choices if provided
-            if (notifications !== undefined) {
-                if (notifications && typeof notifications !== "object") {
-                    return res.status(400).json({
-                        success: false,
-                        message: "error setting notification settings",
-                    });
-                }
-                // console.log(notifications);
-                user.notifications.emailNotification = notifications.email;
-                user.notifications.pushNotification = notifications.push;
-
-                user.notifications.mentionNotification = notifications.mentions;
-                user.notifications.followNotification = notifications.follows;
-                user.notifications.commentNotification = notifications.comments;
-                user.notifications.messageNotification = notifications.messages;
-            }
-
-            if (contactInformation !== undefined) {
-                user.contactInformation = contactInformation;
-            }
-
-            const savedUser = await user.save();
-
-            return res.status(200).json({
-                success: true,
-                message: "Profile updated successfully",
-                user: savedUser,
-            });
-        } catch (error) {
-            console.error("Update user error:", error);
-            return res.status(500).json({
-                success: false,
-                message: "Failed to update user data",
-                error:
-                    process.env.NODE_ENV === "development"
-                        ? error.message
-                        : "Server error",
-            });
-        }
-    },
-);
-
-// public profile view
-// need to set it as id
-router.get("/u/:username", async (req, res) => {
-    try {
-        const user = await User.findOne({
-            username: req.params.username,
-        }).select({
-            _id: 0, // its ok to know the id, but still ...
-            passwordHash: 0,
-            email: 0,
-            provider: 0,
-            ipAddress: 0,
-            lastFiveLogin: 0,
-            savedPosts: 0,
-            likedPosts: 0,
-        });
-
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found",
-            });
-        }
-
-        return res.status(200).json({
-            success: true,
-            user,
-        });
-    } catch (error) {
-        console.error("Get user error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to retrieve user data",
-            error:
-                process.env.NODE_ENV === "development"
-                    ? error.message
-                    : "Server error",
-        });
-    }
-});
-
-// get author by id -- limited data like public profile, but getting by id instead username
-router.get("/author/:id", async (req, res) => {
-    try {
-        const author = await User.findOne({
-            _id: req.params.id,
-        }).select({
-            passwordHash: 0,
-            email: 0,
-            provider: 0,
-            ipAddress: 0,
-            lastFiveLogin: 0,
-            savedPosts: 0,
-            likedPosts: 0,
-        });
-
-        if (!author) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found",
-            });
-        }
-
-        return res.status(200).json({
-            success: true,
-            author,
-        });
-    } catch (error) {
-        console.error("Get author error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to retrieve author data",
-            error:
-                process.env.NODE_ENV === "development"
-                    ? error.message
-                    : "Server error",
-        });
-    }
-});
-
-router.use(handleAuthErrors);
-
-module.exports = {
-    router,
-};
