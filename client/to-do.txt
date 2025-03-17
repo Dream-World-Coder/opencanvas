@@ -183,3 +183,48 @@ issue: in md2pdf when in 2 window mode isPreview must always be false, but if we
 -- make dynamic sitemap
 
 -- make the username an index alongside _id
+
+-- why additional _id in the followers & following?
+followers: [
+      {
+        userId: ObjectId('67d6891e3b5eced5e80e048a'),
+        since: ISODate('2025-03-16T15:35:23.302Z'),
+        _id: ObjectId('67d6efbbfbfbc41972f5f4e9')
+      },
+      {
+        userId: ObjectId('67d3d4d59e13d42e6ba862a8'),
+        since: ISODate('2025-03-16T15:36:55.962Z'),
+        _id: ObjectId('67d6f017fbfbc41972f5f5ab')
+      }
+    ],
+    following: [
+      {
+        userId: ObjectId('67d3d4d59e13d42e6ba862a8'),
+        since: ISODate('2025-03-16T15:22:32.928Z'),
+        _id: ObjectId('67d6ecb8fbfbc41972f5f353')
+      },
+      {
+        userId: ObjectId('67d6891e3b5eced5e80e048a'),
+        since: ISODate('2025-03-16T15:31:53.174Z'),
+        _id: ObjectId('67d6eee9fbfbc41972f5f44f')
+      }
+    ],
+
+http://127.0.0.1:5173/p/67d5d2723be7ea50f3ba48ed
+setPosts((prevPosts) =>
+    prevPosts.map((p) =>
+        p._id === post._id ? { ...p, isPublic: !post.isPublic } : p
+    )
+);
+
+Complete Mechanism Of The Post View Tracking System
+http://127.0.0.1:5173/p/67d51972fdbcfef2ac420548
+
+sat solver
+http://127.0.0.1:5173/p/67d40d63798d80e429be77f0
+
+quantum knot theory
+
+
+-- make the totalFollowers & totalFollowing a nav to see followers of a user,
+in profile component

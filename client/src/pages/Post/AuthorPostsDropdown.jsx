@@ -106,62 +106,50 @@ export const AuthorPostsDropdown = ({ author, currentPostId }) => {
                                   </Card>
                               ))
                         : publicPosts.map((post) => (
-                              <Card
+                              <div
                                   key={post._id}
                                   onClick={() => {
                                       navigate(`/p/${post._id}`);
                                   }}
-                                  className="cursor-pointer hover:shadow-md transition duration-200 shadow-none dark:bg-[#222] dark:text-[#fff] dark:border-none"
+                                  className="p-6 rounded-xl border border-gray-100 dark:border-[#222] bg-white dark:bg-[#111] shadow-sm hover:shadow-md transition-all duration-300 relative"
                               >
-                                  <CardContent className="p-4">
-                                      <div className="flex">
-                                          {post.thumbnailUrl && (
-                                              <div className="mr-3 flex-shrink-0">
-                                                  <img
-                                                      src={post.thumbnailUrl}
-                                                      alt={post.title}
-                                                      className="w-16 h-16 object-cover rounded-md"
-                                                      onError={(e) => {
-                                                          e.target.src =
-                                                              "/api/placeholder/64/64";
-                                                          e.target.alt =
-                                                              "Image not available";
-                                                      }}
-                                                  />
-                                              </div>
-                                          )}
-                                          <div className="flex-1">
-                                              <h4 className="font-medium text-lg mb-2">
-                                                  {post.title}
-                                              </h4>
-                                              <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                                                  {post.readTime}
-                                              </div>
-                                              <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                                                  <div className="flex items-center">
-                                                      <Eye className="h-4 w-4 mr-1" />
-                                                      <span>
-                                                          {post.totalViews || 0}
-                                                      </span>
-                                                  </div>
-                                                  <div className="flex items-center">
-                                                      <ThumbsUp className="h-4 w-4 mr-1" />
-                                                      <span>
-                                                          {post.totalLikes || 0}
-                                                      </span>
-                                                  </div>
-                                                  <div className="flex items-center">
-                                                      <MessageSquare className="h-4 w-4 mr-1" />
-                                                      <span>
-                                                          {post.totalComments ||
-                                                              0}
-                                                      </span>
-                                                  </div>
-                                              </div>
+                                  <div className="flex justify-between items-start mb-4">
+                                      <h3 className="font-medium text-3xl dark:text-[#f0f0f0] capitalize">
+                                          {post.title}
+                                      </h3>
+                                  </div>
+
+                                  {post.thumbnailUrl && (
+                                      <div className="mb-4 overflow-hidden rounded-lg aspect-video">
+                                          <img
+                                              src={post.thumbnailUrl}
+                                              alt={post.title}
+                                              className="object-cover w-full h-full"
+                                              loading="lazy"
+                                          />
+                                      </div>
+                                  )}
+
+                                  <div className="flex items-center justify-between border-t border-gray-100 dark:border-[#222] pt-4 mt-2">
+                                      <div className="flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400">
+                                          <div className="flex items-center">
+                                              <Eye className="w-4 h-4 mr-1 text-gray-500" />
+                                              <span>{post.totalViews}</span>
+                                          </div>
+                                          <div className="flex items-center">
+                                              <ThumbsUp className="w-4 h-4 mr-1 text-gray-500" />
+                                              <span>{post.totalLikes}</span>
+                                          </div>
+                                          <div className="flex items-center">
+                                              <MessageSquare className="w-4 h-4 mr-1 text-gray-500" />
+                                              <span>{post.totalComments}</span>
                                           </div>
                                       </div>
-                                  </CardContent>
-                              </Card>
+                                      <div className="text-sm">
+                                          {post.readTime}
+                                      </div>
+                                  </div>
+                              </div>
                           ))}
                     {publicPosts.length === 0 && !loading && (
                         <div className="text-center py-4 text-gray-500 dark:text-gray-400">

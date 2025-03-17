@@ -21,7 +21,9 @@ const navLinks = [
     { href: "/articles", label: "Articles" },
     // { href: "/about", label: "About" },
     // { href: "/contact", label: "Contact" },
-    { href: "/saved", label: "Saved" },
+    { href: "/saved-posts", label: "Saved" },
+    { href: "/followers", label: "Followers" },
+    { href: "/profile", label: "Profile" },
 ];
 
 export default function ProfileHeader() {
