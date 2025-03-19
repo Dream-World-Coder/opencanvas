@@ -131,6 +131,10 @@ router.get(
     },
 );
 
+/**
+ *******************************************************
+ * Get user Data for Auth, frontend's {@CurrentUser} gets data through this
+ */
 router.get("/user", authenticateToken, async (req, res) => {
     try {
         const user = await User.findById(req.userId).select(

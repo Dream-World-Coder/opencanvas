@@ -13,11 +13,12 @@ const { generateRandomThumbnail } = require("../utils/helper");
 // in js {} & [] are true value
 
 /**
+ *******************************************************
  * send generated _id for new post
  * no db Query
  */
 router.post(
-    "/newpost/written/getId",
+    "/get-new-postId",
     authenticateToken,
     // checkUserExists, // no need, user will be authenticated
     async (req, res) => {
@@ -41,10 +42,11 @@ router.post(
 );
 
 /**
+ *******************************************************
  * save / update written post
  */
 router.post(
-    "/savepost/written",
+    "/save-written-post",
     authenticateToken,
     checkUserExists,
     async (req, res) => {
@@ -133,60 +135,48 @@ router.post(
 );
 
 /**
- * delete-post
+ *******************************************************
+ * Get post by ID,
+ * @for public post page
  */
-router.delete(
-    "/delete-post",
-    authenticateToken,
-    checkUserExists,
-    async (req, res) => {
-        try {
-            const user = req.user;
-            const { postId } = req.query;
+router.get("/p/:postId", async (req, res) => {
+    try {
+        const { postId } = req.params;
 
-            if (!postId) {
-                return res.status(404).json({
-                    success: false,
-                    message: "post id not found",
-                });
-            }
+        if (!mongoose.Types.ObjectId.isValid(postId)) {
+            return res.status(400).json({ error: "Invalid post ID" });
+        }
 
-            if (!mongoose.Types.ObjectId.isValid(postId)) {
-                return res.status(400).json({ error: "Invalid post ID" });
-            }
+        const post = await Post.findById(postId).select(
+            "-totalDislikes -viewedBy -media",
+        );
 
-            const post = await Post.findOneAndDelete({
-                _id: postId, // its in string format
-                authorId: user._id, // ownership check in the same query
-            });
-
-            if (!post) {
-                return res.status(404).json({
-                    success: false,
-                    message: "Post not found or unauthorized to delete",
-                });
-            }
-
-            user.posts = user.posts.filter(
-                (id) => id.toString() !== postId.toString(),
-            );
-            await user.save();
-
-            return res.status(200).json({
-                success: true,
-                message: "post deleted",
-            });
-        } catch (err) {
-            console.log("Error deleting post", err);
-            return res.status(500).json({
+        if (!post) {
+            return res.status(404).json({
                 success: false,
-                message: "Internal server error",
+                message: "Post not found",
             });
         }
-    },
-);
+
+        return res.status(200).json({
+            success: true,
+            post,
+        });
+    } catch (error) {
+        console.error("Get post[written] error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to get post[written]",
+            error:
+                process.env.NODE_ENV === "development"
+                    ? error.message
+                    : "Server error",
+        });
+    }
+});
 
 /**
+ *******************************************************
  * change visibility to public or private
  */
 router.put(
@@ -241,44 +231,7 @@ router.put(
 );
 
 /**
- * Get post by ID,
- * @for public post page
- */
-router.get("/p/:postId", async (req, res) => {
-    try {
-        const { postId } = req.params;
-
-        if (!mongoose.Types.ObjectId.isValid(postId)) {
-            return res.status(400).json({ error: "Invalid post ID" });
-        }
-
-        const post = await Post.findById(postId);
-
-        if (!post) {
-            return res.status(404).json({
-                success: false,
-                message: "Post not found",
-            });
-        }
-
-        return res.status(200).json({
-            success: true,
-            post,
-        });
-    } catch (error) {
-        console.error("Get post[written] error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to get post[written]",
-            error:
-                process.env.NODE_ENV === "development"
-                    ? error.message
-                    : "Server error",
-        });
-    }
-});
-
-/**
+ *******************************************************
  * update post views
  */
 router.put(
@@ -386,6 +339,7 @@ router.put(
 );
 
 /**
+ *******************************************************
  * like / remove-like a post
  */
 router.put(
@@ -455,6 +409,7 @@ router.put(
 );
 
 /**
+ *******************************************************
  * save post in user's savedPosts array
  * @for saving post in a collection
  * only User query
@@ -520,6 +475,62 @@ router.put(
 );
 
 /**
+ *******************************************************
+ * delete-post
+ */
+router.delete(
+    "/delete-post",
+    authenticateToken,
+    checkUserExists,
+    async (req, res) => {
+        try {
+            const user = req.user;
+            const { postId } = req.query;
+
+            if (!postId) {
+                return res.status(404).json({
+                    success: false,
+                    message: "post id not found",
+                });
+            }
+
+            if (!mongoose.Types.ObjectId.isValid(postId)) {
+                return res.status(400).json({ error: "Invalid post ID" });
+            }
+
+            const post = await Post.findOneAndDelete({
+                _id: postId, // its in string format
+                authorId: user._id, // ownership check in the same query
+            });
+
+            if (!post) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Post not found or unauthorized to delete",
+                });
+            }
+
+            user.posts = user.posts.filter(
+                (id) => id.toString() !== postId.toString(),
+            );
+            await user.save();
+
+            return res.status(200).json({
+                success: true,
+                message: "post deleted",
+            });
+        } catch (err) {
+            console.log("Error deleting post", err);
+            return res.status(500).json({
+                success: false,
+                message: "Internal server error",
+            });
+        }
+    },
+);
+
+/**
+ *******************************************************
  * Route to get posts by IDs query string
  * gives every detail of post
  * @for the private /profile route
@@ -570,6 +581,7 @@ router.post("/u/posts/byids", authenticateToken, async (req, res) => {
 });
 
 /**
+ *******************************************************
  * Route to get posts by IDs query string
  * gives limited detail of post
  * @for the public /profile route

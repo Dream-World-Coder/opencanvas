@@ -9,7 +9,12 @@ const {
     checkUserExists,
 } = require("../middlewares/authorisation");
 
-// follow-unfollow
+/* add rate-limiter in continuous follow-unfollow  */
+
+/**
+ *******************************************************
+ * follow - unfollow
+ */
 router.put(
     "/follow-user",
     authenticateToken,
@@ -94,44 +99,92 @@ router.put(
     },
 );
 
-// get followers by ids
-router.post("/u/posts/byids", authenticateToken, async (req, res) => {
+/**
+ *******************************************************
+ * get followers by ids
+ */
+router.post("/u/followers/byids", authenticateToken, async (req, res) => {
     try {
-        // query string, need to split
         const data = req.body;
 
         if (!data) {
             return res.status(400).json({
                 success: false,
-                message: "No post IDs provided",
+                message: "No follower IDs provided",
             });
         }
 
-        // splitting query str _ids & valid Object ids check
-        const postIds = data.postIds
+        const followerIds = data.followerIds
             .split(",")
             .filter((id) => mongoose.Types.ObjectId.isValid(id));
 
-        if (postIds.length === 0) {
+        if (followerIds.length === 0) {
             return res.status(400).json({
                 success: false,
-                message: "No valid post IDs provided",
+                message: "No valid follower IDs provided",
             });
         }
 
-        const posts = await Post.find({
-            _id: { $in: postIds },
-        }).sort({ createdAt: -1 }); // newest first
+        const followers = await User.find({
+            _id: { $in: followerIds },
+        }); //.sort({ createdAt: -1 })
 
         return res.status(200).json({
             success: true,
-            posts: posts,
+            followers,
         });
     } catch (error) {
-        console.error("Error fetching posts by IDs:", error);
+        console.error("Error fetching followers by IDs:", error);
         return res.status(500).json({
             success: false,
-            message: "Failed to fetch posts",
+            message: "Failed to fetch followers",
+            error:
+                process.env.NODE_ENV === "development"
+                    ? error.message
+                    : "Server error",
+        });
+    }
+});
+
+/**
+ *******************************************************
+ * get followig by ids
+ */
+router.post("/u/following/byids", authenticateToken, async (req, res) => {
+    try {
+        const data = req.body;
+
+        if (!data) {
+            return res.status(400).json({
+                success: false,
+                message: "No follower IDs provided",
+            });
+        }
+
+        const followingIds = data.followingIds
+            .split(",")
+            .filter((id) => mongoose.Types.ObjectId.isValid(id));
+
+        if (followingIds.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "No valid followinng IDs provided",
+            });
+        }
+
+        const following = await User.find({
+            _id: { $in: followingIds },
+        });
+
+        return res.status(200).json({
+            success: true,
+            following,
+        });
+    } catch (error) {
+        console.error("Error fetching following by IDs:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch following",
             error:
                 process.env.NODE_ENV === "development"
                     ? error.message

@@ -48,7 +48,7 @@ const postSchema = new Schema(
         thumbnailUrl: { type: String, default: "" },
         premiumPost: { type: Boolean, default: false }, // will be set by the user not me, if premium i will take some charge
 
-        publishedAt: { type: Date, default: Date.now },
+        // createdAt given at default
         modifiedAt: { type: Date, default: Date.now },
 
         tags: {

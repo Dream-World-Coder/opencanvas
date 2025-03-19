@@ -2,7 +2,14 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 
+const {
+    handleAuthErrors,
+    authenticateToken,
+    checkUserExists,
+} = require("../middlewares/authorisation");
+
 /**
+ *******************************************************
  * update user data
  */
 router.put(
@@ -44,6 +51,15 @@ router.put(
                     return res.status(400).json({
                         success: false,
                         message: "Username can be 16 characters long at max",
+                    });
+                }
+
+                // should contain only A-z, 0-9, and _
+                if (!/^[A-Za-z0-9_]+$/.test(username)) {
+                    return res.status(400).json({
+                        success: false,
+                        message:
+                            "Username can only contain letters, numbers, and underscores",
                     });
                 }
 
@@ -128,8 +144,11 @@ router.put(
     },
 );
 
-// public profile view
-// need to set it as id
+/**
+ *******************************************************
+ * public profile view
+ * need to set it as id
+ */
 router.get("/u/:username", async (req, res) => {
     try {
         const user = await User.findOne({
@@ -168,7 +187,10 @@ router.get("/u/:username", async (req, res) => {
     }
 });
 
-// get author by id -- limited data like public profile, but getting by id instead username
+/**
+ *******************************************************
+ * get author by id -- limited data like public profile, but getting by id instead username
+ */
 async function getUserPublicProfileById(req, res) {
     try {
         const author = await User.findOne({
