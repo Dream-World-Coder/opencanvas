@@ -10,7 +10,7 @@ import { Toaster } from "@/components/ui/sonner";
 
 // Loaded with main bundle
 import LandingPage from "./pages/LandingPage/LandingPage";
-// import "./services/fingerprintService";
+import "./services/fingerprintService";
 
 // Lazy loaded components
 const LoginPage = lazy(() => import("./pages/Auth/Login"));
@@ -20,6 +20,8 @@ const AuthSuccess = lazy(() => import("./pages/Auth/AuthSuccess"));
 const Profile = lazy(() => import("./pages/Profile/Profile"));
 const ProfileSettings = lazy(() => import("./pages/Profile/ProfileSettings"));
 const PublicProfile = lazy(() => import("./pages/Profile/PublicProfile"));
+const FollowersPage = lazy(() => import("./pages/Profile/FollowersPage"));
+const FollowingPage = lazy(() => import("./pages/Profile/FollowingPage"));
 
 const ViewPost = lazy(() => import("./pages/Post/ViewPost"));
 
@@ -79,9 +81,6 @@ export default function App() {
                             />
                             <Route path="/logout" element={<LogoutPage />} />
 
-                            {/* <Route path="/p/:id" element={<PostDetail />} /> */}
-                            {/* <Route path="/u/:id" element={<PublicProfile />} /> */}
-                            {/* will move to protected routes later cuz dont want to db qurey for every person's call, only signedin peeps should be able to see  */}
                             <Route
                                 path="/about"
                                 element={<AboutPage bgClr="bg-white" />}
@@ -107,19 +106,19 @@ export default function App() {
                                 element={<PublicProfile bgClr="bg-white" />}
                             />
 
-                            {/* ---------------- remove later /}
-                            <Route
-                                path="/p"
-                                element={<Profile bgClr="bg-white" />}
-                            />
-                            <Route path="/p/s" element={<ProfileSettings />} />
-                            {/* ---------------- */}
-
                             {/* protected */}
                             <Route element={<ProtectedRoute />}>
                                 <Route
                                     path="/profile"
                                     element={<Profile bgClr="bg-white" />}
+                                />
+                                <Route
+                                    path="/u/:username/followers"
+                                    element={<FollowersPage />}
+                                />
+                                <Route
+                                    path="/u/:username/following"
+                                    element={<FollowingPage />}
                                 />
                                 <Route
                                     path="/profile/settings"

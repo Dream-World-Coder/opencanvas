@@ -67,6 +67,12 @@ const ProfileSettings = () => {
     async function updateUser() {
         setLoading(true);
         try {
+            if (!/^[A-Za-z0-9_]+$/.test(formValues.username)) {
+                toast.error(
+                    "Username can only contain letters, numbers, and underscores",
+                );
+                return;
+            }
             const result = await updateUserProfile(formValues);
             toast.success(
                 "Your profile information has been updated successfully.",

@@ -47,7 +47,7 @@ const AboutPage = ({ bgClr = "bg-cream-light" }) => {
                             </span>
                         </h1>
                         <p
-                            className="text-lg sm:text-xl font-zodiak text-stone-700 md:text-stone-800 dark:text-[#f8f8f8]
+                            className="text-lg sm:text-xl font-[montserrat] text-stone-700 md:text-stone-800 dark:text-[#f8f8f8]
                         pointer-events-none md:pointer-events-auto font-bold md:font-normal
                         leading-tight tracking-normal max-w-2xl mx-auto"
                         >
@@ -77,7 +77,7 @@ const AboutPage = ({ bgClr = "bg-cream-light" }) => {
                                     </span>
                                 </h2>
                                 <div className="flex justify-between pr-[15%] md:pr-[20%] pointer-events-none md:pointer-events-auto">
-                                    <p className="font-zodiak text-lg md:text-xl text-stone-700 dark:text-[#f8f8f8] md:text-stone-800 leading-tight max-w-md pl-4">
+                                    <p className="font-[montserrat] text-lg md:text-xl text-stone-700 dark:text-[#f8f8f8] md:text-stone-800 leading-tight max-w-md pl-4">
                                         {item.data}
                                     </p>
                                     <span className="block font-scribe text-7xl text-stone-600/30 dark:text-stone-400/30 font-normal">

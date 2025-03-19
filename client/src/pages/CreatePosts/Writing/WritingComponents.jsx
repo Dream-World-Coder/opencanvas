@@ -343,6 +343,7 @@ export const MarkdownPreview = ({
     lightModeBg = "bg-white",
     insidePost = false,
     darkBg = "bg-[#222]",
+    contentOnly = false,
 }) => {
     // Use ref to store settings for all images
     const imageSettingsRef = useRef({});
@@ -404,13 +405,19 @@ export const MarkdownPreview = ({
                     >
                         {/* title */}
                         {title && (
-                            <div className="font-serif text-4xl md:text-5xl font-bold mt-2 mb-10 leading-tight tracking-tight">
+                            <div
+                                className={`font-serif mt-2 mb-10 leading-tight tracking-tight ${
+                                    contentOnly
+                                        ? "text-3xl font-semibold"
+                                        : "text-4xl md:text-5xl font-bold"
+                                }`}
+                            >
                                 {title}
                             </div>
                         )}
 
                         {/* thumbnail */}
-                        {thumbnailUrl && (
+                        {thumbnailUrl && !contentOnly && (
                             <div className="relative mb-8 rounded-lg overflow-hidden shadow-md">
                                 <img
                                     src={thumbnailUrl}
@@ -574,116 +581,69 @@ export const MarkdownPreview = ({
                                     );
                                 },
 
-                                /*
                                 h1: ({ children }) => (
-                                    <h1 className="font-serif text-4xl md:text-5xl font-bold mt-12 mb-6 leading-tight tracking-tight">
-                                        {children}
-                                    </h1>
-                                ),
-                                h2: ({ children }) => (
-                                    <h2 className="font-serif text-3xl md:text-4xl font-bold mt-10 mb-5 leading-tight tracking-tight">
-                                        {children}
-                                    </h2>
-                                ),
-                                h3: ({ children }) => (
-                                    <h3 className="font-serif text-2xl md:text-3xl font-bold mt-8 mb-4 leading-snug">
-                                        {children}
-                                    </h3>
-                                ),
-                                h4: ({ children }) => (
-                                    <h4 className="font-sans text-xl md:text-2xl font-semibold mt-6 mb-3 leading-snug">
-                                        {children}
-                                    </h4>
-                                ),
-                                h5: ({ children }) => (
-                                    <h5 className="font-sans text-lg md:text-xl font-semibold mt-5 mb-3 leading-snug">
-                                        {children}
-                                    </h5>
-                                ),
-                                h6: ({ children }) => (
-                                    <h6 className="font-sans text-base md:text-lg font-semibold mt-4 mb-2 uppercase tracking-wider">
-                                        {children}
-                                    </h6>
-                                ),
-                                p: ({ children }) => (
-                                    <p className="font-sans text-base md:text-lg leading-relaxed my-5 max-w-prose">
-                                        {children}
-                                    </p>
-                                ),
-                                strong: ({ children }) => (
-                                    <strong className="font-semibold">
-                                        {children}
-                                    </strong>
-                                ),
-                                em: ({ children }) => (
-                                    <em className="italic">{children}</em>
-                                ),
-                                a: ({ href, children }) => (
-                                    <a
-                                        href={href}
-                                        className={`border-b border-current pb-0.5 font-medium transition-colors duration-200 ${
-                                            isDark
-                                                ? "text-blue-300 hover:text-blue-400"
-                                                : "text-blue-600 hover:text-blue-800"
+                                    <h1
+                                        className={`font-serif mt-12 mb-6 leading-tight tracking-tight ${
+                                            contentOnly
+                                                ? "text-3xl font-semibold"
+                                                : "text-4xl md:text-5xl font-bold"
                                         }`}
-                                        target={
-                                            href.startsWith("http")
-                                                ? "_blank"
-                                                : "_self"
-                                        }
-                                        rel={
-                                            href.startsWith("http")
-                                                ? "noopener noreferrer"
-                                                : ""
-                                        }
                                     >
                                         {children}
-                                    </a>
-                                ),
-                                ul: ({ children }) => (
-                                    <ul className="list-disc pl-6 md:pl-8 my-5 space-y-2">
-                                        {children}
-                                    </ul>
-                                ),
-                                ol: ({ children }) => (
-                                    <ol className="list-decimal pl-6 md:pl-8 my-5 space-y-2">
-                                        {children}
-                                    </ol>
-                                ),
-                                li: ({ children }) => (
-                                    <li className="leading-relaxed text-base md:text-lg">
-                                        {children}
-                                    </li>
-                                ),
-                                */
-
-                                h1: ({ children }) => (
-                                    <h1 className="font-serif text-4xl md:text-5xl font-bold mt-12 mb-6 leading-tight tracking-tight">
-                                        {children}
                                     </h1>
                                 ),
                                 h2: ({ children }) => (
-                                    <h2 className="font-serif text-3xl md:text-4xl font-bold mt-10 mb-5 leading-tight tracking-tight">
+                                    <h2
+                                        className={`font-serif mt-10 mb-5 leading-tight tracking-tight ${
+                                            contentOnly
+                                                ? "text-2xl font-semibold"
+                                                : "text-3xl md:text-4xl font-bold"
+                                        }`}
+                                    >
                                         {children}
                                     </h2>
                                 ),
                                 h3: ({ children }) => (
-                                    <h3 className="font-serif text-2xl md:text-3xl font-bold mt-8 mb-4 leading-snug">
+                                    <h3
+                                        className={`font-serif mt-8 mb-4 leading-snug ${
+                                            contentOnly
+                                                ? "text-xl font-semibold"
+                                                : "text-2xl md:text-3xl font-bold"
+                                        }`}
+                                    >
                                         {children}
                                     </h3>
                                 ),
                                 h4: ({ children }) => (
-                                    <h4 className="montserrat-regular text-xl md:text-2xl font-semibold mt-6 mb-3 leading-snug">
+                                    <h4
+                                        className={`montserrat-regular font-semibold mt-6 mb-3 leading-snug ${
+                                            contentOnly
+                                                ? "text-lg"
+                                                : "text-xl md:text-2xl"
+                                        }`}
+                                    >
                                         {children}
                                     </h4>
                                 ),
                                 h5: ({ children }) => (
-                                    <h5 className="montserrat-regular text-lg md:text-xl font-semibold mt-5 mb-3 leading-snug">
+                                    <h5
+                                        className={`montserrat-regular font-semibold mt-5 mb-3 leading-snug ${
+                                            contentOnly
+                                                ? "text-base"
+                                                : "text-lg md:text-xl"
+                                        }`}
+                                    >
                                         {children}
                                     </h5>
                                 ),
                                 h6: ({ children }) => (
-                                    <h6 className="montserrat-regular text-base md:text-lg font-semibold mt-4 mb-2 uppercase tracking-wider">
+                                    <h6
+                                        className={`montserrat-regular font-semibold mt-4 mb-2 uppercase tracking-wider ${
+                                            contentOnly
+                                                ? "text-sm"
+                                                : "text-base md:text-lg"
+                                        }`}
+                                    >
                                         {children}
                                     </h6>
                                 ),

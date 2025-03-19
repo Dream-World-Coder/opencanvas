@@ -17,7 +17,7 @@ export const useDataService = () => {
 
     const getAuthorProfile = async (authorId) => {
         try {
-            const response = await authAxios.get(`/auth/author/${authorId}`);
+            const response = await authAxios.get(`/author/${authorId}`);
             return response.data.author;
         } catch (error) {
             console.error("Error fetching author profile:", error);
@@ -28,7 +28,7 @@ export const useDataService = () => {
     const followUser = async (followId) => {
         try {
             const response = await authAxios.put(
-                `/auth/follow-user?followId=${followId}`,
+                `/follow-user?followId=${followId}`,
             );
             return response.data;
         } catch (error) {
@@ -39,7 +39,7 @@ export const useDataService = () => {
 
     const updateUserProfile = async (formValues) => {
         try {
-            const response = await authAxios.put(`/auth/update-user`, {
+            const response = await authAxios.put(`/update-user`, {
                 username: formValues.username.toLowerCase(),
                 fullName: formValues.fullName,
                 role: formValues.role,
@@ -50,6 +50,7 @@ export const useDataService = () => {
             return response.data;
         } catch (error) {
             console.error("Error updating user profile:", error);
+            toast("Error updating user profile:", error);
             throw error;
         }
     };
@@ -58,7 +59,7 @@ export const useDataService = () => {
     // -------------------------------------------------------------------------------------------
     const getNewPostId = async () => {
         try {
-            const response = await authAxios.post("/newpost/written/getId");
+            const response = await authAxios.post("/get-new-postId");
             return response.data.newPostId;
         } catch (error) {
             console.error("Error creating post:", error);
@@ -117,7 +118,9 @@ export const useDataService = () => {
 
     const savePost = async (postId) => {
         try {
-            const response = await authAxios.put(`/save-post?postId=${postId}`);
+            const response = await authAxios.put(
+                `/save-post-for-user?postId=${postId}`,
+            );
             return response.data;
         } catch (error) {
             console.error("Error saving post:", error);

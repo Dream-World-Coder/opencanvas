@@ -22,7 +22,6 @@ const navLinks = [
     // { href: "/about", label: "About" },
     // { href: "/contact", label: "Contact" },
     { href: "/saved-posts", label: "Saved" },
-    { href: "/followers", label: "Followers" },
     { href: "/profile", label: "Profile" },
 ];
 
