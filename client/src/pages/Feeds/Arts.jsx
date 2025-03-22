@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Heart, MessageSquareText, ArrowRight } from "lucide-react";
 import stories from "./Stories";
-import Header from "../../../components/Header/GalleryHeader";
+import Header from "../../components/Header/GalleryHeader";
 
-const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
+const LiteratureFeed = ({ bgClr = "bg-cream-light" }) => {
     const filters = [
         "all",
         "romance",
@@ -92,4 +92,4 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
     );
 };
 
-export default LiteraryGallery;
+export default LiteratureFeed;

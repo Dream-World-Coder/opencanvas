@@ -20,7 +20,7 @@ const NotFoundPage = ({ bgClr = "bg-cream-light" }) => {
                 <button
                     className="rounded-md bg-cream hover:bg-cream-dark box-content px-4 py-2 text-stone-600/80 flex items-center justify-center gap-2"
                     onClick={() => {
-                        navigate("/profile");
+                        navigate(-1);
                     }}
                 >
                     <ChevronLeft className="size-6" />

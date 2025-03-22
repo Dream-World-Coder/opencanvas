@@ -19,6 +19,21 @@ const followerSchema = new Schema(
     },
     { _id: false },
 );
+const featureItemSchema = new Schema(
+    {
+        itemId: {
+            type: Schema.Types.ObjectId,
+            refPath: "featuredItems.itemType",
+        },
+        itemType: {
+            type: String,
+            enum: ["Post", "Collection"],
+        },
+        itemTitle: { type: String },
+        itemThumbnail: { type: String },
+    },
+    { _id: false },
+);
 
 const userSchema = new Schema(
     {
@@ -149,6 +164,12 @@ const userSchema = new Schema(
                 ref: "Post",
             },
         ],
+        dislikedPosts: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Post",
+            },
+        ],
         // no need to store posts, totalSavedPosts & totalLikedPosts just use .length,
         // cuz the array has to be loaded anyway, when we load currentUser
         collections: [
@@ -158,18 +179,7 @@ const userSchema = new Schema(
             },
         ],
         // featured post or collection, max 8 featured items
-        featuredItems: [
-            {
-                itemId: {
-                    type: Schema.Types.ObjectId,
-                    refPath: "featuredItems.itemType",
-                },
-                itemType: {
-                    type: String,
-                    enum: ["Post", "Collection"],
-                },
-            },
-        ],
+        featuredItems: [featureItemSchema],
         followers: [followerSchema],
         following: [followerSchema],
     },

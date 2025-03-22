@@ -55,6 +55,20 @@ export const useDataService = () => {
         }
     };
 
+    const changeFeaturedSettings = async (itemId, itemType) => {
+        try {
+            const response = await authAxios.put(`/change-post-featured`, {
+                itemId,
+                itemType,
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Error changing featured settings:", error);
+            toast("Error changing featured settings:", error);
+            throw error;
+        }
+    };
+
     // Post related functions
     // -------------------------------------------------------------------------------------------
     const getNewPostId = async () => {
@@ -112,6 +126,18 @@ export const useDataService = () => {
             return response.data;
         } catch (error) {
             console.error("Error liking post:", error);
+            throw error;
+        }
+    };
+
+    const dislikePost = async (postId) => {
+        try {
+            const response = await authAxios.put(
+                `/dislike-post?postId=${postId}`,
+            );
+            return response.data;
+        } catch (error) {
+            console.error("Error disliking post:", error);
             throw error;
         }
     };
@@ -219,12 +245,14 @@ export const useDataService = () => {
         getAuthorProfile,
         updateUserProfile,
         followUser,
+        changeFeaturedSettings,
 
         // Posts
         getNewPostId,
         getPostById,
         deletePost,
         likePost,
+        dislikePost,
         savePost,
         changePostVisibility,
 

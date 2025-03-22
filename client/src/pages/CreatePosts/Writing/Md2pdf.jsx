@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { Helmet } from "react-helmet-async";
 import {
     Save,
@@ -51,6 +52,7 @@ import {
     ScrollToBottomButton,
     formattingButtons,
     rawText,
+    findAndReplace,
 } from "./WritingComponents";
 
 // hooks
@@ -351,7 +353,11 @@ const Md2pdf = ({ artType = "markdown2pdf" }) => {
                                         <DropdownMenuItem
                                             onClick={(e) => {
                                                 e.preventDefault();
-                                                alert("will be available soon");
+                                                findAndReplace(
+                                                    content,
+                                                    setContent,
+                                                    toast,
+                                                );
                                             }}
                                         >
                                             <FileSearch />
@@ -611,7 +617,7 @@ const Md2pdf = ({ artType = "markdown2pdf" }) => {
                                         handleContentChange(e, setIsSaved);
                                     }}
                                     placeholder="Fill your canvas..."
-                                    className={`w-full min-h-screen h-auto resize-none focus:outline-none text-lg text-left transition-all duration-0
+                                    className={`w-full font-[montserrat] min-h-screen h-auto resize-none focus:outline-none text-lg text-left transition-all duration-0
                                                 ${isDark ? "bg-[#222]" : lightModeBg}
                                                 ${isPreview ? "opacity-0 max-h-screen" : "opacity-100 max-h-auto"}
                                                 ${

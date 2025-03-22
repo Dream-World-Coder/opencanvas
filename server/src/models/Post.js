@@ -39,12 +39,13 @@ const postSchema = new Schema(
             required: true,
         },
         // shall i store it ? or cuz i have to fetch the writer anyway to see his posts
-        // for " more from writer " section.
-        // author: {
-        //     name: { type: String, required: true },
-        //     profilePicture: { type: String },
-        //     role: { type: String },
-        // },
+        // for " more from writer " section. -- needed still
+        author: {
+            name: { type: String, required: true },
+            username: { type: String, required: true },
+            profilePicture: { type: String },
+            role: { type: String },
+        },
         thumbnailUrl: { type: String, default: "" },
         premiumPost: { type: Boolean, default: false }, // will be set by the user not me, if premium i will take some charge
 
@@ -91,6 +92,8 @@ const postSchema = new Schema(
         totalComments: { type: Number, default: 0 },
 
         totalViews: { type: Number, default: 0 },
+        totalCompleteReads: { type: Number, default: 0 },
+
         viewedBy: [
             {
                 identifier: String, // ID or fingerprint
@@ -101,9 +104,18 @@ const postSchema = new Schema(
 
         totalLikes: { type: Number, default: 0 },
         totalDislikes: { type: Number, default: 0 },
+        totalShares: { type: Number, default: 0 },
+
+        anonymousEngageMentScore: { type: Number },
+        engageMentScore: { type: Number },
     },
     { timestamps: true },
 );
 
 const Post = mongoose.model("Post", postSchema);
 module.exports = Post;
+
+/*
+postSchema.index({ isPublic: 1, anonymousEngagementScore: -1 });
+postSchema.index({ topics: 1, isPublic: 1, anonymousEngagementScore: -1 });
+*/

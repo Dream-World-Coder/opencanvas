@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
 const User = require("../models/User");
+const Post = require("../models/Post");
+const Collection = require("../models/Collection");
 
 const {
     handleAuthErrors,
@@ -231,6 +234,90 @@ async function getUserPublicProfileById(req, res) {
 router.get("/author/:id", getUserPublicProfileById);
 router.get("/follower/:id", getUserPublicProfileById);
 router.get("/following/:id", getUserPublicProfileById);
+
+/**
+ *******************************************************
+ * change post featured or not
+ */
+router.put(
+    "/change-post-featured",
+    authenticateToken,
+    checkUserExists,
+    async (req, res) => {
+        try {
+            const user = req.user;
+            const data = req.body;
+            const itemId = data.itemId;
+            const itemType = data.itemType;
+
+            if (!itemId || !itemType) {
+                return res.status(404).json({
+                    success: false,
+                    message: "itemid / itemtype not found",
+                });
+            }
+
+            if (!mongoose.Types.ObjectId.isValid(itemId)) {
+                return res
+                    .status(400)
+                    .json({ success: false, message: "Invalid itemId" });
+            }
+
+            let Model = null;
+            if (itemType === "Post") {
+                Model = Post;
+            } else if (itemType === "Collection") {
+                Model = Collection;
+            } else {
+                return res
+                    .status(400)
+                    .json({ success: false, message: "Invalid itemType" });
+            }
+
+            const item = await Model.findById(itemId);
+            if (!item) {
+                return res
+                    .status(400)
+                    .json({ success: false, message: `${itemType} not found` });
+            }
+
+            if (
+                user.featuredItems
+                    .map((item) => item.itemId.toString())
+                    .includes(itemId.toString())
+            ) {
+                user.featuredItems = user.featuredItems.filter(
+                    (item) => item.itemId.toString() !== itemId.toString(),
+                );
+                await user.save();
+
+                return res.status(200).json({
+                    success: true,
+                    message: `${itemType} removed from features`,
+                });
+            }
+
+            user.featuredItems.push({
+                itemId,
+                itemType,
+                itemTitle: item.title,
+                itemThumbnail: item.thumbnailUrl || null,
+            });
+            await user.save();
+
+            return res.status(200).json({
+                success: true,
+                message: `${itemType} featured`,
+            });
+        } catch (err) {
+            console.log("Error liking post", err);
+            return res.status(500).json({
+                success: false,
+                message: "Internal server error",
+            });
+        }
+    },
+);
 
 router.use(handleAuthErrors);
 

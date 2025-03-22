@@ -29,13 +29,13 @@ export const createOptions = [
         label: "New Article",
         color: "bg-amber-500",
     },
-    {
-        id: "picture",
-        href: "/createpost/image",
-        icon: Camera,
-        label: "Upload Picture",
-        color: "bg-emerald-500",
-    },
+    // {
+    //     id: "picture",
+    //     href: "/createpost/image",
+    //     icon: Camera,
+    //     label: "Upload Picture",
+    //     color: "bg-emerald-500",
+    // },
     {
         id: "mybook",
         href: "/createpost/book",

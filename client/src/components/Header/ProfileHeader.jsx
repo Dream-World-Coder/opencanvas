@@ -17,7 +17,7 @@ import { useDataService } from "../../services/dataService";
 
 const navLinks = [
     // { href: "/gallery/photos", label: "Gallery" },
-    { href: "/gallery/literature", label: "Literature" },
+    { href: "/literature", label: "Literature" },
     { href: "/articles", label: "Articles" },
     // { href: "/about", label: "About" },
     // { href: "/contact", label: "Contact" },
@@ -42,21 +42,24 @@ export default function ProfileHeader() {
 
         console.log(`newPostId writingPad: ${newPostId}`);
 
-        window.location.href = option.href;
+        // window.location.href = option.href;
+        navigate(option.href);
         setLoading(false);
     }
 
     return (
-        <nav className="fixed top-0 w-full bg-white dark:bg-[#111] dark:text-white z-50 border-b border-gray-100 dark:border-[#222]">
-            <div className="max-w-[1400px] mx-auto flex justify-between items-center px-8 py-6">
-                <a
-                    href="/"
+        <nav className="fixed top-0 w-full bg-white dark:bg-[#111] dark:text-white z-50 border-b border-gray-100 dark:border-[#333]">
+            <div className="max-w-7xl mx-auto flex justify-between items-center px-8 py-6">
+                <button
+                    onClick={() => {
+                        navigate("/");
+                    }}
                     className="text-base md:text-2xl text-stone-950 bg-lime-400 tracking-normal font-thin rounded-md box-content px-1 py-0 md:px-1 md:py-1"
                 >
                     <span className="font-['Six_Caps'] text-lg md:text-2xl tracking-wide">
                         opencanvas
                     </span>
-                </a>
+                </button>
                 <div className="hidden md:flex items-center space-x-5 text-[15px]">
                     {navLinks.map((link, index) => (
                         <button
@@ -226,27 +229,29 @@ export default function ProfileHeader() {
                 <div className="md:hidden bg-white dark:bg-[#111] border-t border-gray-100 dark:border-[#333]">
                     <div className="px-4 py-2 space-y-1">
                         {navLinks.map((link, index) => (
-                            <a
+                            <button
                                 key={index}
-                                href={link.href}
-                                className="block px-4 py-2 hover:bg-lime-300/60 rounded-md"
-                                onClick={() => setMobileMenuOpen(false)}
+                                onClick={() => {
+                                    navigate(link.href);
+                                    setMobileMenuOpen(false);
+                                }}
+                                className="block px-4 py-2 hover:bg-lime-300/60 rounded-md text-left w-full"
                             >
                                 {link.label}
-                            </a>
+                            </button>
                         ))}
-                        <a
-                            className="block px-4 py-2 hover:bg-lime-300/60 rounded-md"
-                            href="/logout"
+                        <button
+                            onClick={() => navigate("/settings")}
+                            className="block px-4 py-2 hover:bg-lime-300/60 rounded-md text-left w-full"
                         >
                             Settings
-                        </a>
-                        <a
-                            className="block px-4 py-2 text-red-700 hover:bg-red-300/60 rounded-md"
-                            href="/logout"
+                        </button>
+                        <button
+                            onClick={() => navigate("/logout")}
+                            className="block px-4 py-2 text-red-700 hover:bg-red-300/60 rounded-md text-left w-full"
                         >
                             Logout
-                        </a>
+                        </button>
                     </div>
                 </div>
             )}

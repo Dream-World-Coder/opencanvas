@@ -209,3 +209,36 @@ in profile component
 
 
 *** images are not posts, so no need to count them there, like post.type = post etc, they will be loaded differently
+
+
+isPublic: true,
+readTime: '2 min read',
+type: 'article',
+media: [],
+comments: [],
+totalComments: 0,
+totalViews: 0,
+totalLikes: 0,
+totalDislikes: 0,
+modifiedAt: ISODate('2025-03-19T05:33:59.284Z'),
+viewedBy: [],
+createdAt: ISODate('2025-03-19T05:33:59.287Z'),
+updatedAt: ISODate('2025-03-19T05:33:59.287Z'),
+
+=> updated at updates at any change, so modifiedAt is correct
+
+
+-- limit more parameters in posts, like engageMentScore & index user & posts
+
+-- if post is already loaded in feed, use it somehow
+pass it as props then
+
+
+
+-- add attributes like totalEngageMent, totalImpressioins inside posts & usrers, updae schedule wise,
+
+-- similarly add totalLikes in user
+
+
+in featuredItems add store things like {title, thumbnail, type, Id}
+now on click links to the post --> type & id for url generation

@@ -3,44 +3,22 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import {
     Share2,
-    Grid,
-    Rows,
     Camera,
     ThumbsUp,
     MessageCircle,
     Eye,
     EyeOff,
-    Edit,
-    Trash2,
-    MoreHorizontal,
 } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import {
-    DropdownMenu,
-    DropdownMenuTrigger,
-    DropdownMenuContent,
-    DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 
 import ProfileHeader from "../../components/Header/ProfileHeader";
-import { useDataService } from "../../services/dataService";
-// import ProfileFooter from "../../components/Footer/ProfileFooter";
-import { useAuth } from "../../contexts/AuthContext";
+import ProfileFooter from "../../components/Footer/ProfileFooter";
 import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
+import { TabComponent, PostActions } from "./components";
+import { useAuth } from "../../contexts/AuthContext";
 import { useDarkMode } from "../../components/Hooks/darkMode";
 import { formatDistanceToNow } from "date-fns";
 
@@ -55,44 +33,26 @@ const formatDates = (date) => {
     }
 };
 
-function sharePost(post) {
-    const baseUrl = window.location.origin;
-    const postUrl = `${baseUrl}/p/${post._id}`;
-
-    navigator.share
-        ? navigator.share({
-              title: post.title,
-              url: window.location.origin + `/p/${post._id}`,
-          })
-        : navigator.clipboard
-              .writeText(postUrl)
-              .then(() => {
-                  toast.success("Link copied to clipboard");
-              })
-              .catch((err) => {
-                  console.error("Failed to copy link:", err);
-                  toast.error("Faild to copy link");
-              });
-}
-
-function hideDiv(id) {
-    const elementToHide = document.getElementById(id);
-    if (elementToHide) {
-        elementToHide.style.display = "none";
-    }
-}
-
 const Profile = () => {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
     const isDark = useDarkMode();
     const [activeTab, setActiveTab] = useState("all");
     const [posts, setPosts] = useState([]);
+    // const [collections, setCollections] = useState([]);
     const [postsToFetch, setPostsToFetch] = useState(0);
     const [loading, setLoading] = useState(false);
-    const { deletePost, changePostVisibility } = useDataService();
     const userStats = [
-        { name: "POSTS", href: "#post-view", amount: currentUser.posts.length },
+        // {
+        //     name: "TOTAL LIKES",
+        //     href: "#post-view",
+        //     amount: posts.reduce((sum, post) => sum + post.totalLikes, 0),
+        // },
+        {
+            name: "WORKS",
+            href: "#post-view",
+            amount: currentUser.posts.length,
+        },
         {
             name: "FOLLOWERS",
             href: `/u/${currentUser.username}/followers`,
@@ -105,12 +65,7 @@ const Profile = () => {
         },
     ];
 
-    let collections = [];
-    if (currentUser) {
-        collections = currentUser.collections;
-    }
-
-    // fetch posts from user's postIds array
+    // fetch posts+collections from user's postIds array
     const fetchUserPosts = async () => {
         try {
             setLoading(true);
@@ -237,15 +192,15 @@ const Profile = () => {
                 </script>
             </Helmet>
             <div
-                className={`min-h-screen bg-white dark:bg-black dark:text-white font-sans`} //bg-cream-light
+                className={`min-h-screen bg-white dark:bg-[#111] dark:text-white font-sans`}
             >
                 <ProfileHeader />
 
                 <main className="pt-32 px-2 md:px-8">
-                    <div className="max-w-[1400px] mx-auto pb-[20vh]">
+                    <div className="max-w-7xl mx-auto pb-[20vh]">
                         {/* <div className="grid md:grid-cols-[1.62fr,1fr] gap-16 mb-24 border border-black"> */}
                         <div className="flex justify-between items-start gap-16 mb-24">
-                            {/* Left Column with Profile Pic */}
+                            {/* left column with Profile Pic */}
                             <div className="space-y-8 flex-1">
                                 <div className="flex items-start md:items-center space-x-8">
                                     {loading ? (
@@ -280,9 +235,9 @@ const Profile = () => {
                                                 <Skeleton className="h-6 w-1/2" />
                                             </div>
                                         ) : (
-                                            <h1 className="text-4xl md:text-5xl font-[montserrat] leading-[0.95] tracking-tighter pointer-events-none md:pointer-events-auto capitalize dark:text-[#f8f8f8]">
+                                            <h1 className="text-3xl md:text-4xl font-boskaBold leading-[0.95] tracking-tight pointer-events-none md:pointer-events-auto capitalize dark:text-[#fff]">
                                                 {currentUser.fullName}
-                                                <span className="block mt-2 text-xl md:text-3xl font-normal tracking-normal capitalize dark:text-[#e0e0e0]">
+                                                <span className="block mt-2 text-xl md:text-2xl font-boska font-normal tracking-normal capitalize text-lime-700 dark:text-lime-600">
                                                     {currentUser.role}
                                                 </span>
                                             </h1>
@@ -297,19 +252,19 @@ const Profile = () => {
                                     </div>
                                 ) : (
                                     currentUser.aboutMe && (
-                                        <p className="text-stone-700 dark:text-[#b0b0b0] montserrat-regular text-lg leading-tight tracking-normal pointer-events-none md:pointer-events-auto">
+                                        <p className="text-stone-700 dark:text-[#d0d0d0] font-zodiak text-lg leading-tight tracking-normal pointer-events-none md:pointer-events-auto">
                                             {currentUser.aboutMe}
                                         </p>
                                     )
                                 )}
                             </div>
 
-                            {/* Right Column - Quick Stats */}
+                            {/* right column - Quick Stats */}
                             <div className="space-y-3 pt-4 w-[400px] font-[montserrat]">
                                 {userStats.map((item, index) => (
                                     <a
                                         key={index}
-                                        className="flex justify-between items-center rounded border-b border-gray-200 hover:bg-gray-200 dark:border-[#333] dark:hover:bg-[#333] py-3 pr-4 cursor-pointer group"
+                                        className="flex justify-between items-center rounded border-b border-gray-200 hover:bg-gray-100 dark:border-[#333] dark:hover:bg-[#333] py-3 pr-4 cursor-pointer group"
                                         href={item.href}
                                     >
                                         <span className="text-gray-500 dark:text-[#999] text-sm md:text-sm group-hover:translate-x-2 transition-transform duration-300">
@@ -323,8 +278,8 @@ const Profile = () => {
                             </div>
                         </div>
 
-                        {/* Collections Carousel */}
-                        {collections.length > 0 && (
+                        {/* featured */}
+                        {currentUser.featuredItems.length > 0 && (
                             <div className="mb-24">
                                 <h2 className="text-2xl font-semibold tracking-tight mb-8 dark:text-[#f0f0f0]">
                                     <span className="bg-inherit dark:bg-inherit hover:bg-lime-100 dark:hover:bg-[#222] rounded-md box-content px-2 py-1">
@@ -332,15 +287,24 @@ const Profile = () => {
                                     </span>
                                 </h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                    {collections.map((collection) => (
+                                    {currentUser.featuredItems.map((item) => (
                                         <div
-                                            key={collection.id}
+                                            key={item.itemId}
                                             className="group cursor-pointer"
+                                            onClick={() => {
+                                                item.itemType === "Post"
+                                                    ? navigate(
+                                                          `/p/${item.itemId}`,
+                                                      )
+                                                    : navigate(
+                                                          `/c/${item.itemId}`,
+                                                      );
+                                            }}
                                         >
                                             <div className="relative aspect-square overflow-hidden mb-4">
                                                 <img
-                                                    src={collection.cover}
-                                                    alt={collection.title}
+                                                    src={item.itemThumbnail}
+                                                    alt={item.itemTitle}
                                                     className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
                                                 />
                                                 {/* dark inset on hover */}
@@ -349,14 +313,11 @@ const Profile = () => {
                                                 </div>
                                             </div>
                                             <h3 className="text-lg font-medium mb-1 flex justify-between dark:text-[#e8e8e8]">
-                                                {collection.title}
+                                                {item.itemTitle}
                                                 <Share2 className="w-6 h-6 text-black dark:text-white rounded-lg p-1 hover:bg-yellow-200 dark:hover:bg-[#2c2c2c]" />
                                             </h3>
                                             <p className="text-sm text-gray-400 dark:text-[#888]">
-                                                {collection.items}{" "}
-                                                {collection.type === "album"
-                                                    ? "photos"
-                                                    : "pieces"}
+                                                {item.itemType.toLowerCase()}
                                             </p>
                                         </div>
                                     ))}
@@ -364,58 +325,20 @@ const Profile = () => {
                             </div>
                         )}
 
-                        {/* Filter tabs */}
+                        {/* filter tabs */}
                         {posts.length > 0 && (
                             <div
                                 id="post-view"
-                                className="border-b border-gray-200 dark:border-gray-800 mb-8"
+                                className="border-b border-gray-200 dark:border-[#333] mb-8"
                             >
-                                <div className="flex overflow-x-auto no-scrollbar space-x-6 md:space-x-10">
-                                    <button
-                                        onClick={() => setActiveTab("all")}
-                                        className={`py-3 text-sm font-medium transition-colors ${
-                                            activeTab === "all"
-                                                ? "border-b-2 border-black dark:border-white text-black dark:text-white"
-                                                : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-                                        }`}
-                                    >
-                                        All Posts
-                                    </button>
-                                    <button
-                                        onClick={() => setActiveTab("article")}
-                                        className={`py-3 text-sm font-medium transition-colors ${
-                                            activeTab === "article"
-                                                ? "border-b-2 border-black dark:border-white text-black dark:text-white"
-                                                : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-                                        }`}
-                                    >
-                                        Articles
-                                    </button>
-                                    <button
-                                        onClick={() => setActiveTab("story")}
-                                        className={`py-3 text-sm font-medium transition-colors ${
-                                            activeTab === "story"
-                                                ? "border-b-2 border-black dark:border-white text-black dark:text-white"
-                                                : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-                                        }`}
-                                    >
-                                        Stories
-                                    </button>
-                                    <button
-                                        onClick={() => setActiveTab("poem")}
-                                        className={`py-3 text-sm font-medium transition-colors ${
-                                            activeTab === "poem"
-                                                ? "border-b-2 border-black dark:border-white text-black dark:text-white"
-                                                : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-                                        }`}
-                                    >
-                                        Poems
-                                    </button>
-                                </div>
+                                <TabComponent
+                                    activeTab={activeTab}
+                                    setActiveTab={setActiveTab}
+                                />
                             </div>
                         )}
 
-                        {/* Posts layout */}
+                        {/* posts */}
                         <div className="space-y-8 mb-16">
                             {posts.map(
                                 (post) =>
@@ -424,9 +347,6 @@ const Profile = () => {
                                         : true) && (
                                         <div
                                             key={post._id}
-                                            // onClick={() =>
-                                            //     navigate(`/p/${post._id}`)
-                                            // }
                                             className="group Xcursor-pointer"
                                         >
                                             <div className="flex flex-col md:flex-row gap-6">
@@ -561,201 +481,29 @@ const Profile = () => {
                                                                 </span>
                                                             </div>
 
-                                                            <div className="bg-white/90 dark:bg-gray-800/90 shadow-lg rounded-lg backdrop-blur-sm flex items-center cursor-pointer">
-                                                                {/* visit */}
-                                                                <div
-                                                                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-l-lg"
-                                                                    title="View"
-                                                                    onClick={(
-                                                                        e,
-                                                                    ) => {
-                                                                        e.stopPropagation();
-                                                                        navigate(
-                                                                            `/p/${post._id}`,
-                                                                        );
-                                                                    }}
-                                                                >
-                                                                    <Eye
-                                                                        title="View"
-                                                                        className="w-4 h-4 text-gray-600 dark:text-gray-300 rounded-full"
-                                                                    />
-                                                                </div>
-
-                                                                {/* edit */}
-                                                                <div
-                                                                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
-                                                                    title="Edit"
-                                                                    onClick={(
-                                                                        e,
-                                                                    ) => {
-                                                                        e.stopPropagation();
-                                                                        localStorage.setItem(
-                                                                            "newPostId",
-                                                                            post._id.toString(),
-                                                                        );
-                                                                        window.location.href =
-                                                                            "/edit-post";
-                                                                    }}
-                                                                >
-                                                                    <Edit
-                                                                        title="Edit"
-                                                                        className="w-4 h-4 text-gray-600 dark:text-gray-300 rounded-full"
-                                                                    />
-                                                                </div>
-
-                                                                {/* delete */}
-                                                                <AlertDialog title="Delete">
-                                                                    <AlertDialogTrigger className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full">
-                                                                        <Trash2
-                                                                            title="Delete"
-                                                                            className="w-4 h-4 text-gray-600 dark:text-gray-300"
-                                                                        />
-                                                                    </AlertDialogTrigger>
-                                                                    <AlertDialogContent>
-                                                                        <AlertDialogHeader>
-                                                                            <AlertDialogTitle>
-                                                                                Are
-                                                                                you
-                                                                                absolutely
-                                                                                sure?
-                                                                            </AlertDialogTitle>
-                                                                            <AlertDialogDescription>
-                                                                                This
-                                                                                action
-                                                                                cannot
-                                                                                be
-                                                                                undone.
-                                                                                This
-                                                                                will
-                                                                                permanently
-                                                                                delete
-                                                                                the
-                                                                                post.
-                                                                            </AlertDialogDescription>
-                                                                        </AlertDialogHeader>
-                                                                        <AlertDialogFooter>
-                                                                            <AlertDialogCancel>
-                                                                                Cancel
-                                                                            </AlertDialogCancel>
-                                                                            <AlertDialogAction
-                                                                                title="Delete"
-                                                                                onClick={async (
-                                                                                    e,
-                                                                                ) => {
-                                                                                    e.stopPropagation();
-                                                                                    try {
-                                                                                        let res =
-                                                                                            await deletePost(
-                                                                                                post._id,
-                                                                                            );
-                                                                                        toast(
-                                                                                            res.message,
-                                                                                        );
-                                                                                        hideDiv(
-                                                                                            post._id,
-                                                                                        );
-                                                                                    } catch (error) {
-                                                                                        console.error(
-                                                                                            error,
-                                                                                        );
-                                                                                        toast(
-                                                                                            "Failed to delete post.",
-                                                                                        );
-                                                                                    }
-                                                                                }}
-                                                                            >
-                                                                                Continue
-                                                                            </AlertDialogAction>
-                                                                        </AlertDialogFooter>
-                                                                    </AlertDialogContent>
-                                                                </AlertDialog>
-
-                                                                {/* dropdown menu */}
-                                                                <DropdownMenu
-                                                                    className="size-6 grid place-items-center overflow-hidden"
-                                                                    title="More"
-                                                                    onClick={(
-                                                                        e,
-                                                                    ) =>
-                                                                        e.stopPropagation()
-                                                                    }
-                                                                >
-                                                                    <DropdownMenuTrigger className="p-2 box-content hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full">
-                                                                        <MoreHorizontal className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                                                                    </DropdownMenuTrigger>
-                                                                    <DropdownMenuContent>
-                                                                        <DropdownMenuItem>
-                                                                            <button
-                                                                                onClick={async () => {
-                                                                                    let tmp =
-                                                                                        await changePostVisibility(
-                                                                                            post._id,
-                                                                                            !post.isPublic,
-                                                                                        );
-                                                                                    if (
-                                                                                        tmp.success
-                                                                                    ) {
-                                                                                        toast.success(
-                                                                                            tmp.message,
-                                                                                        );
-                                                                                        setPosts(
-                                                                                            (
-                                                                                                prevPosts,
-                                                                                            ) =>
-                                                                                                prevPosts.map(
-                                                                                                    (
-                                                                                                        p,
-                                                                                                    ) =>
-                                                                                                        p._id ===
-                                                                                                        post._id
-                                                                                                            ? {
-                                                                                                                  ...p,
-                                                                                                                  isPublic:
-                                                                                                                      !post.isPublic,
-                                                                                                              }
-                                                                                                            : p,
-                                                                                                ),
-                                                                                        );
-                                                                                    }
-                                                                                }}
-                                                                                className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
-                                                                            >
-                                                                                make{" "}
-                                                                                {post.isPublic
-                                                                                    ? "private"
-                                                                                    : "public"}
-                                                                            </button>
-                                                                        </DropdownMenuItem>
-                                                                    </DropdownMenuContent>
-                                                                </DropdownMenu>
-
-                                                                {/* share */}
-                                                                <div
-                                                                    onClick={(
-                                                                        e,
-                                                                    ) => {
-                                                                        e.stopPropagation();
-                                                                        sharePost(
-                                                                            post,
-                                                                        );
-                                                                    }}
-                                                                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
-                                                                >
-                                                                    <Share2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                                                                </div>
-                                                            </div>
+                                                            {/* post actions */}
+                                                            <PostActions
+                                                                post={post}
+                                                                setPosts={
+                                                                    setPosts
+                                                                }
+                                                                loading={
+                                                                    loading
+                                                                }
+                                                            />
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             {/* divider */}
-                                            <div className="mt-8 border-b border-gray-100 dark:border-gray-800"></div>
+                                            <div className="mt-8 border-b border-gray-100 dark:border-[#333]"></div>
                                         </div>
                                     ),
                             )}
                         </div>
 
+                        {/* load more button */}
                         {currentUser.posts.length > postsToFetch && (
                             <div className="w-[100%] flex items-center justify-center">
                                 <Button
@@ -772,7 +520,8 @@ const Profile = () => {
                         )}
                     </div>
                 </main>
-                {/* <ProfileFooter /> */}
+
+                <ProfileFooter />
             </div>
         </>
     );

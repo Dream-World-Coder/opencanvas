@@ -98,12 +98,18 @@ router.post(
                     tags: postData.tags,
                     isEdited: false,
                     isPublic: postData.isPublic ?? true,
-                    type: postData.artType ?? "written", // artType cannot be changed, its fixed
+                    type: postData.artType ?? "written", // artType cannot be changed, its fixed, for now atleast
                     thumbnailUrl:
                         postData.thumbnailUrl ||
                         generateRandomThumbnail(postData.artType),
                     readTime: postData.readTime,
                     media: postData.media,
+                    author: {
+                        name: user.fullName,
+                        username: user.username,
+                        profilePicture: user.profilePicture,
+                        role: user.role,
+                    },
                 });
 
                 savedPost = await post.save(); // returns the post
@@ -383,7 +389,7 @@ router.put(
                 return res.status(200).json({
                     success: true,
                     message: "removed like",
-                    increase: "false",
+                    increase: "decrease",
                 });
             }
 
@@ -400,6 +406,74 @@ router.put(
             });
         } catch (err) {
             console.log("Error liking post", err);
+            return res.status(500).json({
+                success: false,
+                message: "Internal server error",
+            });
+        }
+    },
+);
+
+/**
+ *******************************************************
+ * dislike / remove-dislike a post
+ */
+router.put(
+    "/dislike-post",
+    authenticateToken,
+    checkUserExists,
+    async (req, res) => {
+        try {
+            const user = req.user;
+            const { postId } = req.query;
+
+            if (!postId) {
+                return res.status(404).json({
+                    success: false,
+                    message: "post id not found",
+                });
+            }
+
+            if (!mongoose.Types.ObjectId.isValid(postId)) {
+                return res
+                    .status(400)
+                    .json({ success: false, message: "Invalid post ID" });
+            }
+
+            const post = await Post.findById(postId);
+            if (!post) {
+                return res
+                    .status(400)
+                    .json({ success: false, message: "post not found" });
+            }
+
+            if (user.dislikedPosts.includes(postId)) {
+                user.dislikedPosts = user.dislikedPosts.filter(
+                    (id) => id.toString() !== postId.toString(),
+                );
+                await user.save();
+
+                post.totalDislikes -= 1;
+                await post.save();
+
+                return res.status(200).json({
+                    success: true,
+                    message: "removed dislike",
+                });
+            }
+
+            post.totalDislikes += 1;
+            await post.save();
+
+            user.dislikedPosts.push(postId);
+            await user.save();
+
+            return res.status(200).json({
+                success: true,
+                message: "disliked",
+            });
+        } catch (err) {
+            console.log("Error disliking post", err);
             return res.status(500).json({
                 success: false,
                 message: "Internal server error",

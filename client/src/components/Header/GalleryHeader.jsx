@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { X, Menu, Plus, ChevronUp, ChevronDown, Filter } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { createOptions } from "./createOptions";
@@ -13,6 +14,7 @@ const Header = ({ filters }) => {
     const { currentUser } = useAuth();
     const { getNewPostId } = useDataService();
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     async function handlePostCreate(option) {
         setLoading(true);
@@ -23,7 +25,8 @@ const Header = ({ filters }) => {
         localStorage.setItem("newPostId", newPostId);
 
         setTimeout(() => {
-            window.location.href = option.href;
+            // window.location.href = option.href;
+            navigate(option.href);
         }, 300);
         setLoading(false);
     }
@@ -70,11 +73,11 @@ const Header = ({ filters }) => {
 
                         {navLinks.map((link, index) => (
                             <React.Fragment key={index}>
-                                <a
-                                    href={link.href}
+                                <button
+                                    onClick={() => navigate(link.href)}
                                     className={`text-stone-600 hover:text-stone-800 dark:text-[#f1f1f1] dark:hover:text-[#f1f1f1]
-                                        ${link.href !== "/profile" ? "hover:bg-lime-300/50" : ""}
-                                        box-content px-3 py-1 rounded-lg transition-all text-sm`}
+                                                    ${link.href !== "/profile" ? "hover:bg-lime-300/50" : ""}
+                                                    box-content px-3 py-1 rounded-lg transition-all text-sm flex items-center`}
                                 >
                                     {link.href !== "/profile" ? (
                                         link.name
@@ -82,10 +85,10 @@ const Header = ({ filters }) => {
                                         <img
                                             src={currentUser.profilePicture}
                                             className="size-6 md:size-8 rounded-full overflow-hidden object-cover block cursor-pointer"
-                                            alt=""
+                                            alt="Profile"
                                         />
                                     )}
-                                </a>
+                                </button>
                                 {index !== navLinks.length - 1 && (
                                     <span className="text-lime-300 flex items-center">
                                         •
@@ -251,14 +254,16 @@ const Header = ({ filters }) => {
                         {/* mobile nav links */}
                         <div className="flex flex-col">
                             {navLinks.map((link, index) => (
-                                <a
+                                <button
                                     key={index}
-                                    href={link.href}
-                                    className="py-2 pl-4 rounded-lg text-stone-600 dark:text-gray-300 hover:text-stone-800 hover:bg-gray-300/30 transition-colors"
-                                    onClick={() => setIsMenuOpen(false)}
+                                    onClick={() => {
+                                        navigate(link.href);
+                                        setIsMenuOpen(false);
+                                    }}
+                                    className="py-2 pl-4 rounded-lg text-stone-600 dark:text-gray-300 hover:text-stone-800 hover:bg-gray-300/30 transition-colors text-left w-full"
                                 >
                                     {link.name}
-                                </a>
+                                </button>
                             ))}
                         </div>
                     </div>

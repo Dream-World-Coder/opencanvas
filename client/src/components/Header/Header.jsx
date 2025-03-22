@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Menu, X, ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { createOptions } from "./createOptions";
@@ -14,6 +15,7 @@ const Header = ({
     const [createMenuOpen, setCreateMenuOpen] = useState(false);
     const { currentUser } = useAuth();
     const { getNewPostId } = useDataService();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
 
     async function handlePostCreate(option) {
@@ -25,7 +27,8 @@ const Header = ({
         localStorage.setItem("newPostId", newPostId);
 
         setTimeout(() => {
-            window.location.href = option.href;
+            // window.location.href = option.href;
+            navigate(option.href);
         }, 300);
         setLoading(false);
     }
@@ -53,8 +56,8 @@ const Header = ({
                 <nav className="flex items-center justify-between h-16 sm:h-20">
                     <div className="flex items-center justify-center gap-2">
                         {/* Logo */}
-                        <a
-                            href="/"
+                        <div
+                            onClick={() => navigate("/")}
                             className="bg-lime-400 font-thin text-stone-950
                         rounded-md box-content px-1 md:px-1 py-0
                         text-xl md:text-2xl tracking-wide"
@@ -62,7 +65,7 @@ const Header = ({
                             <span className="font-['Six_Caps']">
                                 opencanvas
                             </span>
-                        </a>
+                        </div>
                         <SearchBar round={true} hideSubmitBtn={true} />
                     </div>
 
@@ -72,11 +75,11 @@ const Header = ({
                             <React.Fragment key={index}>
                                 {!exclude.includes(link.href) && (
                                     <>
-                                        <a
-                                            href={link.href}
+                                        <button
+                                            onClick={() => navigate(link.href)}
                                             className={`text-stone-600 hover:text-stone-800 dark:text-[#f8f8f8] dark:hover:text-[#fff]
-                                    ${link.href !== "/profile" ? "hover:bg-lime-300/50 dark:hover:bg-lime-700/50" : ""}
-                                    box-content px-3 py-1 rounded-lg transition-all text-sm`}
+                                                            ${link.href !== "/profile" ? "hover:bg-lime-300/50 dark:hover:bg-lime-700/50" : ""}
+                                                            box-content px-3 py-1 rounded-lg transition-all text-sm`}
                                         >
                                             {link.href !== "/profile" ? (
                                                 link.name
@@ -86,10 +89,10 @@ const Header = ({
                                                         currentUser.profilePicture
                                                     }
                                                     className="size-6 md:size-8 rounded-full overflow-hidden object-cover block cursor-pointer"
-                                                    alt=""
+                                                    alt="Profile"
                                                 />
                                             )}
-                                        </a>
+                                        </button>
                                         {index !== navLinks.length - 1 && (
                                             <span
                                                 className={`${ballClr} flex items-center`}
@@ -158,7 +161,7 @@ const Header = ({
                     </div>
 
                     <div className="md:hidden flex items-center justify-center gap-2">
-                        {/* Mobile Create Button */}
+                        {/* mobile create button */}
                         {currentUser && (
                             <button
                                 onClick={() =>
@@ -174,7 +177,7 @@ const Header = ({
                             </button>
                         )}
 
-                        {/* Mobile Menu Button */}
+                        {/* mobile menu button */}
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
                             className="md:hidden p-2 hover:bg-white/50 rounded-sm transition-colors dark:hover:bg-[#222]/50"
@@ -227,7 +230,7 @@ const Header = ({
                     </div>
                 </nav>
 
-                {/* Mobile Menu */}
+                {/* mobile menu */}
                 <div
                     className={`md:hidden absolute left-0 right-0 bg-white dark:bg-[#111] backdrop-blur-md border-b border-stone-200/50 dark:border-stone-700/50 transition-all duration-300 ease-in-out ${
                         isMenuOpen
@@ -236,17 +239,19 @@ const Header = ({
                     }`}
                 >
                     <div className="px-4 py-6 space-y-6">
-                        {/* Mobile Nav Links */}
+                        {/* mobile nav links */}
                         <div className="flex flex-col">
                             {navLinks.map((link, index) => (
-                                <a
+                                <button
                                     key={index}
-                                    href={link.href}
                                     className="py-2 pl-4 rounded-lg text-stone-600 dark:text-gray-300 hover:text-stone-800 dark:hover:text-gray-200 hover:bg-lime-300/50 transition-colors"
-                                    onClick={() => setIsMenuOpen(false)}
+                                    onClick={() => {
+                                        setIsMenuOpen(false);
+                                        navigate(link.href);
+                                    }}
                                 >
                                     {link.name}
-                                </a>
+                                </button>
                             ))}
                         </div>
                     </div>

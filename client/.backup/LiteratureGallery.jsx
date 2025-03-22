@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
 import { Heart, MessageSquareText, ArrowRight } from "lucide-react";
 import stories from "./Stories";
+// import Footer from "../../../components/Footer/GalleryFooter";
 import Header from "../../../components/Header/GalleryHeader";
+// import vineSvg from "../../../assets/icons/vine.svg";
 
 const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
+    const [scrollY, setScrollY] = useState(0);
+
     const filters = [
         "all",
         "romance",
@@ -13,11 +17,46 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
         "fantasy",
     ];
 
+    useEffect(() => {
+        const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+        if (!isMobile) {
+            const handleScroll = () => {
+                setScrollY(window.scrollY);
+            };
+
+            window.addEventListener("scroll", handleScroll);
+            return () => {
+                window.removeEventListener("scroll", handleScroll);
+            };
+        }
+    }, []);
+
     return (
         <div
             className={`min-h-screen ${bgClr} dark:bg-black dark:text-[#f2f2f2] pt-24`}
         >
             <Header filters={filters} />
+            {/* <div
+                className={`relative h-32 md:h-52 overflow-hidden bg-inherit border-b border-gray-200 dark:border-[#333]`}
+                style={{
+                    transform: `translateY(${scrollY * 0.2}px)`,
+                }}
+            >
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center px-6">
+                        <h1 className="text-3xl text-stone-800 mb-3 tracking-wide font-scribe pointer-events-none md:pointer-events-auto">
+                            <span className="relative px-4 pt-3 dark:invert">
+                                A gathering of thoughts, verses, and tales
+                                <img
+                                    className="hidden md:block object-cover w-16 absolute opacity-70 top-[-32%] left-[100%]"
+                                    src={vineSvg}
+                                    alt=""
+                                />
+                            </span>
+                        </h1>
+                    </div>
+                </div>
+            </div> */}
 
             {/* Main Content */}
             <div className="max-w-3xl mx-auto pb-24">
@@ -53,7 +92,7 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
                                 </header>
 
                                 <div className="mb-6">
-                                    <p className="text-base leading-relaxed text-stone-700 whitespace-pre-line font-light dark:text-gray-300 font-[montserrat]">
+                                    <p className="text-base leading-relaxed text-stone-700 whitespace-pre-line font-light dark:text-gray-300">
                                         {story.excerpt.length > 300
                                             ? `${story.excerpt.slice(0, 300)}...`
                                             : story.excerpt}
@@ -88,6 +127,8 @@ const LiteraryGallery = ({ bgClr = "bg-cream-light" }) => {
                     ))}
                 </div>
             </div>
+
+            {/* <Footer /> */}
         </div>
     );
 };

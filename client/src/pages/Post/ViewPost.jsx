@@ -7,8 +7,11 @@ import {
     Share2,
     MoreHorizontal,
     ThumbsUp,
+    ThumbsDown,
     MessageSquareText,
+    ChevronLeft,
 } from "lucide-react";
+import PropTypes from "prop-types";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -38,22 +41,29 @@ function sharePost(post) {
         });
 }
 
-const ViewPost = () => {
+const ViewPost = ({ isArticle = true }) => {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
     const { postId } = useParams();
-    const { getPostById, getAuthorProfile, likePost, savePost, followUser } =
-        useDataService();
+    const {
+        getPostById,
+        getAuthorProfile,
+        likePost,
+        dislikePost,
+        savePost,
+        followUser,
+    } = useDataService();
     const isDark = useDarkMode();
-    const [focusMode, _] = useState(!false);
+    const [focusMode] = useState(true);
 
     const [post, setPost] = useState(null);
     const [likes, setLikes] = useState(0);
     const [author, setAuthor] = useState(null);
-    const [comments, setComments] = useState(0);
+    // const [comments, setComments] = useState(0);
     const [following, setFollowing] = useState(false);
     const [loading, setLoading] = useState(true);
     const [isLiked, setIsLiked] = useState(false);
+    const [isDisliked, setIsDisliked] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
 
     const viewCounted = useViewTracker(postId);
@@ -75,6 +85,10 @@ const ViewPost = () => {
                     !!currentUser &&
                         !!currentUser.likedPosts.includes(postData._id),
                 );
+                setIsDisliked(
+                    !!currentUser &&
+                        !!currentUser.dislikedPosts.includes(postData._id),
+                );
                 setIsSaved(
                     !!currentUser &&
                         !!currentUser.savedPosts.includes(postData._id),
@@ -91,7 +105,6 @@ const ViewPost = () => {
                 setAuthor(authorProfile);
             } catch (err) {
                 console.error("Failed to load post", err);
-                navigate("/404");
             } finally {
                 setLoading(false);
             }
@@ -106,12 +119,25 @@ const ViewPost = () => {
     }, [viewCounted]);
 
     async function handleLike(postId) {
+        // remove dislike first if needed
+        if (isDisliked) {
+            let removeDislikeRes = await dislikePost(postId);
+            if (removeDislikeRes.success) {
+                setIsDisliked(false);
+            } else {
+                toast.error("Failed to remove dislike");
+                return;
+            }
+        }
+
+        // now like
         let res = await likePost(postId);
         if (res.success) {
             toast.success(res.message);
             if (res.increase === "increase") {
                 setLikes(likes + 1);
             } else {
+                // removing like -- toggle action
                 setLikes(likes - 1);
             }
             setIsLiked(!isLiked);
@@ -119,6 +145,32 @@ const ViewPost = () => {
             toast.error(res.message);
         }
     }
+
+    async function handleDislike(postId) {
+        // remove like first if needed
+        if (isLiked) {
+            let removeLikeRes = await likePost(postId);
+            if (removeLikeRes.success) {
+                setIsLiked(false);
+                if (removeLikeRes.increase === "decrease") {
+                    setLikes(likes - 1);
+                }
+            } else {
+                toast.error("Failed to remove like");
+                return;
+            }
+        }
+
+        // now handle the dislike
+        let res = await dislikePost(postId);
+        if (res.success) {
+            toast.success(res.message);
+            setIsDisliked(!isDisliked);
+        } else {
+            toast.error(res.message);
+        }
+    }
+
     async function handleSave(postId) {
         let res = await savePost(postId);
         if (res.success) {
@@ -128,6 +180,7 @@ const ViewPost = () => {
             toast.error(res.message);
         }
     }
+
     async function handleFollow(personToFollow) {
         let res = await followUser(personToFollow);
         if (res.success) {
@@ -138,7 +191,7 @@ const ViewPost = () => {
         }
     }
 
-    // use skeleton later
+    // will use skeleton later
     if (loading)
         return (
             <div className="flex justify-center items-center h-screen text-black dark:text-white">
@@ -146,27 +199,29 @@ const ViewPost = () => {
             </div>
         );
 
-    // navigated, but still
     if (!post)
         return (
-            <div className="flex justify-center items-center h-screen text-black dark:text-white">
-                Post not found
+            <div className="">
+                <Header />
+                <div className="flex text-base flex-col justify-center items-center h-screen text-black dark:text-white gap-3">
+                    Post not found
+                    <button
+                        className="rounded-md text-sm bg-cream hover:bg-cream-dark box-content px-2 py-1 text-stone-600/80 flex items-center justify-center gap-2"
+                        onClick={() => {
+                            navigate(-1);
+                        }}
+                    >
+                        <ChevronLeft className="size-6" />
+                        Go Back
+                    </button>
+                </div>
             </div>
         );
 
     if (!post.isPublic)
         return (
             <div className="w-full h-full grid place-items-center bg-white dark:bg-[#111] overflow-x-hidden pt-20">
-                <Header
-                    noBlur={true}
-                    ballClr={"text-gray-300"}
-                    exclude={[
-                        "/about",
-                        "/contact",
-                        "/gallery/photos",
-                        "/gallery/literature",
-                    ]}
-                />
+                <Header noBlur={true} ballClr={"text-gray-300"} />
                 <div className="flex justify-center items-center h-screen text-black dark:text-white">
                     This Post is Private
                 </div>
@@ -200,7 +255,7 @@ const ViewPost = () => {
         "@type": "Article",
         headline: post.title,
         image: [`${window.location.origin}${post.thumbnailUrl}`],
-        datePublished: formatSchemaDate(post.publishedAt),
+        datePublished: formatSchemaDate(post.createdAt),
         dateModified: formatSchemaDate(post.modifiedAt),
         author: {
             "@type": "Person",
@@ -279,8 +334,18 @@ const ViewPost = () => {
                 <div className="flex flex-col md:flex-row max-w-screen-xl mx-auto bg-white dark:bg-[#111] text-gray-900 dark:text-gray-100">
                     {/* Left sidebar - Read Options or folder structure in case of collection */}
                     <aside
-                        className={`w-full md:w-64 p-4 ${!focusMode ? "border-r border-gray-200 dark:border-[#333]" : ""} hidden md:block`}
+                        className={`relative w-full md:w-64 p-4 ${!focusMode ? "border-r border-gray-200 dark:border-[#333]" : ""} hidden md:block`}
                     >
+                        {isArticle && (
+                            <button
+                                className="absolute top-8 right-0 rounded-full text-sm bg-cream hover:bg-cream-dark dark:bg-[#111] border box-content p-1 text-stone-600/80 dark:border-[#333]"
+                                onClick={() => {
+                                    navigate(-1);
+                                }}
+                            >
+                                <ChevronLeft className="size-6" />
+                            </button>
+                        )}
                         {!focusMode && (
                             <div className="sticky top-4">
                                 <div className="font-bold mb-4">
@@ -360,7 +425,7 @@ const ViewPost = () => {
                                     justify-between md:justify-center gap-2 md:gap-0 w-full md:w-fit mt-2 md:mt-0"
                                 >
                                     <div>
-                                        {formatDate(post.publishedAt)} ·{" "}
+                                        {formatDate(post.createdAt)} ·{" "}
                                         {post.readTime || "2 min read"}
                                     </div>
                                     <div className="flex items-center justify-center text-white">
@@ -442,6 +507,24 @@ const ViewPost = () => {
                                 <Button
                                     variant="ghost"
                                     size="sm"
+                                    className="flex items-center gap-2 hover:bg-transparent"
+                                    onClick={async () => {
+                                        if (!currentUser) {
+                                            toast.error(
+                                                "you need to log in first to dislike",
+                                            );
+                                        } else {
+                                            await handleDislike(post._id);
+                                        }
+                                    }}
+                                >
+                                    <ThumbsDown
+                                        className={`size-4 text-black dark:text-white ${isDisliked ? "fill-black dark:fill-white" : ""}`}
+                                    />
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
                                     className="flex items-center gap-2"
                                 >
                                     <MessageSquareText className="size-4" />
@@ -497,3 +580,7 @@ const ViewPost = () => {
 };
 
 export default ViewPost;
+
+ViewPost.propTypes = {
+    isArticle: PropTypes.bool,
+};

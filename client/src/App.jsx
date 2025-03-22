@@ -8,11 +8,13 @@ import LoadingPage from "./pages/Others/LoadingPage";
 import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/sonner";
 
-// Loaded with main bundle
+// loaded with main bundle
 import LandingPage from "./pages/LandingPage/LandingPage";
+import ArticleFeed from "./pages/Feeds/Articles";
+import LiteratureFeed from "./pages/Feeds/Arts";
 import "./services/fingerprintService";
 
-// Lazy loaded components
+// lazy loaded
 const LoginPage = lazy(() => import("./pages/Auth/Login"));
 const LogoutPage = lazy(() => import("./pages/Auth/Logout"));
 const AuthSuccess = lazy(() => import("./pages/Auth/AuthSuccess"));
@@ -29,17 +31,11 @@ const AboutPage = lazy(() => import("./pages/About/About"));
 const ContactPage = lazy(() => import("./pages/Contact/Contact"));
 
 const WritingPad = lazy(() => import("./pages/CreatePosts/Writing/WritingPad"));
-// const PoemPad = lazy(() => import("./pages/CreatePosts/WritePoem"));
-// const StoryPad = lazy(() => import("./pages/CreatePosts/WriteStory"));
-// const ArticlePad = lazy(() => import("./pages/CreatePosts/WriteArticle"));
 const Md2Pdf = lazy(() => import("./pages/CreatePosts/Writing/Md2pdf"));
 
 const ImageUploadPage = lazy(() => import("./pages/CreatePosts/UploadImage"));
 const PhotoGalleryPage = lazy(
     () => import("./pages/Galleries/PhotoGallery/PhotoGallery"),
-);
-const LiteratureGallery = lazy(
-    () => import("./pages/Galleries/LiteratureGallery/LiteratureGallery"),
 );
 
 const Thanks = lazy(() => import("./pages/Others/Thanks"));
@@ -69,7 +65,17 @@ export default function App() {
                     <Suspense fallback={<LoadingPage bgClr="bg-white" />}>
                         <Routes>
                             {/* public */}
+                            {/* *************** */}
                             <Route path="/" element={<LandingPage />} />
+                            <Route path="/home" element={<ArticleFeed />} />
+                            <Route path="/articles" element={<ArticleFeed />} />
+                            <Route
+                                path="/literature"
+                                element={<LiteratureFeed bgClr="bg-white" />}
+                            />
+                            {/* *************** */}
+
+                            {/* *************** */}
                             <Route
                                 path="/login"
                                 element={<LoginPage bgClr="bg-cream-light" />}
@@ -80,7 +86,9 @@ export default function App() {
                                 element={<AuthSuccess />}
                             />
                             <Route path="/logout" element={<LogoutPage />} />
+                            {/* *************** */}
 
+                            {/* *************** */}
                             <Route
                                 path="/about"
                                 element={<AboutPage bgClr="bg-white" />}
@@ -89,22 +97,23 @@ export default function App() {
                                 path="/contact"
                                 element={<ContactPage bgClr="bg-white" />}
                             />
+                            {/* *************** */}
+
+                            {/* *************** */}
                             <Route
-                                path="/gallery/photos"
+                                path="/photo-gallery"
                                 element={<PhotoGalleryPage bgClr="bg-white" />}
                             />
-                            <Route
-                                path="/gallery/literature"
-                                element={<LiteratureGallery bgClr="bg-white" />}
-                            />
-
                             <Route path="/markdown2pdf" element={<Md2Pdf />} />
+                            {/* *************** */}
 
+                            {/* *************** */}
                             <Route path="/p/:postId" element={<ViewPost />} />
                             <Route
                                 path="/u/:username"
                                 element={<PublicProfile bgClr="bg-white" />}
                             />
+                            {/* *************** */}
 
                             {/* protected */}
                             <Route element={<ProtectedRoute />}>
@@ -136,10 +145,12 @@ export default function App() {
                                     path="/createpost/article"
                                     element={<WritingPad artType={"article"} />}
                                 />
+
                                 <Route
-                                    path="/createpost/image"
+                                    path="/upload-image"
                                     element={<ImageUploadPage />}
                                 />
+
                                 <Route
                                     path="/edit-post"
                                     element={<WritingPad artType={"edit"} />}

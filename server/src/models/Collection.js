@@ -20,6 +20,10 @@ const collectionSchema = new Schema(
                 trim: true,
             },
         ],
+        thumbnailUrl: {
+            type: String,
+            trim: true,
+        },
         posts: [
             {
                 type: Schema.Types.ObjectId,

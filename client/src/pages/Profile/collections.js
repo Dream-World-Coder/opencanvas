@@ -1,4 +1,4 @@
-const collections = [
+export const collections = [
     {
         id: 1,
         type: "album",
@@ -28,5 +28,3 @@ const collections = [
         cover: "https://picsum.photos/id/17/400",
     },
 ];
-
-export default collections;

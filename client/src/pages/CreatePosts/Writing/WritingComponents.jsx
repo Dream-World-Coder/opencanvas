@@ -345,16 +345,16 @@ export const MarkdownPreview = ({
     darkBg = "bg-[#222]",
     contentOnly = false,
 }) => {
-    // Use ref to store settings for all images
+    //useref to store settings for all images individually
     const imageSettingsRef = useRef({});
 
-    // Track which image's settings are being edited
+    //to track which image's settings are being edited
     const [activeImageId, setActiveImageId] = useState(null);
 
-    // Force re-render when settings change
+    // force re-render when settings change
     const [, forceUpdate] = useState({});
 
-    // Get default settings for an image or use existing settings
+    //get the default settings for an image or use existing settings
     const getImageSettings = (imageId) => {
         if (!imageSettingsRef.current[imageId]) {
             imageSettingsRef.current[imageId] = {
@@ -368,7 +368,7 @@ export const MarkdownPreview = ({
         return imageSettingsRef.current[imageId];
     };
 
-    // Update a specific setting for an image
+    //update a specific setting for an image
     const updateImageSetting = (imageId, setting, value) => {
         const settings = getImageSettings(imageId);
         settings[setting] = value;
@@ -406,10 +406,10 @@ export const MarkdownPreview = ({
                         {/* title */}
                         {title && (
                             <div
-                                className={`font-serif mt-2 mb-10 leading-tight tracking-tight ${
+                                className={`mt-2 mb-10 leading-tight tracking-tight capitalize ${
                                     contentOnly
-                                        ? "text-3xl font-semibold"
-                                        : "text-4xl md:text-5xl font-bold"
+                                        ? "text-xl font-semibold font-sans"
+                                        : "text-4xl md:text-5xl font-bold font-serif"
                                 }`}
                             >
                                 {title}
@@ -583,10 +583,10 @@ export const MarkdownPreview = ({
 
                                 h1: ({ children }) => (
                                     <h1
-                                        className={`font-serif mt-12 mb-6 leading-tight tracking-tight ${
+                                        className={`mt-12 mb-6 leading-tight tracking-tight ${
                                             contentOnly
-                                                ? "text-3xl font-semibold"
-                                                : "text-4xl md:text-5xl font-bold"
+                                                ? "text-xl font-semibold font-sans"
+                                                : "text-4xl md:text-5xl font-bold font-serif"
                                         }`}
                                     >
                                         {children}
@@ -596,7 +596,7 @@ export const MarkdownPreview = ({
                                     <h2
                                         className={`font-serif mt-10 mb-5 leading-tight tracking-tight ${
                                             contentOnly
-                                                ? "text-2xl font-semibold"
+                                                ? "text-lg"
                                                 : "text-3xl md:text-4xl font-bold"
                                         }`}
                                     >
@@ -607,7 +607,7 @@ export const MarkdownPreview = ({
                                     <h3
                                         className={`font-serif mt-8 mb-4 leading-snug ${
                                             contentOnly
-                                                ? "text-xl font-semibold"
+                                                ? "text-base"
                                                 : "text-2xl md:text-3xl font-bold"
                                         }`}
                                     >
@@ -618,7 +618,7 @@ export const MarkdownPreview = ({
                                     <h4
                                         className={`montserrat-regular font-semibold mt-6 mb-3 leading-snug ${
                                             contentOnly
-                                                ? "text-lg"
+                                                ? "text-sm"
                                                 : "text-xl md:text-2xl"
                                         }`}
                                     >
@@ -629,7 +629,7 @@ export const MarkdownPreview = ({
                                     <h5
                                         className={`montserrat-regular font-semibold mt-5 mb-3 leading-snug ${
                                             contentOnly
-                                                ? "text-base"
+                                                ? "text-sm"
                                                 : "text-lg md:text-xl"
                                         }`}
                                     >
@@ -648,7 +648,9 @@ export const MarkdownPreview = ({
                                     </h6>
                                 ),
                                 p: ({ children }) => (
-                                    <p className="text-base md:text-lg leading-relaxed my-5 max-w-prose">
+                                    <p
+                                        className={`leading-relaxed my-5 max-w-prose ${contentOnly ? "text-xs" : "text-base md:text-lg"}`}
+                                    >
                                         {children}
                                     </p>
                                 ),
@@ -722,13 +724,15 @@ export const MarkdownPreview = ({
                                 ),
                                 th: ({ children }) => (
                                     <th
-                                        className={`border montserrat-bold ${isDark ? "border-[#ddd]" : "border-gray-300"} px-4 py-2 bg-gray-100`}
+                                        className={`border ${contentOnly ? "text-xs" : "montserrat-bold"} ${isDark ? "border-[#ddd]" : "border-gray-300"} px-4 py-2 bg-gray-100`}
                                     >
                                         {children}
                                     </th>
                                 ),
                                 td: ({ children }) => (
-                                    <td className="border montserrat-regular border-gray-300 px-4 py-2">
+                                    <td
+                                        className={`border border-gray-300 px-4 py-2 ${contentOnly ? "text-xs" : "montserrat-regular"}`}
+                                    >
                                         {children}
                                     </td>
                                 ),
@@ -927,7 +931,9 @@ export const MarkdownPreview = ({
 MarkdownPreview.propTypes = {
     title: PropTypes.any,
     content: PropTypes.any,
+    thumbnailUrl: PropTypes.any,
     isVisible: PropTypes.bool,
+    contentOnly: PropTypes.bool,
     isDark: PropTypes.bool,
     textAlignment: PropTypes.string,
     lightModeBg: PropTypes.string,
@@ -980,7 +986,7 @@ ScrollToBottomButton.propTypes = {
 export const TagInputComponent = ({
     tags,
     setTags,
-    MAX_TAGS = 4,
+    MAX_TAGS = 5,
     MAX_TAG_LENGTH = 30,
 }) => {
     const [inputValue, setInputValue] = useState("");
@@ -1056,7 +1062,7 @@ export const TagInputComponent = ({
                 <Input
                     id="tags"
                     value={inputValue}
-                    placeholder="Ex: history, physics, deeplearning"
+                    placeholder="Ex: cs, deeplearning, physics"
                     className="col-span-4"
                     onChange={handleInputChange}
                 />
@@ -1086,6 +1092,12 @@ export const TagInputComponent = ({
             </div>
         </div>
     );
+};
+TagInputComponent.propTypes = {
+    tags: PropTypes.array,
+    setTags: PropTypes.func,
+    MAX_TAGS: PropTypes.number,
+    MAX_TAG_LENGTH: PropTypes.number,
 };
 
 export const ThumbnailUploader = ({ artType = "article", maxSize = 5 }) => {
@@ -1241,6 +1253,10 @@ export const ThumbnailUploader = ({ artType = "article", maxSize = 5 }) => {
         </div>
     );
 };
+ThumbnailUploader.propTypes = {
+    artType: PropTypes.string,
+    maxSize: PropTypes.number,
+};
 
 export const PublicPreferenceInput = ({ isPublic, setIsPublic }) => {
     return (
@@ -1263,6 +1279,44 @@ export const PublicPreferenceInput = ({ isPublic, setIsPublic }) => {
         </div>
     );
 };
+PublicPreferenceInput.propTypes = {
+    setIsPublic: PropTypes.func,
+    isPublic: PropTypes.bool,
+};
+
+export function findAndReplace(content, setContent, toast) {
+    try {
+        // Get search term from user
+        const searchTerm = prompt("Enter text to find:");
+        if (!searchTerm) return;
+
+        // Get replacement text
+        const replaceTerm = prompt("Enter replacement text:");
+        if (replaceTerm === null) return;
+
+        // Escape special regex characters in the search term
+        const escapedSearchTerm = searchTerm.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            "\\$&",
+        );
+
+        // Replace all occurrences in content
+        const regex = new RegExp(escapedSearchTerm, "g");
+        const newContent = content.replace(regex, replaceTerm);
+
+        // Update content state
+        setContent(newContent);
+
+        // Count occurrences for the message
+        const occurrences = (content.match(regex) || []).length;
+        toast.success(
+            `Replaced ${occurrences} occurrence${occurrences !== 1 ? "s" : ""} of "${searchTerm}"`,
+        );
+    } catch (error) {
+        toast.error("Error during find & replace");
+        console.error(error);
+    }
+}
 
 /*
     // Bottom Bar

@@ -11,6 +11,7 @@ import {
     CircleCheck,
 } from "lucide-react";
 import ProfileHeader from "../../components/Header/ProfileHeader";
+import ProfileFooter from "../../components/Footer/ProfileFooter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -283,7 +284,7 @@ const PublicProfile = () => {
                 </script>
             </Helmet>
             <div
-                className={`min-h-screen bg-white dark:bg-black dark:text-white font-sans`} //bg-cream-light
+                className={`min-h-screen bg-white dark:bg-[#111] dark:text-white font-sans`} //bg-cream-light
             >
                 <ProfileHeader />
 
@@ -347,9 +348,9 @@ const PublicProfile = () => {
                                                 <Skeleton className="h-6 w-1/2" />
                                             </div>
                                         ) : (
-                                            <h1 className="text-4xl md:text-5xl font-[montserrat] leading-[0.95] tracking-tighter pointer-events-none md:pointer-events-auto capitalize dark:text-[#f8f8f8]">
+                                            <h1 className="text-3xl md:text-4xl font-[montserrat] leading-[0.95] tracking-tighter pointer-events-none md:pointer-events-auto capitalize dark:text-[#f8f8f8]">
                                                 {currentProfile.fullName}
-                                                <span className="block mt-2 text-xl md:text-3xl font-normal tracking-normal capitalize dark:text-[#e0e0e0]">
+                                                <span className="block mt-2 text-xl md:text-2xl font-normal tracking-normal capitalize dark:text-[#e0e0e0]">
                                                     {currentProfile.role}
                                                 </span>
                                             </h1>
@@ -483,7 +484,7 @@ const PublicProfile = () => {
                         {posts.length > 0 && (
                             <div
                                 id="post-view"
-                                className="border-b border-gray-200 dark:border-gray-800 mb-8"
+                                className="border-b border-gray-200 dark:border-[#333] mb-8"
                             >
                                 <div className="flex overflow-x-auto no-scrollbar space-x-6 md:space-x-10">
                                     <button
@@ -685,7 +686,7 @@ const PublicProfile = () => {
                                             </div>
 
                                             {/* divider */}
-                                            <div className="mt-8 border-b border-gray-100 dark:border-gray-800"></div>
+                                            <div className="mt-8 border-b border-gray-100 dark:border-[#333]"></div>
                                         </div>
                                     ),
                             )}
@@ -710,6 +711,7 @@ const PublicProfile = () => {
                         )}
                     </div>
                 </main>
+                <ProfileFooter></ProfileFooter>
             </div>
         </>
     );
