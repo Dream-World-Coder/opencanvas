@@ -19,6 +19,9 @@ blockquote {
     font-optical-sizing: auto;
     font-weight: 400;
     font-style: normal;
+    & p {
+        /* line-height: 40px !important; */
+    }
 }
 .montserrat-bold {
     font-family: "Montserrat", sans-serif;

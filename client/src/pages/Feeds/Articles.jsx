@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import Header from "../../components/Header/Header";
+import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
 import { useAuth } from "../../contexts/AuthContext";
 import { useDarkMode } from "../../components/Hooks/darkMode";
 
@@ -22,7 +23,7 @@ const ArticleFeed = () => {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
     const isDark = useDarkMode();
-    const [focusMode, setFocusMode] = useState(false);
+    const [focusMode] = useState(!false);
     const [selectedTopics, setSelectedTopics] = useState([]);
 
     // Feed state
@@ -253,24 +254,6 @@ const ArticleFeed = () => {
         });
     };
 
-    // Truncate content for excerpt
-    const createExcerpt = (content) => {
-        if (!content) return "";
-        // Strip markdown syntax for cleaner excerpt
-        const plainText = content
-            .replace(/#{1,6}\s/g, "") // Remove headings
-            .replace(/\*\*/g, "") // Remove bold
-            .replace(/\*/g, "") // Remove italic
-            .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // Replace links with just the text
-            .replace(/!\[.*?\]\(.*?\)/g, "[image]") // Replace images
-            .replace(/```[\s\S]*?```/g, "[code]") // Replace code blocks
-            .replace(/`([^`]+)`/g, "$1"); // Replace inline code
-
-        return plainText.length > 500
-            ? plainText.substring(0, 500) + "..."
-            : plainText;
-    };
-
     const feedOptions = [
         { name: "For You", href: "#" },
         { name: "Following", href: "#" },
@@ -384,12 +367,8 @@ const ArticleFeed = () => {
 
                     {/* Main content - Feed */}
                     <main
-                        className={`flex-1 p-4 md:p-6 lg:p-8 min-h-screen ${!focusMode ? "border-r border-gray-200 dark:border-[#333]" : ""}`}
+                        className={`flex-1 p-4 min-h-screen ${!focusMode ? "border-r border-gray-200 dark:border-[#333]" : ""}`}
                     >
-                        <h1 className="text-2xl font-bold mb-6">
-                            Discover Posts
-                        </h1>
-
                         {/* Error display */}
                         {error && !loading && posts.length === 0 && (
                             <div className="p-4 mb-6 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400">
@@ -405,7 +384,7 @@ const ArticleFeed = () => {
                         )}
 
                         {/* Posts Feed */}
-                        <div className="space-y-8">
+                        <div className="space-y-4">
                             {posts.map((post, index) => {
                                 // If it's the last post, attach ref for infinite scrolling
                                 if (posts.length === index + 1) {
@@ -419,7 +398,7 @@ const ArticleFeed = () => {
                                             }
                                         >
                                             {post.thumbnailUrl && (
-                                                <div className="h-48 overflow-hidden">
+                                                <div className="h-72 overflow-hidden">
                                                     <img
                                                         src={post.thumbnailUrl}
                                                         alt={post.title}
@@ -461,14 +440,28 @@ const ArticleFeed = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <h2 className="text-xl font-bold mb-2">
-                                                    {post.title}
-                                                </h2>
-                                                <p className="text-gray-700 dark:text-gray-300 mb-4 text-sm">
-                                                    {createExcerpt(
-                                                        post.content,
-                                                    )}
-                                                </p>
+                                                <div className="relative mb-4 max-h-[250px] overflow-hidden">
+                                                    <div className="prose prose-sm dark:prose-invert">
+                                                        <MarkdownPreview
+                                                            title={post.title}
+                                                            content={
+                                                                post.content.slice(
+                                                                    0,
+                                                                    500,
+                                                                ) + "..." || ""
+                                                            }
+                                                            thumbnailUrl={
+                                                                post.thumbnailUrl
+                                                            }
+                                                            isDark={isDark}
+                                                            darkBg="bg-[#111]"
+                                                            textAlignment="left"
+                                                            insidePost={true}
+                                                            contentOnly={true}
+                                                        />
+                                                    </div>
+                                                    <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white dark:from-[#111] to-transparent"></div>
+                                                </div>
 
                                                 {post.topics &&
                                                     post.topics.length > 0 && (
@@ -511,7 +504,7 @@ const ArticleFeed = () => {
                                             }
                                         >
                                             {post.thumbnailUrl && (
-                                                <div className="h-48 overflow-hidden">
+                                                <div className="h-72 overflow-hidden">
                                                     <img
                                                         src={post.thumbnailUrl}
                                                         alt={post.title}
@@ -553,19 +546,33 @@ const ArticleFeed = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <h2 className="text-xl font-bold mb-2">
-                                                    {post.title}
-                                                </h2>
-                                                <p className="text-gray-700 dark:text-gray-300 mb-4 text-sm">
-                                                    {createExcerpt(
-                                                        post.content,
-                                                    )}
-                                                </p>
+                                                <div className="relative mb-4 max-h-[250px] overflow-hidden">
+                                                    <div className="prose prose-sm dark:prose-invert">
+                                                        <MarkdownPreview
+                                                            title={post.title}
+                                                            content={
+                                                                post.content.slice(
+                                                                    0,
+                                                                    500,
+                                                                ) + "..." || ""
+                                                            }
+                                                            thumbnailUrl={
+                                                                post.thumbnailUrl
+                                                            }
+                                                            isDark={isDark}
+                                                            darkBg="bg-[#111]"
+                                                            textAlignment="left"
+                                                            insidePost={true}
+                                                            contentOnly={true}
+                                                        />
+                                                    </div>
+                                                    <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white dark:from-[#111] to-transparent"></div>
+                                                </div>
 
-                                                {post.topics &&
-                                                    post.topics.length > 0 && (
+                                                {!post.tags &&
+                                                    post.tags.length > 0 && (
                                                         <div className="flex flex-wrap gap-2 mb-4">
-                                                            {post.topics.map(
+                                                            {post.tags.map(
                                                                 (topic) => (
                                                                     <span
                                                                         key={
@@ -580,7 +587,7 @@ const ArticleFeed = () => {
                                                         </div>
                                                     )}
 
-                                                <div className="flex items-center text-gray-500 text-sm">
+                                                <div className="flex flex-row gap-2 items-center text-gray-500 text-sm">
                                                     <div className="flex items-center">
                                                         <Eye className="h-4 w-4 mr-1" />
                                                         {post.totalViews || 0}
