@@ -30,11 +30,15 @@ router.post("/feed/anonymous-user", async (req, res) => {
 
         // If cursor is provided, only fetch posts with lower anonymousEngageMentScore
         // This assumes anonymousEngageMentScore is a numeric value
+        // Add these debug logs to investigate the issue
         if (cursor) {
             try {
-                const cursorData = JSON.parse(
-                    Buffer.from(cursor, "base64").toString("utf-8"),
-                );
+                // console.log("Raw cursor:", cursor);
+                const decodedString = Buffer.from(cursor, "base64").toString("utf-8");
+                // console.log("Decoded string:", decodedString);
+                const cursorData = JSON.parse(decodedString);
+                // console.log("Parsed cursor data:", cursorData);
+
                 query.anonymousEngageMentScore = { $lt: cursorData.score };
 
                 // If there are posts with the same score, use _id to break the tie
@@ -44,12 +48,14 @@ router.post("/feed/anonymous-user", async (req, res) => {
                         {
                             anonymousEngageMentScore: cursorData.score,
                             _id: {
-                                $lt: mongoose.Types.ObjectId(cursorData.lastId),
+                                $lt: new mongoose.Types.ObjectId(cursorData.lastId),
                             },
                         },
                     ];
                 }
+
             } catch (error) {
+                console.error("Cursor parsing error:", error);
                 return res.status(400).json({
                     success: false,
                     message: "Invalid cursor format",
@@ -66,7 +72,7 @@ router.post("/feed/anonymous-user", async (req, res) => {
         const posts = await Post.find(query, {
             totalDislikes: 0,
             viewedBy: 0,
-            anonymousEngageMentScore: 0,
+            // anonymousEngageMentScore: 0,
             engagementScore: 0,
             totalCompleteReads: 0,
             media: 0,
@@ -92,11 +98,13 @@ router.post("/feed/anonymous-user", async (req, res) => {
                 score: lastPost.anonymousEngageMentScore,
                 lastId: lastPost._id.toString(),
             };
-            nextCursor = Buffer.from(JSON.stringify(cursorData)).toString(
-                // nextCursor = Buffer.from(cursorData).toString(
-                //
-                "base64",
-            );
+
+            // Add these debug logs
+            // console.log("Creating cursor with data:", cursorData);
+            const jsonString = JSON.stringify(cursorData);
+            // console.log("JSON string:", jsonString);
+            nextCursor = Buffer.from(jsonString).toString("base64");
+            // console.log("Final nextCursor:", nextCursor);
         }
 
         // Return the posts with cursor information

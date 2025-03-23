@@ -684,6 +684,7 @@ router.post("/author/posts/byids", async (req, res) => {
 
         const posts = await Post.find({
             _id: { $in: postIds },
+            isPublic: true,
         })
             .select("-totalDislikes -viewedBy -media")
             .sort({ createdAt: -1 }); // new first

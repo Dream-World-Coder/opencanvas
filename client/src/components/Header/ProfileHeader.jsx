@@ -2,17 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronUp, ChevronDown, Plus, Menu, X, Settings } from "lucide-react";
 import { createOptions } from "./createOptions";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { useDataService } from "../../services/dataService";
 
 const navLinks = [
@@ -72,34 +61,6 @@ export default function ProfileHeader() {
                             {link.label}
                         </button>
                     ))}
-
-                    <AlertDialog>
-                        <AlertDialogTrigger className="hover:bg-red-300/80 dark:hover:bg-red-800/80 rounded-md px-3 py-1 box-content">
-                            Logout
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                    Are you sure to logout?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    This action will remove your current
-                                    session. You can login later.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                    className="bg-red-600 hover:bg-red-500"
-                                    onClick={() => {
-                                        navigate("/logout");
-                                    }}
-                                >
-                                    Continue
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
 
                     <button
                         className="size-6"
@@ -245,12 +206,6 @@ export default function ProfileHeader() {
                             className="block px-4 py-2 hover:bg-lime-300/60 rounded-md text-left w-full"
                         >
                             Settings
-                        </button>
-                        <button
-                            onClick={() => navigate("/logout")}
-                            className="block px-4 py-2 text-red-700 hover:bg-red-300/60 rounded-md text-left w-full"
-                        >
-                            Logout
                         </button>
                     </div>
                 </div>

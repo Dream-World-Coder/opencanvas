@@ -32,6 +32,18 @@ import {
     Trash2,
     PlusCircle,
 } from "lucide-react";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
 import { useAuth } from "../../contexts/AuthContext";
 import { useDataService } from "../../services/dataService";
 
@@ -470,6 +482,34 @@ const ProfileSettings = () => {
                         </div>
                     ))}
                 </div>
+
+                <AlertDialog>
+                    <AlertDialogTrigger className="hover:bg-red-300/80 dark:hover:bg-red-800/80 rounded-md px-3 py-1 box-content">
+                        Logout
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>
+                                Are you sure to logout?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This action will remove your current session.
+                                You can login later.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                                className="bg-red-600 hover:bg-red-500"
+                                onClick={() => {
+                                    navigate("/logout");
+                                }}
+                            >
+                                Continue
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
 
                 {/* save-cancel buttons */}
                 {/* <div className="flex justify-end gap-2">

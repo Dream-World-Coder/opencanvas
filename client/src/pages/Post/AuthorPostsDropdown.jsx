@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import PropTypes from "prop-types";
 import {
     ChevronDown,
     ChevronUp,
@@ -85,25 +85,22 @@ export const AuthorPostsDropdown = ({ author, currentPostId }) => {
             </div>
 
             {isOpen && (
-                <div className="grid gap-4 mt-4 transition-all duration-300">
+                <div className="space-y-6 transition-all duration-300">
                     {loading
-                        ? // Skeleton loaders while fetching
-                          Array(4)
+                        ? Array(3)
                               .fill()
                               .map((_, index) => (
-                                  <Card
+                                  <div
                                       key={`skeleton-${index}`}
-                                      className="overflow-hidden dark:bg-[#222] dark:border-none"
+                                      className="flex space-x-4"
                                   >
-                                      <CardContent className="p-4 flex">
-                                          <Skeleton className="h-16 w-16 rounded-md flex-shrink-0 mr-3" />
-                                          <div className="flex-1">
-                                              <Skeleton className="h-6 w-3/4 mb-2" />
-                                              <Skeleton className="h-4 w-1/2 mb-2" />
-                                              <Skeleton className="h-4 w-1/4" />
-                                          </div>
-                                      </CardContent>
-                                  </Card>
+                                      <Skeleton className="h-16 w-16 rounded-sm flex-shrink-0" />
+                                      <div className="flex-1">
+                                          <Skeleton className="h-4 w-3/4 mb-2" />
+                                          <Skeleton className="h-3 w-1/2 mb-2" />
+                                          <Skeleton className="h-3 w-1/4" />
+                                      </div>
+                                  </div>
                               ))
                         : publicPosts.map((post) => (
                               <div
@@ -111,53 +108,53 @@ export const AuthorPostsDropdown = ({ author, currentPostId }) => {
                                   onClick={() => {
                                       navigate(`/p/${post._id}`);
                                   }}
-                                  className="p-6 rounded-xl border border-gray-100 dark:border-[#222] bg-white dark:bg-[#111] shadow-sm hover:shadow-md transition-all duration-300 relative"
+                                  className="flex flex-col border dark:border-[#333] hover:bg-gray-50 dark:hover:bg-gray-900 p-3 rounded-xl transition-all duration-200 cursor-pointer"
                               >
-                                  <div className="flex justify-between items-start mb-4">
-                                      <h3 className="font-medium text-3xl dark:text-[#f0f0f0] capitalize">
-                                          {post.title}
-                                      </h3>
-                                  </div>
+                                  <div className="flex space-x-4">
+                                      {post.thumbnailUrl && (
+                                          <div className="flex-shrink-0 w-20 h-20 overflow-hidden rounded-sm">
+                                              <img
+                                                  src={post.thumbnailUrl}
+                                                  alt={post.title}
+                                                  className="object-cover w-full h-full"
+                                                  loading="lazy"
+                                              />
+                                          </div>
+                                      )}
 
-                                  {post.thumbnailUrl && (
-                                      <div className="mb-4 overflow-hidden rounded-lg aspect-video">
-                                          <img
-                                              src={post.thumbnailUrl}
-                                              alt={post.title}
-                                              className="object-cover w-full h-full"
-                                              loading="lazy"
-                                          />
-                                      </div>
-                                  )}
-
-                                  <div className="flex items-center justify-between border-t border-gray-100 dark:border-[#222] pt-4 mt-2">
-                                      <div className="flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400">
-                                          <div className="flex items-center">
-                                              <Eye className="w-4 h-4 mr-1 text-gray-500" />
-                                              <span>{post.totalViews}</span>
+                                      <div className="flex-1">
+                                          <h3 className="font-medium text-lg text-gray-900 dark:text-gray-100 line-clamp-2 capitalize">
+                                              {post.title}
+                                          </h3>
+                                          <div className="flex items-center mt-2 text-xs text-gray-500 dark:text-gray-400 space-x-3">
+                                              <div className="flex items-center">
+                                                  <Eye className="w-3 h-3 mr-1" />
+                                                  <span>{post.totalViews}</span>
+                                              </div>
+                                              <div>·</div>
+                                              <div className="flex items-center">
+                                                  <ThumbsUp className="w-3 h-3 mr-1" />
+                                                  <span>{post.totalLikes}</span>
+                                              </div>
+                                              <div>·</div>
+                                              <div>{post.readTime}</div>
                                           </div>
-                                          <div className="flex items-center">
-                                              <ThumbsUp className="w-4 h-4 mr-1 text-gray-500" />
-                                              <span>{post.totalLikes}</span>
-                                          </div>
-                                          <div className="flex items-center">
-                                              <MessageSquare className="w-4 h-4 mr-1 text-gray-500" />
-                                              <span>{post.totalComments}</span>
-                                          </div>
-                                      </div>
-                                      <div className="text-sm">
-                                          {post.readTime}
                                       </div>
                                   </div>
                               </div>
                           ))}
                     {publicPosts.length === 0 && !loading && (
-                        <div className="text-center py-4 text-gray-500 dark:text-gray-400">
-                            No public posts available from this author.
+                        <div className="text-center py-8 text-gray-500 dark:text-gray-400 italic text-sm">
+                            No stories published yet.
                         </div>
                     )}
                 </div>
             )}
         </div>
     );
+};
+
+AuthorPostsDropdown.propTypes = {
+    author: PropTypes.object,
+    currentPostId: PropTypes.string,
 };

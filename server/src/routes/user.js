@@ -280,6 +280,12 @@ router.put(
                     .status(400)
                     .json({ success: false, message: `${itemType} not found` });
             }
+            if (!item.isPublic) {
+                return res.status(400).json({
+                    success: false,
+                    message: `${itemType} is private, make public first`,
+                });
+            }
 
             if (
                 user.featuredItems

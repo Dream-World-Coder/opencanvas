@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 import Header from "../../components/Header/Header";
+import Footer from "../../components/Footer/Footer";
 import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
 import { AuthorPostsDropdown } from "./AuthorPostsDropdown";
 import { RelatedPostsDropdown } from "./RelatedPostsDropdown";
@@ -331,7 +332,7 @@ const ViewPost = ({ isArticle = true }) => {
                         "/gallery/literature",
                     ]}
                 />
-                <div className="flex flex-col md:flex-row max-w-screen-xl mx-auto bg-white dark:bg-[#111] text-gray-900 dark:text-gray-100">
+                <div className="flex flex-col md:flex-row min-h-screen max-w-screen-xl mx-auto bg-white dark:bg-[#111] text-gray-900 dark:text-gray-100">
                     {/* Left sidebar - Read Options or folder structure in case of collection */}
                     <aside
                         className={`relative w-full md:w-64 p-4 ${!focusMode ? "border-r border-gray-200 dark:border-[#333]" : ""} hidden md:block`}
@@ -574,6 +575,8 @@ const ViewPost = ({ isArticle = true }) => {
                         <div className="sticky top-4"></div>
                     </aside>
                 </div>
+
+                <Footer />
             </div>
         </>
     );
