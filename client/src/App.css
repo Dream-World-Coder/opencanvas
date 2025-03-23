@@ -19,9 +19,6 @@ blockquote {
     font-optical-sizing: auto;
     font-weight: 400;
     font-style: normal;
-    & p {
-        /* line-height: 40px !important; */
-    }
 }
 .montserrat-bold {
     font-family: "Montserrat", sans-serif;
@@ -87,4 +84,14 @@ article p {
     .desktop-xl {
         padding-top: 24%;
     }
+}
+
+/* Hide scrollbar for WebKit (Chrome, Safari, Edge) */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for Firefox */
+.scrollbar-hide {
+    scrollbar-width: none;
 }

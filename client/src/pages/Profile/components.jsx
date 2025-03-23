@@ -1,6 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
-import { Eye, Edit, Trash2, MoreHorizontal, Share2 } from "lucide-react";
+import {
+    Eye,
+    Edit,
+    Trash2,
+    MoreHorizontal,
+    Share2,
+    Info,
+    Copy,
+} from "lucide-react";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -91,7 +99,7 @@ export const PostActions = ({ post, setPosts, loading }) => {
         <div className="bg-gray-100 dark:bg-gray-800 rounded-lg backdrop-blur-sm flex items-center cursor-pointer">
             {/* view */}
             <div
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
+                className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full"
                 title="View"
                 onClick={(e) => {
                     e.stopPropagation();
@@ -106,7 +114,7 @@ export const PostActions = ({ post, setPosts, loading }) => {
 
             {/* edit */}
             <div
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
+                className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full"
                 title="Edit"
                 onClick={(e) => {
                     e.stopPropagation();
@@ -122,7 +130,7 @@ export const PostActions = ({ post, setPosts, loading }) => {
 
             {/* delete */}
             <AlertDialog title="Delete">
-                <AlertDialogTrigger className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full">
+                <AlertDialogTrigger className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full">
                     <Trash2
                         title="Delete"
                         className="w-4 h-4 text-gray-600 dark:text-gray-300"
@@ -166,7 +174,7 @@ export const PostActions = ({ post, setPosts, loading }) => {
                 title="More"
                 onClick={(e) => e.stopPropagation()}
             >
-                <DropdownMenuTrigger className="p-2 box-content hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full">
+                <DropdownMenuTrigger className="p-2 box-content hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full">
                     <MoreHorizontal className="w-4 h-4 text-gray-600 dark:text-gray-300" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -205,6 +213,8 @@ export const PostActions = ({ post, setPosts, loading }) => {
                                 );
                                 if (tmp.success) {
                                     toast.success(tmp.message);
+                                } else {
+                                    toast.error(tmp.response.data.message);
                                 }
                             }}
                             className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
@@ -225,7 +235,41 @@ export const PostActions = ({ post, setPosts, loading }) => {
                     e.stopPropagation();
                     sharePost(post);
                 }}
-                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
+            >
+                <Share2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+            </div>
+        </div>
+    );
+};
+
+export const PostActionsPublic = ({ post }) => {
+    const navigate = useNavigate();
+
+    return (
+        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg backdrop-blur-sm flex items-center cursor-pointer">
+            {/* view */}
+            <div
+                className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full"
+                title="View"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/p/${post._id}`);
+                }}
+            >
+                <Eye
+                    title="View"
+                    className="w-4 h-4 text-gray-600 dark:text-gray-300 rounded-full"
+                />
+            </div>
+
+            {/* share */}
+            <div
+                onClick={(e) => {
+                    e.stopPropagation();
+                    sharePost(post);
+                }}
+                className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
             >
                 <Share2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
             </div>
@@ -237,4 +281,54 @@ PostActions.propTypes = {
     post: PropTypes.object,
     setPosts: PropTypes.func,
     loading: PropTypes.bool,
+};
+PostActionsPublic.propTypes = {
+    post: PropTypes.object,
+};
+
+export const FollowUnfollow = ({ currentProfile }) => {
+    return (
+        <AlertDialog>
+            <AlertDialogTrigger className="flex items-center justify-center gap-2">
+                <Info className="size-5" /> Contact
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Contact Information</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        {currentProfile.contactInformation.map(
+                            (item, index) => (
+                                <div key={index} className="mb-3">
+                                    <h3 className="flex items-center justify-between font-semibold text-[#111]">
+                                        {item.title}
+
+                                        <button
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(
+                                                    item.url,
+                                                );
+                                                toast.success(
+                                                    "url copied to clipboard",
+                                                );
+                                            }}
+                                        >
+                                            <Copy />
+                                        </button>
+                                    </h3>
+                                    <div className="text-xs">{item.url}</div>
+                                </div>
+                            ),
+                        )}
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>Close</AlertDialogCancel>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+    );
+};
+
+FollowUnfollow.propTypes = {
+    currentProfile: PropTypes.object,
 };

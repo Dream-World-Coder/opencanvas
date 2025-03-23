@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import {
     Share2,
@@ -196,7 +196,7 @@ const Profile = () => {
             >
                 <ProfileHeader />
 
-                <main className="pt-32 px-2 md:px-8">
+                <main className="pt-32 px-2 md:px-8 min-h-screen">
                     <div className="max-w-7xl mx-auto pb-[20vh]">
                         {/* <div className="grid md:grid-cols-[1.62fr,1fr] gap-16 mb-24 border border-black"> */}
                         <div className="flex justify-between items-start gap-16 mb-24">
@@ -286,11 +286,15 @@ const Profile = () => {
                                         Featured Works
                                     </span>
                                 </h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                <div
+                                    // data-lenis-prevent
+                                    // className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 grid-rows-1 overflow-x-auto scrollbar-hide"
+                                    className="flex gap-6 overflow-x-auto scrollbar-hide flex-nowrap"
+                                >
                                     {currentUser.featuredItems.map((item) => (
                                         <div
                                             key={item.itemId}
-                                            className="group cursor-pointer"
+                                            className="group cursor-pointer min-w-[200px] md:min-w-[300px] max-w-[200px] md:max-w-[300px]"
                                             onClick={() => {
                                                 item.itemType === "Post"
                                                     ? navigate(

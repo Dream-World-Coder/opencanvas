@@ -4,23 +4,13 @@ import { toast } from "sonner";
 export const useDataService = () => {
     const { authAxios } = useAuth();
 
-    // User related functions
-    // const getUserProfile = async (userId) => {
-    //     try {
-    //         const response = await authAxios.get(`/users/${userId}`);
-    //         return response.data;
-    //     } catch (error) {
-    //         console.error("Error fetching user profile:", error);
-    //         throw error;
-    //     }
-    // };
-
     const getAuthorProfile = async (authorId) => {
         try {
             const response = await authAxios.get(`/author/${authorId}`);
             return response.data.author;
         } catch (error) {
             console.error("Error fetching author profile:", error);
+            toast.error("Error fetching author profile:", error);
             throw error;
         }
     };
@@ -33,6 +23,7 @@ export const useDataService = () => {
             return response.data;
         } catch (error) {
             console.error("Error following user:", error);
+            toast.error("Error following user:", error);
             throw error;
         }
     };
@@ -50,7 +41,7 @@ export const useDataService = () => {
             return response.data;
         } catch (error) {
             console.error("Error updating user profile:", error);
-            toast("Error updating user profile:", error);
+            toast.error("Error updating user profile:", error);
             throw error;
         }
     };
@@ -64,8 +55,7 @@ export const useDataService = () => {
             return response.data;
         } catch (error) {
             console.error("Error changing featured settings:", error);
-            toast("Error changing featured settings:", error);
-            throw error;
+            return error;
         }
     };
 
@@ -77,7 +67,7 @@ export const useDataService = () => {
             return response.data.newPostId;
         } catch (error) {
             console.error("Error creating post:", error);
-            toast("Error getting post id");
+            toast.error("Error getting post id");
             throw error;
         }
     };
@@ -103,6 +93,7 @@ export const useDataService = () => {
             return response.data;
         } catch (error) {
             console.error("Error deleting post:", error);
+            toast.error("Error deleting post:", error);
             throw error;
         }
     };
@@ -116,6 +107,7 @@ export const useDataService = () => {
             return response.data;
         } catch (error) {
             console.error("Error changing visibility of the post:", error);
+            toast.error("Error changing visibility of the post:", error);
             throw error;
         }
     };
@@ -126,6 +118,7 @@ export const useDataService = () => {
             return response.data;
         } catch (error) {
             console.error("Error liking post:", error);
+            toast.error("Error liking post:", error);
             throw error;
         }
     };
@@ -138,6 +131,7 @@ export const useDataService = () => {
             return response.data;
         } catch (error) {
             console.error("Error disliking post:", error);
+            toast.error("Error disliking post:", error);
             throw error;
         }
     };
@@ -150,6 +144,7 @@ export const useDataService = () => {
             return response.data;
         } catch (error) {
             console.error("Error saving post:", error);
+            toast.error("Error saving post:", error);
             throw error;
         }
     };
@@ -164,6 +159,7 @@ export const useDataService = () => {
             return response.data;
         } catch (error) {
             console.error("Error creating collection:", error);
+            toast.error("Error creating collection:", error);
             throw error;
         }
     };
@@ -174,6 +170,7 @@ export const useDataService = () => {
             return response.data.collections;
         } catch (error) {
             console.error("Error fetching user collections:", error);
+            toast.error("Error fetching user collections:", error);
             throw error;
         }
     };
@@ -186,6 +183,7 @@ export const useDataService = () => {
             return response.data.collection;
         } catch (error) {
             console.error("Error fetching collection:", error);
+            toast.error("Error fetching collection:", error);
             throw error;
         }
     };
@@ -199,6 +197,7 @@ export const useDataService = () => {
             return response.data;
         } catch (error) {
             console.error("Error updating collection:", error);
+            toast.error("Error updating collection:", error);
             throw error;
         }
     };
@@ -211,6 +210,7 @@ export const useDataService = () => {
             return response.data;
         } catch (error) {
             console.error("Error deleting collection:", error);
+            toast.error("Error deleting collection:", error);
             throw error;
         }
     };
@@ -223,6 +223,7 @@ export const useDataService = () => {
             return response.data;
         } catch (error) {
             console.error("Error adding post to collection:", error);
+            toast.error("Error adding post to collection:", error);
             throw error;
         }
     };
@@ -235,6 +236,7 @@ export const useDataService = () => {
             return response.data;
         } catch (error) {
             console.error("Error removing post from collection:", error);
+            toast.error("Error removing post from collection:", error);
             throw error;
         }
     };

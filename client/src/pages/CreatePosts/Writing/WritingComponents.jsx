@@ -649,7 +649,7 @@ export const MarkdownPreview = ({
                                 ),
                                 p: ({ children }) => (
                                     <p
-                                        className={`leading-relaxed my-5 max-w-prose ${contentOnly ? "text-xs" : "text-base md:text-lg"}`}
+                                        className={`my-5 max-w-prose ${contentOnly ? "text-xs leading-relaxed" : "text-base md:text-lg md:leading-[40px]"}`}
                                     >
                                         {children}
                                     </p>
