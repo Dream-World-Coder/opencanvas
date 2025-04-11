@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import PropTypes from "prop-types";
 import {
     Eye,
@@ -11,6 +12,8 @@ import {
     Copy,
     ChevronLeft,
     ChevronRight,
+    ThumbsUp,
+    MessageCircle,
 } from "lucide-react";
 import {
     AlertDialog,
@@ -44,6 +47,76 @@ export const formatDates = (date) => {
         console.log(error);
         return "some time ago";
     }
+};
+
+function getSchemaData(currentProfile) {
+    const origin = window.location.origin;
+
+    return {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        name: currentProfile.fullName,
+        image: `${origin}${currentProfile.profilePicture}`,
+        description: currentProfile.aboutMe,
+        url: `${origin}/u/${currentProfile.username}`,
+        sameAs: currentProfile.contactInformation.map((contact) => contact.url),
+        jobTitle: currentProfile.role,
+        mainEntityOfPage: {
+            "@type": "WebPage",
+            "@id": `${origin}/u/${currentProfile.username}`,
+        },
+    };
+}
+
+export const ProfileHelmet = ({ currentProfile }) => {
+    const stopWords = [
+        "a",
+        "an",
+        "the",
+        "and",
+        "or",
+        "but",
+        "is",
+        "to",
+        "of",
+        "in",
+        "on",
+        "at",
+        "with",
+        "for",
+        "from",
+        "by",
+    ];
+    if (!currentProfile) return null;
+
+    const schemaData = getSchemaData(currentProfile);
+
+    const keywords = [
+        currentProfile.fullName,
+        currentProfile.fullName.split(" ")[0],
+        ...currentProfile.role
+            .toLowerCase()
+            .split(/\s+/)
+            .filter((word) => !stopWords.includes(word)),
+        "opencanvas",
+    ];
+
+    return (
+        <Helmet>
+            <title>{currentProfile.fullName} | OpenCanvas</title>
+            <meta
+                name="description"
+                content={`OpenCanvas profile page of ${currentProfile.fullName}`}
+            />
+            <meta name="keywords" content={[...new Set(keywords)].join(", ")} />
+            <script type="application/ld+json">
+                {JSON.stringify(schemaData)}
+            </script>
+        </Helmet>
+    );
+};
+ProfileHelmet.propTypes = {
+    currentProfile: PropTypes.object,
 };
 
 export const PostFilterTabs = ({ activeTab, setActiveTab }) => {
@@ -118,7 +191,7 @@ export const PostActions = ({ post, setPosts, loading }) => {
                 title="View"
                 onClick={(e) => {
                     e.stopPropagation();
-                    navigate(`/p/${post._id}`);
+                    navigate(`/p/${post._id}`, { state: { post } });
                 }}
             >
                 <Eye
@@ -257,6 +330,11 @@ export const PostActions = ({ post, setPosts, loading }) => {
         </div>
     );
 };
+PostActions.propTypes = {
+    post: PropTypes.object,
+    setPosts: PropTypes.func,
+    loading: PropTypes.bool,
+};
 
 export const PostActionsPublic = ({ post }) => {
     const navigate = useNavigate();
@@ -269,7 +347,7 @@ export const PostActionsPublic = ({ post }) => {
                 title="View"
                 onClick={(e) => {
                     e.stopPropagation();
-                    navigate(`/p/${post._id}`);
+                    navigate(`/p/${post._id}`, { state: { post } });
                 }}
             >
                 <Eye
@@ -290,12 +368,6 @@ export const PostActionsPublic = ({ post }) => {
             </div>
         </div>
     );
-};
-
-PostActions.propTypes = {
-    post: PropTypes.object,
-    setPosts: PropTypes.func,
-    loading: PropTypes.bool,
 };
 PostActionsPublic.propTypes = {
     post: PropTypes.object,
@@ -459,4 +531,33 @@ export const FeaturedWorks = ({ currentUser }) => {
 };
 FeaturedWorks.propTypes = {
     currentUser: PropTypes.object,
+};
+
+export const PostStats = ({ post }) => {
+    return (
+        <>
+            {/* views */}
+            <div className="flex items-center">
+                <b>{post.totalViews || 0} &nbsp; </b> Views
+            </div>
+
+            {/* likes */}
+            <div className="flex items-center">
+                <b>{post.totalLikes || 0} &nbsp; </b> Likes
+            </div>
+
+            {/* comments */}
+            <div className="flex items-center">
+                <b>{post.totalComments || 0} &nbsp; </b> Comments
+            </div>
+
+            {/* readtime */}
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+                {post.readTime}
+            </span>
+        </>
+    );
+};
+PostStats.propTypes = {
+    post: PropTypes.object,
 };

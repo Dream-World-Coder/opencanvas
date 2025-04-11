@@ -124,19 +124,19 @@ export const AuthorPostsDropdown = ({ author, currentPostId }) => {
                                           </h3>
                                           <div className="flex items-center mt-2 text-sm text-gray-700 dark:text-gray-200 space-x-3">
                                               <div className="flex items-center">
-                                                  <span>
+                                                  <b>
                                                       {post.totalViews || 0}
                                                       &nbsp;
-                                                  </span>
-                                                  <b>Views</b>
+                                                  </b>
+                                                  <span>Views</span>
                                               </div>
                                               <div>·</div>
                                               <div className="flex items-center">
-                                                  <span>
+                                                  <b>
                                                       {post.totalLikes || 0}{" "}
                                                       &nbsp;
-                                                  </span>
-                                                  <b>Likes</b>
+                                                  </b>
+                                                  <span>Likes</span>
                                               </div>
                                               <div>·</div>
                                               <div>

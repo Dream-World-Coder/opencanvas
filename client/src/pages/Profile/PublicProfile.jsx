@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
-import { ThumbsUp, MessageCircle, Eye, CircleCheck } from "lucide-react";
+import { CircleCheck } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,8 @@ import {
     PostActionsPublic,
     ContactInformationDropdown,
     FeaturedWorks,
+    ProfileHelmet,
+    PostStats,
     formatDates,
 } from "./components";
 import { useDataService } from "../../services/dataService";
@@ -169,68 +170,13 @@ const PublicProfile = () => {
         },
     ];
 
-    const schemaData = {
-        "@context": "https://schema.org",
-        "@type": "Person",
-        name: currentProfile.fullName,
-        image: `${window.location.origin}${currentProfile.profilePicture}`,
-        description: currentProfile.aboutMe,
-        url: `${window.location.origin}/u/${currentProfile.username}`,
-        sameAs: currentProfile.contactInformation.map((contact) => contact.url),
-        // Array of social media links (Twitter, LinkedIn, etc.)
-        jobTitle: currentProfile.role,
-        mainEntityOfPage: {
-            "@type": "WebPage",
-            "@id": `${window.location.origin}/u/${currentProfile.username}`,
-        },
+    const handlePostClick = (post) => {
+        navigate(`/p/${post._id}`, { state: { post } });
     };
 
     return (
         <>
-            <Helmet>
-                <title>{currentProfile.fullName} | OpenCanvas</title>
-                <meta
-                    name="description"
-                    content={`OpenCanvas profile page of ${currentProfile.fullName}`}
-                />
-                <meta
-                    name="keywords"
-                    content={[
-                        ...new Set([
-                            currentProfile.fullName,
-                            currentProfile.fullName.split(" ")[0],
-                            ...currentProfile.role
-                                .toLowerCase()
-                                .split(/\s+/)
-                                .filter(
-                                    (word) =>
-                                        ![
-                                            "a",
-                                            "an",
-                                            "the",
-                                            "and",
-                                            "or",
-                                            "but",
-                                            "is",
-                                            "to",
-                                            "of",
-                                            "in",
-                                            "on",
-                                            "at",
-                                            "with",
-                                            "for",
-                                            "from",
-                                            "by",
-                                        ].includes(word),
-                                ),
-                        ]),
-                        "opencanvas",
-                    ].join(", ")}
-                />
-                <script type="application/ld+json">
-                    {JSON.stringify(schemaData)}
-                </script>
-            </Helmet>
+            <ProfileHelmet currentProfile={currentProfile} />
             <div
                 className={`min-h-screen bg-white dark:bg-[#111] dark:text-white font-sans`}
             >
@@ -368,9 +314,7 @@ const PublicProfile = () => {
                                         : true) && (
                                         <div
                                             key={post._id}
-                                            onClick={() =>
-                                                navigate(`/p/${post._id}`)
-                                            }
+                                            onClick={handlePostClick}
                                             className="group cursor-pointer"
                                         >
                                             <div className="flex flex-col md:flex-row gap-6">
@@ -411,7 +355,7 @@ const PublicProfile = () => {
                                                                     content={
                                                                         post.content.slice(
                                                                             0,
-                                                                            500,
+                                                                            350,
                                                                         ) +
                                                                             "..." ||
                                                                         ""
@@ -459,38 +403,9 @@ const PublicProfile = () => {
                                                         {/* Stats and actions */}
                                                         <div className="flex items-center justify-between">
                                                             <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                                                                {/* views */}
-                                                                <div className="flex items-center">
-                                                                    <Eye className="w-4 h-4 mr-1 text-gray-400" />
-                                                                    <span>
-                                                                        {post.totalViews ||
-                                                                            0}
-                                                                    </span>
-                                                                </div>
-
-                                                                {/* likes */}
-                                                                <div className="flex items-center">
-                                                                    <ThumbsUp className="w-4 h-4 mr-1 text-gray-400" />
-                                                                    <span>
-                                                                        {post.totalLikes ||
-                                                                            0}
-                                                                    </span>
-                                                                </div>
-
-                                                                {/* comments */}
-                                                                <div className="flex items-center">
-                                                                    <MessageCircle className="w-4 h-4 mr-1 text-gray-400" />
-                                                                    <span>
-                                                                        {post.totalComments ||
-                                                                            0}
-                                                                    </span>
-                                                                </div>
-
-                                                                <span className="text-sm text-gray-500 dark:text-gray-400">
-                                                                    {
-                                                                        post.readTime
-                                                                    }
-                                                                </span>
+                                                                <PostStats
+                                                                    post={post}
+                                                                />
                                                             </div>
 
                                                             {/* post actions */}

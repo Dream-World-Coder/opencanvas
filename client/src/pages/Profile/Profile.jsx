@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
-import { Camera, ThumbsUp, MessageCircle, Eye, EyeOff } from "lucide-react";
+import { Camera, EyeOff } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -10,21 +9,16 @@ import { toast } from "sonner";
 import ProfileHeader from "../../components/Header/ProfileHeader";
 import ProfileFooter from "../../components/Footer/ProfileFooter";
 import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
-import { PostFilterTabs, PostActions, FeaturedWorks } from "./components";
+import {
+    PostFilterTabs,
+    PostActions,
+    FeaturedWorks,
+    ProfileHelmet,
+    PostStats,
+    formatDates,
+} from "./components";
 import { useAuth } from "../../contexts/AuthContext";
 import { useDarkMode } from "../../components/Hooks/darkMode";
-import { formatDistanceToNow } from "date-fns";
-
-const formatDates = (date) => {
-    try {
-        return formatDistanceToNow(new Date(date), {
-            addSuffix: true,
-        });
-    } catch (error) {
-        console.log(error);
-        return "some time ago";
-    }
-};
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -122,68 +116,9 @@ const Profile = () => {
         fetchPost();
     }, [currentUser]);
 
-    const schemaData = {
-        "@context": "https://schema.org",
-        "@type": "Person",
-        name: currentUser.fullName,
-        image: `${window.location.origin}${currentUser.profilePicture}`,
-        description: currentUser.aboutMe,
-        url: `${window.location.origin}/u/${currentUser.username}`,
-        sameAs: currentUser.contactInformation.map((contact) => contact.url),
-        // Array of social media links (Twitter, LinkedIn, etc.)
-        jobTitle: currentUser.role,
-        mainEntityOfPage: {
-            "@type": "WebPage",
-            "@id": `${window.location.origin}/u/${currentUser.username}`,
-        },
-    };
-
     return (
         <>
-            <Helmet>
-                <title>{currentUser.fullName} | OpenCanvas</title>
-                <meta
-                    name="description"
-                    content={`OpenCanvas profile page of ${currentUser.fullName}`}
-                />
-                <meta
-                    name="keywords"
-                    content={[
-                        ...new Set([
-                            currentUser.fullName,
-                            currentUser.fullName.split(" ")[0],
-                            ...currentUser.role
-                                .toLowerCase()
-                                .split(/\s+/)
-                                .filter(
-                                    (word) =>
-                                        ![
-                                            "a",
-                                            "an",
-                                            "the",
-                                            "and",
-                                            "or",
-                                            "but",
-                                            "is",
-                                            "to",
-                                            "of",
-                                            "in",
-                                            "on",
-                                            "at",
-                                            "with",
-                                            "for",
-                                            "from",
-                                            "by",
-                                        ].includes(word),
-                                ),
-                        ]),
-                        "opencanvas",
-                    ].join(", ")}
-                />
-                <script type="application/ld+json">
-                    {JSON.stringify(schemaData)}
-                </script>
-            </Helmet>
+            <ProfileHelmet currentProfile={currentUser} />
             <div
                 className={`min-h-screen bg-white dark:bg-[#111] dark:text-white font-sans`}
             >
@@ -336,7 +271,7 @@ const Profile = () => {
                                                                     content={
                                                                         post.content.slice(
                                                                             0,
-                                                                            500,
+                                                                            350,
                                                                         ) +
                                                                             "..." ||
                                                                         ""
@@ -385,34 +320,11 @@ const Profile = () => {
                                                         <div className="flex items-center justify-between">
                                                             <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
                                                                 {post.isPublic && (
-                                                                    <>
-                                                                        {/* views */}
-                                                                        <div className="flex items-center">
-                                                                            <Eye className="w-4 h-4 mr-1 text-gray-400" />
-                                                                            <span>
-                                                                                {post.totalViews ||
-                                                                                    0}
-                                                                            </span>
-                                                                        </div>
-
-                                                                        {/* likes */}
-                                                                        <div className="flex items-center">
-                                                                            <ThumbsUp className="w-4 h-4 mr-1 text-gray-400" />
-                                                                            <span>
-                                                                                {post.totalLikes ||
-                                                                                    0}
-                                                                            </span>
-                                                                        </div>
-
-                                                                        {/* comments */}
-                                                                        <div className="flex items-center">
-                                                                            <MessageCircle className="w-4 h-4 mr-1 text-gray-400" />
-                                                                            <span>
-                                                                                {post.totalComments ||
-                                                                                    0}
-                                                                            </span>
-                                                                        </div>
-                                                                    </>
+                                                                    <PostStats
+                                                                        post={
+                                                                            post
+                                                                        }
+                                                                    />
                                                                 )}
                                                                 {!post.isPublic && (
                                                                     <div className="flex items-center">
@@ -422,12 +334,6 @@ const Profile = () => {
                                                                         </span>
                                                                     </div>
                                                                 )}
-
-                                                                <span className="text-sm text-gray-500 dark:text-gray-400">
-                                                                    {
-                                                                        post.readTime
-                                                                    }
-                                                                </span>
                                                             </div>
 
                                                             {/* post actions */}

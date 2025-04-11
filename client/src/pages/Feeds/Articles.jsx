@@ -310,7 +310,7 @@ const ArticleFeed = () => {
                                                         </div>
                                                     )} */}
 
-                                                <div className="flex items-center text-[#f8f8f8] text-sm">
+                                                <div className="flex items-center text-black dark:text-[#f8f8f8] text-sm">
                                                     <div className="flex items-center mr-4">
                                                         <b>
                                                             {post.totalViews ||
