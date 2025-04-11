@@ -34,7 +34,7 @@ const AboutPage = ({ bgClr = "bg-cream-light" }) => {
             <div
                 className={`min-h-screen ${bgClr} dark:bg-[#111] dark:text-white relative overflow-hidden pt-8`}
             >
-                <Header exclude={["/about", "/gallery/photos"]} />
+                <Header exclude={["/about", "/photo-gallery"]} />
 
                 {/* Main Content */}
                 <div className="max-w-4xl mx-auto px-4 py-24 relative z-10">

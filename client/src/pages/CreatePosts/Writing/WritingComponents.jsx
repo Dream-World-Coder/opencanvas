@@ -45,7 +45,10 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
+import {
+    oneLight,
+    atomDark,
+} from "react-syntax-highlighter/dist/esm/styles/prism";
 
 /**
  *
@@ -409,7 +412,7 @@ export const MarkdownPreview = ({
                                 className={`mt-2 mb-10 leading-tight tracking-tight capitalize ${
                                     contentOnly
                                         ? "text-xl font-semibold font-sans"
-                                        : "text-4xl md:text-5xl font-bold font-serif"
+                                        : "text-4xl font-bold font-serif"
                                 }`}
                             >
                                 {title}
@@ -418,7 +421,7 @@ export const MarkdownPreview = ({
 
                         {/* thumbnail */}
                         {thumbnailUrl && !contentOnly && (
-                            <div className="relative mb-8 rounded-lg overflow-hidden shadow-md">
+                            <div className="relative mb-8 w-[110%] transform translate-x-[-5%] max-h-[370px] rounded-lg overflow-hidden shadow-none">
                                 <img
                                     src={thumbnailUrl}
                                     alt={title || "Article thumbnail"}
@@ -481,7 +484,6 @@ export const MarkdownPreview = ({
                                     );
                                 },
                                 code({
-                                    node,
                                     inline,
                                     className,
                                     children,
@@ -498,19 +500,19 @@ export const MarkdownPreview = ({
                                     return !inline && match ? (
                                         // block code
                                         <div
-                                            className={`relative my-4 overflow-hidden rounded-xl flex flex-col
+                                            className={`relative my-4 overflow-hidden rounded-sm flex flex-col
                                             ${
                                                 isDark
-                                                    ? "bg-[#333]"
-                                                    : "bg-[#e8eae6]"
+                                                    ? "bg-[#222]"
+                                                    : "bg-[#e8eae6]" // #e8eae6
                                             }`}
                                         >
                                             {/* codeHeader */}
                                             <div
                                                 className={`flex items-center justify-between px-6 pt-2 ${
                                                     isDark
-                                                        ? "bg-[#333]"
-                                                        : "bg-[#e8eae6]"
+                                                        ? "bg-[#222]"
+                                                        : "bg-[#e8eae6]" // #e8eae6
                                                 }`}
                                             >
                                                 {/* lagguage */}
@@ -536,10 +538,14 @@ export const MarkdownPreview = ({
                                                 </button>
                                             </div>
 
-                                            {/* Rounded code card */}
-                                            <div className="rounded-xl overflow-hidden border-none">
+                                            {/* code card */}
+                                            <div className="rounded-sm overflow-hidden border-none">
                                                 <SyntaxHighlighter
-                                                    style={oneLight}
+                                                    style={
+                                                        isDark
+                                                            ? atomDark
+                                                            : oneLight
+                                                    }
                                                     language={match[1]}
                                                     PreTag="div"
                                                     wrapLongLines
@@ -550,9 +556,6 @@ export const MarkdownPreview = ({
                                                             lineHeight: "1.2",
                                                         },
                                                     }}
-                                                    className={
-                                                        isDark ? "invert" : ""
-                                                    }
                                                     {...props}
                                                 >
                                                     {codeString}
@@ -572,9 +575,8 @@ export const MarkdownPreview = ({
                                 blockquote({ children }) {
                                     return (
                                         <blockquote
-                                            className={`border-l-4 px-4 py-1 my-4 italic rounded-md shadow
-                                                ${isDark ? "border-[#999] bg-[#999]/10 text-[#ddd]" : "border-gray-400 bg-gray-100 text-gray-700"}`}
-                                            // className={`border-l-4 pl-4 italic ${isDark ? "border-[#888] text-[#999]" : "border-gray-500 text-gray-600"}`}
+                                            className={`border-l-4 px-4 py-1 my-4 italic
+                                                ${isDark ? "border-[#999] bg-[#999]/0 text-[#ddd]" : "border-gray-400 bg-gray-100/0 text-gray-700"}`}
                                         >
                                             {children}
                                         </blockquote>
@@ -586,7 +588,7 @@ export const MarkdownPreview = ({
                                         className={`mt-12 mb-6 leading-tight tracking-tight ${
                                             contentOnly
                                                 ? "text-xl font-semibold font-sans"
-                                                : "text-4xl md:text-5xl font-bold font-serif"
+                                                : "text-4xl font-bold font-serif"
                                         }`}
                                     >
                                         {children}
@@ -597,7 +599,7 @@ export const MarkdownPreview = ({
                                         className={`font-serif mt-10 mb-5 leading-tight tracking-tight ${
                                             contentOnly
                                                 ? "text-lg"
-                                                : "text-3xl md:text-4xl font-bold"
+                                                : "text-3xl font-bold"
                                         }`}
                                     >
                                         {children}
@@ -608,7 +610,7 @@ export const MarkdownPreview = ({
                                         className={`font-serif mt-8 mb-4 leading-snug ${
                                             contentOnly
                                                 ? "text-base"
-                                                : "text-2xl md:text-3xl font-bold"
+                                                : "text-2xl font-bold"
                                         }`}
                                     >
                                         {children}
@@ -617,9 +619,7 @@ export const MarkdownPreview = ({
                                 h4: ({ children }) => (
                                     <h4
                                         className={`montserrat-regular font-semibold mt-6 mb-3 leading-snug ${
-                                            contentOnly
-                                                ? "text-sm"
-                                                : "text-xl md:text-2xl"
+                                            contentOnly ? "text-sm" : "text-xl"
                                         }`}
                                     >
                                         {children}
@@ -628,9 +628,7 @@ export const MarkdownPreview = ({
                                 h5: ({ children }) => (
                                     <h5
                                         className={`montserrat-regular font-semibold mt-5 mb-3 leading-snug ${
-                                            contentOnly
-                                                ? "text-sm"
-                                                : "text-lg md:text-xl"
+                                            contentOnly ? "text-sm" : "text-lg"
                                         }`}
                                     >
                                         {children}
@@ -641,7 +639,7 @@ export const MarkdownPreview = ({
                                         className={`montserrat-regular font-semibold mt-4 mb-2 uppercase tracking-wider ${
                                             contentOnly
                                                 ? "text-sm"
-                                                : "text-base md:text-lg"
+                                                : "text-base"
                                         }`}
                                     >
                                         {children}

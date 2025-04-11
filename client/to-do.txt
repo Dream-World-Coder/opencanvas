@@ -242,3 +242,12 @@ pass it as props then
 
 in featuredItems add store things like {title, thumbnail, type, Id}
 now on click links to the post --> type & id for url generation
+
+
+-- post view page for private posts
+
+-- auto update engagement scores in posts
+
+-- in feed all posts are not coming, maybe use &lte instead &lt, <= instead <
+
+-- bug: if i follow author in post page, i cannot see the following whn i dorectly visit his profile from the Post

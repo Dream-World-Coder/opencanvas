@@ -12,25 +12,47 @@ const ContactPage = ({ bgClr = "bg-cream-light" }) => {
         {
             name: "OpenCanvas",
             href: "https://opencanvas.blog/u/subhajit",
-            icon: OpenCanvasIcon,
+            icon: (
+                <div className="size-4">
+                    <OpenCanvasIcon />
+                </div>
+            ),
         },
         {
             name: "GitHub",
             href: "https://github.com/Dream-World-Coder",
-            icon: GitHubIcon,
+            icon: (
+                <GitHubIcon className="size-4 p-1 box-content rounded bg-zinc-300" />
+            ),
         },
         {
             name: "LinkedIn",
             href: "https://www.linkedin.com/in/subhajitgorai",
-            icon: LinkedinIcon,
+            icon: (
+                <LinkedinIcon className="size-4 bg-blue-300 p-1 box-content rounded" />
+            ),
         },
-        { name: "Portfolio", href: "https://subhajit.pages.dev", icon: Globe },
+        {
+            name: "Portfolio",
+            href: "https://subhajit.pages.dev",
+            icon: (
+                <Globe className="size-4 p-1 box-content rounded bg-yellow-300 text-black" />
+            ),
+        },
         {
             name: "Blog",
             href: "https://myopencanvas.pages.dev",
-            icon: BookOpen,
+            icon: (
+                <BookOpen className="size-4 p-1 box-content rounded bg-sky-300 text-black" />
+            ),
         },
-        { name: "Email", href: "mailto@blog.opencanvas@gmail.com", icon: Mail },
+        {
+            name: "Email",
+            href: "mailto:blog.opencanvas@gmail.com",
+            icon: (
+                <Mail className="size-4 p-1 box-content rounded bg-green-300 text-black" />
+            ),
+        },
     ];
 
     return (
@@ -110,40 +132,33 @@ const ContactPage = ({ bgClr = "bg-cream-light" }) => {
             </Helmet>
 
             <div
-                className={`min-h-screen ${bgClr} dark:bg-black dark:text-white pt-8`}
+                className={`min-h-screen ${bgClr} dark:bg-[#111] dark:text-gray-100 pt-8`}
             >
-                <Header exclude={["/contact", "/gallery/photos"]} />
+                <Header exclude={["/contact", "/photo-gallery"]} />
 
                 <main className="max-w-2xl mx-auto px-6 py-16">
                     {/* Header Section */}
                     <div className="mb-24 text-center space-y-3">
-                        <h1 className="font-serif text-4xl text-stone-800 pointer-events-none md:pointer-events-auto dark:text-white">
+                        <h1 className="font-serif text-4xl text-stone-900 pointer-events-none md:pointer-events-auto dark:text-gray-50">
                             Subhajit Gorai
                         </h1>
-                        <p className="font-serif text-lg text-stone-500 italic pointer-events-none md:pointer-events-auto dark:text-white">
+                        <p className="font-serif text-lg text-stone-700 italic pointer-events-none md:pointer-events-auto dark:text-gray-300">
                             Developer &amp; Maintainer
                         </p>
                     </div>
 
                     {/* Connect Links */}
                     <div className="mb-24">
-                        <div className="border-t border-b border-stone-200 py-8">
+                        <div className="border-t border-b border-stone-300 dark:border-gray-700 py-8">
                             <div className="space-y-6 columns-2 items-start">
-                                {connectLinks.map((item, index) => (
+                                {connectLinks.map((item) => (
                                     <a
-                                        key={index}
+                                        key={item.name}
                                         href={item.href}
                                         target="_blank"
-                                        className="flex items-center justify-center gap-3 text-stone-600 dark:text-white hover:text-stone-900 transition-colors dark:hover:text-white"
+                                        className="flex items-center justify-center gap-3 text-stone-800 dark:text-gray-200 hover:text-stone-950 transition-colors dark:hover:text-white"
                                     >
-                                        {index === 0 && (
-                                            <span className="w-4 h-4 block">
-                                                <OpenCanvasIcon />
-                                            </span>
-                                        )}
-                                        {index !== 0 && (
-                                            <item.icon className="w-4 h-4" />
-                                        )}
+                                        {item.icon}
                                         <span className="font-serif text-lg">
                                             {item.name}
                                         </span>
@@ -155,7 +170,7 @@ const ContactPage = ({ bgClr = "bg-cream-light" }) => {
 
                     {/* Contact Form */}
                     <div className="relative max-w-xl mx-auto">
-                        <h2 className="font-serif text-2xl text-stone-800 text-center mb-12 pointer-events-none md:pointer-events-auto dark:text-white">
+                        <h2 className="font-serif text-2xl text-stone-900 text-center mb-12 pointer-events-none md:pointer-events-auto dark:text-gray-50">
                             Feel free to suggest any thoughts
                         </h2>
                         <form
@@ -179,7 +194,7 @@ const ContactPage = ({ bgClr = "bg-cream-light" }) => {
                                     type="text"
                                     placeholder="Your name"
                                     name="name"
-                                    className="w-full bg-transparent border-b border-stone-200 py-2 font-serif text-lg placeholder:text-stone-400 focus:outline-none focus:border-stone-400 transition-colors"
+                                    className="w-full bg-transparent border-b border-stone-300 dark:border-gray-600 py-2 font-serif text-lg placeholder:text-stone-500 dark:placeholder:text-gray-400 focus:outline-none focus:border-stone-600 dark:focus:border-gray-300 transition-colors"
                                 />
                             </div>
                             <div>
@@ -188,7 +203,7 @@ const ContactPage = ({ bgClr = "bg-cream-light" }) => {
                                     name="email"
                                     type="email"
                                     placeholder="Your email"
-                                    className="w-full bg-transparent border-b border-stone-200 py-2 font-serif text-lg placeholder:text-stone-400 focus:outline-none focus:border-stone-400 transition-colors"
+                                    className="w-full bg-transparent border-b border-stone-300 dark:border-gray-600 py-2 font-serif text-lg placeholder:text-stone-500 dark:placeholder:text-gray-400 focus:outline-none focus:border-stone-600 dark:focus:border-gray-300 transition-colors"
                                 />
                             </div>
                             <div>
@@ -197,7 +212,7 @@ const ContactPage = ({ bgClr = "bg-cream-light" }) => {
                                     name="message"
                                     placeholder="Your message"
                                     rows={2}
-                                    className="w-full bg-transparent border-b border-stone-200 py-2 font-serif text-lg placeholder:text-stone-400 focus:outline-none focus:border-stone-400 transition-colors resize-none"
+                                    className="w-full bg-transparent border-b border-stone-300 dark:border-gray-600 py-2 font-serif text-lg placeholder:text-stone-500 dark:placeholder:text-gray-400 focus:outline-none focus:border-stone-600 dark:focus:border-gray-300 transition-colors resize-none"
                                 />
                             </div>
                             <input
@@ -209,10 +224,10 @@ const ContactPage = ({ bgClr = "bg-cream-light" }) => {
                             <div className="text-center pt-8">
                                 <button
                                     type="submit"
-                                    className="font-serif text-lg text-stone-600
-                                hover:text-stone-900 transition-colors inline-flex
-                                items-center gap-2 bg-lime-300/30
-                                border border-lime-300 rounded-full box-content px-4 py-1 dark:text-white"
+                                    className="font-serif text-lg text-stone-800 dark:text-gray-100
+                                    hover:text-stone-950 dark:hover:text-white transition-colors inline-flex
+                                    items-center gap-2 bg-lime-400/40 dark:bg-lime-400/20
+                                    border border-lime-500 dark:border-lime-600 rounded-full box-content px-4 py-1"
                                 >
                                     <span>Send</span>
                                     <Send className="w-4 h-4" />

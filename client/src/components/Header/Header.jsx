@@ -35,8 +35,9 @@ const Header = ({
 
     // Navigation Links
     let navLinks = [
-        { name: "Literature", href: "/gallery/literature" },
-        { name: "Photos", href: "/gallery/photos" },
+        { name: "Literature", href: "/literature" },
+        { name: "Articles", href: "/articles" },
+        { name: "Photos", href: "/photo-gallery" },
         { name: "About", href: "/about" },
         { name: "Contact", href: "/contact" },
     ];

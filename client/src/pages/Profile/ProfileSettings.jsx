@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
@@ -49,6 +50,7 @@ import { useDataService } from "../../services/dataService";
 
 const ProfileSettings = () => {
     const baseUrl = window.location.origin;
+    const navigate = useNavigate();
     const { currentUser } = useAuth();
     const [darkMode, setDarkMode] = useState(false);
     const [activeTab, setActiveTab] = useState("general");
@@ -99,46 +101,40 @@ const ProfileSettings = () => {
         }
     }
 
-    /*
-        // effect to initialize dark mode from localStorage
-        useEffect(() => {
-            // check localStorage for dark mode preference
-            const savedDarkMode = localStorage.getItem("darkMode");
-            const initialDarkMode = savedDarkMode
-                ? JSON.parse(savedDarkMode)
-                : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    // initialize dark mode from localStorage
+    useEffect(() => {
+        const savedDarkMode = localStorage.getItem("darkThemeChoice");
+        const initialDarkMode = savedDarkMode
+            ? JSON.parse(savedDarkMode)
+            : window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-            setDarkMode(initialDarkMode);
-            setFormValues((prevValues) => ({
-                ...prevValues,
-                darkMode: initialDarkMode,
-            }));
-            applyDarkMode(initialDarkMode);
-        }, []);
+        setDarkMode(initialDarkMode);
+        setFormValues((prevValues) => ({
+            ...prevValues,
+            darkMode: initialDarkMode,
+        }));
+        applyDarkMode(initialDarkMode);
+    }, []);
 
-        // toggle dark mode
-        const toggleDarkMode = (value) => {
-            setDarkMode(value);
-            setFormValues((prevValues) => ({
-                ...prevValues,
-                darkMode: value,
-            }));
+    const toggleDarkMode = (value) => {
+        setDarkMode(value);
+        setFormValues((prevValues) => ({
+            ...prevValues,
+            darkMode: value,
+        }));
 
-            localStorage.setItem("darkMode", JSON.stringify(value));
+        localStorage.setItem("darkThemeChoice", JSON.stringify(value));
 
-            // apply dark mode to document
-            applyDarkMode(value);
-        };
+        applyDarkMode(value);
+    };
 
-        // apply dark mode to html element
-        const applyDarkMode = (isDark) => {
-            if (isDark) {
-                document.documentElement.classList.add("dark");
-            } else {
-                document.documentElement.classList.remove("dark");
-            }
-        };
-    */
+    const applyDarkMode = (isDark) => {
+        if (isDark) {
+            document.documentElement.classList.add("dark");
+        } else {
+            document.documentElement.classList.remove("dark");
+        }
+    };
 
     const handleContactInfoChange = (index, field, value) => {
         const updatedContactInfo = [...formValues.contactInformation];
@@ -195,7 +191,7 @@ const ProfileSettings = () => {
                         <Button
                             variant="outline"
                             size="sm"
-                            className="mt-2 dark:text-black cursor-not-allowed"
+                            className="mt-2 dark:text-white cursor-not-allowed"
                         >
                             Change Photo
                         </Button>
@@ -361,15 +357,9 @@ const ProfileSettings = () => {
                         <Switch
                             id="darkMode"
                             checked={darkMode}
-                            // onCheckedChange={toggleDarkMode}
-                            className="cursor-not-allowed"
+                            onCheckedChange={toggleDarkMode}
                         />
-                        <Label
-                            htmlFor="darkMode"
-                            className="cursor-not-allowed"
-                        >
-                            Dark Mode
-                        </Label>
+                        <Label htmlFor="darkMode">Dark Mode</Label>
                         {darkMode ? (
                             <MoonIcon className="h-4 w-4 ml-2" />
                         ) : (
@@ -799,7 +789,7 @@ const ProfileSettings = () => {
         <>
             <Header
                 noBlur={true}
-                exclude={["/about", "/contact", "/gallery/photos"]}
+                exclude={["/about", "/contact", "/photo-gallery"]}
             />
             <div className="w-full h-full bg-white dark:bg-black dark:text-white">
                 <div className="mx-auto max-w-4xl mt-20 px-4 py-8 dark:bg-black">

@@ -37,14 +37,14 @@
   </url>
   <!-- Photo Gallery -->
   <url>
-    <loc>https://www.opencanvas.blog/gallery/photos</loc>
+    <loc>https://www.opencanvas.blog/photo-gallery</loc>
     <lastmod>2025-03-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <!-- Literature Gallery -->
   <url>
-    <loc>https://www.opencanvas.blog/gallery/literature</loc>
+    <loc>https://www.opencanvas.blog/literature</loc>
     <lastmod>2025-03-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>

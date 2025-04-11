@@ -4,13 +4,10 @@ blockquote {
     padding-top: 20px !important;
     padding-bottom: 20px !important;
     & p {
-        font-family: "Handlee", cursive;
-        font-weight: 400;
-        font-style: normal;
-        font-size: 2rem;
-        line-height: 1.5;
         margin-top: 0 !important;
         margin-bottom: 0 !important;
+        line-height: 1.5rem !important;
+        font-size: medium !important;
     }
 }
 

@@ -1,12 +1,15 @@
 import { useEffect, Suspense, lazy } from "react";
 import Lenis from "lenis";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from "@/components/ui/sonner";
 import "./App.css";
+
 import { AuthProvider } from "./contexts/AuthContext";
+import { DarkModeProvider } from "./contexts/ThemeContext";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 import LoadingPage from "./pages/Others/LoadingPage";
 import { HelmetProvider } from "react-helmet-async";
-import { Toaster } from "@/components/ui/sonner";
 
 // loaded with main bundle
 import LandingPage from "./pages/LandingPage/LandingPage";
@@ -61,118 +64,153 @@ export default function App() {
     return (
         <HelmetProvider>
             <Router>
-                <AuthProvider>
-                    <Suspense fallback={<LoadingPage bgClr="bg-white" />}>
-                        <Routes>
-                            {/* public */}
-                            {/* *************** */}
-                            <Route path="/" element={<LandingPage />} />
-                            <Route path="/home" element={<ArticleFeed />} />
-                            <Route path="/articles" element={<ArticleFeed />} />
-                            <Route
-                                path="/literature"
-                                element={<LiteratureFeed bgClr="bg-white" />}
-                            />
-                            {/* *************** */}
+                <DarkModeProvider>
+                    <AuthProvider>
+                        <Suspense fallback={<LoadingPage bgClr="bg-white" />}>
+                            <Routes>
+                                {/* public */}
+                                {/* *************** */}
+                                <Route path="/" element={<LandingPage />} />
+                                <Route path="/home" element={<ArticleFeed />} />
+                                <Route
+                                    path="/articles"
+                                    element={<ArticleFeed />}
+                                />
+                                <Route
+                                    path="/literature"
+                                    element={
+                                        <LiteratureFeed bgClr="bg-white" />
+                                    }
+                                />
+                                {/* *************** */}
 
-                            {/* *************** */}
-                            <Route
-                                path="/login"
-                                element={<LoginPage bgClr="bg-cream-light" />}
-                            />
-                            <Route path="/register" element={<LoginPage />} />
-                            <Route
-                                path="/auth/success"
-                                element={<AuthSuccess />}
-                            />
-                            <Route path="/logout" element={<LogoutPage />} />
-                            {/* *************** */}
+                                {/* *************** */}
+                                <Route
+                                    path="/login"
+                                    element={
+                                        <LoginPage bgClr="bg-cream-light" />
+                                    }
+                                />
+                                <Route
+                                    path="/register"
+                                    element={<LoginPage />}
+                                />
+                                <Route
+                                    path="/auth/success"
+                                    element={<AuthSuccess />}
+                                />
+                                <Route
+                                    path="/logout"
+                                    element={<LogoutPage />}
+                                />
+                                {/* *************** */}
 
-                            {/* *************** */}
-                            <Route
-                                path="/about"
-                                element={<AboutPage bgClr="bg-white" />}
-                            />
-                            <Route
-                                path="/contact"
-                                element={<ContactPage bgClr="bg-white" />}
-                            />
-                            {/* *************** */}
+                                {/* *************** */}
+                                <Route
+                                    path="/about"
+                                    element={<AboutPage bgClr="bg-white" />}
+                                />
+                                <Route
+                                    path="/contact"
+                                    element={<ContactPage bgClr="bg-white" />}
+                                />
+                                {/* *************** */}
 
-                            {/* *************** */}
-                            <Route
-                                path="/photo-gallery"
-                                element={<PhotoGalleryPage bgClr="bg-white" />}
-                            />
-                            <Route path="/markdown2pdf" element={<Md2Pdf />} />
-                            {/* *************** */}
+                                {/* *************** */}
+                                <Route
+                                    path="/photo-gallery"
+                                    element={
+                                        <PhotoGalleryPage bgClr="bg-white" />
+                                    }
+                                />
+                                <Route
+                                    path="/markdown2pdf"
+                                    element={<Md2Pdf />}
+                                />
+                                <Route path="/md2pdf" element={<Md2Pdf />} />
+                                <Route path="/m/2/p" element={<Md2Pdf />} />
+                                <Route path="/m-2-p" element={<Md2Pdf />} />
+                                <Route path="/m2p" element={<Md2Pdf />} />
+                                {/* *************** */}
 
-                            {/* *************** */}
-                            <Route path="/p/:postId" element={<ViewPost />} />
-                            <Route
-                                path="/u/:username"
-                                element={<PublicProfile bgClr="bg-white" />}
-                            />
-                            {/* *************** */}
+                                {/* *************** */}
+                                <Route
+                                    path="/p/:postId"
+                                    element={<ViewPost />}
+                                />
+                                <Route
+                                    path="/u/:username"
+                                    element={<PublicProfile bgClr="bg-white" />}
+                                />
+                                {/* *************** */}
 
-                            {/* protected */}
-                            <Route element={<ProtectedRoute />}>
-                                <Route
-                                    path="/profile"
-                                    element={<Profile bgClr="bg-white" />}
-                                />
-                                <Route
-                                    path="/u/:username/followers"
-                                    element={<FollowersPage />}
-                                />
-                                <Route
-                                    path="/u/:username/following"
-                                    element={<FollowingPage />}
-                                />
-                                <Route
-                                    path="/profile/settings"
-                                    element={<ProfileSettings />}
-                                />
-                                <Route
-                                    path="/createpost/poem"
-                                    element={<WritingPad artType={"poem"} />}
-                                />
-                                <Route
-                                    path="/createpost/story"
-                                    element={<WritingPad artType={"story"} />}
-                                />
-                                <Route
-                                    path="/createpost/article"
-                                    element={<WritingPad artType={"article"} />}
-                                />
+                                {/* protected */}
+                                <Route element={<ProtectedRoute />}>
+                                    <Route
+                                        path="/profile"
+                                        element={<Profile bgClr="bg-white" />}
+                                    />
+                                    <Route
+                                        path="/u/:username/followers"
+                                        element={<FollowersPage />}
+                                    />
+                                    <Route
+                                        path="/u/:username/following"
+                                        element={<FollowingPage />}
+                                    />
+                                    <Route
+                                        path="/profile/settings"
+                                        element={<ProfileSettings />}
+                                    />
+                                    <Route
+                                        path="/createpost/poem"
+                                        element={
+                                            <WritingPad artType={"poem"} />
+                                        }
+                                    />
+                                    <Route
+                                        path="/createpost/story"
+                                        element={
+                                            <WritingPad artType={"story"} />
+                                        }
+                                    />
+                                    <Route
+                                        path="/createpost/article"
+                                        element={
+                                            <WritingPad artType={"article"} />
+                                        }
+                                    />
 
-                                <Route
-                                    path="/upload-image"
-                                    element={<ImageUploadPage />}
-                                />
+                                    <Route
+                                        path="/upload-image"
+                                        element={<ImageUploadPage />}
+                                    />
 
-                                <Route
-                                    path="/edit-post"
-                                    element={<WritingPad artType={"edit"} />}
-                                />
-                            </Route>
+                                    <Route
+                                        path="/edit-post"
+                                        element={
+                                            <WritingPad artType={"edit"} />
+                                        }
+                                    />
+                                </Route>
 
-                            {/* others */}
-                            <Route
-                                path="/thanks"
-                                element={<Thanks bgClr="bg-white" />}
-                            />
-                            <Route
-                                path="/loading"
-                                element={<LoadingPage bgClr="bg-white" />}
-                            />
-                            <Route
-                                path="*"
-                                element={<NotFoundPage bgClr="bg-white" />}
-                            />
-                        </Routes>
-                    </Suspense>
-                </AuthProvider>
+                                {/* others */}
+                                <Route
+                                    path="/thanks"
+                                    element={<Thanks bgClr="bg-white" />}
+                                />
+                                <Route
+                                    path="/loading"
+                                    element={<LoadingPage bgClr="bg-white" />}
+                                />
+                                <Route
+                                    path="*"
+                                    element={<NotFoundPage bgClr="bg-white" />}
+                                />
+                            </Routes>
+                        </Suspense>
+                    </AuthProvider>
+                </DarkModeProvider>
                 <Toaster />
             </Router>
         </HelmetProvider>

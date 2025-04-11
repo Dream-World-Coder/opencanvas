@@ -328,8 +328,8 @@ const ViewPost = ({ isArticle = true }) => {
                     exclude={[
                         "/about",
                         "/contact",
-                        "/gallery/photos",
-                        "/gallery/literature",
+                        "/photo-gallery",
+                        "/literature",
                     ]}
                 />
                 <div className="flex flex-col md:flex-row min-h-screen max-w-screen-xl mx-auto bg-white dark:bg-[#111] text-gray-900 dark:text-gray-100">

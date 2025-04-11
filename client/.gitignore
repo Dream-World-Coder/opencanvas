@@ -30,3 +30,4 @@ src/assets/icons/O*.svg
 # important
 _api_v1/
 .env
+*.un~
