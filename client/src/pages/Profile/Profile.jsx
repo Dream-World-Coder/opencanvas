@@ -1,14 +1,7 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import {
-    Share2,
-    Camera,
-    ThumbsUp,
-    MessageCircle,
-    Eye,
-    EyeOff,
-} from "lucide-react";
+import { Camera, ThumbsUp, MessageCircle, Eye, EyeOff } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -17,7 +10,7 @@ import { toast } from "sonner";
 import ProfileHeader from "../../components/Header/ProfileHeader";
 import ProfileFooter from "../../components/Footer/ProfileFooter";
 import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
-import { TabComponent, PostActions } from "./components";
+import { PostFilterTabs, PostActions, FeaturedWorks } from "./components";
 import { useAuth } from "../../contexts/AuthContext";
 import { useDarkMode } from "../../components/Hooks/darkMode";
 import { formatDistanceToNow } from "date-fns";
@@ -41,7 +34,7 @@ const Profile = () => {
     const [posts, setPosts] = useState([]);
     // const [collections, setCollections] = useState([]);
     const [postsToFetch, setPostsToFetch] = useState(0);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const userStats = [
         // {
         //     name: "TOTAL LIKES",
@@ -279,55 +272,7 @@ const Profile = () => {
                         </div>
 
                         {/* featured */}
-                        {currentUser.featuredItems.length > 0 && (
-                            <div className="mb-24">
-                                <h2 className="text-2xl font-semibold tracking-tight mb-8 dark:text-[#f0f0f0]">
-                                    <span className="bg-inherit dark:bg-inherit hover:bg-lime-100 dark:hover:bg-[#222] rounded-md box-content px-2 py-1">
-                                        Featured Works
-                                    </span>
-                                </h2>
-                                <div
-                                    // data-lenis-prevent
-                                    // className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 grid-rows-1 overflow-x-auto scrollbar-hide"
-                                    className="flex gap-6 overflow-x-auto scrollbar-hide flex-nowrap"
-                                >
-                                    {currentUser.featuredItems.map((item) => (
-                                        <div
-                                            key={item.itemId}
-                                            className="group cursor-pointer min-w-[200px] md:min-w-[300px] max-w-[200px] md:max-w-[300px]"
-                                            onClick={() => {
-                                                item.itemType === "Post"
-                                                    ? navigate(
-                                                          `/p/${item.itemId}`,
-                                                      )
-                                                    : navigate(
-                                                          `/c/${item.itemId}`,
-                                                      );
-                                            }}
-                                        >
-                                            <div className="relative aspect-square overflow-hidden mb-4">
-                                                <img
-                                                    src={item.itemThumbnail}
-                                                    alt={item.itemTitle}
-                                                    className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
-                                                />
-                                                {/* dark inset on hover */}
-                                                <div className="absolute inset-0 bg-black/20 dark:bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                                                    {/* <Share2 className="w-6 h-6 text-white" /> */}
-                                                </div>
-                                            </div>
-                                            <h3 className="text-lg font-medium mb-1 flex justify-between dark:text-[#e8e8e8]">
-                                                {item.itemTitle}
-                                                <Share2 className="w-6 h-6 text-black dark:text-white rounded-lg p-1 hover:bg-yellow-200 dark:hover:bg-[#2c2c2c]" />
-                                            </h3>
-                                            <p className="text-sm text-gray-400 dark:text-[#888]">
-                                                {item.itemType.toLowerCase()}
-                                            </p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+                        <FeaturedWorks currentUser={currentUser} />
 
                         {/* filter tabs */}
                         {posts.length > 0 && (
@@ -335,7 +280,7 @@ const Profile = () => {
                                 id="post-view"
                                 className="border-b border-gray-200 dark:border-[#333] mb-8"
                             >
-                                <TabComponent
+                                <PostFilterTabs
                                     activeTab={activeTab}
                                     setActiveTab={setActiveTab}
                                 />

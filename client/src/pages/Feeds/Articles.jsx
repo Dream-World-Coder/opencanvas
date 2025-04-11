@@ -17,7 +17,7 @@ import { LeftSideBar, RightSideBar } from "./components";
 const ArticleFeed = () => {
     const navigate = useNavigate();
     const isDark = useDarkMode();
-    const [focusMode] = useState(false);
+    const [focusMode] = useState(!false);
     const [selectedTopics, setSelectedTopics] = useState([]);
 
     const [posts, setPosts] = useState([]);
@@ -145,8 +145,8 @@ const ArticleFeed = () => {
         }
     };
 
-    const handlePostClick = (postId) => {
-        navigate(`/p/${postId}`);
+    const handlePostClick = (post) => {
+        navigate(`/p/${post._id}`, { state: { post } });
     };
 
     const formatDate = (dateString) => {
@@ -172,17 +172,12 @@ const ArticleFeed = () => {
                 <Header
                     noBlur={true}
                     ballClr={"text-gray-300"}
-                    exclude={[
-                        "/about",
-                        "/contact",
-                        "/photo-gallery",
-                        "/literature",
-                    ]}
+                    exclude={["/about", "/contact", "/photo-gallery"]}
                 />
                 <div className="flex flex-col md:flex-row max-w-screen-xl mx-auto bg-white dark:bg-[#111] text-gray-900 dark:text-gray-100">
                     {/* Left sidebar */}
                     <aside
-                        className={`w-full md:w-64 p-4 ${!focusMode ? "border-r border-gray-200 dark:border-[#333]" : ""} hidden md:block`}
+                        className={`w-full md:w-64 p-4 border-r border-gray-200 dark:border-[#333] hidden md:block`}
                     >
                         {!focusMode && (
                             <LeftSideBar
@@ -194,7 +189,7 @@ const ArticleFeed = () => {
 
                     {/* Main feed */}
                     <main
-                        className={`flex-1 p-4 min-h-screen ${!focusMode ? "border-r border-gray-200 dark:border-[#333]" : ""}`}
+                        className={`flex-1 p-4 min-h-screen min-w-[60%] border-r border-gray-200 dark:border-[#333]`}
                     >
                         {/* Error display */}
                         {error && !loading && posts.length === 0 && (
@@ -212,117 +207,135 @@ const ArticleFeed = () => {
 
                         {/* Posts feed */}
                         <div className="space-y-4">
-                            {posts.map((post, index) => {
-                                // If it's the last post, attach ref for infinite scrolling
-                                const isLastPost = posts.length === index + 1;
+                            {posts
+                                // .filter((post) =>
+                                //     selectedTopics && selectedTopics.length > 0
+                                //         ? post.tags.some((tag) =>
+                                //               selectedTopics.includes(tag),
+                                //           )
+                                //         : true,
+                                // )
+                                .map((post, index) => {
+                                    // If it's the last post, attach ref for infinite scrolling
+                                    const isLastPost =
+                                        posts.length === index + 1;
 
-                                return (
-                                    <div
-                                        ref={
-                                            isLastPost
-                                                ? lastPostElementRef
-                                                : null
-                                        }
-                                        key={post._id}
-                                        className="border border-gray-200 dark:border-[#333] rounded-sm overflow-hidden cursor-pointer"
-                                        onClick={() =>
-                                            handlePostClick(post._id)
-                                        }
-                                    >
-                                        {post.thumbnailUrl && (
-                                            <div className="h-72 overflow-hidden">
-                                                <img
-                                                    src={post.thumbnailUrl}
-                                                    alt={post.title}
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            </div>
-                                        )}
-                                        <div className="p-4">
-                                            <div className="flex items-center mb-3">
-                                                <Avatar className="h-8 w-8 mr-2">
-                                                    <AvatarImage
-                                                        src={
-                                                            post.author
-                                                                ?.profilePicture
-                                                        }
+                                    return (
+                                        <div
+                                            ref={
+                                                isLastPost
+                                                    ? lastPostElementRef
+                                                    : null
+                                            }
+                                            key={post._id}
+                                            className="border border-gray-200 dark:border-[#333] rounded-sm overflow-hidden cursor-pointer"
+                                            onClick={() =>
+                                                handlePostClick(post)
+                                            }
+                                        >
+                                            {post.thumbnailUrl && (
+                                                <div className="h-72 overflow-hidden">
+                                                    <img
+                                                        src={post.thumbnailUrl}
+                                                        alt={post.title}
+                                                        className="w-full h-full object-cover"
                                                     />
-                                                    <AvatarFallback>
-                                                        {post.author?.displayName?.charAt(
-                                                            0,
-                                                        ) || "U"}
-                                                    </AvatarFallback>
-                                                </Avatar>
-                                                <div>
-                                                    <span className="font-medium text-sm">
-                                                        {post.author
-                                                            ?.displayName ||
-                                                            post.author
-                                                                ?.fullName}
-                                                    </span>
-                                                    <div className="flex items-center text-xs text-gray-500">
-                                                        <Clock className="h-3 w-3 mr-1" />
-                                                        {formatDate(
-                                                            post.createdAt,
-                                                        )}
-                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div className="relative mb-4 max-h-[250px] overflow-hidden">
-                                                <div className="prose prose-sm dark:prose-invert">
-                                                    <MarkdownPreview
-                                                        title={post.title}
-                                                        content={
-                                                            post.content.slice(
+                                            )}
+                                            <div className="p-4">
+                                                <div className="flex items-center mb-3">
+                                                    <Avatar className="h-8 w-8 mr-2">
+                                                        <AvatarImage
+                                                            src={
+                                                                post.author
+                                                                    ?.profilePicture
+                                                            }
+                                                        />
+                                                        <AvatarFallback>
+                                                            {post.author?.name?.charAt(
                                                                 0,
-                                                                500,
-                                                            ) + "..." || ""
-                                                        }
-                                                        thumbnailUrl={
-                                                            post.thumbnailUrl
-                                                        }
-                                                        isDark={isDark}
-                                                        darkBg="bg-[#111]"
-                                                        textAlignment="left"
-                                                        insidePost={true}
-                                                        contentOnly={true}
-                                                    />
-                                                </div>
-                                                <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white dark:from-[#111] to-transparent"></div>
-                                            </div>
-
-                                            {post.topics &&
-                                                post.topics.length > 0 && (
-                                                    <div className="flex flex-wrap gap-2 mb-4">
-                                                        {post.topics.map(
-                                                            (topic) => (
-                                                                <span
-                                                                    key={topic}
-                                                                    className="bg-gray-100 dark:bg-[#222] text-xs px-2 py-1 rounded"
-                                                                >
-                                                                    {topic}
-                                                                </span>
-                                                            ),
-                                                        )}
+                                                            ) || "U"}
+                                                        </AvatarFallback>
+                                                    </Avatar>
+                                                    <div>
+                                                        <span className="font-medium text-sm">
+                                                            {post.author?.name}
+                                                        </span>
+                                                        <div className="flex items-center text-xs text-gray-500">
+                                                            <Clock className="h-3 w-3 mr-1" />
+                                                            {formatDate(
+                                                                post.createdAt,
+                                                            )}
+                                                        </div>
                                                     </div>
-                                                )}
-
-                                            <div className="flex items-center text-gray-500 text-sm">
-                                                <div className="flex items-center mr-4">
-                                                    <Eye className="h-4 w-4 mr-1" />
-                                                    {post.views ||
-                                                        post.totalViews ||
-                                                        0}
                                                 </div>
-                                                <div className="flex items-center">
-                                                    <ThumbsUp className="h-4 w-4 mr-1" />
-                                                    {post.totalLikes || 0}
+                                                <div className="relative mb-4 max-h-[250px] overflow-hidden">
+                                                    <div className="prose prose-sm dark:prose-invert">
+                                                        <MarkdownPreview
+                                                            title={post.title}
+                                                            content={
+                                                                post.content.slice(
+                                                                    0,
+                                                                    350,
+                                                                ) + "..." || ""
+                                                            }
+                                                            thumbnailUrl={
+                                                                post.thumbnailUrl
+                                                            }
+                                                            isDark={isDark}
+                                                            darkBg="bg-[#111]"
+                                                            textAlignment="left"
+                                                            insidePost={true}
+                                                            contentOnly={true}
+                                                        />
+                                                    </div>
+                                                    <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white dark:from-[#111] to-transparent"></div>
+                                                </div>
+
+                                                {/* {post.tags &&
+                                                    post.tags.length > 0 && (
+                                                        <div className="flex flex-wrap gap-2 mb-4">
+                                                            {post.tags.map(
+                                                                (topic) => (
+                                                                    <span
+                                                                        key={
+                                                                            topic
+                                                                        }
+                                                                        className="bg-gray-100 dark:bg-[#222] text-xs px-2 py-1 rounded"
+                                                                    >
+                                                                        {topic}
+                                                                    </span>
+                                                                ),
+                                                            )}
+                                                        </div>
+                                                    )} */}
+
+                                                <div className="flex items-center text-[#f8f8f8] text-sm">
+                                                    <div className="flex items-center mr-4">
+                                                        <b>
+                                                            {post.totalViews ||
+                                                                0}
+                                                            &nbsp;
+                                                        </b>
+                                                        Views
+                                                    </div>
+                                                    <div className="flex items-center mr-4">
+                                                        <b>
+                                                            {post.totalLikes ||
+                                                                0}
+                                                            &nbsp;
+                                                        </b>
+                                                        Likes
+                                                    </div>
+                                                    <div className="flex items-center">
+                                                        {post.readTime ||
+                                                            "2 min read"}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })}
 
                             {/* Loading state */}
                             {loading &&
@@ -370,10 +383,10 @@ const ArticleFeed = () => {
                                 </div>
                             )}
 
-                            {/* End of feed message */}
+                            {/* End of feed msg */}
                             {!loading && !hasMore && posts.length > 0 && (
                                 <div className="text-center py-8 text-gray-500">
-                                    <p>You've reached the end</p>
+                                    <p>You&apos;ve reached the end</p>
                                 </div>
                             )}
                         </div>

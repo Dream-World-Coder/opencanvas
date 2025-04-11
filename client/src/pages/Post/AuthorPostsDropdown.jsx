@@ -1,14 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import PropTypes from "prop-types";
-import {
-    ChevronDown,
-    ChevronUp,
-    Eye,
-    MessageSquare,
-    ThumbsUp,
-} from "lucide-react";
+import { ChevronDown, ChevronUp, Eye, ThumbsUp } from "lucide-react";
 
 export const AuthorPostsDropdown = ({ author, currentPostId }) => {
     const navigate = useNavigate();
@@ -106,9 +100,11 @@ export const AuthorPostsDropdown = ({ author, currentPostId }) => {
                               <div
                                   key={post._id}
                                   onClick={() => {
-                                      navigate(`/p/${post._id}`);
+                                      navigate(`/p/${post._id}`, {
+                                          state: { post },
+                                      });
                                   }}
-                                  className="flex flex-col border dark:border-[#333] hover:bg-gray-50 dark:hover:bg-gray-900 p-3 rounded-xl transition-all duration-200 cursor-pointer"
+                                  className="flex flex-col border dark:border-[#333] hover:bg-gray-50 dark:hover:bg-[#222] p-3 rounded-xl transition-all duration-200 cursor-pointer"
                               >
                                   <div className="flex space-x-4">
                                       {post.thumbnailUrl && (
@@ -126,18 +122,27 @@ export const AuthorPostsDropdown = ({ author, currentPostId }) => {
                                           <h3 className="font-medium text-lg text-gray-900 dark:text-gray-100 line-clamp-2 capitalize">
                                               {post.title}
                                           </h3>
-                                          <div className="flex items-center mt-2 text-xs text-gray-500 dark:text-gray-400 space-x-3">
+                                          <div className="flex items-center mt-2 text-sm text-gray-700 dark:text-gray-200 space-x-3">
                                               <div className="flex items-center">
-                                                  <Eye className="w-3 h-3 mr-1" />
-                                                  <span>{post.totalViews}</span>
+                                                  <span>
+                                                      {post.totalViews || 0}
+                                                      &nbsp;
+                                                  </span>
+                                                  <b>Views</b>
                                               </div>
                                               <div>·</div>
                                               <div className="flex items-center">
-                                                  <ThumbsUp className="w-3 h-3 mr-1" />
-                                                  <span>{post.totalLikes}</span>
+                                                  <span>
+                                                      {post.totalLikes || 0}{" "}
+                                                      &nbsp;
+                                                  </span>
+                                                  <b>Likes</b>
                                               </div>
                                               <div>·</div>
-                                              <div>{post.readTime}</div>
+                                              <div>
+                                                  {post.readTime ||
+                                                      "2 min read"}
+                                              </div>
                                           </div>
                                       </div>
                                   </div>

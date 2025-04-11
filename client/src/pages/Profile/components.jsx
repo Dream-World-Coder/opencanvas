@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import {
@@ -8,6 +9,8 @@ import {
     Share2,
     Info,
     Copy,
+    ChevronLeft,
+    ChevronRight,
 } from "lucide-react";
 import {
     AlertDialog,
@@ -30,8 +33,20 @@ import {
 import { toast } from "sonner";
 import { useDataService } from "../../services/dataService";
 import { useAuth } from "../../contexts/AuthContext";
+import { formatDistanceToNow } from "date-fns";
 
-export const TabComponent = ({ activeTab, setActiveTab }) => {
+export const formatDates = (date) => {
+    try {
+        return formatDistanceToNow(new Date(date), {
+            addSuffix: true,
+        });
+    } catch (error) {
+        console.log(error);
+        return "some time ago";
+    }
+};
+
+export const PostFilterTabs = ({ activeTab, setActiveTab }) => {
     const tabs = [
         { id: "all", label: "All Works" },
         { id: "article", label: "Articles" },
@@ -58,7 +73,7 @@ export const TabComponent = ({ activeTab, setActiveTab }) => {
         </div>
     );
 };
-TabComponent.propTypes = {
+PostFilterTabs.propTypes = {
     setActiveTab: PropTypes.func,
     activeTab: PropTypes.string,
 };
@@ -286,7 +301,7 @@ PostActionsPublic.propTypes = {
     post: PropTypes.object,
 };
 
-export const FollowUnfollow = ({ currentProfile }) => {
+export const ContactInformationDropdown = ({ currentProfile }) => {
     return (
         <AlertDialog>
             <AlertDialogTrigger className="flex items-center justify-center gap-2">
@@ -299,7 +314,7 @@ export const FollowUnfollow = ({ currentProfile }) => {
                         {currentProfile.contactInformation.map(
                             (item, index) => (
                                 <div key={index} className="mb-3">
-                                    <h3 className="flex items-center justify-between font-semibold text-[#111]">
+                                    <h3 className="flex items-center justify-between font-semibold text-[#111] dark:text-white">
                                         {item.title}
 
                                         <button
@@ -329,6 +344,119 @@ export const FollowUnfollow = ({ currentProfile }) => {
     );
 };
 
-FollowUnfollow.propTypes = {
+ContactInformationDropdown.propTypes = {
     currentProfile: PropTypes.object,
+};
+
+export const FeaturedWorks = ({ currentUser }) => {
+    const scrollContainerRef = useRef(null);
+    const navigate = useNavigate();
+    const [showLeftArrow, setShowLeftArrow] = useState(false);
+    const [showRightArrow, setShowRightArrow] = useState(false);
+
+    // Check if scrolling is available
+    const checkScroll = () => {
+        const container = scrollContainerRef.current;
+        if (!container) return;
+
+        const hasScrollableContent =
+            container.scrollWidth > container.clientWidth;
+        const atLeftEdge = container.scrollLeft <= 10;
+        const atRightEdge =
+            container.scrollLeft + container.clientWidth >=
+            container.scrollWidth - 10;
+
+        setShowLeftArrow(hasScrollableContent && !atLeftEdge);
+        setShowRightArrow(hasScrollableContent && !atRightEdge);
+    };
+
+    // Scroll functions
+    const scrollLeft = () => {
+        scrollContainerRef.current.scrollBy({ left: -300, behavior: "smooth" });
+    };
+
+    const scrollRight = () => {
+        scrollContainerRef.current.scrollBy({ left: 300, behavior: "smooth" });
+    };
+
+    // Check on mount and resize
+    useEffect(() => {
+        checkScroll();
+        window.addEventListener("resize", checkScroll);
+        return () => window.removeEventListener("resize", checkScroll);
+    }, []);
+
+    return (
+        <>
+            {currentUser.featuredItems.length > 0 && (
+                <div className="mb-24 relative">
+                    <h2 className="text-2xl font-semibold tracking-tight mb-8 dark:text-[#f0f0f0]">
+                        <span className="bg-inherit dark:bg-inherit hover:bg-lime-100 dark:hover:bg-[#222] rounded-md box-content px-2 py-1">
+                            Featured Works
+                        </span>
+                    </h2>
+
+                    {/* Left Scroll Indicator */}
+                    {showLeftArrow && (
+                        <button
+                            onClick={scrollLeft}
+                            className="absolute left-0 top-1/2 mt-4 transform -translate-y-1/2 bg-white dark:bg-[#1a1a1a] p-2 rounded-full shadow-md z-10 flex items-center"
+                        >
+                            <ChevronLeft className="w-5 h-5" />
+                        </button>
+                    )}
+
+                    {/* Right Scroll Indicator */}
+                    {showRightArrow && (
+                        <button
+                            onClick={scrollRight}
+                            className="absolute right-0 top-1/2 mt-4 transform -translate-y-1/2 bg-white dark:bg-[#1a1a1a] p-2 rounded-full shadow-md z-10 flex items-center"
+                        >
+                            <ChevronRight className="w-5 h-5" />
+                        </button>
+                    )}
+
+                    <div
+                        ref={scrollContainerRef}
+                        className="flex gap-6 overflow-x-auto scrollbar-hide flex-nowrap pb-4"
+                        onScroll={checkScroll}
+                    >
+                        {currentUser.featuredItems.map((item) => (
+                            <div
+                                key={item.itemId}
+                                className="group cursor-pointer min-w-[200px] md:min-w-[300px] max-w-[200px] md:max-w-[300px]"
+                                onClick={() => {
+                                    item.itemType === "Post"
+                                        ? navigate(`/p/${item.itemId}`)
+                                        : navigate(`/c/${item.itemId}`);
+                                }}
+                            >
+                                <div className="relative aspect-square overflow-hidden mb-4">
+                                    <img
+                                        src={item.itemThumbnail}
+                                        alt={item.itemTitle}
+                                        className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+                                    />
+                                    {/* dark inset on hover */}
+                                    <div className="absolute inset-0 bg-black/20 dark:bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                        {/* <Share2 className="w-6 h-6 text-white" /> */}
+                                    </div>
+                                </div>
+                                <h3 className="text-lg font-medium mb-1 flex justify-between dark:text-[#e8e8e8]">
+                                    {item.itemTitle}
+                                    <Share2 className="w-6 h-6 text-black dark:text-white rounded-lg p-1 hover:bg-yellow-200 dark:hover:bg-[#2c2c2c]" />
+                                </h3>
+                                <p className="text-sm text-gray-400 dark:text-[#888]">
+                                    {item.itemType.toLowerCase()}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </>
+    );
+};
+FeaturedWorks.propTypes = {
+    currentUser: PropTypes.object,
 };

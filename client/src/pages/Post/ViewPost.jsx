@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import {
     Eye,
@@ -44,6 +44,7 @@ function sharePost(post) {
 
 const ViewPost = ({ isArticle = true }) => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { currentUser } = useAuth();
     const { postId } = useParams();
     const {
@@ -68,12 +69,11 @@ const ViewPost = ({ isArticle = true }) => {
     const [isSaved, setIsSaved] = useState(false);
 
     const viewCounted = useViewTracker(postId);
-
-    /* It works because of the loading state,
-    the rendering is starting before the useEffect completion,
-    thus post.title is undefined. -> not acctually,
-    i mean many be the return() executes first before postId gets to change and ask for an re-render
-    But with loading on, the return statement is only a simple html, so it works */
+    useEffect(() => {
+        if (viewCounted) {
+            post.totalViews += 1;
+        }
+    }, [viewCounted, post]);
 
     useEffect(() => {
         async function fetchPost() {
@@ -110,14 +110,37 @@ const ViewPost = ({ isArticle = true }) => {
                 setLoading(false);
             }
         }
-        fetchPost();
-    }, [postId]);
+        if (!location.state) {
+            fetchPost();
+        } else {
+            const postData = location.state?.post;
+            setPost(postData);
+            setLikes(postData.totalLikes);
+            setIsLiked(
+                !!currentUser &&
+                    !!currentUser.likedPosts.includes(postData._id),
+            );
+            setIsDisliked(
+                !!currentUser &&
+                    !!currentUser.dislikedPosts.includes(postData._id),
+            );
+            setIsSaved(
+                !!currentUser &&
+                    !!currentUser.savedPosts.includes(postData._id),
+            );
+            setFollowing(
+                !!currentUser &&
+                    !!currentUser.following
+                        .map((item) => item.userId)
+                        .includes(postData.authorId),
+            );
 
-    useEffect(() => {
-        if (viewCounted) {
-            post.totalViews += 1;
+            getAuthorProfile(postData.authorId)
+                .then((profile) => setAuthor(profile))
+                .catch((err) => console.error("Failed to fetch author", err))
+                .finally(() => setLoading(false));
         }
-    }, [viewCounted]);
+    }, [postId]);
 
     async function handleLike(postId) {
         // remove dislike first if needed
@@ -232,7 +255,7 @@ const ViewPost = ({ isArticle = true }) => {
     const readOptions = [
         { name: "Home", href: "#" },
         { name: "Discover", href: "#" },
-        { name: "B-ookmarks", href: "#" },
+        { name: "Bookmarks", href: "#" },
         { name: "Profile", href: "#" },
         { name: "My Feed", href: "#" },
     ];
@@ -260,7 +283,7 @@ const ViewPost = ({ isArticle = true }) => {
         dateModified: formatSchemaDate(post.modifiedAt),
         author: {
             "@type": "Person",
-            name: author.fullName,
+            name: post.author.name,
         },
         publisher: {
             "@type": "Organization",
@@ -325,12 +348,7 @@ const ViewPost = ({ isArticle = true }) => {
                 <Header
                     noBlur={true}
                     ballClr={"text-gray-300"}
-                    exclude={[
-                        "/about",
-                        "/contact",
-                        "/photo-gallery",
-                        "/literature",
-                    ]}
+                    exclude={["/about", "/contact", "/photo-gallery"]}
                 />
                 <div className="flex flex-col md:flex-row min-h-screen max-w-screen-xl mx-auto bg-white dark:bg-[#111] text-gray-900 dark:text-gray-100">
                     {/* Left sidebar - Read Options or folder structure in case of collection */}
@@ -375,24 +393,27 @@ const ViewPost = ({ isArticle = true }) => {
                         {/* Article header */}
                         <div className="mb-8">
                             <div className="flex flex-col md:flex-row items-start md:items-center justify-between space-y-2 md:space-y-0 mb-4">
-                                <div className="flex items-center">
-                                    <Avatar
-                                        className="h-10 w-10 mr-3 cursor-pointer"
-                                        onClick={() => {
-                                            navigate(`/u/${author.username}`);
-                                        }}
-                                    >
+                                <div
+                                    className="flex items-center cursor-pointer"
+                                    onClick={() => {
+                                        navigate(`/u/${post.author.username}`);
+                                        // navigate(`/u/${post.author.username}`, {
+                                        //     state: { author },
+                                        // });
+                                    }}
+                                >
+                                    <Avatar className="h-10 w-10 mr-3">
                                         <AvatarImage
-                                            src={author.profilePicture}
-                                            alt={author.fullName}
+                                            src={post.author.profilePicture}
+                                            alt={post.author.name}
                                         />
                                         <AvatarFallback>
-                                            {author.fullName.charAt(0)}
+                                            {post.author.name.charAt(0)}
                                         </AvatarFallback>
                                     </Avatar>
                                     <div className="">
                                         <div className="font-medium flex items-center justify-start gap-2">
-                                            {author.fullName}
+                                            {post.author.name}
 
                                             {currentUser?._id?.toString() !==
                                                 post.authorId?.toString() && (
@@ -587,3 +608,8 @@ export default ViewPost;
 ViewPost.propTypes = {
     isArticle: PropTypes.bool,
 };
+/* It works because of the loading state,
+the rendering is starting before the useEffect completion,
+thus post.title is undefined. -> not acctually,
+i mean many be the return() executes first before postId gets to change and ask for an re-render
+But with loading on, the return statement is only a simple html, so it works */

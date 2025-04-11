@@ -1,13 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import {
-    Share2,
-    ThumbsUp,
-    MessageCircle,
-    Eye,
-    CircleCheck,
-} from "lucide-react";
+import { ThumbsUp, MessageCircle, Eye, CircleCheck } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -16,26 +10,21 @@ import { toast } from "sonner";
 import ProfileHeader from "../../components/Header/ProfileHeader";
 import ProfileFooter from "../../components/Footer/ProfileFooter";
 import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
-import { TabComponent, PostActionsPublic, FollowUnfollow } from "./components";
+import {
+    PostFilterTabs,
+    PostActionsPublic,
+    ContactInformationDropdown,
+    FeaturedWorks,
+    formatDates,
+} from "./components";
 import { useDataService } from "../../services/dataService";
 import { useAuth } from "../../contexts/AuthContext";
 import { useDarkMode } from "../../components/Hooks/darkMode";
-import { formatDistanceToNow } from "date-fns";
-
-const formatDates = (date) => {
-    try {
-        return formatDistanceToNow(new Date(date), {
-            addSuffix: true,
-        });
-    } catch (error) {
-        console.log(error);
-        return "some time ago";
-    }
-};
 
 const PublicProfile = () => {
     const isDark = useDarkMode();
     const navigate = useNavigate();
+    const location = useLocation();
     const { username } = useParams();
     const { currentUser } = useAuth();
     const { followUser } = useDataService();
@@ -46,64 +35,23 @@ const PublicProfile = () => {
     const [activeTab, setActiveTab] = useState("all");
     const [postsToFetch, setPostsToFetch] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [following, setFollowing] = useState(false);
 
-    // fetch the current profile
-    useEffect(() => {
-        async function fetchCurrentProfile(username) {
-            if (!username) {
-                navigate("/404");
-                return;
-            }
-
-            setIsLoading(true);
-            const apiUrl = `http://127.0.0.1:3000/u/${username}`;
-
-            try {
-                const res = await fetch(apiUrl);
-
-                if (!res.ok) {
-                    navigate("/404");
-                    return;
-                }
-
-                const data = await res.json();
-                setCurrentProfile(data.user);
-                setFollowing(
-                    !!currentUser &&
-                        !!currentUser.following
-                            .map((item) => item.userId)
-                            .includes(data.user._id),
-                );
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setIsLoading(false);
-            }
-        }
-
-        fetchCurrentProfile(username);
-    }, [username, navigate, currentUser]);
-
-    // fetch posts from public user's postIds array
-    const fetchUserPosts = async () => {
+    // fetches user's posts
+    const fetchUserPosts = async (user) => {
         try {
             setLoading(true);
-            if (
-                !currentProfile ||
-                !currentProfile.posts ||
-                currentProfile.posts.length === 0
-            ) {
+            if (!user || !user.posts || user.posts.length === 0) {
                 setPosts([]);
                 setLoading(false);
                 return;
             }
 
-            if (currentProfile.posts.length < postsToFetch) return;
+            if (user.posts.length < postsToFetch) return;
 
             // post IDs to query string
-            const postIdsParam = currentProfile.posts
+            const postIdsParam = user.posts
                 .slice(0 + postsToFetch, 10 + postsToFetch)
                 .join(",");
 
@@ -138,12 +86,45 @@ const PublicProfile = () => {
         }
     };
 
-    // fetching posts
+    // fetch the current profile
     useEffect(() => {
-        if (currentProfile) {
-            fetchUserPosts();
+        async function fetchCurrentProfile(username) {
+            if (!username) {
+                navigate("/404");
+                return;
+            }
+
+            setIsLoading(true);
+            const apiUrl = `http://127.0.0.1:3000/u/${username}`;
+
+            try {
+                const res = await fetch(apiUrl);
+
+                if (!res.ok) {
+                    navigate("/404");
+                    return;
+                }
+
+                const data = await res.json();
+                setCurrentProfile(data.user);
+                setFollowing(
+                    !!currentUser &&
+                        !!currentUser.following
+                            .map((item) => item.userId)
+                            .includes(data.user._id),
+                );
+
+                // fetching posts
+                await fetchUserPosts(data.user);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setIsLoading(false);
+            }
         }
-    }, [currentProfile]);
+
+        fetchCurrentProfile(username);
+    }, [username, navigate, currentUser]);
 
     async function handleFollow(personToFollow) {
         let res = await followUser(personToFollow);
@@ -338,7 +319,7 @@ const PublicProfile = () => {
                                     )
                                 )}
 
-                                <FollowUnfollow
+                                <ContactInformationDropdown
                                     currentProfile={currentProfile}
                                 />
                             </div>
@@ -363,57 +344,7 @@ const PublicProfile = () => {
                         </div>
 
                         {/* featured */}
-                        {currentProfile.featuredItems.length > 0 && (
-                            <div className="mb-24">
-                                <h2 className="text-2xl font-semibold tracking-tight mb-8 dark:text-[#f0f0f0]">
-                                    <span className="bg-inherit dark:bg-inherit hover:bg-lime-100 dark:hover:bg-[#222] rounded-md box-content px-2 py-1">
-                                        Featured Works
-                                    </span>
-                                </h2>
-                                <div
-                                    // data-lenis-prevent
-                                    // className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 grid-rows-1 overflow-x-auto scrollbar-hide"
-                                    className="flex gap-6 overflow-x-auto scrollbar-hide flex-nowrap"
-                                >
-                                    {currentProfile.featuredItems.map(
-                                        (item) => (
-                                            <div
-                                                key={item.itemId}
-                                                className="group cursor-pointer min-w-[200px] md:min-w-[300px] max-w-[200px] md:max-w-[300px]"
-                                                onClick={() => {
-                                                    item.itemType === "Post"
-                                                        ? navigate(
-                                                              `/p/${item.itemId}`,
-                                                          )
-                                                        : navigate(
-                                                              `/c/${item.itemId}`,
-                                                          );
-                                                }}
-                                            >
-                                                <div className="relative aspect-square overflow-hidden mb-4">
-                                                    <img
-                                                        src={item.itemThumbnail}
-                                                        alt={item.itemTitle}
-                                                        className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
-                                                    />
-                                                    {/* dark inset on hover */}
-                                                    <div className="absolute inset-0 bg-black/20 dark:bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                                                        {/* <Share2 className="w-6 h-6 text-white" /> */}
-                                                    </div>
-                                                </div>
-                                                <h3 className="text-lg font-medium mb-1 flex justify-between dark:text-[#e8e8e8]">
-                                                    {item.itemTitle}
-                                                    <Share2 className="w-6 h-6 text-black dark:text-white rounded-lg p-1 hover:bg-yellow-200 dark:hover:bg-[#2c2c2c]" />
-                                                </h3>
-                                                <p className="text-sm text-gray-400 dark:text-[#888]">
-                                                    {item.itemType.toLowerCase()}
-                                                </p>
-                                            </div>
-                                        ),
-                                    )}
-                                </div>
-                            </div>
-                        )}
+                        <FeaturedWorks currentUser={currentProfile} />
 
                         {/* filter tabs */}
                         {posts.length > 0 && (
@@ -421,7 +352,7 @@ const PublicProfile = () => {
                                 id="post-view"
                                 className="border-b border-gray-200 dark:border-[#333] mb-8"
                             >
-                                <TabComponent
+                                <PostFilterTabs
                                     activeTab={activeTab}
                                     setActiveTab={setActiveTab}
                                 />
@@ -588,7 +519,9 @@ const PublicProfile = () => {
                                             currentProfile &&
                                             currentProfile.posts
                                         ) {
-                                            await fetchUserPosts();
+                                            await fetchUserPosts(
+                                                currentProfile,
+                                            );
                                         }
                                     }}
                                 >

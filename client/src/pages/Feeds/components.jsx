@@ -1,19 +1,18 @@
 import { Filter } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import PropTypes from "prop-types"
+import PropTypes from "prop-types";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
 import { useAuth } from "../../contexts/AuthContext";
 
-export const LeftSideBar = ({selectedTopics, setSelectedTopics}) => {
+export const LeftSideBar = ({ selectedTopics, setSelectedTopics }) => {
     const feedOptions = [
-        { name: "For You", href: "#" },
-        { name: "Following", href: "#" },
-        { name: "Popular", href: "#" },
-        { name: "Recommended", href: "#" },
-        { name: "Latest", href: "#" },
+        { name: "For You" },
+        { name: "Following" },
+        { name: "Popular" },
+        { name: "Latest" },
     ];
 
     return (
@@ -21,13 +20,12 @@ export const LeftSideBar = ({selectedTopics, setSelectedTopics}) => {
             <div className="font-bold mb-4">Feed Options</div>
             <nav className="space-y-2">
                 {feedOptions.map((link, index) => (
-                    <a
+                    <div
                         key={index}
-                        href={link.href}
-                        className="block p-2 rounded hover:bg-gray-100 dark:hover:bg-[#222] transition duration-0"
+                        className="block p-2 rounded hover:bg-gray-100 dark:hover:bg-[#222] transition duration-0 cursor-pointer"
                     >
                         {link.name}
-                    </a>
+                    </div>
                 ))}
             </nav>
 
@@ -43,6 +41,7 @@ export const LeftSideBar = ({selectedTopics, setSelectedTopics}) => {
                         "Art",
                         "Science",
                         "Philosophy",
+                        "A",
                     ].map((topic) => (
                         <div key={topic} className="flex items-center">
                             <input
@@ -51,16 +50,25 @@ export const LeftSideBar = ({selectedTopics, setSelectedTopics}) => {
                                 className="mr-2"
                                 onChange={() => {
                                     setSelectedTopics((prev) => {
-                                        if (prev.includes(topic)) {
+                                        if (
+                                            prev.includes(topic.toLowerCase())
+                                        ) {
                                             return prev.filter(
-                                                (t) => t !== topic,
+                                                (t) =>
+                                                    t !== topic.toLowerCase(),
                                             );
                                         } else {
-                                            return [...prev, topic];
+                                            return [
+                                                ...prev,
+                                                topic.toLowerCase(),
+                                            ];
                                         }
                                     });
+                                    console.log(selectedTopics);
                                 }}
-                                checked={selectedTopics.includes(topic)}
+                                checked={selectedTopics.includes(
+                                    topic.toLowerCase(),
+                                )}
                             />
                             <label htmlFor={`topic-${topic}`}>{topic}</label>
                         </div>
@@ -71,10 +79,10 @@ export const LeftSideBar = ({selectedTopics, setSelectedTopics}) => {
     );
 };
 
-LeftSideBar.propTypes={
-    selectedTopics:PropTypes.array,
-    setSelectedTopics:PropTypes.func
-}
+LeftSideBar.propTypes = {
+    selectedTopics: PropTypes.array,
+    setSelectedTopics: PropTypes.func,
+};
 
 export const RightSideBar = () => {
     const { currentUser } = useAuth();
