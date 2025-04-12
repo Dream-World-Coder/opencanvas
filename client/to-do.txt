@@ -1,8 +1,6 @@
--- better pdf quality and page breaks
--- optimisations to load faster
--- Keyboard shortcuts for differnt formats,
-
 -- index the db
+-- comments
+-- imageUpload
 -- interested topics add in settings
 -- add useStrict in main.jsx if needed
 
@@ -24,3 +22,6 @@
     html in export formats
     mermaid support
     beginner totorial vid
+    better pdf quality and page breaks
+    optimisations to load faster
+    Keyboard shortcuts for differnt formats,
