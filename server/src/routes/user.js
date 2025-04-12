@@ -173,6 +173,8 @@ router.get("/u/:username", async (req, res) => {
             });
         }
 
+        user.posts = [...user.posts].reverse();
+
         return res.status(200).json({
             success: true,
             user,
@@ -214,6 +216,8 @@ async function getUserPublicProfileById(req, res) {
                 message: "User not found",
             });
         }
+
+        author.posts = [...author.posts].reverse();
 
         return res.status(200).json({
             success: true,

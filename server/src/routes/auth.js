@@ -148,6 +148,8 @@ router.get("/user", authenticateToken, async (req, res) => {
             });
         }
 
+        user.posts = [...user.posts].reverse();
+
         return res.status(200).json({
             success: true,
             user,

@@ -127,7 +127,7 @@ router.post(
                 postId: savedPost._id,
             });
         } catch (error) {
-            console.error("Get post[written] upload error:", error);
+            console.error("Save/update post[written] upload error:", error);
             return res.status(500).json({
                 success: false,
                 message: "Failed to upload post",
