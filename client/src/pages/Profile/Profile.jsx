@@ -27,7 +27,7 @@ const Profile = () => {
     const [activeTab, setActiveTab] = useState("all");
     const [posts, setPosts] = useState([]);
     // const [collections, setCollections] = useState([]);
-    const [postsToFetch, setPostsToFetch] = useState(0);
+    const [postsToFetchIndex, setPostsToFetchIndex] = useState(0);
     const [loading, setLoading] = useState(true);
     const userStats = [
         // {
@@ -67,14 +67,14 @@ const Profile = () => {
                 return;
             }
 
-            if (currentUser.posts.length < postsToFetch) return;
+            if (currentUser.posts.length < postsToFetchIndex) return;
 
             // post IDs to query string
             const postIdsParam = currentUser.posts
-                .slice(0 + postsToFetch, 10 + postsToFetch)
+                .slice(0 + postsToFetchIndex, 10 + postsToFetchIndex)
                 .join(",");
 
-            setPostsToFetch(postsToFetch + 10);
+            setPostsToFetchIndex(postsToFetchIndex + 10);
 
             const response = await fetch(
                 `http://127.0.0.1:3000/u/posts/byids`,
@@ -359,7 +359,7 @@ const Profile = () => {
                         </div>
 
                         {/* load more button */}
-                        {currentUser.posts.length > postsToFetch && (
+                        {currentUser.posts.length > postsToFetchIndex && (
                             <div className="w-[100%] flex items-center justify-center">
                                 <Button
                                     className="mx-auto z-20 dark:invert"

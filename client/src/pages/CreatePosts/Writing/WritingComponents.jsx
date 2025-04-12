@@ -361,8 +361,8 @@ export const MarkdownPreview = ({
     const getImageSettings = (imageId) => {
         if (!imageSettingsRef.current[imageId]) {
             imageSettingsRef.current[imageId] = {
-                maxWidth: 500,
-                maxHeight: 360,
+                maxWidth: 768,
+                maxHeight: 768,
                 alignment: "center",
                 marginTop: 35,
                 marginBottom: 35,
@@ -463,7 +463,7 @@ export const MarkdownPreview = ({
                                             }
                                         >
                                             <img
-                                                className={`relative object-cover`}
+                                                className={`relative object-contain`}
                                                 style={{
                                                     maxHeight: `${settings.maxHeight}px`,
                                                     maxWidth: `${settings.maxWidth}px`,
