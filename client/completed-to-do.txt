@@ -1,0 +1,138 @@
+-- [x] change seo urls from opencanvas.blog -> myopencanvas.in
+-- [x] Theme options: yellow, white, black
+-- [x] Dropcaps and [less imp]:image direction & orientation
+-- [x] Mobile Responsive
+
+-- [x] ADD loading page when transitioning
+-- [x] drop cap + ``
+-- [x] hidden when preview
+-- [x] scroll fix
+-- [x] dropdown on export button
+
+-- [x] remove unnecessary
+-- [x] preview div fix
+-- [x] theme
+-- [x] remove gap
+-- dropdowns for heading and list ~ NO
+-- [x] text alignment [center/left]
+-- formatting tools appear on text select ~ NO
+-- [x] pages showing Mode for clear distinction of pages
+
+-- [x] in phone remove: heading, quote, inlineCode, list
+
+-- [x] copy & save button not working in phone
+-- [x] when export warning: file cannot be downloaded securely in phones, why
+
+-- [x] find and replace
+
+-- [x] decide main route : /articles
+-- [x] create sitemap.xml and make google indexing,
+-- [x] internal linking for better seo
+
+-- [x] usename, fullname and profile update options
+-- [x] blog Post
+-- [x] image fix
+-- [x] public profile
+-- [x] skeleton
+
+-- [x] two url: public(/u/:username) & private (/profile)
+
+
+-- [x] thumbnail in article
+
+
+-- [x] profile settings:
+1. genaral: theme
+2. notifications
+
+-- personal information:
+1. add title/bio
+2. change username profile picture
+
+-- [x] add contact information in public profile
+-- [x] delete account
+-- [x] always keep the post write option
+-- [x] copy link to public profile
+
+-- profeatures
+1.
+
+
+-- [x] use pop over instead of sheet in the writing-pad
+-- [x] localhost for saving id
+-- [x] md2pdf route and public profile
+-- [x] profile settings
+-- [x] post & article view
+
+
+-- [x] use searchbar or the name of the page, like login instead of `opencanvas` logo in headers, as no need to go there after login
+-- [x] use axios for fetching and for some common fetches use the src/services/dataService.js
+-- [x] save & clear post id in local storage or some other place so that id does not creates different post id
+-- [x] add specific schemadata in About & contact page
+-- [x] last 5 logins in /profile/settings
+-- [x] no need of photo gallery, its simply not for that level of photography
+
+-- [x] remove photography from keywords
+-- [x] mainly for written art
+-- 1 blog browser : only articles
+-- 2 written posts : literature gallery
+
+-- [x] check the order of the posts in profile, should be : newest -> oldest
+-- [x] msg+contact info add in profile settings
+-- [x] saved posts profile nav
+-- [x] may be add navigate features to post thumbnails of /profile posts also, like public profile
+
+-- [x] loader in the writing pad and profile settings
+-- [x] helmet in profile
+-- [x] remove author from post, fetch the author
+-- [x] fetch author in article page
+
+
+-- [x] if post is already loaded in feed, use it somehow
+pass it as props then
+-- [x] add attributes like totalEngageMent, totalImpressioins inside posts & usrers, updae schedule wise,
+
+-- [x] in featuredItems add store things like {title, thumbnail, type, Id}
+-- [x] now on click links to the post --> type & id for url generation
+
+
+-- [x] no need for intermediate post preview [like in profilepage] ---
+    only 2 states: normal & in view -- less dbQuery
+
+    on profilePage: choose between the 3 stages mentioned earlier ->
+        if `view`:open in postViewer
+        if `edit` open in writingPad with properId
+        if `delete` confirm & delete
+
+-- [x] in more from author section same posts are staying again and again, cuz they are not refetched, so the solution will be to force shut the drawer and clean the html/i mean stateVariable,,, when new post loads, so it has to be manually opened, and if it is not
+
+
+
+/*****************
+data
+_________________/
+    book: collection of articles, stories, poems
+    collection: coll of photos
+
+    store postTitle, shortDescription also anong with it's id in currentUser.posts[], it will reduce db query a lot
+    ~~~ NOT needed, habe to fetch author for related posts, have to use redis
+
+    :page breaks will be easy: find the page length of html2pdf module and add
+    <span className=html2pdf__page-break></span>
+    need to check scale up/down s though, --> adding pages creates complexity in image handling, so no need to use it in web version
+
+    img options are for pdf export only
+
+    *** images are not posts, so no need to count them there, like post.type = post etc, they will be loaded differently
+
+
+
+
+------
+TL;DR
+------
+else focus will be gone by browsing different sections, here browse one type of thing
+
+and in the feed, imgs will not be recommended or will be less recommended, they will be in the profile only
+
+collections, imgs, books etc will not be in feed, will only gen when searched for.

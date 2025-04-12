@@ -1,13 +1,20 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Skeleton } from "@/components/ui/skeleton";
 import PropTypes from "prop-types";
-import { ChevronDown, ChevronUp, Eye, ThumbsUp } from "lucide-react";
 
-export const AuthorPostsDropdown = ({ author, currentPostId }) => {
+import { Skeleton } from "@/components/ui/skeleton";
+
+import { ChevronDown, ChevronUp } from "lucide-react";
+
+export const AuthorPostsDropdown = ({
+    author,
+    currentPostId,
+    authorPosts,
+    setAuthorPosts,
+    isOpen,
+    setIsOpen,
+}) => {
     const navigate = useNavigate();
-    const [isOpen, setIsOpen] = useState(false);
-    const [authorPosts, setAuthorPosts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [publicPosts, setPublicPosts] = useState([]);
 
@@ -162,4 +169,8 @@ export const AuthorPostsDropdown = ({ author, currentPostId }) => {
 AuthorPostsDropdown.propTypes = {
     author: PropTypes.object,
     currentPostId: PropTypes.string,
+    authorPosts: PropTypes.array,
+    setAuthorPosts: PropTypes.func,
+    isOpen: PropTypes.bool,
+    setIsOpen: PropTypes.func,
 };

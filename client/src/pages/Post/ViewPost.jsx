@@ -68,6 +68,10 @@ const ViewPost = ({ isArticle = true }) => {
     const [isDisliked, setIsDisliked] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
 
+    // needed here to fetch freshly instead prefetched
+    const [authorPosts, setAuthorPosts] = useState([]);
+    const [isOpen, setIsOpen] = useState(false);
+
     const viewCounted = useViewTracker(postId);
     useEffect(() => {
         if (viewCounted) {
@@ -140,6 +144,8 @@ const ViewPost = ({ isArticle = true }) => {
                 .catch((err) => console.error("Failed to fetch author", err))
                 .finally(() => setLoading(false));
         }
+        setAuthorPosts([]);
+        setIsOpen(false);
     }, [postId]);
 
     async function handleLike(postId) {
@@ -586,6 +592,10 @@ const ViewPost = ({ isArticle = true }) => {
                         <AuthorPostsDropdown
                             author={author}
                             currentPostId={post._id.toString()}
+                            authorPosts={authorPosts}
+                            setAuthorPosts={setAuthorPosts}
+                            isOpen={isOpen}
+                            setIsOpen={setIsOpen}
                         />
 
                         {/* Related posts section */}
