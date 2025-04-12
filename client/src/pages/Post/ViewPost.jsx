@@ -295,8 +295,8 @@ const ViewPost = ({ isArticle = true }) => {
     );
 };
 
-export default ViewPost;
-
 ViewPost.propTypes = {
     isArticle: PropTypes.bool,
 };
+
+export default ViewPost;

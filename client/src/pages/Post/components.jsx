@@ -18,6 +18,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import Header from "../../components/Header/Header";
 
+/**
+ *
+ * @param {*} post
+ */
 function sharePost(post) {
     const baseUrl = window.location.origin;
     const postUrl = `${baseUrl}/p/${post._id}`;
@@ -33,6 +37,11 @@ function sharePost(post) {
         });
 }
 
+/**
+ *
+ * @param {*} param0
+ * @returns
+ */
 export const PostHelmet = ({ post }) => {
     function formatSchemaDate(date) {
         return new Date(date).toISOString();
@@ -110,6 +119,10 @@ PostHelmet.propTypes = {
     post: PropTypes.object,
 };
 
+/**
+ *
+ * @returns
+ */
 export const LoadingPost = () => {
     return (
         <div className="flex justify-center items-center h-screen text-black dark:text-white">
@@ -117,6 +130,11 @@ export const LoadingPost = () => {
         </div>
     );
 };
+
+/**
+ *
+ * @returns
+ */
 export const NotPost = () => {
     const navigate = useNavigate();
     return (
@@ -137,6 +155,11 @@ export const NotPost = () => {
         </div>
     );
 };
+
+/**
+ *
+ * @returns
+ */
 export const NotPublicPost = () => {
     return (
         <div className="w-full h-full grid place-items-center bg-white dark:bg-[#111] overflow-x-hidden pt-20">
@@ -155,6 +178,11 @@ i mean many be the return() executes first before postId gets to change and ask 
 But with loading on, the return statement is only a simple html, so it works
 */
 
+/**
+ *
+ * @param {*} param0
+ * @returns
+ */
 export const LeftSidebar = ({ focusMode, isArticle }) => {
     const readOptions = [
         { name: "Home" },
@@ -172,7 +200,7 @@ export const LeftSidebar = ({ focusMode, isArticle }) => {
             {/* back button */}
             {isArticle && (
                 <button
-                    className="absolute top-8 right-0 rounded-full text-sm bg-cream hover:bg-cream-dark dark:bg-[#111] border box-content p-1 text-stone-600/80 dark:border-[#333]"
+                    className="absolute top-8 right-0 rounded-full text-sm bg-gray-100 hover:bg-gray-200 dark:bg-[#111] border box-content p-1 text-stone-600/80 dark:border-[#333]"
                     onClick={() => {
                         navigate(-1);
                     }}
@@ -204,6 +232,10 @@ LeftSidebar.propTypes = {
     isArticle: PropTypes.bool,
 };
 
+/**
+ *
+ * @returns
+ */
 export const RightSidebar = () => {
     return (
         <aside className="w-full md:w-64 p-4 hidden lg:block">
@@ -212,6 +244,11 @@ export const RightSidebar = () => {
     );
 };
 
+/**
+ *
+ * @param {*} param0
+ * @returns
+ */
 export const ArticleHeader = ({
     post,
     currentUser,
@@ -291,7 +328,9 @@ export const ArticleHeader = ({
                     </div>
                     <div className="flex items-center justify-center text-white">
                         <Bookmark
-                            className={`size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111]  hover:text-white dark:hover:bg-[#eee] dark:hover:text-black ${isSaved ? "fill-lime-500 text-lime-500" : "dark:text-white text-black"}`}
+                            className={`size-4 cursor-pointer rounded px-2 py-1 box-content
+                                hover:bg-gray-100 dark:hover:bg-[#333]
+                                ${isSaved ? "fill-lime-500 text-lime-500" : "dark:text-white text-black"}`}
                             onClick={async () => {
                                 if (!currentUser) {
                                     toast.error(
@@ -304,11 +343,15 @@ export const ArticleHeader = ({
                         />
                         <span className="w-px h-[15px] dark:bg-[#ccc]/60 bg-[#444]/60" />
                         <Share2
-                            className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] dark:text-white text-black hover:text-white dark:hover:bg-[#eee] dark:hover:text-black"
+                            className="size-4 cursor-pointer rounded px-2 py-1 box-content
+                            hover:bg-gray-100 dark:hover:bg-[#333] text-black dark:text-white"
                             onClick={() => sharePost(post)}
                         />
                         <span className="w-px h-[15px] dark:bg-[#ccc]/60 bg-[#444]/60" />
-                        <MoreHorizontal className="size-4 cursor-pointer rounded px-2 py-1 box-content hover:bg-[#111] dark:text-white text-black hover:text-white dark:hover:bg-[#eee] dark:hover:text-black" />
+                        <MoreHorizontal
+                            className="size-4 cursor-pointer rounded px-2 py-1 box-content
+                        hover:bg-gray-100 dark:hover:bg-[#333] text-black dark:text-white"
+                        />
                     </div>
                 </div>
             </div>
@@ -325,6 +368,11 @@ ArticleHeader.propTypes = {
     isSaved: PropTypes.bool,
 };
 
+/**
+ *
+ * @param {*} param0
+ * @returns
+ */
 export const EngagementSection = ({
     post,
     currentUser,
