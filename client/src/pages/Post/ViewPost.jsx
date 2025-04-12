@@ -355,7 +355,8 @@ const ViewPost = ({ isArticle = true }) => {
                     <aside
                         className={`relative w-full md:w-64 p-4 ${!focusMode ? "border-r border-gray-200 dark:border-[#333]" : ""} hidden md:block`}
                     >
-                        {isArticle && (
+                        {/* back button */}
+                        {/* {isArticle && (
                             <button
                                 className="absolute top-8 right-0 rounded-full text-sm bg-cream hover:bg-cream-dark dark:bg-[#111] border box-content p-1 text-stone-600/80 dark:border-[#333]"
                                 onClick={() => {
@@ -364,7 +365,7 @@ const ViewPost = ({ isArticle = true }) => {
                             >
                                 <ChevronLeft className="size-6" />
                             </button>
-                        )}
+                        )} */}
                         {!focusMode && (
                             <div className="sticky top-4">
                                 <div className="font-bold mb-4">

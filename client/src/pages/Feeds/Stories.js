@@ -9,7 +9,7 @@ const stories = [
         likes: 156,
         saves: 42,
         author: "Eleanor Wells",
-        // gradient: "from-sky-200 to-sky-50",
+        image: "https://picsum.photos/id/10/900",
     },
     {
         id: 2,
@@ -21,6 +21,7 @@ const stories = [
         likes: 123,
         saves: 38,
         author: "Thomas Blake",
+        image: "https://picsum.photos/id/13/900",
     },
     {
         id: 3,
@@ -32,6 +33,7 @@ const stories = [
         likes: 189,
         saves: 56,
         author: "Marie Laurent",
+        image: "https://picsum.photos/id/120/900",
     },
     {
         id: 4,
@@ -61,6 +63,7 @@ const stories = [
         likes: 144,
         saves: 47,
         author: "জীবনানন্দ দাশ",
+        image: "https://picsum.photos/id/28/900",
     },
     {
         id: 5,
@@ -72,6 +75,9 @@ const stories = [
         likes: 132,
         saves: 34,
         author: "Amelia Kent",
+        get image() {
+            return `https://picsum.photos/id/${this.likes}/900`;
+        },
     },
     {
         id: 6,
@@ -83,6 +89,9 @@ const stories = [
         likes: 203,
         saves: 63,
         author: "Nathaniel Grey",
+        get image() {
+            return `https://picsum.photos/id/${this.likes}/900`;
+        },
     },
     {
         id: 7,
@@ -94,6 +103,9 @@ const stories = [
         likes: 158,
         saves: 41,
         author: "Isabella Hart",
+        get image() {
+            return `https://picsum.photos/id/${this.likes}/900`;
+        },
     },
     {
         id: 8,
@@ -105,6 +117,9 @@ const stories = [
         likes: 187,
         saves: 54,
         author: "Julia Marlowe",
+        get image() {
+            return `https://picsum.photos/id/${this.likes}/900`;
+        },
     },
     {
         id: 9,
@@ -116,6 +131,9 @@ const stories = [
         likes: 125,
         saves: 39,
         author: "Edward Holloway",
+        get image() {
+            return `https://picsum.photos/id/${this.likes}/900`;
+        },
     },
     {
         id: 10,
@@ -127,6 +145,9 @@ const stories = [
         likes: 195,
         saves: 58,
         author: "Sophia Clarke",
+        get image() {
+            return `https://picsum.photos/id/${this.likes}/900`;
+        },
     },
     {
         id: 11,
@@ -204,6 +225,9 @@ const stories = [
         likes: 156,
         saves: 42,
         author: "Eleanor Wells",
+        get image() {
+            return `https://picsum.photos/id/${this.likes}/900`;
+        },
     },
 ];
 export default stories;

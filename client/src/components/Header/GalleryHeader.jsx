@@ -31,7 +31,7 @@ const Header = ({ filters }) => {
         setLoading(false);
     }
 
-    let navLinks = [];
+    let navLinks = [{ name: "Articles", href: "/articles" }];
     if (!currentUser) {
         navLinks.push({ name: "Login", href: "/login" });
     }

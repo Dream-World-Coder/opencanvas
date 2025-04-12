@@ -1,9 +1,10 @@
-import { Filter } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
+import { Filter, BookOpen, Clock } from "lucide-react";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -16,9 +17,9 @@ export const LeftSideBar = ({ selectedTopics, setSelectedTopics }) => {
     ];
 
     return (
-        <div className="sticky top-4">
-            <div className="font-bold mb-4">Feed Options</div>
-            <nav className="space-y-2">
+        <div className="p-4 bg-white dark:bg-[#171717] rounded-xl shadow-sm">
+            <div className="space-y-2 border p-4 rounded-xl">
+                <div className="font-bold mb-4">Feed Options</div>
                 {feedOptions.map((link, index) => (
                     <div
                         key={index}
@@ -27,9 +28,9 @@ export const LeftSideBar = ({ selectedTopics, setSelectedTopics }) => {
                         {link.name}
                     </div>
                 ))}
-            </nav>
+            </div>
 
-            <div className="mt-8">
+            <div className="mt-8 border p-4 rounded-xl">
                 <div className="font-bold mb-4 flex items-center">
                     <Filter className="w-4 h-4 mr-2" />
                     Topics
@@ -64,7 +65,6 @@ export const LeftSideBar = ({ selectedTopics, setSelectedTopics }) => {
                                             ];
                                         }
                                     });
-                                    console.log(selectedTopics);
                                 }}
                                 checked={selectedTopics.includes(
                                     topic.toLowerCase(),
@@ -89,7 +89,7 @@ export const RightSideBar = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="sticky top-4">
+        <div className="p-4 bg-white dark:bg-[#171717] rounded-xl shadow-sm">
             <div className="p-4 border border-gray-200 dark:border-[#333] rounded-lg mb-6">
                 <h3 className="font-bold mb-3">Trending Topics</h3>
                 <div className="space-y-2">
@@ -157,4 +157,189 @@ export const RightSideBar = () => {
             )}
         </div>
     );
+};
+
+export const ErrorDisplay = ({ error, fetchPosts }) => {
+    return (
+        <div className="p-6 mb-6 bg-red-50 dark:bg-red-900/20 rounded-xl shadow-sm text-red-600 dark:text-red-400">
+            <p>{error}</p>
+            <Button onClick={fetchPosts} variant="outline" className="mt-4">
+                Retry
+            </Button>
+        </div>
+    );
+};
+
+ErrorDisplay.propTypes = {
+    error: PropTypes.string,
+    fetchPosts: PropTypes.func,
+};
+
+export const PostStats = ({ post }) => {
+    return (
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-[#2a2a2a] text-gray-700 dark:text-gray-300 text-sm">
+            <div className="flex items-center space-x-4">
+                <div className="flex items-center">
+                    {/* <Eye className="h-4 w-4 mr-1.5" />
+                    <span>{post.totalViews || 0}</span> */}
+                    <b>
+                        {post.totalViews || 0}
+                        &nbsp;
+                    </b>
+                    Views
+                </div>
+                <div className="flex items-center">
+                    {/* <Heart className="h-4 w-4 mr-1.5" />
+                    <span>{post.totalLikes || 0}</span> */}
+                    <b>
+                        {post.totalLikes || 0}
+                        &nbsp;
+                    </b>
+                    Likes
+                </div>
+            </div>
+            <div className="flex items-center">
+                <BookOpen className="h-4 w-4 mr-1.5" />
+                <span>{post.readTime || "2 min read"}</span>
+            </div>
+        </div>
+    );
+};
+PostStats.propTypes = {
+    post: PropTypes.object,
+};
+
+export const PostTags = ({ post }) => {
+    return (
+        <div className="flex flex-wrap gap-2 mb-4">
+            {post.tags.map((topic) => (
+                <span
+                    key={topic}
+                    className="bg-gray-100 dark:bg-[#2a2a2a] text-xs px-3 py-1 rounded-full font-medium text-gray-700 dark:text-gray-300"
+                >
+                    {topic}
+                </span>
+            ))}
+        </div>
+    );
+};
+PostTags.propTypes = {
+    post: PropTypes.object,
+};
+
+export const PostAuthorInfo = ({ post }) => {
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        });
+    };
+
+    return (
+        <div className="flex items-center mb-4">
+            <Avatar className="h-10 w-10 ring-2 ring-white dark:ring-[#333] mr-3">
+                <AvatarImage src={post.author?.profilePicture} />
+                <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white">
+                    {post.author?.name?.charAt(0) || "U"}
+                </AvatarFallback>
+            </Avatar>
+            <div>
+                <span className="font-semibold text-sm text-gray-900 dark:text-gray-100">
+                    {post.author?.name}
+                </span>
+                <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
+                    <Clock className="h-3 w-3 mr-1" />
+                    {formatDate(post.createdAt)}
+                </div>
+            </div>
+        </div>
+    );
+};
+PostAuthorInfo.propTypes = {
+    post: PropTypes.object,
+};
+
+export const NoPosts = ({ fetchPosts }) => {
+    return (
+        <div className="bg-white dark:bg-[#171717] rounded-xl shadow-sm p-12 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-[#2a2a2a] rounded-full flex items-center justify-center">
+                <BookOpen className="h-8 w-8 text-gray-400 dark:text-gray-500" />
+            </div>
+            <p className="text-xl font-medium text-gray-700 dark:text-gray-300">
+                No posts found
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 max-w-xs mx-auto">
+                Try different topics or check back later for new content
+            </p>
+            <Button onClick={fetchPosts} variant="outline" className="mt-6">
+                Refresh Feed
+            </Button>
+        </div>
+    );
+};
+NoPosts.propTypes = {
+    fetchPosts: PropTypes.func,
+};
+
+export const EndOfFeed = () => {
+    return (
+        <div className="text-center py-8 px-4 bg-white dark:bg-[#171717] rounded-xl shadow-sm">
+            <p className="text-gray-500 dark:text-gray-400">
+                You&apos;ve reached the end of your feed
+            </p>
+            <Button
+                onClick={() =>
+                    window.scrollTo({
+                        top: 0,
+                        behavior: "smooth",
+                    })
+                }
+                variant="outline"
+                className="mt-4"
+            >
+                Back to top
+            </Button>
+        </div>
+    );
+};
+
+export const LoadingSkeleton = () => {
+    return Array(2)
+        .fill(0)
+        .map((_, i) => (
+            <div
+                key={`skeleton-${i}`}
+                className="bg-white dark:bg-[#171717] rounded-xl shadow-sm overflow-hidden"
+            >
+                <Skeleton className="h-52 w-full" />
+                <div className="p-5 sm:p-6">
+                    <div className="flex items-center mb-4">
+                        <Skeleton className="h-10 w-10 rounded-full mr-3" />
+                        <div>
+                            <Skeleton className="h-4 w-32" />
+                            <Skeleton className="h-3 w-24 mt-1" />
+                        </div>
+                    </div>
+                    <Skeleton className="h-8 w-3/4 mb-3" />
+                    <Skeleton className="h-4 w-full mb-2" />
+                    <Skeleton className="h-4 w-full mb-2" />
+                    <Skeleton className="h-4 w-2/3 mb-5" />
+
+                    <div className="flex gap-2 mb-4">
+                        <Skeleton className="h-6 w-16 rounded-full" />
+                        <Skeleton className="h-6 w-16 rounded-full" />
+                    </div>
+
+                    <div className="pt-4 border-t border-gray-100 dark:border-[#2a2a2a] flex justify-between">
+                        <div className="flex gap-4">
+                            <Skeleton className="h-4 w-16" />
+                            <Skeleton className="h-4 w-16" />
+                        </div>
+                        <Skeleton className="h-4 w-24" />
+                    </div>
+                </div>
+            </div>
+        ));
 };

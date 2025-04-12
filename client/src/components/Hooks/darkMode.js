@@ -40,8 +40,8 @@ export function useDarkMode() {
                 if (mutation.attributeName === "class") {
                     const dark = getDarkMode();
                     setIsDark(dark);
-                    console.log("Class attribute changed!");
-                    console.log("New class:", targetNode.className);
+                    // console.log("Class attribute changed!");
+                    // console.log("New class:", targetNode.className);
                 }
             });
         });

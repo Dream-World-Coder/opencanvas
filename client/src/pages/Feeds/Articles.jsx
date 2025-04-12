@@ -1,23 +1,29 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { Eye, ThumbsUp, Clock } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Skeleton } from "@/components/ui/skeleton";
 
 import Header from "../../components/Header/Header";
 import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
 import { useDarkMode } from "../../components/Hooks/darkMode";
 
-import { LeftSideBar, RightSideBar } from "./components";
+import {
+    LeftSideBar,
+    RightSideBar,
+    ErrorDisplay,
+    PostStats,
+    PostTags,
+    NoPosts,
+    EndOfFeed,
+    LoadingSkeleton,
+    PostAuthorInfo,
+} from "./components";
 
 const ArticleFeed = () => {
     const navigate = useNavigate();
     const isDark = useDarkMode();
-    const [focusMode] = useState(!false);
+    const [focusMode] = useState(false);
     const [selectedTopics, setSelectedTopics] = useState([]);
 
     const [posts, setPosts] = useState([]);
@@ -25,6 +31,8 @@ const ArticleFeed = () => {
     const [hasMore, setHasMore] = useState(true);
     const [nextCursor, setNextCursor] = useState(null);
     const [error, setError] = useState(null);
+
+    const API_URL = "http://127.0.0.1:3000/feed/anonymous-user";
 
     // Ref for infinite scrolling
     const observer = useRef();
@@ -47,14 +55,11 @@ const ArticleFeed = () => {
         fetchPosts();
     }, [selectedTopics]);
 
-    const API_URL = "http://127.0.0.1:3000/feed/anonymous-user";
-
     const fetchPosts = async () => {
         setLoading(true);
         setError(null);
 
         try {
-            console.log(nextCursor);
             const response = await fetch(API_URL, {
                 method: "POST",
                 headers: {
@@ -78,7 +83,6 @@ const ArticleFeed = () => {
             if (data.success) {
                 setPosts(data.posts);
                 setHasMore(data.hasMore);
-                console.log(data.nextCursor);
                 setNextCursor(data.nextCursor);
             } else {
                 setError(data.message || "Failed to load posts");
@@ -149,73 +153,79 @@ const ArticleFeed = () => {
         navigate(`/p/${post._id}`, { state: { post } });
     };
 
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-        });
-    };
-
     return (
         <>
             <Helmet>
-                <title>Feed | OpenCanvas</title>
+                <title>Articles Feed | OpenCanvas</title>
                 <meta
                     name="description"
                     content="Discover posts from creators on OpenCanvas"
                 />
             </Helmet>
 
-            <div className="w-full h-full grid place-items-center bg-white dark:bg-[#111] overflow-x-hidden pt-20">
+            <div className="w-full min-h-screen bg-gray-50 dark:bg-[#0f0f0f] overflow-x-hidden pt-16">
                 <Header
                     noBlur={true}
                     ballClr={"text-gray-300"}
-                    exclude={["/about", "/contact", "/photo-gallery"]}
+                    exclude={[
+                        "/about",
+                        "/contact",
+                        "/photo-gallery",
+                        "/articles",
+                    ]}
                 />
-                <div className="flex flex-col md:flex-row max-w-screen-xl mx-auto bg-white dark:bg-[#111] text-gray-900 dark:text-gray-100">
-                    {/* Left sidebar */}
-                    <aside
-                        className={`w-full md:w-64 p-4 border-r border-gray-200 dark:border-[#333] hidden md:block`}
-                    >
-                        {!focusMode && (
-                            <LeftSideBar
-                                selectedTopics={selectedTopics}
-                                setSelectedTopics={setSelectedTopics}
-                            />
-                        )}
-                    </aside>
 
-                    {/* Main feed */}
-                    <main
-                        className={`flex-1 p-4 min-h-screen min-w-[60%] border-r border-gray-200 dark:border-[#333]`}
-                    >
-                        {/* Error display */}
-                        {error && !loading && posts.length === 0 && (
-                            <div className="p-4 mb-6 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400">
-                                <p>{error}</p>
-                                <Button
-                                    onClick={fetchPosts}
-                                    variant="outline"
-                                    className="mt-2"
-                                >
-                                    Retry
-                                </Button>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24">
+                    <div className="flex flex-col lg:flex-row">
+                        {/* Left sidebar - fixed position container */}
+                        <div className="hidden lg:block lg:w-64">
+                            {/* This is an empty container with the same width as the sidebar */}
+                            <div className="w-full lg:w-64 h-1"></div>
+
+                            {/* The actual fixed sidebar */}
+                            <div className="fixed top-24 w-64 max-h-[calc(100vh-80px)] overflow-y-auto">
+                                {!focusMode && (
+                                    <LeftSideBar
+                                        selectedTopics={selectedTopics}
+                                        setSelectedTopics={setSelectedTopics}
+                                    />
+                                )}
                             </div>
-                        )}
+                        </div>
 
-                        {/* Posts feed */}
-                        <div className="space-y-4">
-                            {posts
-                                // .filter((post) =>
-                                //     selectedTopics && selectedTopics.length > 0
-                                //         ? post.tags.some((tag) =>
-                                //               selectedTopics.includes(tag),
-                                //           )
-                                //         : true,
-                                // )
-                                .map((post, index) => {
+                        {/* Main feed */}
+                        <main className="w-full lg:max-w-2xl mx-auto lg:mx-6 mt-2">
+                            {/* Mobile topics menu */}
+                            <div className="lg:hidden mb-4">
+                                <div className="bg-white dark:bg-[#171717] p-4 rounded-xl shadow-sm">
+                                    <details>
+                                        <summary className="font-medium text-gray-700 dark:text-gray-200 cursor-pointer">
+                                            Topics ({selectedTopics.length})
+                                        </summary>
+                                        <div className="mt-3">
+                                            {!focusMode && (
+                                                <LeftSideBar
+                                                    selectedTopics={
+                                                        selectedTopics
+                                                    }
+                                                    setSelectedTopics={
+                                                        setSelectedTopics
+                                                    }
+                                                />
+                                            )}
+                                        </div>
+                                    </details>
+                                </div>
+                            </div>
+
+                            {/* Error display */}
+                            {error && !loading && posts.length === 0 && (
+                                <ErrorDisplay />
+                            )}
+
+                            {/* Posts feed */}
+                            <div className="space-y-6">
+                                {posts.map((post, index) => {
                                     // If it's the last post, attach ref for infinite scrolling
                                     const isLastPost =
                                         posts.length === index + 1;
@@ -228,13 +238,13 @@ const ArticleFeed = () => {
                                                     : null
                                             }
                                             key={post._id}
-                                            className="border border-gray-200 dark:border-[#333] rounded-sm overflow-hidden cursor-pointer"
+                                            className="bg-white dark:bg-[#171717] rounded-xl shadow-sm overflow-hidden cursor-pointer"
                                             onClick={() =>
                                                 handlePostClick(post)
                                             }
                                         >
                                             {post.thumbnailUrl && (
-                                                <div className="h-72 overflow-hidden">
+                                                <div className="h-52 sm:h-64 overflow-hidden">
                                                     <img
                                                         src={post.thumbnailUrl}
                                                         alt={post.title}
@@ -242,37 +252,16 @@ const ArticleFeed = () => {
                                                     />
                                                 </div>
                                             )}
-                                            <div className="p-4">
-                                                <div className="flex items-center mb-3">
-                                                    <Avatar className="h-8 w-8 mr-2">
-                                                        <AvatarImage
-                                                            src={
-                                                                post.author
-                                                                    ?.profilePicture
-                                                            }
-                                                        />
-                                                        <AvatarFallback>
-                                                            {post.author?.name?.charAt(
-                                                                0,
-                                                            ) || "U"}
-                                                        </AvatarFallback>
-                                                    </Avatar>
-                                                    <div>
-                                                        <span className="font-medium text-sm">
-                                                            {post.author?.name}
-                                                        </span>
-                                                        <div className="flex items-center text-xs text-gray-500">
-                                                            <Clock className="h-3 w-3 mr-1" />
-                                                            {formatDate(
-                                                                post.createdAt,
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="relative mb-4 max-h-[250px] overflow-hidden">
-                                                    <div className="prose prose-sm dark:prose-invert">
+                                            <div className="p-5 sm:p-6">
+                                                <PostAuthorInfo post={post} />
+
+                                                <h2 className="text-xl sm:text-2xl font-bold mb-3 text-gray-900 dark:text-white">
+                                                    {post.title}
+                                                </h2>
+
+                                                <div className="relative mb-5 max-h-[220px] overflow-hidden">
+                                                    <div className="prose prose-sm dark:prose-invert max-w-none">
                                                         <MarkdownPreview
-                                                            title={post.title}
                                                             content={
                                                                 post.content.slice(
                                                                     0,
@@ -283,119 +272,54 @@ const ArticleFeed = () => {
                                                                 post.thumbnailUrl
                                                             }
                                                             isDark={isDark}
-                                                            darkBg="bg-[#111]"
+                                                            darkBg="bg-[#171717]"
                                                             textAlignment="left"
                                                             insidePost={true}
                                                             contentOnly={true}
                                                         />
                                                     </div>
-                                                    <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white dark:from-[#111] to-transparent"></div>
+                                                    <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white dark:from-[#171717] to-transparent"></div>
                                                 </div>
 
-                                                {/* {post.tags &&
+                                                {/* Post tags */}
+                                                {post.tags &&
                                                     post.tags.length > 0 && (
-                                                        <div className="flex flex-wrap gap-2 mb-4">
-                                                            {post.tags.map(
-                                                                (topic) => (
-                                                                    <span
-                                                                        key={
-                                                                            topic
-                                                                        }
-                                                                        className="bg-gray-100 dark:bg-[#222] text-xs px-2 py-1 rounded"
-                                                                    >
-                                                                        {topic}
-                                                                    </span>
-                                                                ),
-                                                            )}
-                                                        </div>
-                                                    )} */}
+                                                        <PostTags post={post} />
+                                                    )}
 
-                                                <div className="flex items-center text-black dark:text-[#f8f8f8] text-sm">
-                                                    <div className="flex items-center mr-4">
-                                                        <b>
-                                                            {post.totalViews ||
-                                                                0}
-                                                            &nbsp;
-                                                        </b>
-                                                        Views
-                                                    </div>
-                                                    <div className="flex items-center mr-4">
-                                                        <b>
-                                                            {post.totalLikes ||
-                                                                0}
-                                                            &nbsp;
-                                                        </b>
-                                                        Likes
-                                                    </div>
-                                                    <div className="flex items-center">
-                                                        {post.readTime ||
-                                                            "2 min read"}
-                                                    </div>
-                                                </div>
+                                                {/* Post stats */}
+                                                <PostStats post={post} />
                                             </div>
                                         </div>
                                     );
                                 })}
 
-                            {/* Loading state */}
-                            {loading &&
-                                Array(3)
-                                    .fill(0)
-                                    .map((_, i) => (
-                                        <div
-                                            key={`skeleton-${i}`}
-                                            className="border border-gray-200 dark:border-[#333] rounded-lg overflow-hidden"
-                                        >
-                                            <Skeleton className="h-48 w-full" />
-                                            <div className="p-4">
-                                                <div className="flex items-center mb-3">
-                                                    <Skeleton className="h-8 w-8 rounded-full mr-2" />
-                                                    <div>
-                                                        <Skeleton className="h-4 w-32" />
-                                                        <Skeleton className="h-3 w-24 mt-1" />
-                                                    </div>
-                                                </div>
-                                                <Skeleton className="h-6 w-3/4 mb-2" />
-                                                <Skeleton className="h-4 w-full mb-1" />
-                                                <Skeleton className="h-4 w-full mb-1" />
-                                                <Skeleton className="h-4 w-2/3 mb-4" />
-                                                <div className="flex gap-2 mb-4">
-                                                    <Skeleton className="h-6 w-16 rounded" />
-                                                    <Skeleton className="h-6 w-16 rounded" />
-                                                </div>
-                                                <div className="flex">
-                                                    <Skeleton className="h-4 w-16 mr-4" />
-                                                    <Skeleton className="h-4 w-16" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
+                                {/* Loading state */}
+                                {loading && <LoadingSkeleton />}
 
-                            {/* Empty state */}
-                            {!loading && posts.length === 0 && (
-                                <div className="text-center py-12">
-                                    <p className="text-xl text-gray-500">
-                                        No posts found
-                                    </p>
-                                    <p className="text-sm text-gray-400 mt-2">
-                                        Try different topics or check back later
-                                    </p>
-                                </div>
-                            )}
+                                {/* Empty state */}
+                                {!loading && posts.length === 0 && (
+                                    <NoPosts fetchPosts={fetchPosts} />
+                                )}
 
-                            {/* End of feed msg */}
-                            {!loading && !hasMore && posts.length > 0 && (
-                                <div className="text-center py-8 text-gray-500">
-                                    <p>You&apos;ve reached the end</p>
-                                </div>
-                            )}
+                                {/* End of feed message */}
+                                {!loading && !hasMore && posts.length > 0 && (
+                                    <EndOfFeed />
+                                )}
+                            </div>
+                        </main>
+
+                        {/* Right sidebar - fixed position container */}
+                        <div className="hidden lg:block lg:w-72">
+                            {/* This is an empty container with the same width as the sidebar */}
+                            <div className="w-full lg:w-72 h-1"></div>
+
+                            {/* The actual fixed sidebar */}
+                            <div className="fixed top-24 w-72 max-h-[calc(100vh-80px)] overflow-y-auto">
+                                {!focusMode && <RightSideBar />}
+                            </div>
                         </div>
-                    </main>
-
-                    {/* Right sidebar */}
-                    <aside className="w-full md:w-64 p-4 hidden lg:block">
-                        {!focusMode && <RightSideBar />}
-                    </aside>
+                    </div>
                 </div>
             </div>
         </>

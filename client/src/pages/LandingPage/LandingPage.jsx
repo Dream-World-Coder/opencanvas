@@ -28,7 +28,7 @@ const LandingPage = () => {
                                 />
                             </div>
                         </h1>
-                        <SlidingButton href="/profile">
+                        <SlidingButton href="/articles">
                             Start Exploring{" "}
                             <ChevronRight className="text-[#4d4d4d] transform transition-transform duration-200 size-4 group-hover:translate-x-2" />
                         </SlidingButton>
