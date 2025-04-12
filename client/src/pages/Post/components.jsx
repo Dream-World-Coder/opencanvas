@@ -298,7 +298,8 @@ export const ArticleHeader = ({
                             {currentUser?._id?.toString() !==
                                 post.authorId?.toString() && (
                                 <button
-                                    onClick={async () => {
+                                    onClick={async (e) => {
+                                        e.stopPropagation();
                                         if (!currentUser) {
                                             toast.error(
                                                 "you need to log in first to follow",
@@ -320,7 +321,7 @@ export const ArticleHeader = ({
                 </div>
                 <div
                     className="text-sm text-gray-500 dark:text-gray-400 flex flex-row md:flex-col
-            justify-between md:justify-center gap-2 md:gap-0 w-full md:w-fit mt-2 md:mt-0"
+                    justify-between md:justify-center gap-2 md:gap-0 w-full md:w-fit mt-2 md:mt-0"
                 >
                     <div>
                         {formatDate(post.createdAt)} ·{" "}

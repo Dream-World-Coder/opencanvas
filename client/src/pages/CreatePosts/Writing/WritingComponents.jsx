@@ -421,7 +421,7 @@ export const MarkdownPreview = ({
 
                         {/* thumbnail */}
                         {thumbnailUrl && !contentOnly && (
-                            <div className="relative mb-8 w-[110%] transform translate-x-[-5%] max-h-[370px] rounded-lg overflow-hidden shadow-none">
+                            <div className="relative mb-8 w-full md:w-[110%] md:transform md:translate-x-[-5%] max-h-[370px] rounded-lg overflow-hidden shadow-none">
                                 <img
                                     src={thumbnailUrl}
                                     alt={title || "Article thumbnail"}
