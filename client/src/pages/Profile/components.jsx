@@ -2,8 +2,10 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import PropTypes from "prop-types";
+import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
 import {
     Eye,
+    EyeOff,
     Edit,
     Trash2,
     MoreHorizontal,
@@ -26,7 +28,9 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 import {
     DropdownMenu,
     DropdownMenuTrigger,
@@ -38,7 +42,7 @@ import { useDataService } from "../../services/dataService";
 import { useAuth } from "../../contexts/AuthContext";
 import { formatDistanceToNow } from "date-fns";
 
-export const formatDates = (date) => {
+const formatDates = (date) => {
     try {
         return formatDistanceToNow(new Date(date), {
             addSuffix: true,
@@ -128,21 +132,79 @@ export const PostFilterTabs = ({ activeTab, setActiveTab }) => {
         { id: "collection", label: "Collections" },
     ];
 
+    const [isMobile, setIsMobile] = useState(false);
+    const scrollRef = useRef(null);
+
+    // Check screen size for responsive behavior
+    useEffect(() => {
+        const checkScreenSize = () => {
+            setIsMobile(window.innerWidth < 640);
+        };
+
+        checkScreenSize();
+        window.addEventListener("resize", checkScreenSize);
+
+        return () => {
+            window.removeEventListener("resize", checkScreenSize);
+        };
+    }, []);
+
+    // Scroll active tab into view
+    useEffect(() => {
+        if (scrollRef.current && isMobile) {
+            const activeElement = document.getElementById(`tab-${activeTab}`);
+            if (activeElement) {
+                const scrollLeft =
+                    activeElement.offsetLeft -
+                    scrollRef.current.offsetWidth / 2 +
+                    activeElement.offsetWidth / 2;
+                scrollRef.current.scrollTo({
+                    left: scrollLeft,
+                    behavior: "smooth",
+                });
+            }
+        }
+    }, [activeTab, isMobile]);
+
     return (
-        <div className="flex overflow-x-auto no-scrollbar space-x-6 md:space-x-10">
-            {tabs.map((tab) => (
-                <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`py-3 text-sm font-medium transition-colors ${
-                        activeTab === tab.id
-                            ? "border-b-2 border-black dark:border-white text-black dark:text-white"
-                            : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-                    }`}
-                >
-                    {tab.label}
-                </button>
-            ))}
+        <div className="w-full mb-6">
+            <Tabs
+                value={activeTab}
+                onValueChange={setActiveTab}
+                className="w-full"
+            >
+                <div className="relative" ref={scrollRef}>
+                    <ScrollArea className="w-full whitespace-nowrap pb-2">
+                        <TabsList className="h-12 bg-transparent inline-flex items-center justify-start rounded-none border-b border-gray-200 dark:border-[#333] w-full p-0">
+                            {tabs.map((tab) => (
+                                <TabsTrigger
+                                    key={tab.id}
+                                    value={tab.id}
+                                    id={`tab-${tab.id}`}
+                                    className={cn(
+                                        "h-full data-[state=active]:shadow-none rounded-none px-4 py-2 text-sm font-medium transition-all data-[state=active]:border-b-2 data-[state=active]:border-primary relative",
+                                        "data-[state=active]:text-primary data-[state=active]:dark:text-primary dark:text-gray-400 text-gray-600",
+                                        "hover:text-gray-900 dark:hover:text-gray-200 focus-visible:bg-gray-100 dark:focus-visible:bg-gray-800",
+                                    )}
+                                >
+                                    {tab.label}
+                                    {activeTab === tab.id && (
+                                        <span className="absolute -bottom-px left-0 right-0 h-0.5 bg-primary" />
+                                    )}
+                                </TabsTrigger>
+                            ))}
+                        </TabsList>
+                        <ScrollBar
+                            orientation="horizontal"
+                            className="opacity-0"
+                        />
+                    </ScrollArea>
+
+                    {/* Visual indicators for scrolling on mobile */}
+                    <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-background to-transparent pointer-events-none sm:hidden" />
+                    <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-background to-transparent pointer-events-none sm:hidden" />
+                </div>
+            </Tabs>
         </div>
     );
 };
@@ -184,10 +246,10 @@ export const PostActions = ({ post, setPosts, loading }) => {
         useDataService();
 
     return (
-        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg backdrop-blur-sm flex items-center cursor-pointer">
+        <div className="bg-gray-100 dark:bg-[#333] rounded-lg backdrop-blur-sm flex items-center cursor-pointer">
             {/* view */}
             <div
-                className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full"
+                className="p-2 hover:bg-gray-200 dark:hover:bg-[#444] rounded-full"
                 title="View"
                 onClick={(e) => {
                     e.stopPropagation();
@@ -202,7 +264,7 @@ export const PostActions = ({ post, setPosts, loading }) => {
 
             {/* edit */}
             <div
-                className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full"
+                className="p-2 hover:bg-gray-200 dark:hover:bg-[#444] rounded-full"
                 title="Edit"
                 onClick={(e) => {
                     e.stopPropagation();
@@ -218,7 +280,7 @@ export const PostActions = ({ post, setPosts, loading }) => {
 
             {/* delete */}
             <AlertDialog title="Delete">
-                <AlertDialogTrigger className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full">
+                <AlertDialogTrigger className="p-2 hover:bg-gray-200 dark:hover:bg-[#444] rounded-full">
                     <Trash2
                         title="Delete"
                         className="w-4 h-4 text-gray-600 dark:text-gray-300"
@@ -262,7 +324,7 @@ export const PostActions = ({ post, setPosts, loading }) => {
                 title="More"
                 onClick={(e) => e.stopPropagation()}
             >
-                <DropdownMenuTrigger className="p-2 box-content hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full">
+                <DropdownMenuTrigger className="p-2 box-content hover:bg-gray-200 dark:hover:bg-[#444] rounded-full">
                     <MoreHorizontal className="w-4 h-4 text-gray-600 dark:text-gray-300" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -323,7 +385,7 @@ export const PostActions = ({ post, setPosts, loading }) => {
                     e.stopPropagation();
                     sharePost(post);
                 }}
-                className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
+                className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-[#444] transition-colors duration-200"
             >
                 <Share2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
             </div>
@@ -461,7 +523,7 @@ export const FeaturedWorks = ({ currentUser }) => {
     return (
         <>
             {currentUser.featuredItems.length > 0 && (
-                <div className="mb-24 relative">
+                <div className="mb-24 relative px-4 md:px-0">
                     <h2 className="text-2xl font-semibold tracking-tight mb-8 dark:text-[#f0f0f0]">
                         <span className="bg-inherit dark:bg-inherit hover:bg-lime-100 dark:hover:bg-[#222] rounded-md box-content px-2 py-1">
                             Featured Works
@@ -510,16 +572,35 @@ export const FeaturedWorks = ({ currentUser }) => {
                                         className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
                                     />
                                     {/* dark inset on hover */}
-                                    <div className="absolute inset-0 bg-black/20 dark:bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                                        {/* <Share2 className="w-6 h-6 text-white" /> */}
-                                    </div>
+                                    <div className="absolute inset-0 bg-black/20 dark:bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"></div>
                                 </div>
                                 <h3 className="text-lg font-medium mb-1 flex justify-between dark:text-[#e8e8e8]">
                                     {item.itemTitle}
-                                    <Share2 className="w-6 h-6 text-black dark:text-white rounded-lg p-1 hover:bg-yellow-200 dark:hover:bg-[#2c2c2c]" />
+                                    <Share2
+                                        className="w-6 h-6 text-black dark:text-white rounded-lg p-1 hover:bg-yellow-200 dark:hover:bg-[#2c2c2c]"
+                                        onClick={async (e) => {
+                                            e.stopPropagation();
+                                            let baseUrl =
+                                                window.location.origin;
+                                            let typ =
+                                                item.itemType.toLowerCase() ===
+                                                "collection"
+                                                    ? "c"
+                                                    : "p";
+                                            await navigator.clipboard.writeText(
+                                                `${baseUrl}/${typ}/${item.itemId}`,
+                                            );
+                                            toast.success(
+                                                "link copied to clipboard",
+                                            );
+                                        }}
+                                    />
                                 </h3>
                                 <p className="text-sm text-gray-400 dark:text-[#888]">
-                                    {item.itemType.toLowerCase()}
+                                    {item.itemType.toLowerCase() ===
+                                    "collection"
+                                        ? "Collection"
+                                        : ""}
                                 </p>
                             </div>
                         ))}
@@ -535,29 +616,179 @@ FeaturedWorks.propTypes = {
 
 export const PostStats = ({ post }) => {
     return (
-        <>
+        <div className="flex flex-wrap gap-4 items-center text-sm">
             {/* views */}
-            <div className="flex items-center">
-                <b>{post.totalViews || 0} &nbsp; </b> Views
+            <div className="flex items-center gap-1">
+                <Eye className="w-4 h-4 block sm:hidden" />
+                <b>{post.totalViews || 0}&nbsp;</b>
+                <span className="hidden sm:inline">Views</span>
             </div>
 
             {/* likes */}
-            <div className="flex items-center">
-                <b>{post.totalLikes || 0} &nbsp; </b> Likes
+            <div className="flex items-center gap-1">
+                <ThumbsUp className="w-4 h-4 block sm:hidden" />
+                <b>{post.totalLikes || 0}&nbsp;</b>
+                <span className="hidden sm:inline">Likes</span>
             </div>
 
             {/* comments */}
-            <div className="flex items-center">
-                <b>{post.totalComments || 0} &nbsp; </b> Comments
+            <div className="flex items-center gap-1">
+                <MessageCircle className="w-4 h-4 block sm:hidden" />
+                <b>{post.totalComments || 0}&nbsp;</b>
+                <span className="hidden sm:inline">Comments</span>
             </div>
 
-            {/* readtime */}
+            {/* read time */}
             <span className="text-sm text-gray-500 dark:text-gray-400">
                 {post.readTime}
             </span>
-        </>
+        </div>
     );
 };
 PostStats.propTypes = {
     post: PropTypes.object,
+};
+export const PostDetails = ({ post }) => {
+    return (
+        <div className="flex flex-col lg:flex-row items-start lg:items-center lg:space-x-2">
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+                created {formatDates(post.createdAt)}
+            </span>
+            <span className="text-gray-400 dark:text-gray-500 hidden lg:block">
+                ·
+            </span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+                last edited {formatDates(post.modifiedAt)}
+            </span>
+        </div>
+    );
+};
+PostDetails.propTypes = {
+    post: PropTypes.object,
+};
+
+export const PostList = ({
+    posts,
+    setPosts,
+    activeTab,
+    loading,
+    isDark,
+    forPrivate,
+}) => {
+    const navigate = useNavigate();
+    const handlePostClick = (post, forPrivate) => {
+        if (forPrivate) return;
+        navigate(`/p/${post._id}`, { state: { post } });
+    };
+
+    return (
+        <div className="space-y-8 mb-16 px-4 md:px-0">
+            {posts.map(
+                (post) =>
+                    (activeTab !== "all" ? post.type === activeTab : true) && (
+                        <div
+                            key={post._id}
+                            onClick={() => handlePostClick(post, forPrivate)}
+                            className={`group ${forPrivate ? "" : "cursor-pointer"}`}
+                        >
+                            <div className="flex flex-col gap-4">
+                                {/* Post metadata and title section */}
+                                <div className="w-full">
+                                    {/* tag based on post type */}
+                                    <div className="mb-2">
+                                        <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-full px-2 py-1 box-content font-medium">
+                                            {post.type}
+                                        </span>
+                                    </div>
+
+                                    {/* Content area with thumbnail (if available) */}
+                                    <div className="flex flex-col sm:flex-row gap-4">
+                                        {/* Thumbnail - made responsive, full width on mobile */}
+                                        {post.thumbnailUrl && (
+                                            <div className="w-full max-w-[17rem] aspect-video overflow-hidden rounded-lg _mx-auto _sm:_mx-0">
+                                                <img
+                                                    src={post.thumbnailUrl}
+                                                    alt={post.title}
+                                                    className="object-cover w-full h-full"
+                                                    loading="lazy"
+                                                />
+                                            </div>
+                                        )}
+
+                                        {/* Content preview */}
+                                        <div className="w-full flex flex-col justify-start items-start">
+                                            {/* preview snippet */}
+                                            <div className="relative mb-4 max-h-[150px] overflow-hidden">
+                                                <div className="prose prose-sm dark:prose-invert">
+                                                    <MarkdownPreview
+                                                        title={post.title}
+                                                        content={
+                                                            post.content.slice(
+                                                                0,
+                                                                350,
+                                                            ) + "..." || ""
+                                                        }
+                                                        thumbnailUrl={
+                                                            post.thumbnailUrl
+                                                        }
+                                                        isDark={isDark}
+                                                        darkBg="bg-[#111]"
+                                                        textAlignment="left"
+                                                        insidePost={true}
+                                                        contentOnly={true}
+                                                    />
+                                                </div>
+                                                <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white dark:from-[#111] to-transparent"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Post details and actions */}
+                                <div className="flex flex-col space-y-4">
+                                    {/* details */}
+                                    <PostDetails post={post} />
+
+                                    {/* Stats and actions */}
+                                    <div className="flex items-center justify-between flex-wrap gap-2">
+                                        <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                                            {post.isPublic ? (
+                                                <PostStats post={post} />
+                                            ) : (
+                                                <div className="flex items-center">
+                                                    <EyeOff className="w-4 h-4 mr-1 text-gray-500" />
+                                                    <span>private</span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* post actions */}
+                                        {forPrivate ? (
+                                            <PostActions
+                                                post={post}
+                                                setPosts={setPosts}
+                                                loading={loading}
+                                            />
+                                        ) : (
+                                            <PostActionsPublic post={post} />
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* divider */}
+                            <div className="mt-8 border-b border-gray-100 dark:border-[#333]"></div>
+                        </div>
+                    ),
+            )}
+        </div>
+    );
+};
+PostList.propTypes = {
+    posts: PropTypes.array,
+    setPosts: PropTypes.func,
+    activeTab: PropTypes.string,
+    loading: PropTypes.bool,
+    isDark: PropTypes.bool,
+    forPrivate: PropTypes.bool,
 };

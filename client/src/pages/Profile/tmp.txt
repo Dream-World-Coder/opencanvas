@@ -1,0 +1,248 @@
+login color fix
+
+{/* Posts */}
+<div className="space-y-8 mb-16">
+  {posts.map((post) => {
+    const isVisible = activeTab === "all" || post.type === activeTab;
+    if (!isVisible) return null;
+
+    return (
+      <div key={post._id} className="group Xcursor-pointer">
+        <div className="flex flex-col md:flex-row gap-6">
+          {/* Thumbnail */}
+          {post.thumbnailUrl && (
+            <div className="max-w-[15rem] aspect-square overflow-hidden rounded-lg">
+              <img
+                src={post.thumbnailUrl}
+                alt={post.title}
+                className="object-cover size-full"
+                loading="lazy"
+              />
+            </div>
+          )}
+
+          {/* Content */}
+          <div className={`${post.thumbnailUrl ? "md:w-2/3" : "w-full"} flex flex-col justify-between`}>
+            {/* Tag & Preview */}
+            <div>
+              <div className="mb-2">
+                <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">
+                  {post.type}
+                </span>
+              </div>
+
+              <div className="relative mb-4 max-h-[150px] overflow-hidden">
+                <div className="prose prose-sm dark:prose-invert">
+                  <MarkdownPreview
+                    title={post.title}
+                    content={(post.content.slice(0, 350) || "") + "..."}
+                    thumbnailUrl={post.thumbnailUrl}
+                    isDark={isDark}
+                    darkBg="bg-[#111]"
+                    textAlignment="left"
+                    insidePost={true}
+                    contentOnly={true}
+                  />
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white dark:from-[#111] to-transparent" />
+              </div>
+            </div>
+
+            {/* Metadata & Actions */}
+            <div className="flex flex-col space-y-4">
+              <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                <span>created {formatDates(post.createdAt)}</span>
+                <span className="text-gray-400 dark:text-gray-500">·</span>
+                <span>last edited {formatDates(post.modifiedAt)}</span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                  {post.isPublic ? (
+                    <PostStats post={post} />
+                  ) : (
+                    <div className="flex items-center">
+                      <EyeOff className="w-4 h-4 mr-1 text-gray-500" />
+                      <span>private</span>
+                    </div>
+                  )}
+                </div>
+
+                <PostActions post={post} setPosts={setPosts} loading={loading} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="mt-8 border-b border-gray-100 dark:border-[#333]" />
+      </div>
+    );
+  })}
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div className="space-y-8 mb-16 px-4 md:px-0">
+                            {posts.map(
+                                (post) =>
+                                    (activeTab !== "all"
+                                        ? post.type === activeTab
+                                        : true) && (
+                                        <div key={post._id} className="group">
+                                            <div className="flex flex-col md:flex-row gap-6">
+                                                {/* thumbnail */}
+                                                {post.thumbnailUrl && (
+                                                    <div className="max-w-[15rem] aspect-square overflow-hidden rounded-lg">
+                                                        <img
+                                                            src={
+                                                                post.thumbnailUrl
+                                                            }
+                                                            alt={post.title}
+                                                            className="object-cover size-full"
+                                                            loading="lazy"
+                                                        />
+                                                    </div>
+                                                )}
+
+                                                {/* Content */}
+                                                <div
+                                                    className={`${post.thumbnailUrl ? "md:w-2/3" : "w-full"} flex flex-col justify-between`}
+                                                >
+                                                    {/* post metadata and title */}
+                                                    <div>
+                                                        {/* tag based on post type */}
+                                                        <div className="mb-2">
+                                                            <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">
+                                                                {post.type}
+                                                            </span>
+                                                        </div>
+
+                                                        {/* preview snippet */}
+                                                        <div className="relative mb-4 max-h-[150px] overflow-hidden">
+                                                            <div className="prose prose-sm dark:prose-invert">
+                                                                <MarkdownPreview
+                                                                    title={
+                                                                        post.title
+                                                                    }
+                                                                    content={
+                                                                        post.content.slice(
+                                                                            0,
+                                                                            350,
+                                                                        ) +
+                                                                            "..." ||
+                                                                        ""
+                                                                    }
+                                                                    thumbnailUrl={
+                                                                        post.thumbnailUrl
+                                                                    }
+                                                                    isDark={
+                                                                        isDark
+                                                                    }
+                                                                    darkBg="bg-[#111]"
+                                                                    textAlignment="left"
+                                                                    insidePost={
+                                                                        true
+                                                                    }
+                                                                    contentOnly={
+                                                                        true
+                                                                    }
+                                                                />
+                                                            </div>
+                                                            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white dark:from-[#111] to-transparent"></div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex flex-col space-y-4">
+                                                        {/* details */}
+                                                        <PostDetails
+                                                            post={post}
+                                                        />
+
+                                                        {/* Stats and actions */}
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                                                                {post.isPublic && (
+                                                                    <PostStats
+                                                                        post={
+                                                                            post
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {!post.isPublic && (
+                                                                    <div className="flex items-center">
+                                                                        <EyeOff className="w-4 h-4 mr-1 text-gray-500" />
+                                                                        <span>
+                                                                            private
+                                                                        </span>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+
+                                                            {/* post actions */}
+                                                            <PostActions
+                                                                post={post}
+                                                                setPosts={
+                                                                    setPosts
+                                                                }
+                                                                loading={
+                                                                    loading
+                                                                }
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* divider */}
+                                            <div className="mt-8 border-b border-gray-100 dark:border-[#333]"></div>
+                                        </div>
+                                    ),
+                            )}
+                        </div>

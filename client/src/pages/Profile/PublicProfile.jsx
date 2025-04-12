@@ -8,15 +8,12 @@ import { toast } from "sonner";
 
 import ProfileHeader from "../../components/Header/ProfileHeader";
 import ProfileFooter from "../../components/Footer/ProfileFooter";
-import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
 import {
     PostFilterTabs,
-    PostActionsPublic,
     ContactInformationDropdown,
     FeaturedWorks,
     ProfileHelmet,
-    PostStats,
-    formatDates,
+    PostList,
 } from "./components";
 import { useDataService } from "../../services/dataService";
 import { useAuth } from "../../contexts/AuthContext";
@@ -170,10 +167,6 @@ const PublicProfile = () => {
         },
     ];
 
-    const handlePostClick = (post) => {
-        navigate(`/p/${post._id}`, { state: { post } });
-    };
-
     return (
         <>
             <ProfileHelmet currentProfile={currentProfile} />
@@ -184,10 +177,9 @@ const PublicProfile = () => {
 
                 <main className="pt-32 px-2 md:px-8 min-h-screen">
                     <div className="max-w-7xl mx-auto pb-[20vh]">
-                        {/* <div className="grid md:grid-cols-[1.62fr,1fr] gap-16 mb-24 border border-black"> */}
-                        <div className="flex justify-between items-start gap-16 mb-24">
-                            {/* left column with Profile Pic */}
-                            <div className="space-y-8 flex-1">
+                        <div className="flex flex-col md:flex-row justify-between items-start gap-6 md:gap-16 mb-12 md:mb-24 px-4 md:px-0">
+                            {/* User Details */}
+                            <div className="space-y-6 md:space-y-8 flex-1 w-full">
                                 <div className="flex items-start md:items-center space-x-8">
                                     {loading ? (
                                         <Skeleton className="size-16 md:size-24 rounded-full" />
@@ -235,16 +227,16 @@ const PublicProfile = () => {
                                             )}
                                         </div>
                                     )}
-                                    <div className="flex-1">
+                                    <div className="flex-1 min-w-0">
                                         {loading ? (
                                             <div className="space-y-2">
                                                 <Skeleton className="h-10 w-3/4" />
                                                 <Skeleton className="h-6 w-1/2" />
                                             </div>
                                         ) : (
-                                            <h1 className="text-3xl md:text-4xl font-boskaBold leading-[0.95] tracking-tight pointer-events-none md:pointer-events-auto capitalize dark:text-[#fff]">
+                                            <h1 className="text-2xl md:text-3xl lg:text-4xl font-boskaBold leading-tight md:leading-[0.95] tracking-tight pointer-events-none md:pointer-events-auto capitalize dark:text-[#fff] truncate">
                                                 {currentProfile.fullName}
-                                                <span className="block mt-2 text-xl md:text-2xl font-boska font-normal tracking-normal capitalize text-lime-700 dark:text-lime-600">
+                                                <span className="block mt-1 md:mt-2 text-lg md:text-xl lg:text-2xl font-boska font-normal tracking-normal capitalize text-lime-700 dark:text-lime-600">
                                                     {currentProfile.role}
                                                 </span>
                                             </h1>
@@ -259,7 +251,7 @@ const PublicProfile = () => {
                                     </div>
                                 ) : (
                                     currentProfile.aboutMe && (
-                                        <p className="text-stone-700 dark:text-[#d0d0d0] font-zodiak text-lg leading-tight tracking-normal pointer-events-none md:pointer-events-auto">
+                                        <p className="text-stone-700 dark:text-[#d0d0d0] font-zodiak text-base md:text-lg leading-tight tracking-normal pointer-events-none md:pointer-events-auto">
                                             {currentProfile.aboutMe}
                                         </p>
                                     )
@@ -270,8 +262,8 @@ const PublicProfile = () => {
                                 />
                             </div>
 
-                            {/* right column - Quick Stats */}
-                            <div className="space-y-3 pt-4 w-[400px] font-[montserrat]">
+                            {/* Quick Stats */}
+                            <div className="space-y-2 md:space-y-3 pt-2 md:pt-4 w-full md:w-[300px] lg:w-[400px] font-[montserrat] mt-6 md:mt-0">
                                 {userStats.map((item, index) => (
                                     <a
                                         key={index}
@@ -294,10 +286,7 @@ const PublicProfile = () => {
 
                         {/* filter tabs */}
                         {posts.length > 0 && (
-                            <div
-                                id="post-view"
-                                className="border-b border-gray-200 dark:border-[#333] mb-8"
-                            >
+                            <div id="post-view" className="mb-2 px-4 md:px-0">
                                 <PostFilterTabs
                                     activeTab={activeTab}
                                     setActiveTab={setActiveTab}
@@ -306,125 +295,14 @@ const PublicProfile = () => {
                         )}
 
                         {/* posts */}
-                        <div className="space-y-8 mb-16">
-                            {posts.map(
-                                (post) =>
-                                    (activeTab !== "all"
-                                        ? post.type === activeTab
-                                        : true) && (
-                                        <div
-                                            key={post._id}
-                                            onClick={() =>
-                                                handlePostClick(post)
-                                            }
-                                            className="group cursor-pointer"
-                                        >
-                                            <div className="flex flex-col md:flex-row gap-6">
-                                                {/* thumbnail */}
-                                                {post.thumbnailUrl && (
-                                                    <div className="max-w-[15rem] aspect-square overflow-hidden rounded-lg">
-                                                        <img
-                                                            src={
-                                                                post.thumbnailUrl
-                                                            }
-                                                            alt={post.title}
-                                                            className="object-cover size-full"
-                                                            loading="lazy"
-                                                        />
-                                                    </div>
-                                                )}
-
-                                                {/* Content */}
-                                                <div
-                                                    className={`${post.thumbnailUrl ? "md:w-2/3" : "w-full"} flex flex-col justify-between`}
-                                                >
-                                                    {/* post metadata and title */}
-                                                    <div>
-                                                        {/* tag based on post type */}
-                                                        <div className="mb-2">
-                                                            <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">
-                                                                {post.type}
-                                                            </span>
-                                                        </div>
-
-                                                        {/* preview snippet */}
-                                                        <div className="relative mb-4 max-h-[150px] overflow-hidden">
-                                                            <div className="prose prose-sm dark:prose-invert">
-                                                                <MarkdownPreview
-                                                                    title={
-                                                                        post.title
-                                                                    }
-                                                                    content={
-                                                                        post.content.slice(
-                                                                            0,
-                                                                            350,
-                                                                        ) +
-                                                                            "..." ||
-                                                                        ""
-                                                                    }
-                                                                    thumbnailUrl={
-                                                                        post.thumbnailUrl
-                                                                    }
-                                                                    isDark={
-                                                                        isDark
-                                                                    }
-                                                                    darkBg="bg-[#111]"
-                                                                    textAlignment="left"
-                                                                    insidePost={
-                                                                        true
-                                                                    }
-                                                                    contentOnly={
-                                                                        true
-                                                                    }
-                                                                />
-                                                            </div>
-                                                            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white dark:from-[#111] to-transparent"></div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="flex flex-col space-y-4">
-                                                        {/* details */}
-                                                        <div className="flex items-center space-x-2">
-                                                            <span className="text-sm text-gray-600 dark:text-gray-400">
-                                                                created{" "}
-                                                                {formatDates(
-                                                                    post.createdAt,
-                                                                )}
-                                                            </span>
-                                                            <span className="text-gray-400 dark:text-gray-500">
-                                                                ·
-                                                            </span>
-                                                            <span className="text-sm text-gray-600 dark:text-gray-400">
-                                                                last edited{" "}
-                                                                {formatDates(
-                                                                    post.modifiedAt,
-                                                                )}
-                                                            </span>
-                                                        </div>
-
-                                                        {/* Stats and actions */}
-                                                        <div className="flex items-center justify-between">
-                                                            <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                                                                <PostStats
-                                                                    post={post}
-                                                                />
-                                                            </div>
-
-                                                            {/* post actions */}
-                                                            <PostActionsPublic
-                                                                post={post}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* divider */}
-                                            <div className="mt-8 border-b border-gray-100 dark:border-[#333]"></div>
-                                        </div>
-                                    ),
-                            )}
-                        </div>
+                        <PostList
+                            posts={posts}
+                            setPosts={setPosts}
+                            activeTab={activeTab}
+                            loading={loading}
+                            isDark={isDark}
+                            forPrivate={false}
+                        />
 
                         {/* load more button */}
                         {currentProfile.posts.length > postsToFetch && (
