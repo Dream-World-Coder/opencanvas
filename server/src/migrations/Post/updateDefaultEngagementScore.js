@@ -51,7 +51,7 @@ async function updateDefaultEngagementScore() {
         }
 
         console.log(
-            "anonymousEngageMentScore updated successfully for all posts!",
+            "anonymousEngageMentScore updated successfully for all posts.",
         );
     } catch (error) {
         console.error("Error during migration:", error);

@@ -99,9 +99,7 @@ router.post(
                     isEdited: false,
                     isPublic: postData.isPublic ?? true,
                     type: postData.artType ?? "written", // artType cannot be changed, its fixed, for now atleast
-                    thumbnailUrl:
-                        postData.thumbnailUrl ||
-                        generateRandomThumbnail(postData.artType),
+                    thumbnailUrl: postData.thumbnailUrl, //||generateRandomThumbnail(postData.artType),
                     readTime: postData.readTime,
                     media: postData.media,
                     author: {
