@@ -61,9 +61,9 @@ passport.use(
                         email: profile.emails[0].value,
                         passwordHash: "google-hash",
                         provider: "google",
-                        profilePicture: generateRandomThumbnail("profile"),
-                        // profile.photos[0]?.value ||
-                        // "https://opencanvas.blog/defaults/profile.png",
+                        profilePicture:
+                            profile.photos[0]?.value ||
+                            generateRandomThumbnail("profile"),
                         lastFiveLogin: [
                             {
                                 loginTime: new Date(),
