@@ -12,6 +12,7 @@ import ProfileHeader from "../../components/Header/ProfileHeader";
 const FollowersPage = () => {
     const [followers, setFollowers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [orderReversed, setOrderReversed] = useState(false);
     const [followersToFetch, setFollowersToFetch] = useState(0);
     const navigate = useNavigate();
     const { username } = useParams();
@@ -155,10 +156,13 @@ const FollowersPage = () => {
                 <h1 className="text-2xl md:text-3xl font-bold mb-6 flex items-center justify-start">
                     {currentProfile.fullName}&apos;s Followers
                     <button
-                        className="ml-4 px-3 py-1 text-sm bg-gray-500 hover:bg-gray-600 text-white rounded-md"
-                        onClick={() => setFollowers([...followers].reverse())}
+                        className="ml-4 px-3 py-1 text-sm bg-gray-500 dark:bg-gray-700 hover:bg-gray-600 text-white rounded-md"
+                        onClick={() => {
+                            setFollowers([...followers].reverse());
+                            setOrderReversed(!orderReversed);
+                        }}
                     >
-                        reverse order
+                        {orderReversed ? "newest " : "oldest "} first
                     </button>
                 </h1>
                 <div className="grid grid-cols-1 gap-4">
@@ -194,10 +198,17 @@ const FollowersPage = () => {
                                     </p>
                                     <p className="text-xs text-gray-500 mt-2">
                                         Followed{" "}
-                                        {formatFollowedDate(
-                                            currentProfile.followers[index]
-                                                .since,
-                                        )}
+                                        {orderReversed
+                                            ? formatFollowedDate(
+                                                  [
+                                                      ...currentProfile.followers,
+                                                  ].reverse()[index].since,
+                                              )
+                                            : formatFollowedDate(
+                                                  currentProfile.followers[
+                                                      index
+                                                  ].since,
+                                              )}
                                     </p>
                                 </div>
                             </CardContent>
