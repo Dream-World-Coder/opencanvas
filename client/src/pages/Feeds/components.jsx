@@ -15,6 +15,24 @@ export const LeftSideBar = ({ selectedTopics, setSelectedTopics }) => {
         { name: "Popular" },
         { name: "Latest" },
     ];
+    const filters = [
+        "Technology",
+        "Writing",
+        "Art",
+        "Science",
+        "Philosophy",
+        "Regular",
+    ];
+
+    const toggleTopic = (topic) => {
+        setSelectedTopics((prev) => {
+            if (prev.includes(topic.toLowerCase())) {
+                return prev.filter((t) => t !== topic.toLowerCase());
+            } else {
+                return [...prev, topic.toLowerCase()];
+            }
+        });
+    };
 
     return (
         <div className="p-4 bg-white dark:bg-[#171717] rounded-xl shadow-sm">
@@ -29,48 +47,47 @@ export const LeftSideBar = ({ selectedTopics, setSelectedTopics }) => {
                     </div>
                 ))}
             </div>
-
             <div className="mt-8 border p-4 rounded-xl">
                 <div className="font-bold mb-4 flex items-center">
                     <Filter className="w-4 h-4 mr-2" />
                     Topics
                 </div>
                 <div className="space-y-2">
-                    {[
-                        "Technology",
-                        "Writing",
-                        "Art",
-                        "Science",
-                        "Philosophy",
-                        "A",
-                    ].map((topic) => (
+                    {filters.map((topic) => (
                         <div key={topic} className="flex items-center">
-                            <input
-                                type="checkbox"
-                                id={`topic-${topic}`}
-                                className="mr-2"
-                                onChange={() => {
-                                    setSelectedTopics((prev) => {
-                                        if (
-                                            prev.includes(topic.toLowerCase())
-                                        ) {
-                                            return prev.filter(
-                                                (t) =>
-                                                    t !== topic.toLowerCase(),
-                                            );
-                                        } else {
-                                            return [
-                                                ...prev,
-                                                topic.toLowerCase(),
-                                            ];
-                                        }
-                                    });
+                            <div
+                                className="w-4 h-4 mr-2 border border-gray-300 rounded cursor-pointer flex items-center justify-center"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    toggleTopic(topic);
                                 }}
-                                checked={selectedTopics.includes(
+                                role="checkbox"
+                                aria-checked={selectedTopics.includes(
                                     topic.toLowerCase(),
                                 )}
-                            />
-                            <label htmlFor={`topic-${topic}`}>{topic}</label>
+                                tabIndex={0}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter" || e.key === " ") {
+                                        e.preventDefault();
+                                        toggleTopic(topic);
+                                    }
+                                }}
+                            >
+                                {selectedTopics.includes(
+                                    topic.toLowerCase(),
+                                ) && (
+                                    <div className="w-2 h-2 bg-blue-500 rounded-sm"></div>
+                                )}
+                            </div>
+                            <div
+                                className="cursor-pointer select-none"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    toggleTopic(topic);
+                                }}
+                            >
+                                {topic}
+                            </div>
                         </div>
                     ))}
                 </div>

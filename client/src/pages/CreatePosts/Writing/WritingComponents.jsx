@@ -658,7 +658,9 @@ export const MarkdownPreview = ({
                                     </strong>
                                 ),
                                 em: ({ children }) => (
-                                    <em className="italic">{children}</em>
+                                    <em className="italic font-serif">
+                                        {children}
+                                    </em>
                                 ),
                                 a: ({ href, children }) => (
                                     <a

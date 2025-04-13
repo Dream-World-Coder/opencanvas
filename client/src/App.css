@@ -11,6 +11,12 @@ blockquote {
     }
 }
 
+em strong {
+    font-style: italic !important;
+    font-family: serif !important;
+    font-weight: 700 !important;
+}
+
 .montserrat-regular {
     font-family: "Montserrat", sans-serif;
     font-optical-sizing: auto;

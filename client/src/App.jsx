@@ -95,6 +95,7 @@ export default function App() {
                                     path="/register"
                                     element={<LoginPage />}
                                 />
+                                <Route path="/signup" element={<LoginPage />} />
                                 <Route
                                     path="/auth/success"
                                     element={<AuthSuccess />}

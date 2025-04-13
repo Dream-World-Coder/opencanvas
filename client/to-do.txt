@@ -18,10 +18,13 @@
 -- bug: if i follow author in post page, i cannot see the following whn i dorectly visit his profile from the Post
 -- like dislike fix
 -- [x] Login page color fix
--- [ ] Feed not visible to log out users
 -- [ ] follow fix in post page
 -- [ ] image upload
 -- [ ] in profile footer add `opencanvas`
+-- [-] profile image proxy
+-- assignment 8
+-- filters not working in feed
+-- some problems in followers / following ig, also problem in reversing, [and need to think, i.g it will be better to stor followers info directly instead fetching them]
 -- Magazine [week - month - year] : best articles or collections [any one], best stories & poems [in different sections[max 8]]
 
 -- I think another attribute `timesFetched` can be added, to easily cache proper posts, its not necessary only a more fetched post will always be on trending,
