@@ -17,6 +17,14 @@
 -- in feed all posts are not coming, maybe use &lte instead &lt, <= instead <
 -- bug: if i follow author in post page, i cannot see the following whn i dorectly visit his profile from the Post
 -- like dislike fix
+-- [x] Login page color fix
+-- [ ] Feed not visible to log out users
+-- [ ] follow fix in post page
+-- [ ] image upload
+-- [ ] in profile footer add `opencanvas`
+-- Magazine [week - month - year] : best articles or collections [any one], best stories & poems [in different sections[max 8]]
+
+-- I think another attribute `timesFetched` can be added, to easily cache proper posts, its not necessary only a more fetched post will always be on trending,
 
 * less imp
     html in export formats
@@ -25,3 +33,5 @@
     better pdf quality and page breaks
     optimisations to load faster
     Keyboard shortcuts for differnt formats,
+
+^^^ MOTO: focused place, to publish individual works, groups can be formed though, publish reserch papers, stories, poems

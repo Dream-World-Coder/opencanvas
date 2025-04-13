@@ -1,12 +1,10 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FlowerIcon } from "./Flower";
-import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { useEffect } from "react";
-
-// import { LoginForm } from "@/components/ui/login-form";
 
 const LoginPage = ({ bgClr = "bg-cream-light" }) => {
     const navigate = useNavigate();
@@ -22,7 +20,7 @@ const LoginPage = ({ bgClr = "bg-cream-light" }) => {
         <div
             className={`min-h-auto md:min-h-screen h-[100dvh] md:h-auto ${bgClr} flex items-center justify-center p-4`}
         >
-            <Card className="w-full max-w-md p-12 space-y-8 relative overflow-hidden">
+            <Card className="w-full max-w-md p-12 space-y-8 relative overflow-hidden !bg-white !text-black dark:border-none">
                 <div className="absolute top-0 right-0 -mr-18 -mt-18 opacity-10">
                     <FlowerIcon />
                 </div>
@@ -32,11 +30,9 @@ const LoginPage = ({ bgClr = "bg-cream-light" }) => {
 
                 <div className="space-y-4 text-center relative">
                     <h2 className="text-2xl font-[stardom] font-medium text-gray-400">
-                        {/* OpenCanvas */}
                         <span className="font-['Six_Caps'] text-2xl tracking-wide">
-                            {/* <span className="font-[Smooch]">my</span> */}
                             opencanvas
-                        </span>{" "}
+                        </span>
                     </h2>
                     <h1 className="text-4xl font-serif">Welcome Back</h1>
                 </div>
@@ -77,7 +73,7 @@ const LoginPage = ({ bgClr = "bg-cream-light" }) => {
                                     fill="#EA4335"
                                 />
                             </svg>
-                            <span className="text-lg">Google</span>
+                            <span className="text-lg !text-black">Google</span>
                         </Button>
                         <Button
                             className="w-full flex items-center justify-center space-x-3 bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 p-6"
@@ -89,13 +85,14 @@ const LoginPage = ({ bgClr = "bg-cream-light" }) => {
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 0 24 24"
+                                className="!text-black"
                             >
                                 <path
                                     d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"
                                     fill="currentColor"
                                 />
                             </svg>
-                            <span className="text-lg">Apple</span>
+                            <span className="text-lg !text-black">Apple</span>
                         </Button>
                     </div>
                 </div>
@@ -134,13 +131,3 @@ LoginPage.propTypes = {
 };
 
 export default LoginPage;
-
-// export default function LoginPage() {
-//     return (
-//         <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
-//             <div className="w-full max-w-sm md:max-w-3xl">
-//                 <LoginForm />
-//             </div>
-//         </div>
-//     );
-// }
