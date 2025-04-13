@@ -152,8 +152,14 @@ const FollowersPage = () => {
         <div className="min-h-screen bg-white dark:bg-[#111] text-gray-800 dark:text-gray-100 p-4 md:p-6">
             <ProfileHeader />
             <div className="max-w-3xl mx-auto pt-28">
-                <h1 className="text-2xl md:text-3xl font-bold mb-6">
+                <h1 className="text-2xl md:text-3xl font-bold mb-6 flex items-center justify-start">
                     {currentProfile.fullName}&apos;s Followers
+                    <button
+                        className="ml-4 px-3 py-1 text-sm bg-gray-500 hover:bg-gray-600 text-white rounded-md"
+                        onClick={() => setFollowers([...followers].reverse())}
+                    >
+                        reverse order
+                    </button>
                 </h1>
                 <div className="grid grid-cols-1 gap-4">
                     {followers.map((follower, index) => (
