@@ -87,6 +87,10 @@
 -- [x] remove author from post, fetch the author
 -- [x] fetch author in article page
 
+-- [-] profile image proxy
+-- [x] min-max width of post view
+-- [x] back button position change
+
 
 -- [x] if post is already loaded in feed, use it somehow
 pass it as props then

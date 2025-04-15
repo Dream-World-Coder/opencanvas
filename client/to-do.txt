@@ -21,9 +21,6 @@
 -- [ ] follow fix in post page
 -- [ ] image upload
 -- [ ] in profile footer add `opencanvas`
--- [-] profile image proxy
--- [x] min-max width of post view
--- [x] back button position change
 -- [] gap button in editor
 -- filters not working in feed
 -- some problems in followers / following ig, also problem in reversing, [and need to think, i.g it will be better to stor followers info directly instead fetching them]

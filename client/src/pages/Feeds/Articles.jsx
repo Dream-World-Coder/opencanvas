@@ -288,16 +288,21 @@ const ArticleFeed = () => {
                                                                 }
                                                                 isDark={isDark}
                                                                 darkBg="bg-[#171717]"
-                                                                textAlignment="left"
+                                                                textAlignment={
+                                                                    post.type ===
+                                                                    "poem"
+                                                                        ? "left"
+                                                                        : "left"
+                                                                }
                                                                 insidePost={
                                                                     true
                                                                 }
                                                                 contentOnly={
                                                                     true
                                                                 }
-                                                                artType={
-                                                                    post.type
-                                                                }
+                                                                // artType={
+                                                                //     post.type
+                                                                // }
                                                             />
                                                         </div>
                                                         <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white dark:from-[#171717] to-transparent"></div>
