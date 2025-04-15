@@ -22,7 +22,9 @@
 -- [ ] image upload
 -- [ ] in profile footer add `opencanvas`
 -- [-] profile image proxy
--- assignment 8
+-- [x] min-max width of post view
+-- [x] back button position change
+-- [] gap button in editor
 -- filters not working in feed
 -- some problems in followers / following ig, also problem in reversing, [and need to think, i.g it will be better to stor followers info directly instead fetching them]
 -- Magazine [week - month - year] : best articles or collections [any one], best stories & poems [in different sections[max 8]]

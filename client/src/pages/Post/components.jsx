@@ -200,7 +200,7 @@ export const LeftSidebar = ({ focusMode, isArticle }) => {
             {/* back button */}
             {isArticle && (
                 <button
-                    className="absolute top-8 right-0 rounded-full text-sm bg-gray-100 hover:bg-gray-200 dark:bg-[#111] border box-content p-1 text-stone-600/80 dark:border-[#333]"
+                    className="absolute top-[37px] right-0 rounded-full text-sm bg-gray-100 hover:bg-gray-200 dark:bg-[#111] border box-content p-1 text-stone-600/80 dark:border-[#333]"
                     onClick={() => {
                         navigate(-1);
                     }}

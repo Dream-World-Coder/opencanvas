@@ -222,7 +222,7 @@ const ViewPost = ({ isArticle = true }) => {
 
                     {/* Main content */}
                     <main
-                        className={`flex-1 p-4 md:p-6 lg:p-8 min-h-screen ${!focusMode ? "border-r border-gray-200 dark:border-[#333]" : ""}`}
+                        className={`flex-1 p-4 md:p-6 lg:p-8 min-h-screen max-w-3xl ${!focusMode ? "border-r border-gray-200 dark:border-[#333]" : ""}`}
                     >
                         {/* Article header */}
                         <ArticleHeader
@@ -243,8 +243,11 @@ const ViewPost = ({ isArticle = true }) => {
                                 thumbnailUrl={post.thumbnailUrl}
                                 isDark={isDark}
                                 darkBg="bg-[#111]"
-                                textAlignment="left"
+                                textAlignment={
+                                    post.type !== "poem" ? "left" : "center"
+                                }
                                 insidePost={true}
+                                artType={post.type}
                             />
                             <div className="flex flex-wrap gap-2 mb-6">
                                 {post.tags.map((tag, index) => (

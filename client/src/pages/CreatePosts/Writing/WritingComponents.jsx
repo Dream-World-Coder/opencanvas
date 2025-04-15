@@ -347,6 +347,7 @@ export const MarkdownPreview = ({
     insidePost = false,
     darkBg = "bg-[#222]",
     contentOnly = false,
+    artType = "written",
 }) => {
     //useref to store settings for all images individually
     const imageSettingsRef = useRef({});
@@ -409,13 +410,21 @@ export const MarkdownPreview = ({
                         {/* title */}
                         {title && (
                             <div
-                                className={`mt-2 mb-10 leading-tight tracking-tight capitalize ${
+                                className={`pt-2 mb-10 leading-tight tracking-tight capitalize ${
                                     contentOnly
                                         ? "text-xl font-semibold font-sans"
                                         : "text-4xl font-bold font-serif"
-                                }`}
+                                }
+                                ${artType === "poem" ? "!max-w-[600px] !font-boskaBold" : ""}
+                                `}
                             >
                                 {title}
+                                <hr
+                                    className={`mt-6 mb-px border-t ${isDark ? "border-[#333]" : "border-gray-200"}`}
+                                />
+                                <hr
+                                    className={`mb-6 border-t ${isDark ? "border-[#333]" : "border-gray-200"}`}
+                                />
                             </div>
                         )}
 
@@ -647,18 +656,25 @@ export const MarkdownPreview = ({
                                 ),
                                 p: ({ children }) => (
                                     <p
-                                        className={`my-5 max-w-prose ${contentOnly ? "text-xs leading-relaxed" : "text-base md:text-lg md:leading-[40px]"}`}
+                                        className={`my-8 max-w-prose
+                                            ${contentOnly ? "text-xs leading-relaxed" : "text-base md:text-lg md:leading-[28px]"}
+                                            ${artType === "poem" ? "!font-boskaLight !text-xl !leading-[32px] !my-0" : ""}`}
                                     >
+                                        {/* initially it was : leading-[40px] */}
                                         {children}
                                     </p>
                                 ),
                                 strong: ({ children }) => (
-                                    <strong className="font-semibold montserrat-bold">
+                                    <strong
+                                        className={`font-semibold montserrat-bold`}
+                                    >
                                         {children}
                                     </strong>
                                 ),
                                 em: ({ children }) => (
-                                    <em className="italic font-serif">
+                                    <em
+                                        className={`italic ${artType === "poem" ? "font-boska" : "font-boska"}`}
+                                    >
                                         {children}
                                     </em>
                                 ),
@@ -939,6 +955,7 @@ MarkdownPreview.propTypes = {
     lightModeBg: PropTypes.string,
     insidePost: PropTypes.bool,
     darkBg: PropTypes.string,
+    artType: PropTypes.string,
 };
 
 /*
