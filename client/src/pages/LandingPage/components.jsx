@@ -48,8 +48,8 @@ export const Navbar = ({ bg }) => {
     const { currentUser } = useAuth();
 
     let navLinks = [
+        { name: "Articles", href: "/articles" },
         { name: "Literature", href: "/literature" },
-        { name: "Photos", href: "/photo-gallery" },
         { name: "About", href: "/about" },
         { name: "Contact", href: "/contact" },
     ];
