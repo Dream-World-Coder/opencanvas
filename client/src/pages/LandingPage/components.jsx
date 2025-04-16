@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { X, Menu } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 
 export const Circle = ({
     radius = "300px",
@@ -22,6 +23,14 @@ export const Circle = ({
         />
     );
 };
+Circle.propTypes = {
+    radius: PropTypes.string,
+    top: PropTypes.string,
+    left: PropTypes.string,
+    bg: PropTypes.string,
+    border: PropTypes.string,
+    blur: PropTypes.string,
+};
 
 export const SlidingButton = ({ href, children }) => {
     const navigate = useNavigate();
@@ -41,6 +50,10 @@ export const SlidingButton = ({ href, children }) => {
             </span>
         </button>
     );
+};
+SlidingButton.propTypes = {
+    href: PropTypes.string,
+    children: PropTypes.any,
 };
 
 export const Navbar = ({ bg }) => {
@@ -64,7 +77,9 @@ export const Navbar = ({ bg }) => {
         <>
             <nav className="flex justify-end items-center h-16 fixed top-4 right-8 z-40">
                 {/* Desktop Navigation */}
-                <div className="hidden md:flex space-x-2 border border-[#c2c4c0] bg-[#c2c4c0]/10 rounded-full pl-2">
+                <div
+                    className={`hidden md:flex space-x-2 border border-[#c2c4c0] bg-[#c2c4c0]/10 rounded-full pl-2 ${currentUser ? "" : "py-[6px] pr-2"}`}
+                >
                     {navLinks.map((link, index) => (
                         <React.Fragment key={index}>
                             <a
@@ -125,6 +140,9 @@ export const Navbar = ({ bg }) => {
             )}
         </>
     );
+};
+Navbar.propTypes = {
+    bg: PropTypes.string,
 };
 
 export const Footer = () => {
