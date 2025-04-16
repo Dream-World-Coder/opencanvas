@@ -88,6 +88,7 @@
 -- [x] fetch author in article page
 
 -- [-] profile image proxy
+-- [x] Login page color fix
 -- [x] min-max width of post view
 -- [x] back button position change
 

@@ -64,14 +64,14 @@ export const Navbar = ({ bg }) => {
         <>
             <nav className="flex justify-end items-center h-16 fixed top-4 right-8 z-40">
                 {/* Desktop Navigation */}
-                <div className="hidden md:flex space-x-2">
+                <div className="hidden md:flex space-x-2 border border-[#c2c4c0] bg-[#c2c4c0]/10 rounded-full pl-2">
                     {navLinks.map((link, index) => (
                         <React.Fragment key={index}>
                             <a
                                 href={link.href}
                                 className={`text-stone-600 hover:text-stone-800 flex items-center
                                     ${link.href !== "/profile" ? "hover:bg-[#d2d4d0]" : ""}
-                                    rounded-lg text-sm transition-all duration-300 box-content px-3 py-1`}
+                                    rounded-full text-sm transition-all duration-300 box-content px-3 py-1`}
                             >
                                 {link.href !== "/profile" ? (
                                     link.name
