@@ -9,9 +9,10 @@ import { toast } from "sonner";
 import ProfileHeader from "../../components/Header/ProfileHeader";
 import ProfileFooter from "../../components/Footer/ProfileFooter";
 import {
-    PostFilterTabs,
-    FeaturedWorks,
     ProfileHelmet,
+    QuickStatsProfile,
+    FeaturedWorks,
+    PostFilterTabs,
     PostList,
 } from "./components";
 import { useAuth } from "../../contexts/AuthContext";
@@ -26,28 +27,6 @@ const Profile = () => {
     // const [collections, setCollections] = useState([]);
     const [postsToFetchIndex, setPostsToFetchIndex] = useState(0);
     const [loading, setLoading] = useState(true);
-    const userStats = [
-        // {
-        //     name: "TOTAL LIKES",
-        //     href: "#post-view",
-        //     amount: posts.reduce((sum, post) => sum + post.totalLikes, 0),
-        // },
-        {
-            name: "WORKS",
-            href: "#post-view",
-            amount: currentUser.posts.length,
-        },
-        {
-            name: "FOLLOWERS",
-            href: `/u/${currentUser.username}/followers`,
-            amount: currentUser.followers.length,
-        },
-        {
-            name: "FOLLOWING",
-            href: `/u/${currentUser.username}/following`,
-            amount: currentUser.following.length,
-        },
-    ];
 
     // fetch posts+collections from user's postIds array
     const fetchUserPosts = async () => {
@@ -185,22 +164,7 @@ const Profile = () => {
                             </div>
 
                             {/* Quick Stats */}
-                            <div className="space-y-2 md:space-y-3 pt-2 md:pt-4 w-full md:w-[300px] lg:w-[400px] font-[montserrat] mt-6 md:mt-0">
-                                {userStats.map((item, index) => (
-                                    <a
-                                        key={index}
-                                        className="flex justify-between items-center rounded border-b border-gray-200 hover:bg-gray-100 dark:border-[#333] dark:hover:bg-[#333] py-2 md:py-3 pr-3 md:pr-4 cursor-pointer group"
-                                        href={item.href}
-                                    >
-                                        <span className="text-gray-500 dark:text-[#999] text-xs md:text-sm group-hover:translate-x-1 md:group-hover:translate-x-2 transition-transform duration-300">
-                                            {item.name}
-                                        </span>
-                                        <span className="text-sm md:text-base dark:text-[#e0e0e0]">
-                                            {item.amount}
-                                        </span>
-                                    </a>
-                                ))}
-                            </div>
+                            <QuickStatsProfile currentUser={currentUser} />
                         </div>
 
                         {/* featured */}

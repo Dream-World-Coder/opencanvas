@@ -16,6 +16,9 @@ import {
     ChevronRight,
     ThumbsUp,
     MessageCircle,
+    SquareChartGantt,
+    Users,
+    UserCheck,
 } from "lucide-react";
 import {
     AlertDialog,
@@ -121,6 +124,98 @@ export const ProfileHelmet = ({ currentProfile }) => {
 };
 ProfileHelmet.propTypes = {
     currentProfile: PropTypes.object,
+};
+
+export const QuickStatsProfile = ({ currentUser }) => {
+    const [hoveredItem, setHoveredItem] = useState(null);
+
+    const userStats = [
+        {
+            name: "WORKS",
+            href: "#post-view",
+            amount: currentUser.posts.length,
+            icon: SquareChartGantt,
+        },
+        {
+            name: "FOLLOWERS",
+            href: `/u/${currentUser.username}/followers`,
+            amount: currentUser.followers.length,
+            icon: Users,
+        },
+        {
+            name: "FOLLOWING",
+            href: `/u/${currentUser.username}/following`,
+            amount: currentUser.following.length,
+            icon: UserCheck,
+        },
+    ];
+
+    return (
+        <div className="w-full md:w-[300px] lg:w-[400px] font-sans border border-gray-200 dark:border-[#222] mt-6 md:mt-0 rounded-lg bg-white dark:bg-[#111] overflow-hidden">
+            {userStats.map((item, index) => (
+                <a
+                    key={index}
+                    className={`flex items-center justify-between px-4 py-3 border-b last:border-b-0 border-gray-100 dark:border-[#222] hover:bg-gray-50 dark:hover:bg-[#222] transition-all duration-300 ease-in-out ${
+                        hoveredItem === index ? "bg-gray-50 dark:bg-[#222]" : ""
+                    }`}
+                    href={item.href}
+                    onMouseEnter={() => setHoveredItem(index)}
+                    onMouseLeave={() => setHoveredItem(null)}
+                >
+                    <div className="flex items-center space-x-3">
+                        <span
+                            className={`text-gray-400 dark:text-gray-500 transition-all duration-300 ${
+                                hoveredItem === index
+                                    ? "text-gray-600 dark:text-gray-300"
+                                    : ""
+                            }`}
+                        >
+                            <item.icon size={16} strokeWidth={1.5} />
+                        </span>
+                        <span
+                            className={`font-medium text-xs tracking-wider text-gray-500 dark:text-gray-400 transition-all duration-300 ${
+                                hoveredItem === index
+                                    ? "text-gray-700 dark:text-gray-200 translate-x-1"
+                                    : ""
+                            }`}
+                        >
+                            {item.name}
+                        </span>
+                    </div>
+                    <div
+                        className={`flex items-center transition-all duration-300 ${
+                            hoveredItem === index ? "scale-110" : ""
+                        }`}
+                    >
+                        <span className="font-semibold text-base text-gray-800 dark:text-gray-200">
+                            {item.amount}
+                        </span>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className={`h-4 w-4 ml-1 text-gray-400 dark:text-gray-500 transition-transform duration-300 ${
+                                hoveredItem === index
+                                    ? "transform translate-x-1 opacity-100 text-gray-600 dark:text-gray-300"
+                                    : "opacity-0"
+                            }`}
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={1.5}
+                                d="M9 5l7 7-7 7"
+                            />
+                        </svg>
+                    </div>
+                </a>
+            ))}
+        </div>
+    );
+};
+QuickStatsProfile.propTypes = {
+    currentUser: PropTypes.object.isRequired,
 };
 
 export const PostFilterTabs = ({ activeTab, setActiveTab }) => {

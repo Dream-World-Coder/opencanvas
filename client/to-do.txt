@@ -22,6 +22,8 @@
 -- [ ] in profile footer add `opencanvas`
 -- [] gap button in editor
 -- [] store fetched posts of feed [use context or cache]
+-- [] UI-UX and design upgrade needed
+-- [] sliding effect in header, highlight current route, and traverse the green box to other
 -- filters not working in feed
 -- some problems in followers / following ig, also problem in reversing, [and need to think, i.g it will be better to stor followers info directly instead fetching them]
 -- Magazine [week - month - year] : best articles or collections [any one], best stories & poems [in different sections[max 8]]

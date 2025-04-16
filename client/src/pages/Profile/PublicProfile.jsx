@@ -9,10 +9,11 @@ import { toast } from "sonner";
 import ProfileHeader from "../../components/Header/ProfileHeader";
 import ProfileFooter from "../../components/Footer/ProfileFooter";
 import {
-    PostFilterTabs,
+    ProfileHelmet,
+    QuickStatsProfile,
     ContactInformationDropdown,
     FeaturedWorks,
-    ProfileHelmet,
+    PostFilterTabs,
     PostList,
 } from "./components";
 import { useDataService } from "../../services/dataService";
@@ -149,24 +150,6 @@ const PublicProfile = () => {
             </div>
         );
 
-    const userStats = [
-        {
-            name: "WORKS",
-            href: "#post-view",
-            amount: currentProfile.posts.length,
-        },
-        {
-            name: "FOLLOWERS",
-            href: `/u/${username}/followers`,
-            amount: currentProfile.followers.length,
-        },
-        {
-            name: "FOLLOWING",
-            href: `/u/${username}/following`,
-            amount: currentProfile.following.length,
-        },
-    ];
-
     return (
         <>
             <ProfileHelmet currentProfile={currentProfile} />
@@ -263,22 +246,7 @@ const PublicProfile = () => {
                             </div>
 
                             {/* Quick Stats */}
-                            <div className="space-y-2 md:space-y-3 pt-2 md:pt-4 w-full md:w-[300px] lg:w-[400px] font-[montserrat] mt-6 md:mt-0">
-                                {userStats.map((item, index) => (
-                                    <a
-                                        key={index}
-                                        className="flex justify-between items-center rounded border-b border-gray-200 hover:bg-gray-100 dark:border-[#333] dark:hover:bg-[#333] py-3 pr-4 cursor-pointer group"
-                                        href={item.href}
-                                    >
-                                        <span className="text-gray-500 dark:text-[#999] text-sm md:text-sm group-hover:translate-x-2 transition-transform duration-300">
-                                            {item.name}
-                                        </span>
-                                        <span className="dark:text-[#e0e0e0]">
-                                            {item.amount}
-                                        </span>
-                                    </a>
-                                ))}
-                            </div>
+                            <QuickStatsProfile currentUser={currentProfile} />
                         </div>
 
                         {/* featured */}

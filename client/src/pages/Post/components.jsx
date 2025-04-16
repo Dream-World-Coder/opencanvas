@@ -274,7 +274,7 @@ export const ArticleHeader = ({
         <div className="mb-8">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between space-y-2 md:space-y-0 mb-4">
                 <div
-                    className="flex items-center cursor-pointer"
+                    className="flex items-center cursor-pointer mr-12"
                     onClick={() => {
                         navigate(`/u/${post.author.username}`);
                         // navigate(`/u/${post.author.username}`, {

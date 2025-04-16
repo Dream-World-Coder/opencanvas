@@ -362,8 +362,8 @@ export const MarkdownPreview = ({
     const getImageSettings = (imageId) => {
         if (!imageSettingsRef.current[imageId]) {
             imageSettingsRef.current[imageId] = {
-                maxWidth: 768,
-                maxHeight: 768,
+                maxWidth: 468,
+                maxHeight: 468,
                 alignment: "center",
                 marginTop: 35,
                 marginBottom: 35,
@@ -419,12 +419,16 @@ export const MarkdownPreview = ({
                                 `}
                             >
                                 {title}
-                                <hr
-                                    className={`mt-6 mb-px border-t ${isDark ? "border-[#333]" : "border-gray-200"}`}
-                                />
-                                <hr
-                                    className={`mb-6 border-t ${isDark ? "border-[#333]" : "border-gray-200"}`}
-                                />
+                                {!contentOnly && (
+                                    <>
+                                        <hr
+                                            className={`mt-6 mb-px border-t ${isDark ? "border-[#333]" : "border-gray-200"}`}
+                                        />
+                                        <hr
+                                            className={`mb-6 border-t ${isDark ? "border-[#333]" : "border-gray-200"}`}
+                                        />
+                                    </>
+                                )}
                             </div>
                         )}
 
