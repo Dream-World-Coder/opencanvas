@@ -474,7 +474,7 @@ const ProfileSettings = () => {
                 </div>
 
                 <AlertDialog>
-                    <AlertDialogTrigger className="hover:bg-red-300/80 dark:hover:bg-red-800/80 rounded-md px-3 py-1 box-content">
+                    <AlertDialogTrigger className="hover:bg-red-300/80 dark:hover:bg-red-800/80 border border-red-300/80 dark:border-red-600/80 rounded-md px-3 py-1 box-content">
                         Logout
                     </AlertDialogTrigger>
                     <AlertDialogContent>
