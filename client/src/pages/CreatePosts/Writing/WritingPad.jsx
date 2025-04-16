@@ -2,28 +2,28 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Helmet } from "react-helmet-async";
 import {
-    ArrowLeft,
+    X,
     Sun,
+    Eye,
     Moon,
     Undo,
     Redo,
-    MoreHorizontal,
-    AlertTriangle,
-    Eye,
     Edit,
-    X,
-    Download,
-    FileText,
-    FileType,
     Type,
     Info,
-    AlignCenter,
-    AlignLeft,
-    NotebookText,
-    ScrollText,
-    FileSearch,
-    PanelTop,
+    Download,
+    FileText,
     Columns2,
+    FileType,
+    PanelTop,
+    ArrowLeft,
+    AlignLeft,
+    FileSearch,
+    ScrollText,
+    AlignCenter,
+    NotebookText,
+    AlertTriangle,
+    MoreHorizontal,
 } from "lucide-react";
 import PropTypes from "prop-types";
 
@@ -64,6 +64,7 @@ import {
     formattingButtons,
     rawText,
     findAndReplace,
+    getSchemaData,
 } from "./WritingComponents";
 
 // hooks
@@ -111,8 +112,6 @@ const WritingPad = ({ artType = "article" }) => {
         setContent,
         isSaved,
         setIsSaved,
-        // syncStatus,
-        // lastSynced,
         showUnsavedAlert,
         setShowUnsavedAlert,
         handleSave,
@@ -122,6 +121,8 @@ const WritingPad = ({ artType = "article" }) => {
         setTags,
         isPublic,
         setIsPublic,
+        setMedia,
+        setThumbnailUrl,
     } = useWritingPad({ postId, frontendOnly, artType });
 
     // Editor formatting functionality
@@ -170,35 +171,6 @@ const WritingPad = ({ artType = "article" }) => {
     //     return <div>Redirecting...</div>;
     // }
 
-    const schemaData = {
-        "@context": "https://schema.org",
-        "@type": "Article",
-        headline: { title },
-        // image: ["https://opencanvas.blog/photos/1x1/photo.jpg"],
-        datePublished: {},
-        dateModified: {},
-        author: {
-            "@type": "Person",
-            name: {},
-        },
-        publisher: {
-            "@type": "Organization",
-            name: "Opencanvas",
-            logo: {
-                "@type": "ImageObject",
-                url: "https://opencanvas.blog/logo.png",
-            },
-        },
-        description:
-            "A sample article description goes here, summarizing the main content of the article.",
-        mainEntityOfPage: {
-            "@type": "WebPage",
-            "@id": "https://opencanvas.blog/sample-article",
-        },
-        keywords:
-            "SEO, keywords, search engine optimization, blog, web development",
-    };
-
     return (
         <>
             <Helmet>
@@ -209,7 +181,7 @@ const WritingPad = ({ artType = "article" }) => {
                     content="technology, blog, javascript, SEO, web development"
                 />
                 <script type="application/ld+json">
-                    {JSON.stringify(schemaData)}
+                    {JSON.stringify(getSchemaData(title))}
                 </script>
             </Helmet>
             <div
@@ -289,7 +261,10 @@ const WritingPad = ({ artType = "article" }) => {
                                             </div>
                                             <ThumbnailUploader
                                                 artType={artType}
-                                                maxSize={5}
+                                                setThumbnailUrl={
+                                                    setThumbnailUrl
+                                                }
+                                                setMedia={setMedia}
                                             />
                                         </div>
 
@@ -562,6 +537,7 @@ const WritingPad = ({ artType = "article" }) => {
                                     sizing="px-[6px] md:px-2 py-3"
                                 />
                                 <ImageUploadButton
+                                    setMedia={setMedia}
                                     onImageInsert={(markdownImageText) => {
                                         const textarea =
                                             document.querySelector("textarea");

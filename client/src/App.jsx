@@ -124,15 +124,12 @@ export default function App() {
                                         <PhotoGalleryPage bgClr="bg-white" />
                                     }
                                 />
-                                <Route
-                                    path="/markdown2pdf"
-                                    element={<Md2Pdf />}
-                                />
-                                <Route path="/md2pdf" element={<Md2Pdf />} />
-                                <Route path="/m/2/p" element={<Md2Pdf />} />
-                                <Route path="/m-2-p" element={<Md2Pdf />} />
-                                <Route path="/m2p" element={<Md2Pdf />} />
                                 {/* *************** */}
+
+                                <Route
+                                    path="/upload-image"
+                                    element={<ImageUploadPage />}
+                                />
 
                                 {/* *************** */}
                                 <Route
@@ -181,11 +178,22 @@ export default function App() {
                                             <WritingPad artType={"article"} />
                                         }
                                     />
-
                                     <Route
+                                        path="/markdown2pdf"
+                                        element={<Md2Pdf />}
+                                    />
+                                    <Route
+                                        path="/md2pdf"
+                                        element={<Md2Pdf />}
+                                    />
+                                    <Route path="/m/2/p" element={<Md2Pdf />} />
+                                    <Route path="/m-2-p" element={<Md2Pdf />} />
+                                    <Route path="/m2p" element={<Md2Pdf />} />
+
+                                    {/* <Route
                                         path="/upload-image"
                                         element={<ImageUploadPage />}
-                                    />
+                                    /> */}
 
                                     <Route
                                         path="/edit-post"

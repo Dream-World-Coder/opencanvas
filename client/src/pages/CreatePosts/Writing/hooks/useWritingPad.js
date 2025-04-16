@@ -9,15 +9,13 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
     const [twoColumn, setTwoColumn] = useState(false);
     const [postLoading, setPostLoading] = useState(false);
     const [isSaved, setIsSaved] = useState(true);
-    // const [lastSynced, setLastSynced] = useState(null);
-    // const [syncStatus, setSyncStatus] = useState("synced"); // 'synced', 'saving', 'offline'
     const [showUnsavedAlert, setShowUnsavedAlert] = useState(false);
     const [tags, setTags] = useState(["regular"]);
     const [isPublic, setIsPublic] = useState(true);
     const [thumbnailUrl, setThumbnailUrl] = useState("");
     const [media, setMedia] = useState([]);
 
-    const { getPostById } = useDataService();
+    const { getPostByIdSecured } = useDataService();
     // const navigate = useNavigate();
 
     // else not getting it in the first chance, postId
@@ -42,6 +40,7 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
             id: postId,
             title,
             content,
+            media,
             lastSaved: new Date().toISOString(),
             syncedWithServer: false,
         };
@@ -79,9 +78,11 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
                 isPublic,
                 artType,
                 thumbnailUrl,
-                readTime: `${Math.ceil((content.split(" ").length * 0.8) / 300)} min read`,
+                readTime: `${Math.ceil((content.split(" ").length * 0.8) / 237)} min read`,
                 media,
             };
+            // console.log(`thumbnailUrl : ${thumbnailUrl}`);
+            // console.log(`media : ${media}`);
 
             const token = localStorage.getItem("authToken");
 
@@ -140,12 +141,12 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
         }, 200);
 
         /*
-        const draftKeys = Object.keys(localStorage).filter((key) =>
+        const draftKeys = Object.keys(local-Storage).filter((key) =>
             key.startsWith("draft-"),
         );
 
         for (const key of draftKeys) {
-            const draft = JSON.parse(localStorage.getItem(key));
+            const draft = JSON.parse(local-Storage.getItem(key));
             if (!draft.syncedWithServer) {
                 try {
                     const response = await fetch(`/api/posts/${draft.id}`, {
@@ -157,7 +158,7 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
                     });
 
                     if (response.ok) {
-                        localStorage.removeItem(key);
+                        local-Storage.removeItem(key);
                     }
                 } catch (error) {
                     console.error("Error syncing draft:", error);
@@ -184,12 +185,13 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
             async function fetchPost() {
                 setPostLoading(true);
                 try {
-                    const postData = await getPostById(postId);
+                    const postData = await getPostByIdSecured(postId);
                     setTitle(postData.title);
                     setContent(postData.content);
                     setTags(postData.tags);
                     setIsPublic(postData.isPublic);
                     setThumbnailUrl(postData.thumbnailUrl);
+                    setMedia(postData.media ?? []);
 
                     await new Promise((resolve) => setTimeout(resolve, 300));
                     const txtArea = document.getElementById("txtArea");
@@ -213,10 +215,16 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
                 try {
                     const savedPost = localStorage.getItem("blogPost");
                     if (savedPost) {
-                        const { title: savedTitle, content: savedContent } =
-                            JSON.parse(savedPost);
+                        const {
+                            title: savedTitle,
+                            content: savedContent,
+                            media: savedMedia,
+                            thumbnailUrl: savedThumbnailUrl,
+                        } = JSON.parse(savedPost);
                         setTitle(savedTitle);
                         setContent(savedContent);
+                        setMedia(savedMedia ?? []);
+                        setThumbnailUrl(savedThumbnailUrl);
                     }
 
                     // Wait for React state updates to complete
@@ -335,5 +343,7 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
         setTags,
         isPublic,
         setIsPublic,
+        setMedia,
+        setThumbnailUrl,
     };
 }

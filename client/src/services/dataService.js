@@ -83,6 +83,17 @@ export const useDataService = () => {
             throw error;
         }
     };
+    // here post media will also be reveled, so auth needed, else anyone can delete the images via imgur api
+    const getPostByIdSecured = async (postId) => {
+        try {
+            const response = await authAxios.get(`/secure/p/${postId}`);
+            return response.data.post;
+        } catch (error) {
+            console.error("Error fetching post:", error);
+            toast.error("Error getting post");
+            throw error;
+        }
+    };
 
     // would have been betten if could do these in bulk
     const deletePost = async (postId) => {
@@ -252,6 +263,7 @@ export const useDataService = () => {
         // Posts
         getNewPostId,
         getPostById,
+        getPostByIdSecured,
         deletePost,
         likePost,
         dislikePost,

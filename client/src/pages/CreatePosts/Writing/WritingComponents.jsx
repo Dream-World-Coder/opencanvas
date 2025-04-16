@@ -35,6 +35,10 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+    uploadImage,
+    validateFile,
+} from "../../../services/imageUploadService";
 
 // ***************************************************
 import ReactMarkdown from "react-markdown";
@@ -49,6 +53,37 @@ import {
     oneLight,
     atomDark,
 } from "react-syntax-highlighter/dist/esm/styles/prism";
+
+export const getSchemaData = (title) => {
+    return {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: { title },
+        // image: ["https://opencanvas.blog/photos/1x1/photo.jpg"],
+        datePublished: {},
+        dateModified: {},
+        author: {
+            "@type": "Person",
+            name: {},
+        },
+        publisher: {
+            "@type": "Organization",
+            name: "Opencanvas",
+            logo: {
+                "@type": "ImageObject",
+                url: "https://opencanvas.blog/logo.png",
+            },
+        },
+        description:
+            "A sample article description goes here, summarizing the main content of the article.",
+        mainEntityOfPage: {
+            "@type": "WebPage",
+            "@id": "https://opencanvas.blog/sample-article",
+        },
+        keywords:
+            "SEO, keywords, search engine optimization, blog, web development",
+    };
+};
 
 /**
  *
@@ -82,58 +117,29 @@ export const formattingButtons = [
  *
  *
  */
-export const ImageUploadButton = ({ onImageInsert, sizing }) => {
+export const ImageUploadButton = ({ onImageInsert, sizing, setMedia }) => {
     const fileInputRef = useRef(null);
     const [preview, setPreview] = useState(null);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [error, setError] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
 
-    const validateFile = (file) => {
-        const MAX_SIZE = 10 * 1024 * 1024; // 10MB
-        const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif"];
-
-        if (!ALLOWED_TYPES.includes(file.type)) {
-            throw new Error(
-                "Invalid file type. Please upload a JPG, PNG, or GIF.",
-            );
-        }
-
-        if (file.size > MAX_SIZE) {
-            throw new Error("File size exceeds 10MB limit.");
-        }
-    };
-
     const handleImageSelect = async (event) => {
         const file = event.target.files[0];
         if (!file) return;
 
         try {
-            validateFile(file);
             setError(null);
 
+            // preview URL & preview state
             const objectUrl = URL.createObjectURL(file);
             setPreview(objectUrl);
             setIsUploading(true);
 
-            const formData = new FormData();
-            formData.append("image", file);
+            const { directLink, imgDeleteHash } = await uploadImage(file);
+            onImageInsert(`![image](${directLink})`);
+            setMedia((prev) => [...prev, imgDeleteHash]);
 
-            const response = await fetch(
-                "https://encryptease.pythonanywhere.com/api/uploadImage",
-                {
-                    method: "POST",
-                    body: formData,
-                },
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || "Upload failed");
-            }
-
-            onImageInsert(data.markdown_link);
             setDialogOpen(false);
         } catch (error) {
             setError(error.message);
@@ -153,7 +159,7 @@ export const ImageUploadButton = ({ onImageInsert, sizing }) => {
                 <button
                     className={
                         sizing +
-                        "hover:bg-gray-200 md:rounded-lg transition-all duration-0"
+                        " hover:bg-gray-200 md:rounded-lg transition-all duration-0"
                     }
                 >
                     <Image className="size-4" />
@@ -163,7 +169,7 @@ export const ImageUploadButton = ({ onImageInsert, sizing }) => {
                 <DialogHeader>
                     <DialogTitle>Insert Image</DialogTitle>
                     <DialogDescription>
-                        Upload an image (JPG, PNG, or GIF, max 10MB)
+                        Upload an image (JPG, JPEG, PNG, or WEBP, max 10MB)
                     </DialogDescription>
                 </DialogHeader>
 
@@ -215,6 +221,7 @@ export const ImageUploadButton = ({ onImageInsert, sizing }) => {
 
 ImageUploadButton.propTypes = {
     onImageInsert: PropTypes.func,
+    setMedia: PropTypes.func,
     sizing: PropTypes.string,
 };
 
@@ -1121,56 +1128,30 @@ TagInputComponent.propTypes = {
     MAX_TAG_LENGTH: PropTypes.number,
 };
 
-export const ThumbnailUploader = ({ artType = "article", maxSize = 5 }) => {
-    const [thumbnail, setThumbnail] = useState(null);
-    const [thumbnailURL, setThumbnailURL] = useState("");
+export const ThumbnailUploader = ({
+    artType = "article",
+    setThumbnailUrl,
+    setMedia,
+}) => {
+    const [preview, setPreview] = useState(null);
     const [error, setError] = useState("");
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef(null);
 
-    const MAX_FILE_SIZE = maxSize * 1024 * 1024; // 5MB in bytes
-    const ALLOWED_EXTENSIONS = ["png", "jpeg", "jpg", "webp"];
-
-    const validateFile = (file) => {
-        // Check if file exists
-        if (!file) {
-            setError("Please select a file");
-            return false;
-        }
-
-        // Check file size
-        if (file.size > MAX_FILE_SIZE) {
-            setError(
-                `File size exceeds maximum limit of 5MB. Your file is ${(file.size / (1024 * 1024)).toFixed(2)}MB`,
-            );
-            return false;
-        }
-
-        // Check file extension
-        const extension = file.name.split(".").pop().toLowerCase();
-        if (!ALLOWED_EXTENSIONS.includes(extension)) {
-            setError(
-                `Unsupported file format. Please upload ${ALLOWED_EXTENSIONS.join(", ")} files only`,
-            );
-            return false;
-        }
-
-        setError("");
-        return true;
-    };
-
-    const handleFileChange = (e) => {
+    const handleFileChange = async (e) => {
         const file = e.target.files[0];
 
-        if (validateFile(file)) {
-            setThumbnail(file);
+        try {
+            await validateFile(file);
             const objectUrl = URL.createObjectURL(file);
-            setThumbnailURL(objectUrl);
-        } else {
-            // Reset the input if validation fails
+            setPreview(objectUrl);
+            const { directLink, imgDeleteHash } = await uploadImage(file);
+            setThumbnailUrl(directLink);
+            setMedia((prev) => [...prev, imgDeleteHash]);
+        } catch (err) {
+            setError(err);
             e.target.value = "";
-            setThumbnail(null);
-            setThumbnailURL("");
+            setThumbnailUrl("");
         }
     };
 
@@ -1184,15 +1165,18 @@ export const ThumbnailUploader = ({ artType = "article", maxSize = 5 }) => {
         setIsDragging(false);
     };
 
-    const handleDrop = (e) => {
+    const handleDrop = async (e) => {
         e.preventDefault();
         setIsDragging(false);
 
         const file = e.dataTransfer.files[0];
-        if (validateFile(file)) {
-            setThumbnail(file);
+        try {
+            await validateFile(file);
             const objectUrl = URL.createObjectURL(file);
-            setThumbnailURL(objectUrl);
+            setPreview(objectUrl);
+            const { directLink, imgDeleteHash } = await uploadImage(file);
+            setThumbnailUrl(directLink);
+            setMedia((prev) => [...prev, imgDeleteHash]);
 
             // Update the file input for consistency
             if (fileInputRef.current) {
@@ -1201,6 +1185,8 @@ export const ThumbnailUploader = ({ artType = "article", maxSize = 5 }) => {
                 dataTransfer.items.add(file);
                 fileInputRef.current.files = dataTransfer.files;
             }
+        } catch (err) {
+            console.error(`Thumbnail image upload error: ${err}`);
         }
     };
 
@@ -1233,20 +1219,13 @@ export const ThumbnailUploader = ({ artType = "article", maxSize = 5 }) => {
                         onDrop={handleDrop}
                         onClick={handleClickUpload}
                     >
-                        {thumbnailURL ? (
+                        {preview ? (
                             <div className="flex flex-col items-center">
                                 <img
-                                    src={thumbnailURL}
+                                    src={preview}
                                     alt="Thumbnail preview"
                                     className="max-h-40 mb-2 rounded-md"
                                 />
-                                <p className="text-sm text-gray-500">
-                                    {thumbnail?.name} (
-                                    {(thumbnail?.size / (1024 * 1024)).toFixed(
-                                        2,
-                                    )}
-                                    MB)
-                                </p>
                                 <p className="text-xs text-gray-400 mt-2">
                                     Click or drag to replace
                                 </p>
@@ -1276,7 +1255,8 @@ export const ThumbnailUploader = ({ artType = "article", maxSize = 5 }) => {
 };
 ThumbnailUploader.propTypes = {
     artType: PropTypes.string,
-    maxSize: PropTypes.number,
+    setThumbnailUrl: PropTypes.func,
+    setMedia: PropTypes.func,
 };
 
 export const PublicPreferenceInput = ({ isPublic, setIsPublic }) => {

@@ -77,9 +77,8 @@ const ImageUploadPage = () => {
     const handleUpload = async () => {
         setIsUploading(true);
 
-        // Mock upload - in a real app, you would use FormData to send to your backend
         try {
-            // Simulate API call
+            // mock API call
             await new Promise((resolve) => setTimeout(resolve, 1500));
 
             console.log("Images to upload:", images);

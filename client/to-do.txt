@@ -39,3 +39,12 @@
     Keyboard shortcuts for differnt formats,
 
 ^^^ MOTO: focused place, to publish individual works, groups can be formed though, publish reserch papers, stories, poems
+
+-- delete them later: K99YgaZcpyAgDZc,
+ media: [
+    '400fGtxt2AyENZT',
+    'O6GSLwxgwrspQb3',
+    'AGtGi5NuiQSm7bC',
+    'rriulg4IrPUM5zG'
+  ],
+  media: [ 'RChLZdjZI4MdkBN', 'iaqXHJ7F5T5dXqh' ],
