@@ -85,12 +85,12 @@ const WritingPad = ({ artType = "article" }) => {
     // const navigate = useNavigate();
 
     const [postId, setPostId] = useState("");
-    console.log(`postID writingPad 1: ${postId}`);
+    // console.log(`postID writingPad 1: ${postId}`);
     useEffect(() => {
         setPostId(localStorage.getItem("newPostId", ""));
-        console.log(`postID writingPad 2: ${postId}`);
+        // console.log(`postID writingPad 2: ${postId}`);
     }, [postId]);
-    console.log(`postID writingPad 3: ${postId}`);
+    // console.log(`postID writingPad 3: ${postId}`);
 
     const [frontendOnly, _] = useState(false);
 

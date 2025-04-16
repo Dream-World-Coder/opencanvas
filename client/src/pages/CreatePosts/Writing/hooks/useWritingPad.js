@@ -23,19 +23,19 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
     // else not getting it in the first chance, postId
     postId = localStorage.getItem("newPostId", "");
 
-    console.log(`newPostId 1: ${postId}`);
+    // console.log(`newPostId 1: ${postId}`);
     useEffect(() => {
         if (!postId) {
-            console.log(`newPostId 2: ${postId}`);
+            // console.log(`newPostId 2: ${postId}`);
 
             console.error("postId not found");
             toast.error("postId not found");
             // window.location.href = "/profile";
 
-            console.log(`newPostId 3: ${postId}`);
+            // console.log(`newPostId 3: ${postId}`);
         }
     }, [postId]);
-    console.log(`newPostId 4: ${postId}`);
+    // console.log(`newPostId 4: ${postId}`);
 
     const saveDraftLocally = () => {
         const draft = {
