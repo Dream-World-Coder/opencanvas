@@ -6,6 +6,7 @@ const MongoStore = require("connect-mongo");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
+const cron = require("node-cron");
 
 const { router: authRoutes } = require("./routes/auth");
 const { router: userRoutes } = require("./routes/user");
@@ -13,6 +14,7 @@ const { router: postRoutes } = require("./routes/post");
 const { router: followerRoutes } = require("./routes/follower");
 const { router: feedRoutes } = require("./routes/feed");
 const { router: errorHandler } = require("./middlewares/errorHandler.js");
+const updateDefaultEngagementScore = require("./migrations/Post/updateDefaultEngagementScore");
 
 // const { authenticateToken } = require("./middlewares/authorisation.js");
 
@@ -75,6 +77,13 @@ app.use(userRoutes);
 app.use(postRoutes);
 app.use(followerRoutes);
 app.use(feedRoutes);
+
+cron.schedule("*/15 * * * *", () => {
+    console.log("Running scheduled update...");
+    updateDefaultEngagementScore().catch((err) => {
+        console.error("Scheduled task failed:", err);
+    });
+});
 
 app.get("/", (req, res) => {
     res.json({
