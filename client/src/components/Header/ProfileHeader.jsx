@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { ChevronUp, ChevronDown, Plus, Menu, X, Settings } from "lucide-react";
 import { createOptions } from "./createOptions";
 import { useDataService } from "../../services/dataService";
+import { useAuth } from "../../contexts/AuthContext";
+import { toast } from "sonner";
 
 const navLinks = [
     // { href: "/gallery/photos", label: "Gallery" },
@@ -15,6 +17,7 @@ const navLinks = [
 ];
 
 export default function ProfileHeader() {
+    const { currentUser } = useAuth();
     const navigate = useNavigate();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [createMenuOpen, setCreateMenuOpen] = useState(false);
@@ -23,16 +26,24 @@ export default function ProfileHeader() {
 
     async function handlePostCreate(option) {
         setLoading(true);
-        localStorage.removeItem("blogPost");
-        localStorage.removeItem("newPostId");
-        setCreateMenuOpen(false);
-        let newPostId = await getNewPostId();
-        localStorage.setItem("newPostId", newPostId);
 
-        console.log(`newPostId writingPad: ${newPostId}`);
+        if (!currentUser) {
+            toast.error("you need to Log In first");
 
-        // window.location.href = option.href;
-        navigate(option.href);
+            setTimeout(() => {
+                navigate("/login");
+            }, 500);
+        } else {
+            localStorage.removeItem("blogPost");
+            localStorage.removeItem("newPostId");
+            setCreateMenuOpen(false);
+            let newPostId = await getNewPostId();
+            localStorage.setItem("newPostId", newPostId);
+            // console.log(`newPostId writingPad: ${newPostId}`);
+
+            navigate(option.href);
+        }
+
         setLoading(false);
     }
 

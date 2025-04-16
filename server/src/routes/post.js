@@ -185,51 +185,47 @@ router.get("/p/:postId", async (req, res) => {
  * Get post by ID,
  * @for private/secured post page
  */
-router.get(
-    "/secure/p/:postId",
-    authenticateToken,
-    checkUserExists,
-    async (req, res) => {
-        try {
-            const { postId } = req.params;
+router.get("/secure/p/:postId", authenticateToken, async (req, res) => {
+    try {
+        const { postId } = req.params;
 
-            if (!mongoose.Types.ObjectId.isValid(postId)) {
-                return res.status(400).json({ error: "Invalid post ID" });
-            }
+        if (!mongoose.Types.ObjectId.isValid(postId)) {
+            return res.status(400).json({ error: "Invalid post ID" });
+        }
 
-            const post = await Post.findById(postId).select("-viewedBy");
+        const post = await Post.findById(postId).select("-viewedBy");
 
-            if (!post) {
-                return res.status(404).json({
-                    success: false,
-                    message: "Post not found",
-                });
-            }
-
-            if (post.authorId !== req.user._id) {
-                return res.status(401).json({
-                    success: false,
-                    message: "Unauthorised",
-                });
-            }
-
-            return res.status(200).json({
-                success: true,
-                post,
-            });
-        } catch (error) {
-            console.error("Get post[written] error:", error);
-            return res.status(500).json({
+        if (!post) {
+            return res.status(404).json({
                 success: false,
-                message: "Failed to get post[written]",
-                error:
-                    process.env.NODE_ENV === "development"
-                        ? error.message
-                        : "Server error",
+                message: "Post not found",
             });
         }
-    },
-);
+
+        if (post.authorId.toString() !== req.userId.toString()) {
+            return res.status(403).json({
+                success: false,
+                message:
+                    "Forbidden: You do not have permission to perform this action.",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            post,
+        });
+    } catch (error) {
+        console.error("Get post[written] error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to get post[written]",
+            error:
+                process.env.NODE_ENV === "development"
+                    ? error.message
+                    : "Server error",
+        });
+    }
+});
 
 /**
  *******************************************************
