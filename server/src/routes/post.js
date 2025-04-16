@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Post = require("../models/Post");
 const Comment = require("../models/Comment");
+const MediaDeletionQueue = require("../models/MediaDeletionQueue");
 const {
     authenticateToken,
     checkUserExists,
@@ -78,7 +79,7 @@ router.post(
                 currentPost.readTime = postData.readTime;
                 currentPost.modifiedAt = Date.now();
                 currentPost.isEdited = true;
-                currentPost.isPublic = postData.isPublic ?? true; // nullish coalescing
+                currentPost.isPublic = postData.isPublic ?? true;
                 currentPost.thumbnailUrl =
                     postData.thumbnailUrl || currentPost.thumbnailUrl;
                 currentPost.media = postData.media || [];
@@ -101,7 +102,7 @@ router.post(
                     type: postData.artType ?? "written", // artType cannot be changed, its fixed, for now atleast
                     thumbnailUrl: postData.thumbnailUrl, //||generateRandomThumbnail(postData.artType),
                     readTime: postData.readTime,
-                    media: postData.media,
+                    media: postData.media || [],
                     author: {
                         name: user.fullName,
                         username: user.username,
@@ -178,6 +179,57 @@ router.get("/p/:postId", async (req, res) => {
         });
     }
 });
+
+/**
+ *******************************************************
+ * Get post by ID,
+ * @for private/secured post page
+ */
+router.get(
+    "/secure/p/:postId",
+    authenticateToken,
+    checkUserExists,
+    async (req, res) => {
+        try {
+            const { postId } = req.params;
+
+            if (!mongoose.Types.ObjectId.isValid(postId)) {
+                return res.status(400).json({ error: "Invalid post ID" });
+            }
+
+            const post = await Post.findById(postId).select("-viewedBy");
+
+            if (!post) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Post not found",
+                });
+            }
+
+            if (post.authorId !== req.user._id) {
+                return res.status(401).json({
+                    success: false,
+                    message: "Unauthorised",
+                });
+            }
+
+            return res.status(200).json({
+                success: true,
+                post,
+            });
+        } catch (error) {
+            console.error("Get post[written] error:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Failed to get post[written]",
+                error:
+                    process.env.NODE_ENV === "development"
+                        ? error.message
+                        : "Server error",
+            });
+        }
+    },
+);
 
 /**
  *******************************************************
@@ -582,6 +634,14 @@ router.delete(
                 });
             }
 
+            await MediaDeletionQueue.insertOne({
+                deletehashes: post.media.map((item) => ({
+                    deleteHash: item,
+                    addedAt: Date.now(),
+                })),
+            });
+
+            // removing post from user's list
             user.posts = user.posts.filter(
                 (id) => id.toString() !== postId.toString(),
             );

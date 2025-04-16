@@ -13,7 +13,8 @@ const { router: userRoutes } = require("./routes/user");
 const { router: postRoutes } = require("./routes/post");
 const { router: followerRoutes } = require("./routes/follower");
 const { router: feedRoutes } = require("./routes/feed");
-const { router: errorHandler } = require("./middlewares/errorHandler.js");
+const { router: errorHandler } = require("./middlewares/errorHandler");
+const { router: imageService } = require("./services/imageService");
 const updateDefaultEngagementScore = require("./migrations/Post/updateDefaultEngagementScore");
 
 // const { authenticateToken } = require("./middlewares/authorisation.js");
@@ -33,7 +34,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
     cors({
-        origin: ["http://127.0.0.1:5173", "http://127.0.0.1:3000"],
+        origin: [
+            "http://127.0.0.1:5173",
+            "http://localhost:5173",
+            "http://127.0.0.1:3000",
+            "http://localhost:3000",
+        ],
         credentials: true,
     }),
 );
@@ -77,6 +83,7 @@ app.use(userRoutes);
 app.use(postRoutes);
 app.use(followerRoutes);
 app.use(feedRoutes);
+app.use("/api", imageService);
 
 cron.schedule("*/15 * * * *", () => {
     console.log("Running scheduled update...");
