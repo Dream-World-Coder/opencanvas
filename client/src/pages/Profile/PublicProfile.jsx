@@ -92,6 +92,10 @@ const PublicProfile = () => {
                 navigate("/404");
                 return;
             }
+            username = username.trim();
+            if (username.startsWith("@")) {
+                username = username.slice(1);
+            }
 
             setIsLoading(true);
             const apiUrl = `http://127.0.0.1:3000/u/${username}`;
