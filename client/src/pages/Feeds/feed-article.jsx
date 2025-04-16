@@ -47,7 +47,7 @@ const ArticleFeed = () => {
         fetchPosts();
     }, [selectedTopics]);
 
-    const API_URL = "http://127.0.0.1:3000/feed/anonymous-user";
+    const API_URL = "http://localhost:3000/feed/anonymous-user";
 
     const fetchPosts = async () => {
         setLoading(true);
@@ -440,7 +440,7 @@ const ArticleFeed = () => {
     const [nextCursor, setNextCursor] = useState(null);
     const [error, setError] = useState(null);
 
-    const API_URL = "http://127.0.0.1:3000/feed/anonymous-user";
+    const API_URL = "http://localhost:3000/feed/anonymous-user";
 
     // Ref for infinite scrolling
     const observer = useRef();

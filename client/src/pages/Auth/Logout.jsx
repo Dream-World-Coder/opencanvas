@@ -46,7 +46,7 @@
 //                             onClick={() => {
 //                                 // navigate("/auth/google");
 //                                 window.location.href =
-//                                     "http://127.0.0.1:3000/auth/google";
+//                                     "http://localhost:3000/auth/google";
 //                             }}
 //                         >
 //                             <svg className="w-6 h-12" viewBox="0 0 24 24">

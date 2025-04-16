@@ -26,7 +26,7 @@ const FollowersPage = () => {
         }
 
         setIsLoading(true);
-        const apiUrl = `http://127.0.0.1:3000/u/${username}`;
+        const apiUrl = `http://localhost:3000/u/${username}`;
 
         try {
             const res = await fetch(apiUrl);
@@ -69,7 +69,7 @@ const FollowersPage = () => {
             setFollowersToFetch(followersToFetch + 10);
 
             const response = await fetch(
-                `http://127.0.0.1:3000/u/followers/byids`,
+                `http://localhost:3000/u/followers/byids`,
                 {
                     method: "POST",
                     headers: {

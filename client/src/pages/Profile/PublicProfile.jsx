@@ -57,7 +57,7 @@ const PublicProfile = () => {
             setPostsToFetch(postsToFetch + 10);
 
             const response = await fetch(
-                `http://127.0.0.1:3000/author/posts/byids`,
+                `http://localhost:3000/author/posts/byids`,
                 {
                     method: "POST",
                     headers: {
@@ -98,7 +98,7 @@ const PublicProfile = () => {
             }
 
             setIsLoading(true);
-            const apiUrl = `http://127.0.0.1:3000/u/${username}`;
+            const apiUrl = `http://localhost:3000/u/${username}`;
 
             try {
                 const res = await fetch(apiUrl);

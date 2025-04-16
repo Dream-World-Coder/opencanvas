@@ -87,7 +87,7 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
             const token = localStorage.getItem("authToken");
 
             const response = await fetch(
-                "http://127.0.0.1:3000/save-written-post",
+                "http://localhost:3000/save-written-post",
                 {
                     method: "POST",
                     headers: {

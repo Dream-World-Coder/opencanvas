@@ -25,7 +25,7 @@ export const AuthorPostsDropdown = ({
             // fetch 6 posts instead of 4 to makeup for private posts
             const postIdsParam = author.posts.slice(0, 6).join(",");
             const response = await fetch(
-                `http://127.0.0.1:3000/author/posts/byids`,
+                `http://localhost:3000/author/posts/byids`,
                 {
                     method: "POST",
                     headers: {

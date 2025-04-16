@@ -17,7 +17,7 @@ export const useViewTracker = (postId) => {
                     if (!mounted) return;
 
                     const response = await axios.put(
-                        `http://127.0.0.1:3000/update-post-views/${postId}`,
+                        `http://localhost:3000/update-post-views/${postId}`,
                     );
 
                     if (response.data.counted) {

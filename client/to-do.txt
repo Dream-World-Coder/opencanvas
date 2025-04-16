@@ -48,3 +48,9 @@
     'rriulg4IrPUM5zG'
   ],
   media: [ 'RChLZdjZI4MdkBN', 'iaqXHJ7F5T5dXqh' ],
+
+------------------------------
+sed -i '' 's/127\.0\.0\.1/localhost/g' $(rg -l '127\.0\.0\.1')
+
+https://console.cloud.google.com/apis/credentials
+------------------------------

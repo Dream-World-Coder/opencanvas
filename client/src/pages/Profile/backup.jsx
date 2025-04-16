@@ -71,7 +71,7 @@ const Profile = () => {
             setPostsToFetch(postsToFetch + 10);
 
             const response = await fetch(
-                `http://127.0.0.1:3000/u/posts/byids`,
+                `http://localhost:3000/u/posts/byids`,
                 {
                     method: "POST",
                     headers: {
