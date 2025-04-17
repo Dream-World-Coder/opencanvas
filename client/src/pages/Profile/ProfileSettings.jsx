@@ -51,7 +51,7 @@ import { useDataService } from "../../services/dataService";
 const ProfileSettings = () => {
     const baseUrl = window.location.origin;
     const navigate = useNavigate();
-    const { currentUser } = useAuth();
+    const { currentUser, logout } = useAuth();
     const [darkMode, setDarkMode] = useState(false);
     const [activeTab, setActiveTab] = useState("general");
     const [formValues, setFormValues] = useState({
@@ -492,7 +492,7 @@ const ProfileSettings = () => {
                             <AlertDialogAction
                                 className="bg-red-600 hover:bg-red-500"
                                 onClick={() => {
-                                    navigate("/logout");
+                                    logout();
                                 }}
                             >
                                 Continue

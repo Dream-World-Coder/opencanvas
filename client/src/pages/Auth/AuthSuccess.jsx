@@ -6,7 +6,7 @@ export default function AuthSuccess() {
 
     useEffect(() => {
         handleGoogleAuthSuccess();
-    }, [handleGoogleAuthSuccess]);
+    }, []);
 
     return (
         <div className="flex items-center justify-center min-h-screen">

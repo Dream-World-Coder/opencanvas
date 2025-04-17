@@ -50,11 +50,6 @@ const ArticleFeed = () => {
         [loading, hasMore],
     );
 
-    // Fetch initial posts
-    useEffect(() => {
-        fetchPosts();
-    }, [selectedTopics]);
-
     const fetchPosts = async () => {
         setLoading(true);
         setError(null);
@@ -66,7 +61,7 @@ const ArticleFeed = () => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    limit: 10,
+                    limit: 16,
                     // topics:
                     //     selectedTopics.length > 0 ? selectedTopics : undefined,
                 }),
@@ -108,7 +103,7 @@ const ArticleFeed = () => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    limit: 10,
+                    limit: 16,
                     cursor: nextCursor,
                     // topics:
                     //     selectedTopics.length > 0 ? selectedTopics : undefined,
@@ -149,11 +144,16 @@ const ArticleFeed = () => {
         }
     };
 
+    // fetch initial posts
+    useEffect(() => {
+        fetchPosts();
+    }, []);
+
     const handlePostClick = (post) => {
         navigate(`/p/${post._id}`, { state: { post } });
     };
 
-    const filteredPosts = posts.filter((post) =>
+    const finalFilteredPosts = posts.filter((post) =>
         selectedTopics.length > 0
             ? post.tags.some((tag) =>
                   selectedTopics.includes(tag.toLowerCase()),
@@ -233,7 +233,7 @@ const ArticleFeed = () => {
 
                             {/* Posts feed */}
                             <div className="space-y-6">
-                                {filteredPosts.map((post, index) => {
+                                {finalFilteredPosts.map((post, index) => {
                                     // If it's the last post, attach ref for infinite scrolling
                                     const isLastPost =
                                         posts.length === index + 1;
@@ -314,14 +314,17 @@ const ArticleFeed = () => {
                                 {loading && <LoadingSkeleton />}
 
                                 {/* Empty state */}
-                                {!loading && filteredPosts.length === 0 && (
-                                    <NoPosts fetchPosts={fetchPosts} />
-                                )}
+                                {!loading &&
+                                    finalFilteredPosts.length === 0 && (
+                                        <NoPosts fetchPosts={fetchPosts} />
+                                    )}
 
                                 {/* End of feed message */}
                                 {!loading &&
                                     !hasMore &&
-                                    filteredPosts.length > 0 && <EndOfFeed />}
+                                    finalFilteredPosts.length > 0 && (
+                                        <EndOfFeed />
+                                    )}
                             </div>
                         </main>
 

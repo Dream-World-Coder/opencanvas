@@ -1,13 +1,11 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import PropTypes from "prop-types";
+import { toast } from "sonner";
 import axios from "axios";
 
 const AuthContext = createContext();
-
-export const useAuth = () => {
-    return useContext(AuthContext);
-};
 
 export const AuthProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState(null);
@@ -18,12 +16,11 @@ export const AuthProvider = ({ children }) => {
 
     const API_URL = import.meta.env.BACKEND_API_URL || "http://localhost:3000";
 
-    // Setup axios instance with auth headers
     const authAxios = axios.create({
         baseURL: API_URL,
     });
 
-    // Add auth token to requests
+    // auth token added to requests
     authAxios.interceptors.request.use((config) => {
         const token = localStorage.getItem("authToken");
         if (token) {
@@ -32,17 +29,20 @@ export const AuthProvider = ({ children }) => {
         return config;
     });
 
-    // Check if token is expired
     const isTokenExpired = (token) => {
         try {
             const decoded = jwtDecode(token);
             return decoded.exp < Date.now() / 1000;
-        } catch (error) {
+        } catch {
             return true;
         }
     };
 
-    // Load user from token on initial load
+    async function fetchCurrentUser() {
+        return await authAxios.get("/auth/user");
+    }
+
+    // Load user on initial load
     useEffect(() => {
         const loadUser = async () => {
             const token = localStorage.getItem("authToken");
@@ -55,11 +55,12 @@ export const AuthProvider = ({ children }) => {
             }
 
             try {
-                const response = await authAxios.get("/auth/user");
+                const response = await fetchCurrentUser();
                 setCurrentUser(response.data.user);
             } catch (error) {
                 console.error("Failed to load user:", error);
                 localStorage.removeItem("authToken");
+                setError(error);
                 setCurrentUser(null);
             } finally {
                 setLoading(false);
@@ -69,85 +70,32 @@ export const AuthProvider = ({ children }) => {
         loadUser();
     }, []);
 
-    // not needed now
-    /*
-    // Register with email/password
-    const register = async (userData) => {
-        setError(null);
-        try {
-            const response = await axios.post(
-                `${API_URL}/auth/register`,
-                userData,
-            );
-
-            if (response.data.success) {
-                localStorage.setItem("authToken", response.data.token);
-                setCurrentUser(response.data.user);
-                navigate("/profile");
-                return true;
-            }
-        } catch (error) {
-            setError(error.response?.data?.message || "Registration failed");
-            return false;
-        }
-    };
-
-    // Login with email/password
-    const login = async (email, password) => {
-        setError(null);
-        try {
-            const response = await axios.post(`${API_URL}/auth/login`, {
-                email,
-                password,
-            });
-
-            if (response.data.success) {
-                localStorage.setItem("authToken", response.data.token);
-                setCurrentUser(response.data.user);
-                navigate("/profile");
-                return true;
-            }
-        } catch (error) {
-            setError(error.response?.data?.message || "Login failed");
-            return false;
-        }
-    };
-    */
-
     // hangle google-auth success
     const handleGoogleAuthSuccess = async () => {
         const token = searchParams.get("token");
 
         if (token) {
             localStorage.setItem("authToken", token);
+            navigate(location.pathname, { replace: true }); // remove token from browser history, not needed though
             try {
-                await loadUserData(token);
+                await loadUserData();
                 navigate("/profile");
             } catch (error) {
                 console.error("Failed during Google auth:", error);
-                alert("Authentication failed, redirecting to login");
-                setTimeout(() => {
-                    navigate("/login");
-                }, 400);
+                toast.error("Authentication failed, redirected to login");
+                setError(error);
+                navigate("/login");
             }
         } else {
-            alert("token not found, redirecting to login");
-            setTimeout(() => {
-                navigate("/login");
-            }, 400);
+            toast.error("Authorisation Token not found, redirected to login");
+            navigate("/login");
         }
     };
 
-    // load user data from /auth/user route of backend
-    const loadUserData = async (token) => {
+    // load user from /auth/user of backend
+    const loadUserData = async () => {
         try {
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            };
-
-            const response = await axios.get(`${API_URL}/auth/user`, config);
+            const response = await fetchCurrentUser();
             setCurrentUser(response.data.user);
         } catch (error) {
             console.error("Failed to load user data:", error);
@@ -166,8 +114,6 @@ export const AuthProvider = ({ children }) => {
         setCurrentUser,
         loading,
         error,
-        // register,
-        // login,
         logout,
         handleGoogleAuthSuccess,
         authAxios,
@@ -176,4 +122,9 @@ export const AuthProvider = ({ children }) => {
     return (
         <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
     );
+};
+AuthProvider.propTypes = { children: PropTypes.node.isRequired };
+
+export const useAuth = () => {
+    return useContext(AuthContext);
 };

@@ -27,6 +27,7 @@
 -- filters not working in feed
 -- some problems in followers / following ig, also problem in reversing, [and need to think, i.g it will be better to stor followers info directly instead fetching them]
 -- Magazine [week - month - year] : best articles or collections [any one], best stories & poems [in different sections[max 8]]
+-- caching is available in sever environments, but something similar can be made, i.e. if same arguments then same result, no api call needed, [store the previous in some ref / context]
 
 -- I think another attribute `timesFetched` can be added, to easily cache proper posts, its not necessary only a more fetched post will always be on trending,
 

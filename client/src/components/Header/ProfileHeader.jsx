@@ -7,11 +7,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import { toast } from "sonner";
 
 const navLinks = [
-    // { href: "/gallery/photos", label: "Gallery" },
     { href: "/literature", label: "Literature" },
     { href: "/articles", label: "Articles" },
-    // { href: "/about", label: "About" },
-    // { href: "/contact", label: "Contact" },
     { href: "/saved-posts", label: "Saved" },
     { href: "/profile", label: "Profile" },
 ];
@@ -213,7 +210,7 @@ export default function ProfileHeader() {
                             </button>
                         ))}
                         <button
-                            onClick={() => navigate("/settings")}
+                            onClick={() => navigate("/profile/settings")}
                             className="block px-4 py-2 hover:bg-lime-300/60 rounded-md text-left w-full"
                         >
                             Settings

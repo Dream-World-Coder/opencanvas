@@ -19,7 +19,6 @@ import "./services/fingerprintService";
 
 // lazy loaded
 const LoginPage = lazy(() => import("./pages/Auth/Login"));
-const LogoutPage = lazy(() => import("./pages/Auth/Logout"));
 const AuthSuccess = lazy(() => import("./pages/Auth/AuthSuccess"));
 
 const Profile = lazy(() => import("./pages/Profile/Profile"));
@@ -99,10 +98,6 @@ export default function App() {
                                 <Route
                                     path="/auth/success"
                                     element={<AuthSuccess />}
-                                />
-                                <Route
-                                    path="/logout"
-                                    element={<LogoutPage />}
                                 />
                                 {/* *************** */}
 
