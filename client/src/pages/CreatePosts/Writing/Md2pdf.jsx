@@ -525,12 +525,12 @@ const Md2pdf = ({ artType = "markdown2pdf" }) => {
                 {/* Writing Area */}
                 <div className={`pt-[8.25rem] pb-[200px] px-6 relative h-fit`}>
                     <div
-                        className={`${twoColumn ? "max-w-6xl" : "max-w-4xl"} mx-auto relative h-fit`}
+                        className={`${twoColumn ? "max-w-6xl" : "max-w-3xl"} mx-auto relative h-fit`}
                     >
                         {/* help div */}
                         <div
                             className={`w-[100%] h-auto mx-auto  relative mb-4 z-30
-                            rounded text-lg transition-all duration-0 max-w-4xl
+                            rounded text-lg transition-all duration-0 max-w-3xl
                             ${helpOpen ? "" : "hidden"} ${isDark ? "invert" : ""}`}
                         >
                             <Card className="bg-white">

@@ -67,8 +67,8 @@ const ArticleFeed = () => {
                 },
                 body: JSON.stringify({
                     limit: 10,
-                    topics:
-                        selectedTopics.length > 0 ? selectedTopics : undefined,
+                    // topics:
+                    //     selectedTopics.length > 0 ? selectedTopics : undefined,
                 }),
             });
 
@@ -110,8 +110,8 @@ const ArticleFeed = () => {
                 body: JSON.stringify({
                     limit: 10,
                     cursor: nextCursor,
-                    topics:
-                        selectedTopics.length > 0 ? selectedTopics : undefined,
+                    // topics:
+                    //     selectedTopics.length > 0 ? selectedTopics : undefined,
                 }),
             });
 
@@ -152,6 +152,14 @@ const ArticleFeed = () => {
     const handlePostClick = (post) => {
         navigate(`/p/${post._id}`, { state: { post } });
     };
+
+    const filteredPosts = posts.filter((post) =>
+        selectedTopics.length > 0
+            ? post.tags.some((tag) =>
+                  selectedTopics.includes(tag.toLowerCase()),
+              )
+            : true,
+    );
 
     return (
         <>
@@ -225,117 +233,95 @@ const ArticleFeed = () => {
 
                             {/* Posts feed */}
                             <div className="space-y-6">
-                                {posts
-                                    .filter((post) =>
-                                        selectedTopics.length > 0
-                                            ? post.tags.some((tag) =>
-                                                  selectedTopics.includes(
-                                                      tag.toLowerCase(),
-                                                  ),
-                                              )
-                                            : true,
-                                    )
-                                    .map((post, index) => {
-                                        // If it's the last post, attach ref for infinite scrolling
-                                        const isLastPost =
-                                            posts.length === index + 1;
+                                {filteredPosts.map((post, index) => {
+                                    // If it's the last post, attach ref for infinite scrolling
+                                    const isLastPost =
+                                        posts.length === index + 1;
 
-                                        return (
-                                            <div
-                                                ref={
-                                                    isLastPost
-                                                        ? lastPostElementRef
-                                                        : null
-                                                }
-                                                key={post._id}
-                                                className="bg-white dark:bg-[#171717] rounded-xl shadow-sm overflow-hidden cursor-pointer"
-                                                onClick={() =>
-                                                    handlePostClick(post)
-                                                }
-                                            >
-                                                {post.thumbnailUrl && (
-                                                    <div className="h-52 sm:h-64 overflow-hidden">
-                                                        <img
-                                                            src={
+                                    return (
+                                        <div
+                                            ref={
+                                                isLastPost
+                                                    ? lastPostElementRef
+                                                    : null
+                                            }
+                                            key={post._id}
+                                            className="bg-white dark:bg-[#171717] rounded-xl shadow-sm overflow-hidden cursor-pointer"
+                                            onClick={() =>
+                                                handlePostClick(post)
+                                            }
+                                        >
+                                            {post.thumbnailUrl && (
+                                                <div className="h-52 sm:h-64 overflow-hidden">
+                                                    <img
+                                                        src={post.thumbnailUrl}
+                                                        alt={post.title}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                </div>
+                                            )}
+                                            <div className="p-5 sm:p-6">
+                                                <PostAuthorInfo post={post} />
+
+                                                <h2 className="text-xl sm:text-2xl font-bold mb-3 text-gray-900 dark:text-white">
+                                                    {post.title}
+                                                </h2>
+
+                                                <div className="relative mb-5 max-h-[220px] overflow-hidden">
+                                                    <div className="prose prose-sm dark:prose-invert max-w-none">
+                                                        <MarkdownPreview
+                                                            content={
+                                                                post.content.slice(
+                                                                    0,
+                                                                    350,
+                                                                ) + "..." || ""
+                                                            }
+                                                            thumbnailUrl={
                                                                 post.thumbnailUrl
                                                             }
-                                                            alt={post.title}
-                                                            className="w-full h-full object-cover"
+                                                            isDark={isDark}
+                                                            darkBg="bg-[#171717]"
+                                                            textAlignment={
+                                                                post.type ===
+                                                                "poem"
+                                                                    ? "left"
+                                                                    : "left"
+                                                            }
+                                                            insidePost={true}
+                                                            contentOnly={true}
+                                                            // artType={
+                                                            //     post.type
+                                                            // }
                                                         />
                                                     </div>
-                                                )}
-                                                <div className="p-5 sm:p-6">
-                                                    <PostAuthorInfo
-                                                        post={post}
-                                                    />
-
-                                                    <h2 className="text-xl sm:text-2xl font-bold mb-3 text-gray-900 dark:text-white">
-                                                        {post.title}
-                                                    </h2>
-
-                                                    <div className="relative mb-5 max-h-[220px] overflow-hidden">
-                                                        <div className="prose prose-sm dark:prose-invert max-w-none">
-                                                            <MarkdownPreview
-                                                                content={
-                                                                    post.content.slice(
-                                                                        0,
-                                                                        350,
-                                                                    ) + "..." ||
-                                                                    ""
-                                                                }
-                                                                thumbnailUrl={
-                                                                    post.thumbnailUrl
-                                                                }
-                                                                isDark={isDark}
-                                                                darkBg="bg-[#171717]"
-                                                                textAlignment={
-                                                                    post.type ===
-                                                                    "poem"
-                                                                        ? "left"
-                                                                        : "left"
-                                                                }
-                                                                insidePost={
-                                                                    true
-                                                                }
-                                                                contentOnly={
-                                                                    true
-                                                                }
-                                                                // artType={
-                                                                //     post.type
-                                                                // }
-                                                            />
-                                                        </div>
-                                                        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white dark:from-[#171717] to-transparent"></div>
-                                                    </div>
-
-                                                    {/* Post tags */}
-                                                    {post.tags &&
-                                                        post.tags.length >
-                                                            0 && (
-                                                            <PostTags
-                                                                post={post}
-                                                            />
-                                                        )}
-
-                                                    {/* Post stats */}
-                                                    <PostStats post={post} />
+                                                    <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white dark:from-[#171717] to-transparent"></div>
                                                 </div>
+
+                                                {/* Post tags */}
+                                                {post.tags &&
+                                                    post.tags.length > 0 && (
+                                                        <PostTags post={post} />
+                                                    )}
+
+                                                {/* Post stats */}
+                                                <PostStats post={post} />
                                             </div>
-                                        );
-                                    })}
+                                        </div>
+                                    );
+                                })}
 
                                 {/* Loading state */}
                                 {loading && <LoadingSkeleton />}
 
                                 {/* Empty state */}
-                                {!loading && posts.length === 0 && (
+                                {!loading && filteredPosts.length === 0 && (
                                     <NoPosts fetchPosts={fetchPosts} />
                                 )}
 
                                 {/* End of feed message */}
-                                {!loading && !hasMore && posts.length > 0 && (
-                                    <EndOfFeed />
-                                )}
+                                {!loading &&
+                                    !hasMore &&
+                                    filteredPosts.length > 0 && <EndOfFeed />}
                             </div>
                         </main>
 

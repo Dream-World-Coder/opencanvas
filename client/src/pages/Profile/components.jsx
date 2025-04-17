@@ -629,7 +629,7 @@ export const FeaturedWorks = ({ currentUser }) => {
                     {showLeftArrow && (
                         <button
                             onClick={scrollLeft}
-                            className="absolute left-0 top-1/2 mt-4 transform -translate-y-1/2 bg-white dark:bg-[#1a1a1a] p-2 rounded-full shadow-md z-10 flex items-center"
+                            className="absolute left-0 top-1/2 mt-0 transform -translate-y-1/2 bg-white dark:bg-[#1a1a1a] p-2 rounded-full shadow-md z-10 flex items-center"
                         >
                             <ChevronLeft className="w-5 h-5" />
                         </button>
@@ -639,7 +639,7 @@ export const FeaturedWorks = ({ currentUser }) => {
                     {showRightArrow && (
                         <button
                             onClick={scrollRight}
-                            className="absolute right-0 top-1/2 mt-4 transform -translate-y-1/2 bg-white dark:bg-[#1a1a1a] p-2 rounded-full shadow-md z-10 flex items-center"
+                            className="absolute right-0 top-1/2 mt-0 transform -translate-y-1/2 bg-white dark:bg-[#1a1a1a] p-2 rounded-full shadow-md z-10 flex items-center"
                         >
                             <ChevronRight className="w-5 h-5" />
                         </button>
