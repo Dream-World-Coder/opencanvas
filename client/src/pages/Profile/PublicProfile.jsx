@@ -25,7 +25,7 @@ const PublicProfile = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { username } = useParams();
-    const { currentUser } = useAuth();
+    const { currentUser, setCurrentUser } = useAuth();
     const { followUser } = useDataService();
 
     const [currentProfile, setCurrentProfile] = useState(null);
@@ -129,11 +129,29 @@ const PublicProfile = () => {
         fetchCurrentProfile(username);
     }, [username, navigate, currentUser]);
 
-    async function handleFollow(personToFollow) {
-        let res = await followUser(personToFollow);
-        if (res.success) {
-            setFollowing(!following);
+    async function handleFollow(userId) {
+        let res = await followUser(userId);
+        if (res.success && res.message === "followed") {
+            setFollowing(true);
             toast.success(res.message);
+            setCurrentUser((currentUser) => ({
+                ...currentUser,
+                following: [
+                    ...currentUser.following,
+                    { userId, since: Date.now() },
+                ],
+            }));
+        } else if (res.success && res.message === "unfollowed") {
+            setFollowing(false);
+            toast.success(res.message);
+            setCurrentUser((currentUser) => ({
+                ...currentUser,
+                following: [
+                    ...currentUser.following.filter(
+                        (i) => i.userId.toString() !== userId.toString(),
+                    ),
+                ],
+            }));
         } else {
             toast.error(res.message);
         }
