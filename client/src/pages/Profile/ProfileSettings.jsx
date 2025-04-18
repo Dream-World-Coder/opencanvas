@@ -87,7 +87,7 @@ const ProfileSettings = () => {
                 );
                 return;
             }
-            const result = await updateUserProfile(formValues);
+            await updateUserProfile(formValues);
             toast.success(
                 "Your profile information has been updated successfully.",
             );
@@ -792,7 +792,7 @@ const ProfileSettings = () => {
                 exclude={["/about", "/contact", "/photo-gallery"]}
             />
             <div className="w-full h-full bg-white dark:bg-black dark:text-white">
-                <div className="mx-auto max-w-4xl mt-20 px-4 py-8 dark:bg-black">
+                <div className="mx-auto max-w-4xl mt-20 p-4 dark:bg-black">
                     <h1 className="text-3xl font-bold mb-6 dark:text-white">
                         Profile Settings
                         <div className="text-sm font-thin">

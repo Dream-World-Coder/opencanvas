@@ -100,7 +100,7 @@ const Profile = () => {
             >
                 <ProfileHeader />
 
-                <main className="pt-32 px-2 md:px-8 min-h-screen">
+                <main className="pt-28 px-2 md:px-0 min-h-screen">
                     <div className="max-w-7xl mx-auto pb-[20vh]">
                         {/* <div className="grid md:grid-cols-[1.62fr,1fr] gap-16 mb-24 border border-black"> */}
                         <div className="flex flex-col md:flex-row justify-between items-start gap-6 md:gap-16 mb-12 md:mb-24 px-4 md:px-0">

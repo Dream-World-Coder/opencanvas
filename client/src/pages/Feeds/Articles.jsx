@@ -171,7 +171,7 @@ const ArticleFeed = () => {
                 />
             </Helmet>
 
-            <div className="w-full min-h-screen bg-gray-50 dark:bg-[#0f0f0f] overflow-x-hidden pt-16">
+            <div className="w-full min-h-screen bg-gray-50 dark:bg-[#0f0f0f] overflow-x-hidden pt-12">
                 <Header
                     noBlur={true}
                     ballClr={"text-gray-300"}
@@ -191,7 +191,7 @@ const ArticleFeed = () => {
                             <div className="w-full lg:w-64 h-1"></div>
 
                             {/* The actual fixed sidebar */}
-                            <div className="fixed top-24 w-64 max-h-[calc(100vh-80px)] overflow-y-auto">
+                            <div className="fixed top-20 w-64 max-h-[calc(100vh-80px)] overflow-y-auto">
                                 {!focusMode && (
                                     <LeftSideBar
                                         selectedTopics={selectedTopics}
@@ -252,11 +252,11 @@ const ArticleFeed = () => {
                                             }
                                         >
                                             {post.thumbnailUrl && (
-                                                <div className="h-52 sm:h-64 overflow-hidden">
+                                                <div className="max-h-72 overflow-hidden grid place-items-center bg-gray-200 dark:bg-[#333]">
                                                     <img
                                                         src={post.thumbnailUrl}
                                                         alt={post.title}
-                                                        className="w-full h-full object-cover"
+                                                        className="object-contain max-h-72"
                                                     />
                                                 </div>
                                             )}
@@ -334,7 +334,7 @@ const ArticleFeed = () => {
                             <div className="w-full lg:w-72 h-1"></div>
 
                             {/* The actual fixed sidebar */}
-                            <div className="fixed top-24 w-72 max-h-[calc(100vh-80px)] overflow-y-auto">
+                            <div className="fixed top-20 w-72 max-h-[calc(100vh-80px)] overflow-y-auto">
                                 {!focusMode && <RightSideBar />}
                             </div>
                         </div>

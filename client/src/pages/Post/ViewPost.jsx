@@ -276,7 +276,7 @@ const ViewPost = ({ isArticle = true }) => {
         <>
             <PostHelmet post={post} />
 
-            <div className="w-full h-full grid place-items-center bg-white dark:bg-[#111] overflow-x-hidden pt-20">
+            <div className="w-full h-full grid place-items-center bg-white dark:bg-[#111] overflow-x-hidden pt-16">
                 <Header
                     noBlur={true}
                     ballClr={"text-gray-300"}

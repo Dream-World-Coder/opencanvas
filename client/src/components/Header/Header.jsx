@@ -35,8 +35,8 @@ const Header = ({
 
     // Navigation Links
     let navLinks = [
-        { name: "Literature", href: "/literature" },
         { name: "Articles", href: "/articles" },
+        { name: "Social", href: "/literature" },
         { name: "Photos", href: "/photo-gallery" },
         { name: "About", href: "/about" },
         { name: "Contact", href: "/contact" },
@@ -51,17 +51,22 @@ const Header = ({
 
     return (
         <header
-            className={`fixed w-full top-0 z-50 ${noBlur ? "bg-white dark:bg-black dark:text-white border-b border-gray-200 dark:border-[#333]" : "bg-white/20 dark:bg-[#222]/20 backdrop-blur-md"}`}
+            className={`fixed w-full top-0 z-50
+                ${
+                    noBlur
+                        ? "bg-white dark:bg-black dark:text-white border-b border-gray-100 dark:border-[#333] shadow-sm dark:shadow-none"
+                        : "bg-white/20 dark:bg-[#222]/20 backdrop-blur-md"
+                }`}
         >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6">
-                <nav className="flex items-center justify-between h-16 sm:h-20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-0 py-3">
+                <nav className="flex items-center justify-between">
                     <div className="flex items-center justify-center gap-2">
                         {/* Logo */}
                         <div
                             onClick={() => navigate("/")}
                             className="bg-lime-400 font-thin text-stone-950
-                        rounded-md box-content px-1 md:px-1 py-0
-                        text-xl md:text-2xl tracking-wide"
+                            rounded-md box-content px-1 md:px-1 py-0
+                            text-xl md:text-2xl tracking-wide"
                         >
                             <span className="font-['Six_Caps']">
                                 opencanvas
@@ -114,7 +119,7 @@ const Header = ({
                                     }
                                     className="flex items-center space-x-2 bg-black dark:bg-[#333] text-white px-4 py-2 rounded-full hover:bg-stone-800/90 transition-colors"
                                 >
-                                    <span>Create</span>
+                                    <span className="text-sm">Create</span>
                                     {!createMenuOpen && (
                                         <ChevronDown className="w-4 h-4" />
                                     )}

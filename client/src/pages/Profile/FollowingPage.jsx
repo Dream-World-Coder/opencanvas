@@ -126,7 +126,7 @@ const FollowingPage = () => {
 
     if (isLoading)
         return (
-            <div className="flex justify-center items-center h-screen pt-32">
+            <div className="flex justify-center items-center h-screen pt-24">
                 {Array(4)
                     .fill(0)
                     .map((_, index) => (
@@ -151,11 +151,11 @@ const FollowingPage = () => {
         );
 
     return (
-        <div className="min-h-screen bg-white dark:bg-[#111] text-gray-800 dark:text-gray-100 p-4 md:p-6">
+        <div className="min-h-screen bg-white dark:bg-[#111] text-gray-800 dark:text-gray-100 p-4 md:p-0">
             <ProfileHeader />
             <div className="max-w-3xl mx-auto pt-24">
                 <div className="flex items-center justify-between mb-6 pb-4">
-                    <h1 className="text-2xl md:text-3xl font-bold">
+                    <h1 className="text-2xl md:text-3xl font-bold font-serif">
                         People Followed by {currentProfile.fullName}
                     </h1>
                     <button

@@ -10,7 +10,7 @@ export default {
                     light: "#FFFAF2",
                     dark: "#E6D4C4",
                 },
-                tintLime: "#BBD8A3",
+                tintLime: "#DDEB9D",
                 background: "hsl(var(--background))",
                 foreground: "hsl(var(--foreground))",
                 card: {

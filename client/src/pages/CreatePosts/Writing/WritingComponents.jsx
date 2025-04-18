@@ -423,8 +423,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                         ? "text-xl font-semibold font-sans"
                                         : "text-4xl font-bold font-serif"
                                 }
-                                ${artType === "poem" ? "!max-w-[600px] !font-boskaBold" : ""}
-                                `}
+                                ${artType === "poem" ? "!max-w-[600px] !font-boskaBold" : ""}`}
                             >
                                 {title}
                                 {!contentOnly && (
@@ -443,13 +442,16 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                         {/* thumbnail */}
                         {thumbnailUrl && !contentOnly && (
                             <div
-                                className="relative mb-8 w-full md:w-[110%] md:transform md:translate-x-[-5%] max-h-[370px]
-                                rounded-lg overflow-hidden shadow-none border border-gray-200 dark:border-[#333]"
+                                className="relative mb-8 w-full md:w-[110%] md:transform md:translate-x-[-5%] max-h-[370px] _bg-gray-200 _dark:bg-[#333]
+                                rounded-lg overflow-hidden shadow-none border border-gray-200 dark:border-[#333] grid place-items-center"
+                                // style={{
+                                //     background: `url(${thumbnailUrl}) center/cover no-repeat`,
+                                // }}
                             >
                                 <img
                                     src={thumbnailUrl}
                                     alt={title || "Article thumbnail"}
-                                    className="object-contain"
+                                    className="object-contain _max-h-[370px]" // remove max-h-[370px] to restore prev
                                     loading="lazy"
                                 />
                             </div>
@@ -609,6 +611,14 @@ export const MarkdownPreview = memo(function MarkdownPreview({
 
                                 h1: ({ children }) => (
                                     <h1
+                                        id={
+                                            children
+                                                .toLowerCase()
+                                                .replace(/[^a-z0-9\s-]/g, "") // remove special chars except space and hyphen
+                                                .replace(/\s+/g, "-") // replace spaces/tabs with hyphens
+                                                .replace(/-+/g, "-") // collapse multiple hyphens
+                                                .replace(/^-|-$/g, "") // trim hyphens from start/end
+                                        }
                                         className={`mt-12 mb-6 leading-tight tracking-tight ${
                                             contentOnly
                                                 ? "text-xl font-semibold font-sans"
@@ -620,6 +630,12 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                 ),
                                 h2: ({ children }) => (
                                     <h2
+                                        id={children
+                                            .toLowerCase()
+                                            .replace(/[^a-z0-9\s-]/g, "")
+                                            .replace(/\s+/g, "-")
+                                            .replace(/-+/g, "-")
+                                            .replace(/^-|-$/g, "")}
                                         className={`font-serif mt-10 mb-5 leading-tight tracking-tight ${
                                             contentOnly
                                                 ? "text-lg"
@@ -631,6 +647,12 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                 ),
                                 h3: ({ children }) => (
                                     <h3
+                                        id={children
+                                            .toLowerCase()
+                                            .replace(/[^a-z0-9\s-]/g, "")
+                                            .replace(/\s+/g, "-")
+                                            .replace(/-+/g, "-")
+                                            .replace(/^-|-$/g, "")}
                                         className={`font-serif mt-8 mb-4 leading-snug ${
                                             contentOnly
                                                 ? "text-base"
