@@ -69,7 +69,7 @@ const Header = ({
                             rounded-md box-content px-1 md:px-1 py-0
                             text-xl md:text-2xl tracking-wide"
                         >
-                            <span className="font-['Six_Caps']">
+                            <span className="font-['Six_Caps'] text-black">
                                 opencanvas
                             </span>
                         </div>

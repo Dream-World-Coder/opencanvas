@@ -205,7 +205,7 @@ const ArticleFeed = () => {
                         <main className="w-full lg:max-w-2xl mx-auto lg:mx-6 mt-2">
                             {/* Mobile topics menu */}
                             <div className="lg:hidden mb-4">
-                                <div className="bg-white dark:bg-[#171717] p-4 rounded-xl shadow-sm">
+                                <div className="bg-white dark:bg-[#222] p-4 rounded-xl shadow-sm">
                                     <details>
                                         <summary className="font-medium text-gray-700 dark:text-gray-200 cursor-pointer">
                                             Topics ({selectedTopics.length})
@@ -246,17 +246,17 @@ const ArticleFeed = () => {
                                                     : null
                                             }
                                             key={post._id}
-                                            className="bg-white dark:bg-[#171717] rounded-xl shadow-sm overflow-hidden cursor-pointer"
+                                            className="bg-white dark:bg-[#222] rounded-xl shadow-sm overflow-hidden cursor-pointer"
                                             onClick={() =>
                                                 handlePostClick(post)
                                             }
                                         >
                                             {post.thumbnailUrl && (
-                                                <div className="max-h-72 overflow-hidden grid place-items-center bg-gray-200 dark:bg-[#333]">
+                                                <div className="overflow-hidden flex items-center justify-center bg-gray-200 dark:bg-[#333] max-h-72">
                                                     <img
                                                         src={post.thumbnailUrl}
                                                         alt={post.title}
-                                                        className="object-contain max-h-72"
+                                                        className="object-contain aspect-video" // just change it to cover for filling results
                                                     />
                                                 </div>
                                             )}
@@ -280,7 +280,7 @@ const ArticleFeed = () => {
                                                                 post.thumbnailUrl
                                                             }
                                                             isDark={isDark}
-                                                            darkBg="bg-[#171717]"
+                                                            darkBg="bg-[#222]"
                                                             textAlignment={
                                                                 post.type ===
                                                                 "poem"
@@ -294,7 +294,7 @@ const ArticleFeed = () => {
                                                             // }
                                                         />
                                                     </div>
-                                                    <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white dark:from-[#171717] to-transparent"></div>
+                                                    <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white dark:from-[#222] to-transparent"></div>
                                                 </div>
 
                                                 {/* Post tags */}

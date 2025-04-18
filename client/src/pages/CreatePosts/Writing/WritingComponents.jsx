@@ -281,7 +281,7 @@ export const LinkInsertButton = ({ onLinkInsert, sizing }) => {
                 </DialogHeader>
                 {error && (
                     <Alert variant="destructive">
-                        <AlertDescription>{error}</AlertDescription>
+                        <AlertDescription>{error.toString()}</AlertDescription>
                     </Alert>
                 )}
                 <div className="space-y-4">
@@ -442,8 +442,8 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                         {/* thumbnail */}
                         {thumbnailUrl && !contentOnly && (
                             <div
-                                className="relative mb-8 w-full md:w-[110%] md:transform md:translate-x-[-5%] max-h-[370px] _bg-gray-200 _dark:bg-[#333]
-                                rounded-lg overflow-hidden shadow-none border border-gray-200 dark:border-[#333] grid place-items-center"
+                                className="relative mb-8 w-full md:w-[110%] md:transform md:translate-x-[-5%] max-h-[370px] __bg-gray-200 __dark:bg-[#333]
+                                rounded-lg overflow-hidden shadow-none border border-gray-200 dark:border-[#333] flex items-center justify-center"
                                 // style={{
                                 //     background: `url(${thumbnailUrl}) center/cover no-repeat`,
                                 // }}
@@ -451,7 +451,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                 <img
                                     src={thumbnailUrl}
                                     alt={title || "Article thumbnail"}
-                                    className="object-contain _max-h-[370px]" // remove max-h-[370px] to restore prev
+                                    className="object-cover aspect-video"
                                     loading="lazy"
                                 />
                             </div>
@@ -1127,7 +1127,7 @@ export const TagInputComponent = ({
 
             {error && (
                 <Alert variant="destructive" className="mt-2">
-                    <AlertDescription>{error}</AlertDescription>
+                    <AlertDescription>{error.toString()}</AlertDescription>
                 </Alert>
             )}
 

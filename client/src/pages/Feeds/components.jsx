@@ -35,8 +35,8 @@ export const LeftSideBar = ({ selectedTopics, setSelectedTopics }) => {
     };
 
     return (
-        <div className="p-4 bg-white dark:bg-[#171717] rounded-xl shadow-sm">
-            <div className="space-y-2 border p-4 rounded-xl">
+        <div className="p-4 bg-white dark:bg-[#222] rounded-xl shadow-sm">
+            <div className="space-y-2 border dark:border-[#333] p-4 rounded-xl">
                 <div className="font-bold mb-4">Feed Options</div>
                 {feedOptions.map((link, index) => (
                     <div
@@ -47,7 +47,7 @@ export const LeftSideBar = ({ selectedTopics, setSelectedTopics }) => {
                     </div>
                 ))}
             </div>
-            <div className="mt-8 border p-4 rounded-xl">
+            <div className="mt-8 border dark:border-[#333] p-4 rounded-xl">
                 <div className="font-bold mb-4 flex items-center">
                     <Filter className="w-4 h-4 mr-2" />
                     Topics
@@ -106,7 +106,7 @@ export const RightSideBar = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="p-4 bg-white dark:bg-[#171717] rounded-xl shadow-sm">
+        <div className="p-4 bg-white dark:bg-[#222] rounded-xl shadow-sm">
             <div className="p-4 border border-gray-200 dark:border-[#333] rounded-lg mb-6">
                 <h3 className="font-bold mb-3">Trending Topics</h3>
                 <div className="space-y-2">
@@ -179,7 +179,7 @@ export const RightSideBar = () => {
 export const ErrorDisplay = ({ error, fetchPosts }) => {
     return (
         <div className="p-6 mb-6 bg-red-50 dark:bg-red-900/20 rounded-xl shadow-sm text-red-600 dark:text-red-400">
-            <p>{error}</p>
+            <p>{`${error}`}</p>
             <Button onClick={fetchPosts} variant="outline" className="mt-4">
                 Retry
             </Button>
@@ -232,7 +232,7 @@ export const PostTags = ({ post }) => {
             {post.tags.map((topic) => (
                 <span
                     key={topic}
-                    className="bg-gray-100 dark:bg-[#2a2a2a] text-xs px-3 py-1 rounded-full font-medium text-gray-700 dark:text-gray-300"
+                    className="bg-gray-100 dark:bg-[#313131] text-xs px-3 py-1 rounded-full font-medium text-gray-700 dark:text-gray-300"
                 >
                     {topic}
                 </span>
@@ -280,7 +280,7 @@ PostAuthorInfo.propTypes = {
 
 export const NoPosts = ({ fetchPosts }) => {
     return (
-        <div className="bg-white dark:bg-[#171717] rounded-xl shadow-sm p-12 text-center">
+        <div className="bg-white dark:bg-[#222] rounded-xl shadow-sm p-12 text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-[#2a2a2a] rounded-full flex items-center justify-center">
                 <BookOpen className="h-8 w-8 text-gray-400 dark:text-gray-500" />
             </div>
@@ -302,7 +302,7 @@ NoPosts.propTypes = {
 
 export const EndOfFeed = () => {
     return (
-        <div className="text-center py-8 px-4 bg-white dark:bg-[#171717] rounded-xl shadow-sm">
+        <div className="text-center py-8 px-4 bg-white dark:bg-[#222] rounded-xl shadow-sm">
             <p className="text-gray-500 dark:text-gray-400">
                 You&apos;ve reached the end of your feed
             </p>
@@ -328,7 +328,7 @@ export const LoadingSkeleton = () => {
         .map((_, i) => (
             <div
                 key={`skeleton-${i}`}
-                className="bg-white dark:bg-[#171717] rounded-xl shadow-sm overflow-hidden"
+                className="bg-white dark:bg-[#222] rounded-xl shadow-sm overflow-hidden"
             >
                 <Skeleton className="h-52 w-full" />
                 <div className="p-5 sm:p-6">

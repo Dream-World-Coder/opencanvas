@@ -52,7 +52,7 @@ export default function ProfileHeader() {
                     onClick={() => navigate("/")}
                     className="flex items-center px-1 focus:outline-none bg-lime-400 rounded"
                 >
-                    <span className="font-['Six_Caps'] text-lg md:text-2xl tracking-wide">
+                    <span className="font-['Six_Caps'] text-lg md:text-2xl tracking-wide text-black">
                         opencanvas
                     </span>
                 </button>
