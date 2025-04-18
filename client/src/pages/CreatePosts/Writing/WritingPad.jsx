@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { toast } from "sonner";
 import { Helmet } from "react-helmet-async";
 import {
@@ -75,7 +75,7 @@ import { useExport } from "./hooks/useExport";
 // import useSingleTab from "./hooks/useSingleTab";
 import { useAuth } from "../../../contexts/AuthContext";
 
-const WritingPad = ({ artType = "article" }) => {
+const WritingPad = memo(function WritingPad({ artType = "article" }) {
     const { currentUser } = useAuth();
 
     // const navigate = useNavigate();
@@ -771,7 +771,7 @@ const WritingPad = ({ artType = "article" }) => {
             </div>
         </>
     );
-};
+});
 
 export default WritingPad;
 

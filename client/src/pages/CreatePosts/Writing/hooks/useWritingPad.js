@@ -309,10 +309,10 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
             }
         }, 5000);
 
-        // backend sync every 5 mins if online && not frontendOnly
+        // backend sync every 30 mins if online && not frontendOnly
         // also check if content has changed or not -- done already by !isSaved check in performAutosave
         if (navigator.onLine && !frontendOnly) {
-            autosaveInterval = setInterval(performAutosave, 300000);
+            autosaveInterval = setInterval(performAutosave, 1800000);
         }
 
         return () => {

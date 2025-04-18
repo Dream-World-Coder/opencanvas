@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, memo } from "react";
 import {
     X,
     Bold,
@@ -343,7 +343,7 @@ LinkInsertButton.propTypes = {
  *
  *
  */
-export const MarkdownPreview = ({
+export const MarkdownPreview = memo(function MarkdownPreview({
     title,
     content,
     thumbnailUrl = null,
@@ -355,7 +355,7 @@ export const MarkdownPreview = ({
     darkBg = "bg-[#222]",
     contentOnly = false,
     artType = "written",
-}) => {
+}) {
     //useref to store settings for all images individually
     const imageSettingsRef = useRef({});
 
@@ -953,7 +953,7 @@ export const MarkdownPreview = ({
             )}
         </>
     );
-};
+});
 
 MarkdownPreview.propTypes = {
     title: PropTypes.any,
@@ -1260,6 +1260,7 @@ ThumbnailUploader.propTypes = {
 };
 
 export const PublicPreferenceInput = ({ isPublic, setIsPublic }) => {
+    // rename it to SetPublicVisibility
     return (
         <div className="p-2">
             <h2 className="mb-1">Publish publicly or keep private?</h2>
@@ -1287,11 +1288,9 @@ PublicPreferenceInput.propTypes = {
 
 export function findAndReplace(content, setContent, toast) {
     try {
-        // Get search term from user
         const searchTerm = prompt("Enter text to find:");
         if (!searchTerm) return;
 
-        // Get replacement text
         const replaceTerm = prompt("Enter replacement text:");
         if (replaceTerm === null) return;
 
