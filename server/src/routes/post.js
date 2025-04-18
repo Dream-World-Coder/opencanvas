@@ -163,6 +163,13 @@ router.get("/p/:postId", async (req, res) => {
             });
         }
 
+        if (!post.isPublic) {
+            return res.status(403).json({
+                success: false,
+                message: "Post is Private",
+            });
+        }
+
         return res.status(200).json({
             success: true,
             post,
