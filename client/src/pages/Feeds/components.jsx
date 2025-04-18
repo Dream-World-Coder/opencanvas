@@ -16,11 +16,11 @@ export const LeftSideBar = ({ selectedTopics, setSelectedTopics }) => {
         { name: "Latest" },
     ];
     const filters = [
-        "Technology",
-        "Writing",
-        "Art",
-        "Science",
-        "Philosophy",
+        "AI",
+        "Math",
+        "Physics",
+        "Adventure",
+        "Experience",
         "Regular",
     ];
 
