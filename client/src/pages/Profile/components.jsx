@@ -328,6 +328,7 @@ function sharePost(post) {
               });
 }
 
+// better than setting currentuser, else have to remap all posts again
 function hideDiv(id) {
     const elementToHide = document.getElementById(id);
     if (elementToHide) {
@@ -876,6 +877,7 @@ export const PostList = ({
                     (activeTab !== "all" ? post.type === activeTab : true) && (
                         <div
                             key={post._id}
+                            id={`${post._id}`}
                             onClick={() => handlePostClick(post, forPrivate)}
                             className={`group ${forPrivate ? "" : "cursor-pointer"}`}
                         >
