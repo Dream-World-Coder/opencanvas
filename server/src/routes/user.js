@@ -157,7 +157,6 @@ router.get("/u/:username", async (req, res) => {
         const user = await User.findOne({
             username: req.params.username,
         }).select({
-            passwordHash: 0,
             email: 0,
             provider: 0,
             ipAddress: 0,
@@ -201,7 +200,6 @@ async function getUserPublicProfileById(req, res) {
         const author = await User.findOne({
             _id: req.params.id,
         }).select({
-            passwordHash: 0,
             email: 0,
             provider: 0,
             ipAddress: 0,
@@ -304,6 +302,7 @@ router.put(
                 return res.status(200).json({
                     success: true,
                     message: `${itemType} removed from features`,
+                    added: false,
                 });
             }
 
@@ -318,6 +317,7 @@ router.put(
             return res.status(200).json({
                 success: true,
                 message: `${itemType} featured`,
+                added: true,
             });
         } catch (err) {
             console.log("Error liking post", err);

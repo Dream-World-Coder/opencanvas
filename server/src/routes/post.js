@@ -556,16 +556,13 @@ router.put(
                     .json({ success: false, message: "Invalid post ID" });
             }
 
-            /*
-            const post = await Post.findById(postId);
-            if (!post) {
-                return res
-                    .status(400)
-                    .json({ success: false, message: "post not found" });
-            }
-            */
+            // no need to query the post
 
-            if (user.savedPosts.includes(postId)) {
+            if (
+                user.savedPosts
+                    .map((i) => i.toString())
+                    .includes(postId.toString())
+            ) {
                 user.savedPosts = user.savedPosts.filter(
                     (id) => id.toString() !== postId.toString(),
                 );
@@ -574,6 +571,7 @@ router.put(
                 return res.status(200).json({
                     success: true,
                     message: "unsaved post",
+                    saved: false,
                 });
             }
 
@@ -583,6 +581,7 @@ router.put(
             return res.status(200).json({
                 success: true,
                 message: "saved post",
+                saved: true,
             });
         } catch (err) {
             console.log("Error saving post", err);

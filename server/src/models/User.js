@@ -59,10 +59,6 @@ const userSchema = new Schema(
             trim: true,
             lowercase: true,
         },
-        passwordHash: {
-            type: String,
-            required: true,
-        },
         provider: {
             type: String,
             enum: ["google", "opencanvas"],

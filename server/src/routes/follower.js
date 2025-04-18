@@ -45,7 +45,6 @@ router.put(
             }
             const personToFollow = await User.findById(followId);
             if (!personToFollow) {
-                console.log("!personToFollow");
                 return res.status(404).json({
                     success: false,
                     message: "User to follow not found",

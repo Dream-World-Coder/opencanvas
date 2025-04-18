@@ -3,6 +3,9 @@ const router = express.Router();
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const jwt = require("jsonwebtoken");
+const apicache = require("apicache");
+const cache = apicache.middleware;
+
 const User = require("../models/User");
 const {
     generateRandomAlphanumeric,
@@ -59,7 +62,6 @@ passport.use(
                             generateRandomAlphanumeric(4).toLowerCase(), // total 8 chars
                         fullName: profile.displayName.slice(0, 32) || "User",
                         email: profile.emails[0].value,
-                        passwordHash: "google-hash",
                         provider: "google",
                         profilePicture:
                             profile.photos[0]?.value ||
@@ -133,187 +135,45 @@ router.get(
 
 /**
  *******************************************************
- * Get user Data for Auth, frontend's {@CurrentUser} gets data through this
+ * Get user Data for Auth, frontend's {@currentUser} gets data through this
  */
-router.get("/user", authenticateToken, async (req, res) => {
-    try {
-        const user = await User.findById(req.userId).select(
-            "-passwordHash -provider -ipAddress",
-        );
+router.get(
+    "/user",
+    authenticateToken,
+    cache("60 seconds"),
+    async (req, res) => {
+        try {
+            const user = await User.findById(req.userId).select(
+                "-provider -ipAddress",
+            );
 
-        if (!user) {
-            return res.status(404).json({
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: "User not found",
+                });
+            }
+
+            user.posts = [...user.posts].reverse();
+
+            return res.status(200).json({
+                success: true,
+                user,
+            });
+        } catch (error) {
+            console.error("Get user error:", error);
+            return res.status(500).json({
                 success: false,
-                message: "User not found",
+                message: "Failed to retrieve user data",
+                error:
+                    process.env.NODE_ENV === "development"
+                        ? error.message
+                        : "Server error",
             });
         }
-
-        user.posts = [...user.posts].reverse();
-
-        return res.status(200).json({
-            success: true,
-            user,
-        });
-    } catch (error) {
-        console.error("Get user error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to retrieve user data",
-            error:
-                process.env.NODE_ENV === "development"
-                    ? error.message
-                    : "Server error",
-        });
-    }
-});
+    },
+);
 
 router.use(handleAuthErrors);
 
 module.exports = { router };
-
-/*
-router.post("/register", async (req, res) => {
-    try {
-        const { username, email, password } = req.body;
-
-        if (!username || !email || !password) {
-            return res.status(400).json({
-                success: false,
-                message: "All fields are required",
-            });
-        }
-
-        // user already exists check
-        const existingUser = await User.findOne({
-            $or: [{ email }, { username }],
-        });
-
-        if (existingUser) {
-            return res.status(409).json({
-                success: false,
-                message:
-                    existingUser.email === email
-                        ? "Email already in use"
-                        : "Username already taken",
-            });
-        }
-
-        const passwordHash = await bcrypt.hash(password, 10); // password hashing
-
-        // Create new user
-        const newUser = new User({
-            username,
-            fullName: null,
-            email,
-            passwordHash,
-            ipAddress: req.ip,
-            lastFiveLogin: [
-                {
-                    loginTime: new Date(),
-                    deviceInfo: req.headers["user-agent"] || "Unknown device",
-                },
-            ],
-        });
-
-        await newUser.save();
-
-        // JWT token generation
-        const token = jwt.sign(
-            { userId: newUser._id, email: newUser.email },
-            JWT_SECRET,
-            { expiresIn: "7d" },
-        );
-
-        // return success with token
-        return res.status(201).json({
-            success: true,
-            message: "User registered successfully",
-            token,
-            user: {
-                id: newUser._id,
-                username: newUser.username,
-                fullName: newUser.fullName,
-                email: newUser.email,
-                profilePicture: newUser.profilePicture,
-            },
-        });
-    } catch (error) {
-        console.error("Registration error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Registration failed",
-            error:
-                process.env.NODE_ENV === "development"
-                    ? error.message
-                    : "Server error",
-        });
-    }
-});
-
-router.post("/login", async (req, res) => {
-    try {
-        const { email, password } = req.body;
-
-        if (!email || !password) {
-            return res.status(400).json({
-                success: false,
-                message: "Email and password are required",
-            });
-        }
-
-        // find user
-        const user = await User.findOne({ email });
-
-        // Check if user exists and password is correct
-        if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
-            return res.status(401).json({
-                success: false,
-                message: "Invalid email or password",
-            });
-        }
-
-        // Update login information
-        if (user.lastFiveLogin.length >= 5) {
-            user.lastFiveLogin.pop(); // Remove oldest login
-        }
-
-        user.lastFiveLogin.unshift({
-            loginTime: new Date(),
-            deviceInfo: req.headers["user-agent"] || "Unknown device",
-        });
-
-        await user.save();
-
-        // Generate JWT token
-        const token = jwt.sign(
-            { userId: user._id, email: user.email },
-            JWT_SECRET,
-            { expiresIn: "7d" },
-        );
-
-        // Return success with token
-        return res.status(200).json({
-            success: true,
-            message: "Login successful",
-            token,
-            user: {
-                id: user._id,
-                username: user.username,
-                fullName: user.fullName,
-                email: user.email,
-                profilePicture: user.profilePicture,
-            },
-        });
-    } catch (error) {
-        console.error("Login error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Login failed",
-            error:
-                process.env.NODE_ENV === "development"
-                    ? error.message
-                    : "Server error",
-        });
-    }
-});
-*/

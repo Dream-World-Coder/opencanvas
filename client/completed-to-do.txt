@@ -100,6 +100,22 @@ pass it as props then
 -- [x] in featuredItems add store things like {title, thumbnail, type, Id}
 -- [x] now on click links to the post --> type & id for url generation
 
+-- [x] filters not working in feed
+-- [x] some problems in followers / following ig, also problem in reversing, [and need to think, i.g it will be better to stor followers info directly instead fetching them]
+
+-- [x] auto update engagement scores in posts
+-- [x] in feed all posts are not coming, maybe use &lte instead &lt, <= instead <
+-- [x] bug: if i follow author in post page, i cannot see the following whn i dorectly visit his profile from the Post
+-- [x] like dislike fix
+-- [x] follow fix in post page
+-- [x] image upload
+
+-- [x] limit more parameters in posts, like engageMentScore & index user & posts
+-- [x] test what actions un-signed users can perform
+-- [-] similarly add totalLikes in user
+-- [x] imageUpload
+-- [-] add useStrict in main.jsx if needed
+
 
 -- [x] no need for intermediate post preview [like in profilepage] ---
     only 2 states: normal & in view -- less dbQuery

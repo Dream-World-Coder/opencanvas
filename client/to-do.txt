@@ -1,35 +1,21 @@
--- index the db
--- comments
--- imageUpload
--- interested topics add in settings
--- add useStrict in main.jsx if needed
+-- [] index the db
+-- [] comments
+-- [] interested topics add in settings
 
--- issue: in md2pdf when in 2 window mode isPreview must always be false, but if we use the export during that time, then it will be turned on, so it will be better to close the the 2 window view first, when export pressed
+-- [] saved page ->> liked & other collections
+-- [] make dynamic sitemap
 
--- saved ->> liked & other collections
--- make dynamic sitemap
--- test what actions un-signed users can perform
-
--- limit more parameters in posts, like engageMentScore & index user & posts
--- similarly add totalLikes in user
--- post view page for private posts
--- auto update engagement scores in posts
--- in feed all posts are not coming, maybe use &lte instead &lt, <= instead <
--- bug: if i follow author in post page, i cannot see the following whn i dorectly visit his profile from the Post
--- like dislike fix
--- [ ] follow fix in post page
--- [ ] image upload
--- [ ] in profile footer add `opencanvas`
+-- [] post view page for private posts
+-- [] in profile footer add `opencanvas`
 -- [] gap button in editor
 -- [] store fetched posts of feed [use context or cache]
 -- [] UI-UX and design upgrade needed
 -- [] sliding effect in header, highlight current route, and traverse the green box to other
--- filters not working in feed
--- some problems in followers / following ig, also problem in reversing, [and need to think, i.g it will be better to stor followers info directly instead fetching them]
--- Magazine [week - month - year] : best articles or collections [any one], best stories & poems [in different sections[max 8]]
--- caching is available in sever environments, but something similar can be made, i.e. if same arguments then same result, no api call needed, [store the previous in some ref / context]
 
--- I think another attribute `timesFetched` can be added, to easily cache proper posts, its not necessary only a more fetched post will always be on trending,
+-- [] Magazine [week - month - year] : best articles or collections [any one], best stories & poems [in different sections[max 8]]
+-- [] caching is available in sever environments, but something similar can be made, i.e. if same arguments then same result, no api call needed, [store the previous in some ref / context]
+
+-- [] I think another attribute `timesFetched` can be added, to easily cache proper posts, its not necessary only a more fetched post will always be on trending,
 
 * less imp
     html in export formats
@@ -40,6 +26,10 @@
     Keyboard shortcuts for differnt formats,
 
 ^^^ MOTO: focused place, to publish individual works, groups can be formed though, publish reserch papers, stories, poems
+
+
+-- issue: in md2pdf when in 2 window mode isPreview must always be false, but if we use the export during that time, then it will be turned on, so it will be better to close the the 2 window view first, when export pressed
+
 
 -- delete them later: K99YgaZcpyAgDZc,
  media: [

@@ -15,7 +15,7 @@ const {
 router.post("/feed/anonymous-user", async (req, res) => {
     try {
         // Extract cursor and limit parameters
-        const { cursor, limit = 10, topics } = req.body;
+        const { cursor, limit = 16 } = req.body; // { ..., topics} = ...
 
         // Validate limit
         if (limit < 1 || limit > 50) {
@@ -28,13 +28,12 @@ router.post("/feed/anonymous-user", async (req, res) => {
         // Build query object
         const query = { isPublic: true };
 
-        // If cursor is provided, only fetch posts with lower anonymousEngageMentScore
-        // This assumes anonymousEngageMentScore is a numeric value
-        // Add these debug logs to investigate the issue
         if (cursor) {
             try {
                 // console.log("Raw cursor:", cursor);
-                const decodedString = Buffer.from(cursor, "base64").toString("utf-8");
+                const decodedString = Buffer.from(cursor, "base64").toString(
+                    "utf-8",
+                );
                 // console.log("Decoded string:", decodedString);
                 const cursorData = JSON.parse(decodedString);
                 // console.log("Parsed cursor data:", cursorData);
@@ -48,12 +47,13 @@ router.post("/feed/anonymous-user", async (req, res) => {
                         {
                             anonymousEngageMentScore: cursorData.score,
                             _id: {
-                                $lt: new mongoose.Types.ObjectId(cursorData.lastId),
+                                $lt: new mongoose.Types.ObjectId(
+                                    cursorData.lastId,
+                                ),
                             },
                         },
                     ];
                 }
-
             } catch (error) {
                 console.error("Cursor parsing error:", error);
                 return res.status(400).json({
@@ -64,9 +64,9 @@ router.post("/feed/anonymous-user", async (req, res) => {
         }
 
         // Add topic filtering if provided
-        if (topics && Array.isArray(topics) && topics.length > 0) {
-            query.topics = { $in: topics };
-        }
+        // if (topics && Array.isArray(topics) && topics.length > 0) {
+        //     query.topics = { $in: topics };
+        // }
 
         // Execute the query with projection to exclude sensitive fields
         const posts = await Post.find(query, {
