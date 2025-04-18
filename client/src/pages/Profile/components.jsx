@@ -336,7 +336,7 @@ function hideDiv(id) {
 }
 export const PostActions = ({ post, setPosts, loading }) => {
     const navigate = useNavigate();
-    const { currentUser } = useAuth();
+    const { currentUser, setCurrentUser } = useAuth();
     const { deletePost, changePostVisibility, changeFeaturedSettings } =
         useDataService();
 
@@ -449,17 +449,43 @@ export const PostActions = ({ post, setPosts, loading }) => {
                             make {post.isPublic ? "private" : "public"}
                         </button>
                     </DropdownMenuItem>
+
+                    {/* feature post / remove feature */}
                     <DropdownMenuItem>
                         <button
                             onClick={async () => {
-                                let tmp = await changeFeaturedSettings(
+                                let res = await changeFeaturedSettings(
                                     post._id,
                                     "Post",
                                 );
-                                if (tmp.success) {
-                                    toast.success(tmp.message);
+                                if (res.success && res.added == true) {
+                                    toast.success(res.message);
+                                    setCurrentUser((currentUser) => ({
+                                        ...currentUser,
+                                        featuredItems: [
+                                            ...currentUser.featuredItems,
+                                            {
+                                                itemId: post._id,
+                                                itemType: "Post",
+                                                itemTitle: post.title,
+                                                itemThumbnail:
+                                                    post.thumbnailUrl,
+                                            },
+                                        ],
+                                    }));
+                                } else if (res.success && res.added == false) {
+                                    toast.success(res.message);
+                                    setCurrentUser((currentUser) => ({
+                                        ...currentUser,
+                                        featuredItems: [
+                                            ...currentUser.featuredItems.filter(
+                                                (item) =>
+                                                    item.itemId != post._id,
+                                            ),
+                                        ],
+                                    }));
                                 } else {
-                                    toast.error(tmp.response.data.message);
+                                    toast.error(res.response.data.message);
                                 }
                             }}
                             className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
@@ -655,7 +681,7 @@ export const FeaturedWorks = ({ currentUser }) => {
                                 key={item.itemId}
                                 className="group cursor-pointer min-w-[200px] md:min-w-[300px] max-w-[200px] md:max-w-[300px]"
                                 onClick={() => {
-                                    item.itemType === "Post"
+                                    item.itemType.toLowerCase() === "post"
                                         ? navigate(`/p/${item.itemId}`)
                                         : navigate(`/c/${item.itemId}`);
                                 }}
@@ -707,6 +733,73 @@ export const FeaturedWorks = ({ currentUser }) => {
 };
 FeaturedWorks.propTypes = {
     currentUser: PropTypes.object,
+};
+
+const MockFeatureItem = ({ post = null, collection = null }) => {
+    const navigate = useNavigate();
+    let item = {};
+    if (post) {
+        item = {
+            itemType: "Post",
+            itemThumbnail: post.thumbnailUrl,
+            itemTitle: post.title,
+        };
+    } else if (collection) {
+        item = {
+            itemType: "Collection",
+            itemThumbnail: collection.thumbnailUrl,
+            itemTitle: collection.title,
+        };
+    } else {
+        return;
+    }
+    return (
+        <div
+            className="group cursor-pointer min-w-[200px] md:min-w-[300px] max-w-[200px] md:max-w-[300px]"
+            onClick={() => {
+                item.itemType.toLowerCase() === "post"
+                    ? navigate(`/p/${item.itemId}`)
+                    : navigate(`/c/${item.itemId}`);
+            }}
+        >
+            <div className="relative aspect-square overflow-hidden mb-4">
+                <img
+                    src={item.itemThumbnail}
+                    alt={item.itemTitle}
+                    className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+                />
+                {/* dark inset on hover */}
+                <div className="absolute inset-0 bg-black/20 dark:bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"></div>
+            </div>
+            <h3 className="text-lg font-medium mb-1 flex justify-between dark:text-[#e8e8e8]">
+                {item.itemTitle}
+                <Share2
+                    className="w-6 h-6 text-black dark:text-white rounded-lg p-1 hover:bg-yellow-200 dark:hover:bg-[#2c2c2c]"
+                    onClick={async (e) => {
+                        e.stopPropagation();
+                        let baseUrl = window.location.origin;
+                        let typ =
+                            item.itemType.toLowerCase() === "collection"
+                                ? "c"
+                                : "p";
+                        await navigator.clipboard.writeText(
+                            `${baseUrl}/${typ}/${item.itemId}`,
+                        );
+                        toast.success("link copied to clipboard");
+                    }}
+                />
+            </h3>
+            <p className="text-sm text-gray-400 dark:text-[#888]">
+                {item.itemType.toLowerCase() === "collection"
+                    ? "Collection"
+                    : ""}
+            </p>
+        </div>
+    );
+};
+MockFeatureItem.propTypes = {
+    post: PropTypes.object,
+    collection: PropTypes.object,
 };
 
 export const PostStats = ({ post }) => {

@@ -75,34 +75,24 @@ import { useExport } from "./hooks/useExport";
 // import useSingleTab from "./hooks/useSingleTab";
 import { useAuth } from "../../../contexts/AuthContext";
 
-/**
- • supports latex && easy to use + image upload, easily give gap, cuz supports html
- • ^%SOS# for unTested code -- no more exists
- • post click : edit preview settings
- */
 const WritingPad = ({ artType = "article" }) => {
     const { currentUser } = useAuth();
 
     // const navigate = useNavigate();
 
     const [postId, setPostId] = useState("");
-    // console.log(`postID writingPad 1: ${postId}`);
     useEffect(() => {
         setPostId(localStorage.getItem("newPostId", ""));
-        // console.log(`postID writingPad 2: ${postId}`);
     }, [postId]);
-    // console.log(`postID writingPad 3: ${postId}`);
 
     const [frontendOnly, _] = useState(false);
 
     // const isActiveTab = useSingleTab();
     // customized  redirect path:
     // const isActiveTab = useSingleTab({
-    //   redirectPath: "/dashboard",
-    //   messageText: "Editor is already open. Redirecting to dashboard..."
+    //   redirectPath: "/profile",
+    //   messageText: "Editor is already open. Redirecting to profile..."
     // });
-    //
-    // or
 
     // main writing pad functionality
     const {
@@ -127,8 +117,6 @@ const WritingPad = ({ artType = "article" }) => {
 
     // Editor formatting functionality
     const {
-        selectedText,
-        setSelectedText,
         textAlignment,
         setTextAlignment,
         handleContentChange,
@@ -171,6 +159,9 @@ const WritingPad = ({ artType = "article" }) => {
     //     return <div>Redirecting...</div>;
     // }
 
+    const lastButton = formattingButtons[formattingButtons.length - 1];
+    const LastIcon = lastButton.icon;
+
     return (
         <>
             <Helmet>
@@ -203,7 +194,6 @@ const WritingPad = ({ artType = "article" }) => {
                                             return;
                                         }
                                         localStorage.removeItem("newPostId");
-                                        // navigate("/profile");
                                         window.location.href = "/profile";
                                     }}
                                     className="hover:opacity-70 transition-opacity p-1 border rounded-full"
@@ -509,8 +499,9 @@ const WritingPad = ({ artType = "article" }) => {
                                         ${isPreview ? "opacity-0 h-0" : ""}`}
                         >
                             <div className="flex items-center md:space-x-2">
-                                {formattingButtons.map(
-                                    ({ format, icon: Icon }) => (
+                                {formattingButtons
+                                    .slice(0, -1)
+                                    .map(({ format, icon: Icon }) => (
                                         <button
                                             key={format}
                                             onClick={() => handleFormat(format)}
@@ -521,7 +512,31 @@ const WritingPad = ({ artType = "article" }) => {
                                         >
                                             <Icon className="size-4" />
                                         </button>
-                                    ),
+                                    ))}
+                                {frontendOnly && (
+                                    <button
+                                        onClick={() =>
+                                            handleFormat(lastButton.format)
+                                        }
+                                        className={`px-[6px] md:px-2 py-3 md:rounded-lg transition-all duration-0
+                                                border-r md:border-none
+                                                ${isDark ? "hover:bg-gray-500 border-[#222]" : "hover:bg-gray-200 border-gray-200"}
+                                                ${
+                                                    [
+                                                        "heading",
+                                                        "quote",
+                                                        "list",
+                                                        "inlineCode",
+                                                        "dropCap",
+                                                    ].includes(
+                                                        lastButton.format,
+                                                    )
+                                                        ? "hidden md:block"
+                                                        : ""
+                                                }`}
+                                    >
+                                        <LastIcon className="size-4" />
+                                    </button>
                                 )}
                                 <LinkInsertButton
                                     onLinkInsert={(markdownImageText) => {
