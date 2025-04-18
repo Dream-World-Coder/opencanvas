@@ -26,7 +26,7 @@ import {
 
 const ViewPost = ({ isArticle = true }) => {
     const location = useLocation();
-    const { currentUser } = useAuth();
+    const { currentUser, setCurrentUser } = useAuth();
     const { postId } = useParams();
     const {
         getPostById,
@@ -135,6 +135,14 @@ const ViewPost = ({ isArticle = true }) => {
             let removeDislikeRes = await dislikePost(postId);
             if (removeDislikeRes.success) {
                 setIsDisliked(false);
+                setCurrentUser((currentUser) => ({
+                    ...currentUser,
+                    dislikedPosts: [
+                        ...currentUser.dislikedPosts.filter(
+                            (item) => item.toString() !== postId.toString(),
+                        ),
+                    ],
+                }));
             } else {
                 toast.error("Failed to remove dislike");
                 return;
@@ -147,9 +155,21 @@ const ViewPost = ({ isArticle = true }) => {
             toast.success(res.message);
             if (res.increase === "increase") {
                 setLikes(likes + 1);
+                setCurrentUser((currentUser) => ({
+                    ...currentUser,
+                    likedPosts: [...currentUser.likedPosts, postId],
+                }));
             } else {
                 // removing like -- toggle action
                 setLikes(likes - 1);
+                setCurrentUser((currentUser) => ({
+                    ...currentUser,
+                    likedPosts: [
+                        ...currentUser.likedPosts.filter(
+                            (item) => item.toString() !== postId.toString(),
+                        ),
+                    ],
+                }));
             }
             setIsLiked(!isLiked);
         } else {
@@ -161,11 +181,20 @@ const ViewPost = ({ isArticle = true }) => {
         // remove like first if needed
         if (isLiked) {
             let removeLikeRes = await likePost(postId);
-            if (removeLikeRes.success) {
+            if (
+                removeLikeRes.success &&
+                removeLikeRes.increase === "decrease"
+            ) {
                 setIsLiked(false);
-                if (removeLikeRes.increase === "decrease") {
-                    setLikes(likes - 1);
-                }
+                setLikes(likes - 1);
+                setCurrentUser((currentUser) => ({
+                    ...currentUser,
+                    likedPosts: [
+                        ...currentUser.likedPosts.filter(
+                            (item) => item.toString() !== postId.toString(),
+                        ),
+                    ],
+                }));
             } else {
                 toast.error("Failed to remove like");
                 return;
@@ -177,6 +206,10 @@ const ViewPost = ({ isArticle = true }) => {
         if (res.success) {
             toast.success(res.message);
             setIsDisliked(!isDisliked);
+            setCurrentUser((currentUser) => ({
+                ...currentUser,
+                dislikedPosts: [...currentUser.dislikedPosts, postId],
+            }));
         } else {
             toast.error(res.message);
         }
@@ -184,19 +217,52 @@ const ViewPost = ({ isArticle = true }) => {
 
     async function handleSave(postId) {
         let res = await savePost(postId);
-        if (res.success) {
-            setIsSaved(!isSaved);
+        if (res.success && res.saved == true) {
+            setIsSaved(true);
             toast.success(res.message);
+            setCurrentUser((currentUser) => ({
+                ...currentUser,
+                savedPosts: [...currentUser.savedPosts, postId],
+            }));
+        } else if (res.success && res.saved != true) {
+            setIsSaved(false);
+            toast.success(res.message);
+            setCurrentUser((currentUser) => ({
+                ...currentUser,
+                savedPosts: [
+                    ...currentUser.savedPosts.filter(
+                        (i) => i.toString() !== postId.toString(),
+                    ),
+                ],
+            }));
         } else {
             toast.error(res.message);
         }
     }
 
-    async function handleFollow(personToFollow) {
-        let res = await followUser(personToFollow);
-        if (res.success) {
-            setFollowing(!following);
+    async function handleFollow(userId) {
+        let res = await followUser(userId);
+        if (res.success && res.message === "followed") {
+            setFollowing(true);
             toast.success(res.message);
+            setCurrentUser((currentUser) => ({
+                ...currentUser,
+                following: [
+                    ...currentUser.following,
+                    { userId, since: Date.now() },
+                ],
+            }));
+        } else if (res.success && res.message === "unfollowed") {
+            setFollowing(false);
+            toast.success(res.message);
+            setCurrentUser((currentUser) => ({
+                ...currentUser,
+                following: [
+                    ...currentUser.following.filter(
+                        (i) => i.userId.toString() !== userId.toString(),
+                    ),
+                ],
+            }));
         } else {
             toast.error(res.message);
         }
