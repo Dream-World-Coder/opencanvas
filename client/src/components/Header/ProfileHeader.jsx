@@ -7,8 +7,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import { toast } from "sonner";
 
 const navLinks = [
-    { href: "/literature", label: "Literature" },
     { href: "/articles", label: "Articles" },
+    { href: "/literature", label: "Social" },
     { href: "/saved-posts", label: "Saved" },
     { href: "/profile", label: "Profile" },
 ];
@@ -43,21 +43,21 @@ export default function ProfileHeader() {
     }
 
     return (
-        <nav className="fixed top-0 w-full bg-white dark:bg-gray-900 z-50 shadow-sm dark:shadow-none backdrop-blur-md bg-opacity-80 dark:bg-opacity-80">
+        <nav className="fixed top-0 w-full bg-white dark:bg-gray-900 z-50 shadow-sm dark:shadow-none backdrop-blur-md bg-opacity-90 dark:bg-opacity-90">
             <div className="max-w-7xl mx-auto flex justify-between items-center px-4 sm:px-6 py-4">
                 {/* Logo */}
                 <button
                     onClick={() => navigate("/")}
-                    className="flex items-center space-x-2 focus:outline-none"
+                    className="flex items-center px-1 focus:outline-none bg-lime-400 rounded"
                 >
-                    <span className="font-['Six_Caps'] bg-lime-400 text-lg md:text-2xl tracking-wide">
+                    <span className="font-['Six_Caps'] text-lg md:text-2xl tracking-wide">
                         opencanvas
                     </span>
                 </button>
 
                 {/* Desktop Navigation */}
                 <div className="hidden md:flex items-center space-x-1">
-                    <div className="flex items-center mr-2 border border-gray-100 dark:border-gray-800 rounded-full px-1">
+                    <div className="flex items-center mr-2 border border-gray-100 dark:border-gray-800 rounded-full">
                         {navLinks.map((link, index) => (
                             <button
                                 key={index}
@@ -71,7 +71,7 @@ export default function ProfileHeader() {
 
                     <button
                         onClick={() => navigate("/profile/settings")}
-                        className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-all duration-200"
+                        className="p-2 !mr-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-all duration-200 border border-gray-100 dark:border-gray-800"
                     >
                         <Settings className="w-5 h-5" />
                     </button>

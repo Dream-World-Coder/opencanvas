@@ -762,6 +762,7 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
                                     isDark={isDark}
                                     textAlignment={textAlignment}
                                     lightModeBg={lightModeBg}
+                                    // no need to add thumbnail here
                                 />
                             </div>
                         </div>

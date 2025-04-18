@@ -8,13 +8,14 @@ export const validateFile = async (file) => {
         "image/jpeg",
         "image/jpg",
         "image/png",
-        "image/webp",
-        // "image/svg+xml", // imgur does not support svg
+        // "image/webp",
+        // "image/svg+xml",
+        // imgur does not support svg & webp
     ];
 
     if (!ALLOWED_TYPES.includes(file.type)) {
         throw new Error(
-            "Invalid file type. Please upload a JPG, JPEG, PNG, or WEBP image.",
+            "Invalid file type. Please upload a JPG, JPEG or PNG image.",
         );
     }
 
