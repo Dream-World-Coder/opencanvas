@@ -651,7 +651,7 @@ export const FeaturedWorks = ({ currentUser }) => {
             {currentUser.featuredItems.length > 0 && (
                 <div className="mb-24 relative px-4 md:px-0">
                     <h2 className="text-2xl font-semibold tracking-tight mb-8 dark:text-[#f0f0f0]">
-                        <span className="bg-inherit dark:bg-inherit bg-lime-100 hover:bg-[#222] rounded-md box-content px-2 py-1">
+                        <span className="bg-lime-100 dark:bg-[#222] rounded-md box-content px-2 py-1">
                             Featured Works
                         </span>
                     </h2>
