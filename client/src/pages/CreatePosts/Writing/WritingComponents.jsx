@@ -1,22 +1,22 @@
 import { useRef, useState } from "react";
 import {
-    Image,
+    X,
     Bold,
-    Italic,
-    Underline,
-    Strikethrough,
-    Highlighter,
-    FilePlus,
-    Quote,
     Code,
     Link,
     List,
-    Heading,
     Minus,
-    FileJson,
-    LetterText,
-    X,
+    Quote,
+    Image,
+    Italic,
     Upload,
+    Heading,
+    FilePlus,
+    FileJson,
+    Underline,
+    LetterText,
+    Highlighter,
+    Strikethrough,
 } from "lucide-react";
 import PropTypes from "prop-types";
 // ***************************************************
