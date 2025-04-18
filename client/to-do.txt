@@ -5,6 +5,8 @@
 -- [] saved page ->> liked & other collections
 -- [] make dynamic sitemap
 
+ --- 16/9
+
 -- [] post view page for private posts
 -- [] in profile footer add `opencanvas`
 -- [] gap button in editor

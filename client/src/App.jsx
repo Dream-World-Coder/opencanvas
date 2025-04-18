@@ -28,6 +28,7 @@ const FollowersPage = lazy(() => import("./pages/Profile/FollowersPage"));
 const FollowingPage = lazy(() => import("./pages/Profile/FollowingPage"));
 
 const ViewPost = lazy(() => import("./pages/Post/ViewPost"));
+const PrivatePostView = lazy(() => import("./pages/Post/PrivatePostView"));
 
 const AboutPage = lazy(() => import("./pages/About/About"));
 const ContactPage = lazy(() => import("./pages/Contact/Contact"));
@@ -154,6 +155,10 @@ export default function App() {
                                     <Route
                                         path="/profile/settings"
                                         element={<ProfileSettings />}
+                                    />
+                                    <Route
+                                        path="/private/p/:postId"
+                                        element={<PrivatePostView />}
                                     />
                                     <Route
                                         path="/createpost/poem"

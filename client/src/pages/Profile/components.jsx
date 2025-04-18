@@ -349,7 +349,11 @@ export const PostActions = ({ post, setPosts, loading }) => {
                 title="View"
                 onClick={(e) => {
                     e.stopPropagation();
-                    navigate(`/p/${post._id}`, { state: { post } });
+                    post.isPublic
+                        ? navigate(`/p/${post._id}`, { state: { post } })
+                        : navigate(`/private/p/${post._id}`, {
+                              state: { post },
+                          });
                 }}
             >
                 <Eye
