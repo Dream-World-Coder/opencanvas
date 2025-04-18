@@ -281,6 +281,7 @@ const ViewPost = ({ isArticle = true }) => {
                     noBlur={true}
                     ballClr={"text-gray-300"}
                     exclude={["/about", "/contact", "/photo-gallery"]}
+                    abs={true}
                 />
                 <div className="flex flex-col md:flex-row min-h-screen max-w-screen-xl mx-auto bg-white dark:bg-[#111] text-gray-900 dark:text-gray-100">
                     {/* Left sidebar - Read Options or folder structure in case of collection */}
