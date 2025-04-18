@@ -8,6 +8,8 @@ import { toast } from "sonner";
 
 import ProfileHeader from "../../components/Header/ProfileHeader";
 import ProfileFooter from "../../components/Footer/ProfileFooter";
+import Header from "../../components/Header/Header";
+import Footer from "../../components/Footer/Footer";
 import {
     ProfileHelmet,
     QuickStatsProfile,
@@ -89,7 +91,6 @@ const PublicProfile = () => {
     useEffect(() => {
         async function fetchCurrentProfile(username) {
             if (!username) {
-                navigate("/404");
                 return;
             }
             username = username.trim();
@@ -104,7 +105,6 @@ const PublicProfile = () => {
                 const res = await fetch(apiUrl);
 
                 if (!res.ok) {
-                    navigate("/404");
                     return;
                 }
 
@@ -167,9 +167,13 @@ const PublicProfile = () => {
     // navigating, but still,
     if (!currentProfile)
         return (
-            <div className="flex justify-center items-center h-screen">
-                Profile Not found...
-            </div>
+            <>
+                <Header />
+                <div className="flex justify-center items-center h-screen">
+                    Profile Not found...
+                </div>
+                <Footer />
+            </>
         );
 
     return (

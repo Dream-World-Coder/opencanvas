@@ -613,6 +613,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                     <h1
                                         id={
                                             children
+                                                .toString()
                                                 .toLowerCase()
                                                 .replace(/[^a-z0-9\s-]/g, "") // remove special chars except space and hyphen
                                                 .replace(/\s+/g, "-") // replace spaces/tabs with hyphens
@@ -631,6 +632,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                 h2: ({ children }) => (
                                     <h2
                                         id={children
+                                            .toString()
                                             .toLowerCase()
                                             .replace(/[^a-z0-9\s-]/g, "")
                                             .replace(/\s+/g, "-")
@@ -648,6 +650,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                 h3: ({ children }) => (
                                     <h3
                                         id={children
+                                            .toString()
                                             .toLowerCase()
                                             .replace(/[^a-z0-9\s-]/g, "")
                                             .replace(/\s+/g, "-")
