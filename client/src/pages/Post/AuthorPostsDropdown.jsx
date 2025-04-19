@@ -13,6 +13,7 @@ export const AuthorPostsDropdown = ({
     setAuthorPosts,
     isOpen,
     setIsOpen,
+    darkTheme,
 }) => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
@@ -70,36 +71,46 @@ export const AuthorPostsDropdown = ({
     };
 
     return (
-        <div className="mb-12">
+        <div className={`mb-12`}>
             <div
-                className="flex items-center justify-between cursor-pointer mb-2 bg-gray-50 dark:bg-[#21252b] p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-[#2c313a] transition-colors"
+                className={`flex items-center justify-between cursor-pointer mb-2 bg-gray-50 ${darkTheme.colors.headerBg} p-4 rounded-lg hover:bg-gray-100 ${darkTheme.colors.hoverBg} transition-colors`}
                 onClick={toggleDropdown}
             >
-                <h3 className="text-xl font-bold">
+                <h3 className={`text-xl font-bold`}>
                     More from {author?.fullName}
                 </h3>
                 {isOpen ? (
-                    <ChevronUp className="h-5 w-5 text-gray-500 dark:text-[#abb2bf]" />
+                    <ChevronUp
+                        className={`h-5 w-5 text-gray-500 ${darkTheme.colors.primaryText}`}
+                    />
                 ) : (
-                    <ChevronDown className="h-5 w-5 text-gray-500 dark:text-[#abb2bf]" />
+                    <ChevronDown
+                        className={`h-5 w-5 text-gray-500 ${darkTheme.colors.primaryText}`}
+                    />
                 )}
             </div>
 
             {isOpen && (
-                <div className="space-y-6 transition-all duration-300">
+                <div className={`space-y-6 transition-all duration-300`}>
                     {loading
                         ? Array(3)
                               .fill()
                               .map((_, index) => (
                                   <div
                                       key={`skeleton-${index}`}
-                                      className="flex space-x-4"
+                                      className={`flex space-x-4`}
                                   >
-                                      <Skeleton className="h-16 w-16 rounded-sm flex-shrink-0" />
-                                      <div className="flex-1">
-                                          <Skeleton className="h-4 w-3/4 mb-2" />
-                                          <Skeleton className="h-3 w-1/2 mb-2" />
-                                          <Skeleton className="h-3 w-1/4" />
+                                      <Skeleton
+                                          className={`h-16 w-16 rounded-sm flex-shrink-0`}
+                                      />
+                                      <div className={`flex-1`}>
+                                          <Skeleton
+                                              className={`h-4 w-3/4 mb-2`}
+                                          />
+                                          <Skeleton
+                                              className={`h-3 w-1/2 mb-2`}
+                                          />
+                                          <Skeleton className={`h-3 w-1/4`} />
                                       </div>
                                   </div>
                               ))
@@ -111,26 +122,34 @@ export const AuthorPostsDropdown = ({
                                           state: { post },
                                       });
                                   }}
-                                  className="flex flex-col border dark:border-[#3e4451] hover:bg-gray-50 dark:hover:bg-[#2c313a] p-3 rounded-xl transition-all duration-200 cursor-pointer"
+                                  className={`flex flex-col border ${darkTheme.colors.border} hover:bg-gray-50 ${darkTheme.colors.hoverBg} p-3 rounded-xl transition-all duration-200 cursor-pointer`}
                               >
-                                  <div className="flex space-x-4">
+                                  <div className={`flex space-x-4`}>
                                       {post.thumbnailUrl && (
-                                          <div className="flex-shrink-0 w-20 h-20 overflow-hidden rounded-sm">
+                                          <div
+                                              className={`flex-shrink-0 w-20 h-20 overflow-hidden rounded-sm`}
+                                          >
                                               <img
                                                   src={post.thumbnailUrl}
                                                   alt={post.title}
-                                                  className="object-cover w-full h-full"
-                                                  loading="lazy"
+                                                  className={`object-cover w-full h-full`}
+                                                  loading={`lazy`}
                                               />
                                           </div>
                                       )}
 
-                                      <div className="flex-1">
-                                          <h3 className="font-medium text-lg text-gray-900 dark:text-[#abb2bf] line-clamp-2 capitalize">
+                                      <div className={`flex-1`}>
+                                          <h3
+                                              className={`font-medium text-lg text-gray-900 ${darkTheme.colors.primaryText} line-clamp-2 capitalize`}
+                                          >
                                               {post.title}
                                           </h3>
-                                          <div className="flex items-center mt-2 text-sm text-gray-700 dark:text-[#9da5b4] space-x-3">
-                                              <div className="flex items-center">
+                                          <div
+                                              className={`flex items-center mt-2 text-sm text-gray-700 ${darkTheme.colors.secondaryText} space-x-3`}
+                                          >
+                                              <div
+                                                  className={`flex items-center`}
+                                              >
                                                   <b>
                                                       {post.totalViews || 0}
                                                       &nbsp;
@@ -138,7 +157,9 @@ export const AuthorPostsDropdown = ({
                                                   <span>Views</span>
                                               </div>
                                               <div>·</div>
-                                              <div className="flex items-center">
+                                              <div
+                                                  className={`flex items-center`}
+                                              >
                                                   <b>
                                                       {post.totalLikes || 0}{" "}
                                                       &nbsp;
@@ -156,7 +177,9 @@ export const AuthorPostsDropdown = ({
                               </div>
                           ))}
                     {publicPosts.length === 0 && !loading && (
-                        <div className="text-center py-8 text-gray-500 dark:text-[#9da5b4] italic text-sm">
+                        <div
+                            className={`text-center py-8 text-gray-500 ${darkTheme.colors.secondaryText} italic text-sm`}
+                        >
                             No stories published yet.
                         </div>
                     )}
@@ -168,6 +191,7 @@ export const AuthorPostsDropdown = ({
 
 AuthorPostsDropdown.propTypes = {
     author: PropTypes.object,
+    darkTheme: PropTypes.object,
     currentPostId: PropTypes.string,
     authorPosts: PropTypes.array,
     setAuthorPosts: PropTypes.func,

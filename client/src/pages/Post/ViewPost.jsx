@@ -6,13 +6,14 @@ import { toast } from "sonner";
 
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
-import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
+// import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
 import { AuthorPostsDropdown } from "./AuthorPostsDropdown";
 import { RelatedPostsDropdown } from "./RelatedPostsDropdown";
 import { useAuth } from "../../contexts/AuthContext";
 import { useDataService } from "../../services/dataService";
 import { useDarkMode } from "../../components/Hooks/darkMode";
 import { useViewTracker } from "../../components/Hooks/viewCount";
+import { postDarkThemes } from "../../services/themes";
 import {
     PostHelmet,
     LoadingPost,
@@ -22,6 +23,7 @@ import {
     RightSidebar,
     EngagementSection,
     ArticleHeader,
+    ThemedMarkdownPreview,
 } from "./components";
 
 const ViewPost = ({ isArticle = true }) => {
@@ -52,6 +54,9 @@ const ViewPost = ({ isArticle = true }) => {
     // needed here to fetch freshly instead prefetched
     const [authorPosts, setAuthorPosts] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
+    const [darkTheme, setDarkTheme] = useState(
+        isDark ? postDarkThemes.monokai : postDarkThemes.light,
+    );
 
     const viewCounted = useViewTracker(postId);
     useEffect(() => {
@@ -276,21 +281,25 @@ const ViewPost = ({ isArticle = true }) => {
         <>
             <PostHelmet post={post} />
 
-            <div className="w-full h-full grid place-items-center bg-white dark:bg-[#282c34] overflow-x-hidden pt-16">
+            <div
+                className={`w-full h-full grid place-items-center bg-white ${darkTheme.colors.bg} overflow-x-hidden pt-16`}
+            >
                 <Header
                     noBlur={true}
                     ballClr={"text-gray-300"}
                     exclude={["/about", "/contact", "/photo-gallery"]}
                     abs={true}
-                    darkBg={"dark:bg-oneDarkHeavy"}
+                    darkBg={`${darkTheme.colors.headerBg}`}
                 />
-                <div className="flex flex-col md:flex-row min-h-screen max-w-screen-xl mx-auto bg-white dark:bg-[#282c34] text-gray-900 dark:text-[#abb2bf]">
+                <div
+                    className={`flex flex-col md:flex-row min-h-screen max-w-screen-xl mx-auto bg-white ${darkTheme.colors.bg} text-gray-900 ${darkTheme.colors.primaryText}`}
+                >
                     {/* Left sidebar - Read Options or folder structure in case of collection */}
                     <LeftSidebar focusMode={focusMode} isArticle={isArticle} />
 
                     {/* Main content */}
                     <main
-                        className={`flex-1 p-4 md:p-6 lg:p-8 min-h-screen max-w-3xl ${!focusMode ? "border-r border-gray-200 dark:border-[#3e4451]" : ""}`}
+                        className={`flex-1 p-4 md:p-6 lg:p-8 min-h-screen max-w-3xl ${!focusMode ? `border-r border-gray-200 ${darkTheme.colors.border}` : ""}`}
                     >
                         {/* Article header */}
                         <ArticleHeader
@@ -301,16 +310,19 @@ const ViewPost = ({ isArticle = true }) => {
                             handleFollow={handleFollow}
                             following={following}
                             isSaved={isSaved}
+                            darkTheme={darkTheme}
+                            setDarkTheme={setDarkTheme}
                         />
 
                         {/* Article content */}
                         <div className="prose dark:prose-invert max-w-none pt-4 mb-16">
-                            <MarkdownPreview
+                            <ThemedMarkdownPreview
                                 title={post.title}
                                 content={post.content}
                                 thumbnailUrl={post.thumbnailUrl}
                                 isDark={isDark}
-                                darkBg="bg-[#282c34]"
+                                darkBg={darkTheme.colors.bg}
+                                darkTheme={darkTheme.colors}
                                 textAlignment={
                                     post.type !== "poem" ? "left" : "center"
                                 }
@@ -321,7 +333,7 @@ const ViewPost = ({ isArticle = true }) => {
                                 {post.tags.map((tag, index) => (
                                     <span
                                         key={index}
-                                        className="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-[#3e4451] text-gray-700 dark:text-[#d3d7de]"
+                                        className={`text-xs px-2 py-1 rounded-full bg-gray-100 ${darkTheme.colors.tagBg} text-gray-700 ${darkTheme.colors.tagText}`}
                                     >
                                         {tag}
                                     </span>
@@ -350,10 +362,11 @@ const ViewPost = ({ isArticle = true }) => {
                             setAuthorPosts={setAuthorPosts}
                             isOpen={isOpen}
                             setIsOpen={setIsOpen}
+                            darkTheme={darkTheme}
                         />
 
                         {/* Related posts section */}
-                        <RelatedPostsDropdown />
+                        <RelatedPostsDropdown darkTheme={darkTheme} />
                     </main>
 
                     {/* Right sidebar - empty */}

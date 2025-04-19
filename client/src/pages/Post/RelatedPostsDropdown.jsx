@@ -1,8 +1,9 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
-export const RelatedPostsDropdown = () => {
+export const RelatedPostsDropdown = ({ darkTheme }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const relatedPosts = [
@@ -31,32 +32,38 @@ export const RelatedPostsDropdown = () => {
     };
 
     return (
-        <div className="mb-8">
+        <div className={`mb-8`}>
             <div
-                className="flex items-center justify-between cursor-pointer mb-2 bg-gray-50 dark:bg-[#21252b] p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-[#2c313a] transition-colors"
+                className={`flex items-center justify-between cursor-pointer mb-2 bg-gray-50 ${darkTheme.colors.headerBg} p-4 rounded-lg hover:bg-gray-100 ${darkTheme.colors.hoverBg} transition-colors`}
                 onClick={toggleDropdown}
             >
-                <h3 className="text-xl font-bold">Related Posts</h3>
+                <h3 className={`text-xl font-bold`}>Related Posts</h3>
                 {isOpen ? (
-                    <ChevronUp className="h-5 w-5 text-gray-500 dark:text-[#abb2bf]" />
+                    <ChevronUp
+                        className={`h-5 w-5 text-gray-500 ${darkTheme.colors.primaryText}`}
+                    />
                 ) : (
-                    <ChevronDown className="h-5 w-5 text-gray-500 dark:text-[#abb2bf]" />
+                    <ChevronDown
+                        className={`h-5 w-5 text-gray-500 ${darkTheme.colors.primaryText}`}
+                    />
                 )}
             </div>
             {isOpen && (
-                <div className="grid gap-4 mt-4 transition-all duration-300">
+                <div className={`grid gap-4 mt-4 transition-all duration-300`}>
                     {relatedPosts.map((item) => (
                         <Card
                             key={item.id}
-                            className="hover:shadow-md transition duration-200 shadow-none dark:bg-[#2c313a] dark:text-[#abb2bf] dark:border-[#3e4451]"
+                            className={`hover:shadow-md transition duration-200 shadow-none ${darkTheme.colors.cardBg} ${darkTheme.colors.primaryText} ${darkTheme.colors.border}`}
                         >
-                            <CardContent className="p-4">
-                                <h4 className="font-medium text-lg mb-2">
+                            <CardContent className={`p-4`}>
+                                <h4 className={`font-medium text-lg mb-2`}>
                                     {item.title}
                                 </h4>
-                                <div className="flex justify-between text-sm">
+                                <div className={`flex justify-between text-sm`}>
                                     <span>{item.author}</span>
-                                    <span className="text-gray-500 dark:text-[#9da5b4]">
+                                    <span
+                                        className={`text-gray-500 ${darkTheme.colors.secondaryText}`}
+                                    >
                                         {item.readTime}
                                     </span>
                                 </div>
@@ -68,3 +75,4 @@ export const RelatedPostsDropdown = () => {
         </div>
     );
 };
+RelatedPostsDropdown.propTypes = { darkTheme: PropTypes.object };
