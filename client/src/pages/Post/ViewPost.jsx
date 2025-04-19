@@ -276,20 +276,21 @@ const ViewPost = ({ isArticle = true }) => {
         <>
             <PostHelmet post={post} />
 
-            <div className="w-full h-full grid place-items-center bg-white dark:bg-[#111] overflow-x-hidden pt-16">
+            <div className="w-full h-full grid place-items-center bg-white dark:bg-[#282c34] overflow-x-hidden pt-16">
                 <Header
                     noBlur={true}
                     ballClr={"text-gray-300"}
                     exclude={["/about", "/contact", "/photo-gallery"]}
                     abs={true}
+                    darkBg={"dark:bg-oneDarkHeavy"}
                 />
-                <div className="flex flex-col md:flex-row min-h-screen max-w-screen-xl mx-auto bg-white dark:bg-[#111] text-gray-900 dark:text-gray-100">
+                <div className="flex flex-col md:flex-row min-h-screen max-w-screen-xl mx-auto bg-white dark:bg-[#282c34] text-gray-900 dark:text-[#abb2bf]">
                     {/* Left sidebar - Read Options or folder structure in case of collection */}
                     <LeftSidebar focusMode={focusMode} isArticle={isArticle} />
 
                     {/* Main content */}
                     <main
-                        className={`flex-1 p-4 md:p-6 lg:p-8 min-h-screen max-w-3xl ${!focusMode ? "border-r border-gray-200 dark:border-[#333]" : ""}`}
+                        className={`flex-1 p-4 md:p-6 lg:p-8 min-h-screen max-w-3xl ${!focusMode ? "border-r border-gray-200 dark:border-[#3e4451]" : ""}`}
                     >
                         {/* Article header */}
                         <ArticleHeader
@@ -309,7 +310,7 @@ const ViewPost = ({ isArticle = true }) => {
                                 content={post.content}
                                 thumbnailUrl={post.thumbnailUrl}
                                 isDark={isDark}
-                                darkBg="bg-[#111]"
+                                darkBg="bg-[#282c34]"
                                 textAlignment={
                                     post.type !== "poem" ? "left" : "center"
                                 }
@@ -320,7 +321,7 @@ const ViewPost = ({ isArticle = true }) => {
                                 {post.tags.map((tag, index) => (
                                     <span
                                         key={index}
-                                        className="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-[#222] text-gray-700 dark:text-gray-300"
+                                        className="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-[#3e4451] text-gray-700 dark:text-[#d3d7de]"
                                     >
                                         {tag}
                                     </span>

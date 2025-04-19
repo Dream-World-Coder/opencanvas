@@ -33,23 +33,22 @@ export const RelatedPostsDropdown = () => {
     return (
         <div className="mb-8">
             <div
-                className="flex items-center justify-between cursor-pointer mb-2 bg-gray-50 dark:bg-[#222] p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-[#333] transition-colors"
+                className="flex items-center justify-between cursor-pointer mb-2 bg-gray-50 dark:bg-[#21252b] p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-[#2c313a] transition-colors"
                 onClick={toggleDropdown}
             >
                 <h3 className="text-xl font-bold">Related Posts</h3>
                 {isOpen ? (
-                    <ChevronUp className="h-5 w-5 text-gray-500" />
+                    <ChevronUp className="h-5 w-5 text-gray-500 dark:text-[#abb2bf]" />
                 ) : (
-                    <ChevronDown className="h-5 w-5 text-gray-500" />
+                    <ChevronDown className="h-5 w-5 text-gray-500 dark:text-[#abb2bf]" />
                 )}
             </div>
-
             {isOpen && (
                 <div className="grid gap-4 mt-4 transition-all duration-300">
                     {relatedPosts.map((item) => (
                         <Card
                             key={item.id}
-                            className="hover:shadow-md transition duration-200 shadow-none dark:bg-[#222] dark:text-[#fff] dark:border-none"
+                            className="hover:shadow-md transition duration-200 shadow-none dark:bg-[#2c313a] dark:text-[#abb2bf] dark:border-[#3e4451]"
                         >
                             <CardContent className="p-4">
                                 <h4 className="font-medium text-lg mb-2">
@@ -57,7 +56,7 @@ export const RelatedPostsDropdown = () => {
                                 </h4>
                                 <div className="flex justify-between text-sm">
                                     <span>{item.author}</span>
-                                    <span className="text-gray-500 dark:text-gray-400">
+                                    <span className="text-gray-500 dark:text-[#9da5b4]">
                                         {item.readTime}
                                     </span>
                                 </div>

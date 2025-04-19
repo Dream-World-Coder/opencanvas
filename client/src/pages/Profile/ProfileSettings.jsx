@@ -212,7 +212,7 @@ const ProfileSettings = () => {
                                                 e.target.value.toLowerCase(),
                                         })
                                     }
-                                    className="dark:bg-black dark:text-white dark:border-gray-800"
+                                    className="dark:bg-[#111] dark:text-white dark:border-[#333]"
                                 />
                             </div>
 
@@ -228,7 +228,7 @@ const ProfileSettings = () => {
                                             fullName: e.target.value,
                                         })
                                     }
-                                    className="dark:bg-black dark:text-white dark:border-gray-800"
+                                    className="dark:bg-[#111] dark:text-white dark:border-[#333]"
                                 />
                             </div>
                         </div>
@@ -245,7 +245,7 @@ const ProfileSettings = () => {
                                         role: e.target.value,
                                     })
                                 }
-                                className="dark:bg-black dark:text-white dark:border-gray-800"
+                                className="dark:bg-[#111] dark:text-white dark:border-[#333]"
                             />
                         </div>
 
@@ -262,7 +262,7 @@ const ProfileSettings = () => {
                                         aboutMe: e.target.value,
                                     })
                                 }
-                                className="dark:bg-black dark:text-white dark:border-gray-800"
+                                className="dark:bg-[#111] dark:text-white dark:border-[#333]"
                             />
                         </div>
 
@@ -281,7 +281,7 @@ const ProfileSettings = () => {
                                         <Input
                                             // id={`contact-title-${index}`}
                                             placeholder="Title, eg: GitHub"
-                                            className="dark:border-gray-800"
+                                            className="dark:border-[#333]"
                                             value={contact.title}
                                             onChange={(e) =>
                                                 handleContactInfoChange(
@@ -304,7 +304,7 @@ const ProfileSettings = () => {
                                             <Input
                                                 // id={`contact-url-${index}`}
                                                 placeholder="eg: https://github.com/username"
-                                                className="dark:border-gray-800"
+                                                className="dark:border-[#333]"
                                                 value={contact.url}
                                                 onChange={(e) =>
                                                     handleContactInfoChange(
@@ -409,7 +409,7 @@ const ProfileSettings = () => {
                                 id="currentPassword"
                                 type="password"
                                 value="************"
-                                className="dark:bg-black dark:text-white dark:border-gray-800"
+                                className="dark:bg-[#111] dark:text-white dark:border-[#333]"
                             />
                         </div>
                         <div className="grid gap-4 sm:grid-cols-2">
@@ -420,7 +420,7 @@ const ProfileSettings = () => {
                                 <Input
                                     id="newPassword"
                                     type="password"
-                                    className="dark:bg-black dark:text-white dark:border-gray-800"
+                                    className="dark:bg-[#111] dark:text-white dark:border-[#333]"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -430,7 +430,7 @@ const ProfileSettings = () => {
                                 <Input
                                     id="confirmPassword"
                                     type="password"
-                                    className="dark:bg-black dark:text-white dark:border-gray-800"
+                                    className="dark:bg-[#111] dark:text-white dark:border-[#333]"
                                 />
                             </div>
                         </div>
@@ -450,7 +450,7 @@ const ProfileSettings = () => {
                     {currentUser.lastFiveLogin.map((item, index) => (
                         <div
                             key={index}
-                            className="rounded-lg border p-4 dark:border-gray-800 dark:bg-gray-900"
+                            className="rounded-lg border p-4 dark:border-[#333] dark:bg-[#000]"
                         >
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">
@@ -505,7 +505,7 @@ const ProfileSettings = () => {
                 {/* <div className="flex justify-end gap-2">
                     <Button
                         variant="outline"
-                        className="dark:bg-gray-900 dark:hover:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white"
+                        className="dark:bg-[#000] dark:hover:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white"
                     >
                         Cancel
                     </Button>
@@ -514,7 +514,7 @@ const ProfileSettings = () => {
                     </Button>
                 </div> */}
 
-                <Card className="border border-red-200 dark:border-red-900 dark:bg-black dark:text-white">
+                <Card className="border border-red-200 dark:border-red-900 dark:bg-[#111] dark:text-white">
                     <CardHeader>
                         <div className="flex items-center justify-between">
                             <div>
@@ -529,7 +529,7 @@ const ProfileSettings = () => {
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">
-                            <div className="rounded-lg border border-red-200 dark:border-red-900 p-4 dark:bg-gray-900">
+                            <div className="rounded-lg border border-red-200 dark:border-red-900 p-4 dark:bg-[#000]">
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                     <div>
                                         <h3 className="text-base font-medium dark:text-white">
@@ -550,7 +550,7 @@ const ProfileSettings = () => {
                                 </div>
                             </div>
 
-                            <div className="rounded-lg border border-red-200 dark:border-red-900 p-4 dark:bg-gray-900">
+                            <div className="rounded-lg border border-red-200 dark:border-red-900 p-4 dark:bg-[#000]">
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                     <div>
                                         <h3 className="text-base font-medium dark:text-white">
@@ -632,7 +632,7 @@ const ProfileSettings = () => {
                             return (
                                 <div
                                     key={category}
-                                    className="flex items-center justify-between rounded-lg border p-4 dark:border-gray-800 dark:bg-gray-900"
+                                    className="flex items-center justify-between rounded-lg border p-4 dark:border-[#333] dark:bg-[#000]"
                                 >
                                     <div>
                                         <h3 className="text-sm font-medium">
@@ -696,7 +696,7 @@ const ProfileSettings = () => {
         icon: <CreditCardIcon className="h-4 w-4" />,
         content: (
             <div className="space-y-6 dark:text-white">
-                <div className="rounded-lg border p-6 text-center space-y-4 dark:border-gray-800 dark:bg-gray-900">
+                <div className="rounded-lg border p-6 text-center space-y-4 dark:border-[#333] dark:bg-[#000]">
                     <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-lime-100 dark:bg-lime-900">
                         <UserPlusIcon className="h-8 w-8 text-lime-600 dark:text-lime-400" />
                     </div>
@@ -737,7 +737,7 @@ const ProfileSettings = () => {
                         ].map((item, i) => (
                             <div
                                 key={i}
-                                className="flex items-center space-x-2 rounded-lg border p-3 dark:border-gray-800 dark:bg-gray-900"
+                                className="flex items-center space-x-2 rounded-lg border p-3 dark:border-[#333] dark:bg-[#000]"
                             >
                                 <div className="text-lime-600 dark:text-lime-400">
                                     {item.icon}
@@ -761,7 +761,7 @@ const ProfileSettings = () => {
                     </div>
                 </div>
 
-                <div className="rounded-lg border p-4 dark:border-gray-800 dark:bg-gray-900">
+                <div className="rounded-lg border p-4 dark:border-[#333] dark:bg-[#000]">
                     <div className="flex items-center justify-between">
                         <div>
                             <h3 className="text-sm font-medium">
@@ -791,8 +791,8 @@ const ProfileSettings = () => {
                 noBlur={true}
                 exclude={["/about", "/contact", "/photo-gallery"]}
             />
-            <div className="w-full h-full bg-white dark:bg-black dark:text-white">
-                <div className="mx-auto max-w-4xl mt-20 p-4 dark:bg-black">
+            <div className="w-full h-full bg-white dark:bg-[#111] dark:text-white">
+                <div className="mx-auto max-w-4xl pt-24 px-4 pb-4 dark:bg-[#111">
                     <h1 className="text-3xl font-bold mb-6 dark:text-white">
                         Profile Settings
                         <div className="text-sm font-thin">
@@ -804,7 +804,7 @@ const ProfileSettings = () => {
                         <select
                             value={activeTab}
                             onChange={(e) => setActiveTab(e.target.value)}
-                            className="w-full p-2 rounded-md border border-gray-300 dark:border-gray-700 dark:bg-black dark:text-white focus:ring-lime-500 focus:border-lime-500"
+                            className="w-full p-2 rounded-md border border-gray-300 dark:border-gray-700 dark:bg-[#111] dark:text-white focus:ring-lime-500 focus:border-lime-500"
                         >
                             {settingsSections.map((section) => (
                                 <option key={section.id} value={section.id}>
@@ -819,7 +819,7 @@ const ProfileSettings = () => {
                         onValueChange={setActiveTab}
                         className="space-y-6"
                     >
-                        <Card className="dark:bg-black dark:border-gray-800">
+                        <Card className="dark:bg-[#111] dark:border-[#333]">
                             <CardHeader className="pb-2">
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                                     <div>
@@ -845,7 +845,7 @@ const ProfileSettings = () => {
                                         </CardDescription>
                                     </div>
                                     <TabsList
-                                        className={`hidden sm:grid grid-cols-${settingsSections.length} gap-1 dark:bg-gray-900`}
+                                        className={`hidden sm:grid grid-cols-${settingsSections.length} gap-1 dark:bg-[#000]`}
                                     >
                                         {settingsSections.map((section) => (
                                             <TabsTrigger

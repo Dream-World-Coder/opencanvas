@@ -6,11 +6,16 @@ export default {
         extend: {
             colors: {
                 cream: {
-                    DEFAULT: "#FFF5E9",
-                    light: "#FFFAF2",
-                    dark: "#E6D4C4",
+                    DEFAULT: "#fff5e9",
+                    light: "#fffaf2",
+                    dark: "#e6d4c4",
                 },
-                tintLime: "#DDEB9D",
+                tintLime: "#ddeb9d",
+                oneDarkHeavy: "#21252b",
+                oneDarkBg: "#282c34",
+                oneDarkText: "#abb2bf",
+                oneDarkBorder: "#3e4451",
+                oneDarkTagClr: "#d3d7de",
                 background: "hsl(var(--background))",
                 foreground: "hsl(var(--foreground))",
                 card: {

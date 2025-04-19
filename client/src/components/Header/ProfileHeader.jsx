@@ -45,7 +45,7 @@ export default function ProfileHeader() {
     }
 
     return (
-        <nav className="fixed top-0 w-full bg-white dark:bg-[#111] dark:text-white border-b border-gray-100 dark:border-[#333] shadow-sm dark:shadow-none z-50">
+        <nav className="fixed top-0 w-full bg-white dark:bg-[#222] dark:text-white border-b border-gray-100 dark:border-[#333] shadow-sm dark:shadow-none z-50">
             <div className="max-w-7xl mx-auto flex justify-between items-center px-4 sm:px-0 py-3">
                 {/* Logo */}
                 <button

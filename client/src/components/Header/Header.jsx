@@ -11,6 +11,7 @@ const Header = ({
     ballClr = "text-lime-300",
     exclude = [""],
     abs = false,
+    darkBg = "dark:bg-[#222]",
 }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [createMenuOpen, setCreateMenuOpen] = useState(false);
@@ -55,8 +56,8 @@ const Header = ({
             className={`${abs ? "absolute" : "fixed"} w-full top-0 z-50
                 ${
                     noBlur
-                        ? "bg-white dark:bg-black dark:text-white border-b border-gray-100 dark:border-[#333] shadow-sm dark:shadow-none"
-                        : "bg-white/20 dark:bg-[#222]/20 backdrop-blur-md"
+                        ? `bg-white ${darkBg} dark:text-white border-b border-gray-100 dark:border-[#333] shadow-sm dark:shadow-none`
+                        : `bg-white/20 ${darkBg}/20 backdrop-blur-md`
                 }`}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-0 py-3">

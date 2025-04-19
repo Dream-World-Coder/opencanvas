@@ -429,10 +429,10 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                 {!contentOnly && (
                                     <>
                                         <hr
-                                            className={`mt-6 mb-px border-t ${isDark ? "border-[#333]" : "border-gray-200"}`}
+                                            className={`mt-6 mb-px border-t ${isDark ? "border-oneDarkBorder" : "border-gray-200"}`}
                                         />
                                         <hr
-                                            className={`mb-6 border-t ${isDark ? "border-[#333]" : "border-gray-200"}`}
+                                            className={`mb-6 border-t ${isDark ? "border-oneDarkBorder" : "border-gray-200"}`}
                                         />
                                     </>
                                 )}
@@ -501,14 +501,16 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                         </div>
                                     );
                                 },
+
                                 hr(props) {
                                     return (
                                         <hr
-                                            className={`my-6 border-t ${isDark ? "border-[#333]" : "border-gray-200"}`}
+                                            className={`my-6 border-t ${isDark ? "border-oneDarkBorder" : "border-gray-200"}`}
                                             {...props}
                                         />
                                     );
                                 },
+
                                 code({
                                     inline,
                                     className,
@@ -529,16 +531,16 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                             className={`relative my-4 overflow-hidden rounded-sm flex flex-col
                                             ${
                                                 isDark
-                                                    ? "bg-[#222]"
-                                                    : "bg-[#e8eae6]" // #e8eae6
+                                                    ? "bg-[#171717]"
+                                                    : "bg-[#e8eae6]"
                                             }`}
                                         >
                                             {/* codeHeader */}
                                             <div
                                                 className={`flex items-center justify-between px-6 pt-2 ${
                                                     isDark
-                                                        ? "bg-[#222]"
-                                                        : "bg-[#e8eae6]" // #e8eae6
+                                                        ? "bg-[#171717]"
+                                                        : "bg-[#e8eae6]"
                                                 }`}
                                             >
                                                 {/* lagguage */}
@@ -592,12 +594,14 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                         // inline code
                                         <code
                                             className={`px-1 py-0.5 rounded text-sm font-mono
-                                            ${isDark ? "text-[#ffd085] bg-[#ffd085]/10" : "bg-gray-200"}`}
+                                            ${isDark ? "text-oneDarkTagClr bg-oneDarkTagClr/10" : "bg-gray-200"}`}
                                         >
+                                            {/* ${isDark ? "text-[#ffd085] bg-[#ffd085]/10" : "bg-gray-200"}`} */}
                                             {children}
                                         </code>
                                     );
                                 },
+
                                 blockquote({ children }) {
                                     return (
                                         <blockquote
@@ -694,6 +698,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                         {children}
                                     </h6>
                                 ),
+
                                 p: ({ children }) => (
                                     <p
                                         className={`my-8 max-w-prose
@@ -704,6 +709,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                         {children}
                                     </p>
                                 ),
+
                                 strong: ({ children }) => (
                                     <strong
                                         className={`font-semibold montserrat-bold`}
@@ -711,6 +717,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                         {children}
                                     </strong>
                                 ),
+
                                 em: ({ children }) => (
                                     <em
                                         className={`italic ${artType === "poem" ? "font-boska" : "font-boska"}`}
@@ -718,6 +725,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                         {children}
                                     </em>
                                 ),
+
                                 a: ({ href, children }) => (
                                     <a
                                         href={href}
@@ -740,6 +748,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                         {children}
                                     </a>
                                 ),
+
                                 ul: ({ children }) => (
                                     <ul className="montserrat-regular list-disc pl-6 md:pl-8 my-5 space-y-2">
                                         {children}
@@ -759,35 +768,37 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                 table: ({ children }) => (
                                     <div className="overflow-x-auto">
                                         <table
-                                            className={`border border-gray-400 bg-white w-full ${isDark ? "invert-[95%] text-black" : ""}`}
+                                            className={`border border-gray-400 dark:border-[#3e4451] bg-white dark:bg-[#282c34] w-full text-gray-900 dark:text-[#abb2bf]`}
                                         >
                                             {children}
                                         </table>
                                     </div>
                                 ),
                                 thead: ({ children }) => (
-                                    <thead className="bg-gray-200">
+                                    <thead className="bg-gray-200 dark:bg-[#21252b]">
                                         {children}
                                     </thead>
                                 ),
                                 tbody: ({ children }) => (
-                                    <tbody>{children}</tbody>
+                                    <tbody className="dark:bg-[#282c34]">
+                                        {children}
+                                    </tbody>
                                 ),
                                 tr: ({ children }) => (
-                                    <tr className="border border-gray-300">
+                                    <tr className="border border-gray-300 dark:border-[#3e4451]">
                                         {children}
                                     </tr>
                                 ),
                                 th: ({ children }) => (
                                     <th
-                                        className={`border ${contentOnly ? "text-xs" : "montserrat-bold"} ${isDark ? "border-[#ddd]" : "border-gray-300"} px-4 py-2 bg-gray-100`}
+                                        className={`border ${contentOnly ? "text-xs" : "montserrat-bold"} border-gray-300 dark:border-[#3e4451] px-4 py-2 bg-gray-100 dark:bg-[#21252b]`}
                                     >
                                         {children}
                                     </th>
                                 ),
                                 td: ({ children }) => (
                                     <td
-                                        className={`border border-gray-300 px-4 py-2 ${contentOnly ? "text-xs" : "montserrat-regular"}`}
+                                        className={`border border-gray-300 dark:border-[#3e4451] px-4 py-2 dark:bg-[#282c34] ${contentOnly ? "text-xs" : "montserrat-regular"}`}
                                     >
                                         {children}
                                     </td>

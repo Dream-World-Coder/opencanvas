@@ -72,16 +72,16 @@ export const AuthorPostsDropdown = ({
     return (
         <div className="mb-12">
             <div
-                className="flex items-center justify-between cursor-pointer mb-2 bg-gray-50 dark:bg-[#222] p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-[#333] transition-colors"
+                className="flex items-center justify-between cursor-pointer mb-2 bg-gray-50 dark:bg-[#21252b] p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-[#2c313a] transition-colors"
                 onClick={toggleDropdown}
             >
                 <h3 className="text-xl font-bold">
                     More from {author?.fullName}
                 </h3>
                 {isOpen ? (
-                    <ChevronUp className="h-5 w-5 text-gray-500" />
+                    <ChevronUp className="h-5 w-5 text-gray-500 dark:text-[#abb2bf]" />
                 ) : (
-                    <ChevronDown className="h-5 w-5 text-gray-500" />
+                    <ChevronDown className="h-5 w-5 text-gray-500 dark:text-[#abb2bf]" />
                 )}
             </div>
 
@@ -111,7 +111,7 @@ export const AuthorPostsDropdown = ({
                                           state: { post },
                                       });
                                   }}
-                                  className="flex flex-col border dark:border-[#333] hover:bg-gray-50 dark:hover:bg-[#222] p-3 rounded-xl transition-all duration-200 cursor-pointer"
+                                  className="flex flex-col border dark:border-[#3e4451] hover:bg-gray-50 dark:hover:bg-[#2c313a] p-3 rounded-xl transition-all duration-200 cursor-pointer"
                               >
                                   <div className="flex space-x-4">
                                       {post.thumbnailUrl && (
@@ -126,10 +126,10 @@ export const AuthorPostsDropdown = ({
                                       )}
 
                                       <div className="flex-1">
-                                          <h3 className="font-medium text-lg text-gray-900 dark:text-gray-100 line-clamp-2 capitalize">
+                                          <h3 className="font-medium text-lg text-gray-900 dark:text-[#abb2bf] line-clamp-2 capitalize">
                                               {post.title}
                                           </h3>
-                                          <div className="flex items-center mt-2 text-sm text-gray-700 dark:text-gray-200 space-x-3">
+                                          <div className="flex items-center mt-2 text-sm text-gray-700 dark:text-[#9da5b4] space-x-3">
                                               <div className="flex items-center">
                                                   <b>
                                                       {post.totalViews || 0}
@@ -156,7 +156,7 @@ export const AuthorPostsDropdown = ({
                               </div>
                           ))}
                     {publicPosts.length === 0 && !loading && (
-                        <div className="text-center py-8 text-gray-500 dark:text-gray-400 italic text-sm">
+                        <div className="text-center py-8 text-gray-500 dark:text-[#9da5b4] italic text-sm">
                             No stories published yet.
                         </div>
                     )}
