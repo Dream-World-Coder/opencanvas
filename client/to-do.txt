@@ -5,7 +5,7 @@
 -- [] saved page ->> liked & other collections
 -- [] make dynamic sitemap
 
- --- 16/9
+--- [] study concept of react query and remake the whole
 
 -- [] post view page for private posts
 -- [] in profile footer add `opencanvas`

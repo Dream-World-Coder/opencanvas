@@ -13,7 +13,7 @@ import {
     ChevronLeft,
     MoreHorizontal,
     Check,
-    Palette,
+    // Palette,
 } from "lucide-react";
 import { toast } from "sonner";
 
