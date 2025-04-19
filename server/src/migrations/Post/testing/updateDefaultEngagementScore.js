@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Post = require("../../models/Post");
+const Post = require("../../../models/Post");
 
 const WEIGHTS = {
     shares: 4,
@@ -39,7 +39,8 @@ async function updateDefaultEngagementScore() {
             const T = getT(post.createdAt, post.modifiedAt);
             const calculatedEngagementScore =
                 ((post.totalViews || 0) * WEIGHTS["views"] +
-                    (post.totalCompleteReads || 0) * WEIGHTS["readCompletion"] +
+                    // (post.totalCompleteReads || 0) * WEIGHTS["readCompletion"] +
+                    (post.totalViews || 0) * WEIGHTS["readCompletion"] + // for now assume totalViews = totalReadcomplete
                     (post.totalShares || 0) * WEIGHTS["shares"] +
                     (post.totalLikes || 0) * WEIGHTS["likes"] +
                     WEIGHTS["randomBoost"] -

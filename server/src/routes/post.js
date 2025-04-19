@@ -298,7 +298,7 @@ router.put(
     fingerprintMiddleware,
     async (req, res) => {
         const MAX_VIEWS = 16;
-        const RELAXATION_PERIOD = 35; //minutes
+        const RELAXATION_PERIOD = 150; //minutes
         try {
             const { postId } = req.params;
 
