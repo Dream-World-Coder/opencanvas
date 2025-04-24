@@ -23,6 +23,7 @@
 -- [] Image viewer -> chobi boro kore dekhar moto jinis, like in gfg, click korle dekha jabe,
 ** maybe protita image inside article ke ekta onClick dite hobe just and Toaster er moto ekta viewer component niche laagiye debo, and then see enlarged image on click
 
+-- remove post.author things as much as  possible, fetch author, else have to update them
 * less imp
     html in export formats
     mermaid support

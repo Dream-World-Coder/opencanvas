@@ -33,6 +33,9 @@ const PrivatePostView = lazy(() => import("./pages/Post/PrivatePostView"));
 
 const AboutPage = lazy(() => import("./pages/About/About"));
 const ContactPage = lazy(() => import("./pages/Contact/Contact"));
+// ----
+const LumiFeed = lazy(() => import("./pages/lumifeed/HomePage"));
+const TuringMachineVisualizer = lazy(() => import("./pages/turing/Index"));
 
 const WritingPad = lazy(() => import("./pages/CreatePosts/Writing/WritingPad"));
 const Md2Pdf = lazy(() => import("./pages/CreatePosts/Writing/Md2pdf"));
@@ -74,6 +77,14 @@ export default function App() {
                                 fallback={<LoadingPage bgClr="bg-white" />}
                             >
                                 <Routes>
+                                    <Route
+                                        path="/lumi"
+                                        element={<LumiFeed />}
+                                    />
+                                    <Route
+                                        path="/turing"
+                                        element={<TuringMachineVisualizer />}
+                                    />
                                     {/* public */}
                                     {/* *************** */}
                                     <Route path="/" element={<LandingPage />} />

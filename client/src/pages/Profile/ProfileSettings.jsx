@@ -51,7 +51,7 @@ import { useDataService } from "../../services/dataService";
 const ProfileSettings = () => {
     const baseUrl = window.location.origin;
     const navigate = useNavigate();
-    const { currentUser, logout } = useAuth();
+    const { currentUser, setCurrentUser, logout } = useAuth();
     const [darkMode, setDarkMode] = useState(false);
     const [activeTab, setActiveTab] = useState("general");
     const [formValues, setFormValues] = useState({
@@ -91,6 +91,26 @@ const ProfileSettings = () => {
             toast.success(
                 "Your profile information has been updated successfully.",
             );
+            setFormValues((prevValues) => ({
+                ...prevValues,
+                contactInformation: [
+                    ...formValues.contactInformation.map((item) =>
+                        item.title.toLowerCase() === "opencanvas"
+                            ? {
+                                  ...item,
+                                  url: `${baseUrl}/u/${formValues.username.trim().toLowerCase()}`,
+                              }
+                            : item,
+                    ),
+                ],
+            }));
+            setCurrentUser((oldCurrentUser) => ({
+                ...oldCurrentUser,
+                username: formValues.username.trim().toLowerCase(),
+                fullName: formValues.fullName.trim().toLowerCase(),
+                role: formValues.role.trim().toLowerCase(),
+                aboutMe: formValues.aboutMe.trim().toLowerCase(),
+            }));
         } catch (error) {
             toast.error(
                 error.response?.data?.message ||

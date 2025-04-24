@@ -646,6 +646,8 @@ export const FeaturedWorks = ({ currentUser }) => {
         return () => window.removeEventListener("resize", checkScroll);
     }, []);
 
+    const featuredItems = currentUser.featuredItems.reverse();
+
     return (
         <>
             {currentUser.featuredItems.length > 0 && (
@@ -681,7 +683,7 @@ export const FeaturedWorks = ({ currentUser }) => {
                         className="flex gap-6 overflow-x-auto scrollbar-hide flex-nowrap pb-4"
                         onScroll={checkScroll}
                     >
-                        {currentUser.featuredItems.map((item) => (
+                        {featuredItems.map((item) => (
                             <div
                                 key={item.itemId}
                                 className="group cursor-pointer min-w-[200px] md:min-w-[300px] max-w-[200px] md:max-w-[300px]"
@@ -703,7 +705,7 @@ export const FeaturedWorks = ({ currentUser }) => {
                                 <h3 className="text-lg font-medium mb-1 flex justify-between dark:text-[#e8e8e8]">
                                     {item.itemTitle}
                                     <Share2
-                                        className="w-6 h-6 text-black dark:text-white rounded-lg p-1 hover:bg-yellow-200 dark:hover:bg-[#2c2c2c]"
+                                        className="w-6 h-6 min-h-[24px] min-w-[24px] text-black dark:text-white rounded-lg p-1 hover:bg-yellow-200 dark:hover:bg-[#2c2c2c]"
                                         onClick={async (e) => {
                                             e.stopPropagation();
                                             let baseUrl =

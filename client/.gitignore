@@ -31,3 +31,7 @@ src/assets/icons/O*.svg
 _api_v1/
 .env
 *.un~
+
+
+lumifeed
+turing
