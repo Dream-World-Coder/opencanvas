@@ -39,7 +39,7 @@ const ViewPost = ({ isArticle = true }) => {
         followUser,
     } = useDataService();
     const isDark = useDarkMode();
-    const [focusMode] = useState(true);
+    const [focusMode] = useState(!!true);
 
     const [post, setPost] = useState(null);
     const [likes, setLikes] = useState(0);

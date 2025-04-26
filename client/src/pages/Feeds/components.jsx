@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { useAuth } from "../../contexts/AuthContext";
+import { timeAgo } from "../../services/formatDate";
 
 export const LeftSideBar = ({ selectedTopics, setSelectedTopics }) => {
     const feedOptions = [
@@ -245,15 +246,6 @@ PostTags.propTypes = {
 };
 
 export const PostAuthorInfo = ({ post }) => {
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-        });
-    };
-
     return (
         <div className="flex items-center mb-4">
             <Avatar className="h-10 w-10 ring-2 ring-white dark:ring-[#333] mr-3">
@@ -268,7 +260,7 @@ export const PostAuthorInfo = ({ post }) => {
                 </span>
                 <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
                     <Clock className="h-3 w-3 mr-1" />
-                    {formatDate(post.createdAt)}
+                    {timeAgo(post.createdAt)}
                 </div>
             </div>
         </div>
