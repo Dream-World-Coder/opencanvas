@@ -671,6 +671,13 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                 ),
                                 h4: ({ children }) => (
                                     <h4
+                                        id={children
+                                            .toString()
+                                            .toLowerCase()
+                                            .replace(/[^a-z0-9\s-]/g, "")
+                                            .replace(/\s+/g, "-")
+                                            .replace(/-+/g, "-")
+                                            .replace(/^-|-$/g, "")}
                                         className={`montserrat-regular font-semibold mt-6 mb-3 leading-snug ${
                                             contentOnly ? "text-sm" : "text-xl"
                                         }`}

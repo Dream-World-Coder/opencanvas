@@ -30,7 +30,7 @@ const ArticleFeed = () => {
 
     // Function to handle post click navigation
     const handlePostClick = (post) => {
-        navigate(`/p/${post._id}`);
+        navigate(`/p/${post._id}`, { state: { post } });
     };
 
     // Function to fetch posts - will be called by React Query

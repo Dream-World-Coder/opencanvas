@@ -13,6 +13,8 @@ import {
     ChevronLeft,
     MoreHorizontal,
     Check,
+    ChevronDown,
+    ChevronUp,
     // Palette,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -200,65 +202,310 @@ But with loading on, the return statement is only a simple html, so it works
  * @param {*} param0
  * @returns
  */
-export const LeftSidebar = ({ focusMode, isArticle }) => {
-    const readOptions = [
-        { name: "Home" },
-        { name: "Discover" },
-        { name: "Bookmarks" },
-        { name: "Profile" },
-        { name: "My Feed" },
-    ];
-    const navigate = useNavigate();
+export const LeftSidebar = () => {
+    // const readOptions = [
+    //     { name: "Home" },
+    //     { name: "Discover" },
+    //     { name: "Bookmarks" },
+    //     { name: "Profile" },
+    //     { name: "My Feed" },
+    // ];
 
     return (
-        <aside
-            className={`relative w-full md:w-64 p-4 ${!focusMode ? "border-r border-gray-200 dark:border-[#333]" : ""} hidden md:block`}
-        >
-            {/* back button */}
-            {isArticle && (
-                <button
-                    className="absolute top-[37px] right-0 rounded-full text-sm bg-gray-100 hover:bg-gray-200 dark:bg-[#111] border box-content p-1 text-stone-600/80 dark:border-[#333]"
-                    onClick={() => {
-                        navigate(-1);
-                    }}
-                >
-                    <ChevronLeft className="size-6" />
-                </button>
-            )}
-            {!focusMode && (
-                <div className="sticky top-4">
-                    <div className="font-bold mb-4">Read Options</div>
-                    {/* big-small font, yellow color bg, serif, modern -- tooltip like */}
-                    <nav className="space-y-2">
-                        {readOptions.map((link, index) => (
-                            <div
-                                key={index}
-                                className="block p-2 rounded hover:bg-gray-100 dark:hover:bg-[#222] transition duration-0"
-                            >
-                                {link.name}
-                            </div>
-                        ))}
-                    </nav>
-                </div>
-            )}
+        <aside className={`relative w-full md:w-64 p-4 hidden md:block`}>
+            {/* <div className="sticky top-4">
+                <div className="font-bold mb-4">Read Options</div>
+                <nav className="space-y-2">
+                    {readOptions.map((link, index) => (
+                        <div
+                            key={index}
+                            className="block p-2 rounded hover:bg-gray-100 dark:hover:bg-[#222] transition duration-0"
+                        >
+                            {link.name}
+                        </div>
+                    ))}
+                </nav>
+            </div> */}
         </aside>
     );
-};
-LeftSidebar.propTypes = {
-    focusMode: PropTypes.bool,
-    isArticle: PropTypes.bool,
 };
 
 /**
  *
  * @returns
  */
-export const RightSidebar = () => {
+export const TableOfContents = ({ tableOfContents, isArticle }) => {
+    const [isOpen, setIsOpen] = useState(true);
+
     return (
-        <aside className="w-full md:w-64 p-4 hidden lg:block">
-            <div className="sticky top-4"></div>
+        <aside className="w-full md:w-72 p-4 hidden lg:block relative">
+            {isArticle && (
+                <div className="fixed top-24 right-0 w-72 px-0">
+                    <summary
+                        className="flex items-center justify-start gap-1 py-2 cursor-pointer list-none"
+                        onClick={() => setIsOpen(!isOpen)}
+                    >
+                        <div className="font-serif text-xl px-2 bg-[#F0F1C5] rounded">
+                            Table of Contents
+                        </div>
+                        <div className="opencloseindicatorIcon">
+                            {isOpen ? (
+                                <ChevronUp size={16} />
+                            ) : (
+                                <ChevronDown size={16} />
+                            )}
+                        </div>
+                    </summary>
+
+                    {isOpen && (
+                        <div
+                            data-lenis-prevent
+                            className="dropdown max-h-[600px] overflow-y-auto pb-4"
+                        >
+                            <ul className="pl-1 pt-2">
+                                {tableOfContents.map((title, titleIndex) => (
+                                    <li
+                                        key={`title-${titleIndex}`}
+                                        className="mb-2"
+                                    >
+                                        {title.text && (
+                                            <a
+                                                href={`#${title.id}`}
+                                                className="font-bold text-neutral-800 hover:text-neutral-600"
+                                            >
+                                                {title.text}
+                                            </a>
+                                        )}
+
+                                        {title.headings.length > 0 && (
+                                            <details open className="pl-0 mt-1">
+                                                <summary className="list-none text-sm text-neutral-500 cursor-pointer">
+                                                    Expand sections
+                                                </summary>
+                                                <ul className="pl-4 mt-1">
+                                                    {title.headings.map(
+                                                        (
+                                                            heading,
+                                                            headingIndex,
+                                                        ) => (
+                                                            <li
+                                                                key={`heading-${titleIndex}-${headingIndex}`}
+                                                                className="mb-1"
+                                                            >
+                                                                {heading.text && (
+                                                                    <a
+                                                                        href={`#${heading.id}`}
+                                                                        className="font-medium text-neutral-700 hover:text-neutral-500"
+                                                                    >
+                                                                        {
+                                                                            heading.text
+                                                                        }
+                                                                    </a>
+                                                                )}
+
+                                                                {heading
+                                                                    .subheadings
+                                                                    .length >
+                                                                    0 && (
+                                                                    <details className="mt-1">
+                                                                        <summary className="list-none text-xs text-neutral-500 cursor-pointer ml-2">
+                                                                            Subsections
+                                                                        </summary>
+                                                                        <ul className="pl-4 mt-1">
+                                                                            {heading.subheadings.map(
+                                                                                (
+                                                                                    subheading,
+                                                                                    subheadingIndex,
+                                                                                ) => (
+                                                                                    <li
+                                                                                        key={`subheading-${titleIndex}-${headingIndex}-${subheadingIndex}`}
+                                                                                        className="mb-1"
+                                                                                    >
+                                                                                        {subheading.text && (
+                                                                                            <a
+                                                                                                href={`#${subheading.id}`}
+                                                                                                className="text-neutral-600 hover:text-neutral-400"
+                                                                                            >
+                                                                                                {
+                                                                                                    subheading.text
+                                                                                                }
+                                                                                            </a>
+                                                                                        )}
+
+                                                                                        {subheading
+                                                                                            .h4s
+                                                                                            .length >
+                                                                                            0 && (
+                                                                                            <details className="mt-1">
+                                                                                                <summary className="list-none text-xs text-neutral-400 cursor-pointer ml-2">
+                                                                                                    Details
+                                                                                                </summary>
+                                                                                                <ul className="pl-4 mt-1">
+                                                                                                    {subheading.h4s.map(
+                                                                                                        (
+                                                                                                            h4,
+                                                                                                            h4Index,
+                                                                                                        ) => (
+                                                                                                            <li
+                                                                                                                key={`h4-${titleIndex}-${headingIndex}-${subheadingIndex}-${h4Index}`}
+                                                                                                            >
+                                                                                                                <a
+                                                                                                                    href={`#${h4.id}`}
+                                                                                                                    className="text-sm text-neutral-500 hover:text-neutral-300"
+                                                                                                                >
+                                                                                                                    {
+                                                                                                                        h4.text
+                                                                                                                    }
+                                                                                                                </a>
+                                                                                                            </li>
+                                                                                                        ),
+                                                                                                    )}
+                                                                                                </ul>
+                                                                                            </details>
+                                                                                        )}
+                                                                                    </li>
+                                                                                ),
+                                                                            )}
+                                                                        </ul>
+                                                                    </details>
+                                                                )}
+                                                            </li>
+                                                        ),
+                                                    )}
+                                                </ul>
+                                            </details>
+                                        )}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </div>
+            )}
         </aside>
     );
+};
+TableOfContents.propTypes = {
+    tableOfContents: PropTypes.array,
+    isArticle: PropTypes.bool,
+};
+export const RightSidebar = ({ content, isArticle = true }) => {
+    // Parse content to build the table of contents
+    const parseTableOfContents = (content) => {
+        if (!content) return [];
+
+        const lines = content.split("\n");
+        const tableOfContents = [];
+        let currentTitle = null;
+        let currentHeading = null;
+        let currentSubheading = null;
+
+        for (const line of lines) {
+            // Check for title (# heading)
+            if (line.startsWith("# ")) {
+                const text = line.substring(2).trim();
+                const id = createId(text);
+                currentTitle = { text, id, headings: [] };
+                tableOfContents.push(currentTitle);
+                currentHeading = null;
+                currentSubheading = null;
+            }
+            // Check for heading (## heading)
+            else if (line.startsWith("## ")) {
+                const text = line.substring(3).trim();
+                const id = createId(text);
+                currentHeading = { text, id, subheadings: [] };
+
+                // If no title yet, create a container for headings
+                if (!currentTitle) {
+                    currentTitle = { text: "", id: "", headings: [] };
+                    tableOfContents.push(currentTitle);
+                }
+
+                currentTitle.headings.push(currentHeading);
+                currentSubheading = null;
+            }
+            // Check for subheading (### heading)
+            else if (line.startsWith("### ")) {
+                const text = line.substring(4).trim();
+                const id = createId(text);
+                currentSubheading = { text, id, h4s: [] };
+
+                // If no heading yet, create one
+                if (!currentHeading && currentTitle) {
+                    currentHeading = { text: "", id: "", subheadings: [] };
+                    currentTitle.headings.push(currentHeading);
+                } else if (!currentHeading && !currentTitle) {
+                    currentTitle = { text: "", id: "", headings: [] };
+                    currentHeading = { text: "", id: "", subheadings: [] };
+                    tableOfContents.push(currentTitle);
+                    currentTitle.headings.push(currentHeading);
+                }
+
+                currentHeading.subheadings.push(currentSubheading);
+            }
+            // Check for h4 (#### heading)
+            else if (line.startsWith("#### ")) {
+                const text = line.substring(5).trim();
+                const id = createId(text);
+                const h4 = { text, id };
+
+                // Handle case where we don't have proper hierarchy
+                if (!currentSubheading && currentHeading) {
+                    currentSubheading = { text: "", id: "", h4s: [] };
+                    currentHeading.subheadings.push(currentSubheading);
+                } else if (
+                    !currentSubheading &&
+                    !currentHeading &&
+                    currentTitle
+                ) {
+                    currentHeading = { text: "", id: "", subheadings: [] };
+                    currentSubheading = { text: "", id: "", h4s: [] };
+                    currentTitle.headings.push(currentHeading);
+                    currentHeading.subheadings.push(currentSubheading);
+                } else if (
+                    !currentSubheading &&
+                    !currentHeading &&
+                    !currentTitle
+                ) {
+                    currentTitle = { text: "", id: "", headings: [] };
+                    currentHeading = { text: "", id: "", subheadings: [] };
+                    currentSubheading = { text: "", id: "", h4s: [] };
+                    tableOfContents.push(currentTitle);
+                    currentTitle.headings.push(currentHeading);
+                    currentHeading.subheadings.push(currentSubheading);
+                }
+
+                currentSubheading.h4s.push(h4);
+            }
+        }
+
+        return tableOfContents;
+    };
+
+    // Create ID from text using the specified mechanism
+    const createId = (text) => {
+        return text
+            .toString()
+            .toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, "")
+            .replace(/\s+/g, "-")
+            .replace(/-+/g, "-")
+            .replace(/^-|-$/g, "");
+    };
+
+    const tableOfContents = parseTableOfContents(content);
+
+    return (
+        <TableOfContents
+            tableOfContents={tableOfContents}
+            isArticle={isArticle}
+        />
+    );
+};
+RightSidebar.propTypes = {
+    content: PropTypes.string,
+    isArticle: PropTypes.bool,
 };
 
 export const ThemeSelector = ({ darkTheme, setDarkTheme }) => {
@@ -365,54 +612,69 @@ export const ArticleHeader = ({
     }
 
     return (
-        <div className="mb-8">
+        <div className="mb-2 md:mb-0">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between space-y-2 md:space-y-0 mb-4">
-                <div
-                    className="flex items-center cursor-pointer mr-12"
-                    onClick={() => {
-                        navigate(`/u/${post.author.username}`);
-                        // navigate(`/u/${post.author.username}`, {
-                        //     state: { author },
-                        // });
-                    }}
-                >
-                    <Avatar className="h-10 w-10 mr-3">
-                        <AvatarImage
-                            src={post.author.profilePicture}
-                            alt={post.author.name}
-                        />
-                        <AvatarFallback>
-                            {post.author.name.charAt(0)}
-                        </AvatarFallback>
-                    </Avatar>
-                    <div className="">
-                        <div className="font-medium flex items-center justify-start gap-2">
-                            {post.author.name}
+                {/* back btn */}
+                <div className="flex justify-center items-center gap-2">
+                    <button
+                        className="rounded-full text-sm bg-gray-100 hover:bg-gray-200 dark:bg-[#111] border box-content p-1 text-stone-600/80 dark:border-[#333] cursor-pointer"
+                        onClick={() => {
+                            navigate(-1);
+                        }}
+                    >
+                        <ChevronLeft className="size-6" />
+                    </button>
 
-                            {currentUser?._id?.toString() !==
-                                post.authorId?.toString() && (
-                                <button
-                                    onClick={async (e) => {
-                                        e.stopPropagation();
-                                        if (!currentUser) {
-                                            toast.error(
-                                                "you need to log in first to follow",
-                                            );
-                                            return;
-                                        }
-                                        await handleFollow(post.authorId);
-                                    }}
-                                    className={`px-1 rounded text-xs cursor-pointer dark:invert ${following ? "bg-white text-black" : "bg-black text-white"}`}
-                                >
-                                    {following ? "Following" : "Follow"}
-                                </button>
-                            )}
-                        </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                            {author.role}
+                    {/* author details */}
+                    <div
+                        className="flex items-center cursor-pointer mr-12"
+                        onClick={() => {
+                            navigate(`/u/${post.author.username}`);
+                            // navigate(`/u/${post.author.username}`, {
+                            //     state: { author },
+                            // });
+                        }}
+                    >
+                        <Avatar className="h-10 w-10 mr-3">
+                            <AvatarImage
+                                src={post.author.profilePicture}
+                                alt={post.author.name}
+                            />
+                            <AvatarFallback>
+                                {post.author.name.charAt(0)}
+                            </AvatarFallback>
+                        </Avatar>
+                        <div className="">
+                            <div className="font-medium flex items-center justify-start gap-2">
+                                {post.author.name}
+
+                                {currentUser?._id?.toString() !==
+                                    post.authorId?.toString() && (
+                                    <button
+                                        onClick={async (e) => {
+                                            e.stopPropagation();
+                                            if (!currentUser) {
+                                                toast.error(
+                                                    "you need to log in first to follow",
+                                                );
+                                                return;
+                                            }
+                                            await handleFollow(post.authorId);
+                                        }}
+                                        className={`px-1 rounded text-xs cursor-pointer dark:invert ${following ? "bg-white text-black" : "bg-black text-white"}`}
+                                    >
+                                        {following ? "Following" : "Follow"}
+                                    </button>
+                                )}
+                            </div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                                {author.role}
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                {/* post options */}
                 <div
                     className="text-sm text-gray-500 dark:text-gray-400 flex flex-row md:flex-col
                     justify-between md:justify-center gap-2 md:gap-0 w-full md:w-fit mt-2 md:mt-0"
@@ -937,6 +1199,13 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                                 ),
                                 h4: ({ children }) => (
                                     <h4
+                                        id={children
+                                            .toString()
+                                            .toLowerCase()
+                                            .replace(/[^a-z0-9\s-]/g, "")
+                                            .replace(/\s+/g, "-")
+                                            .replace(/-+/g, "-")
+                                            .replace(/^-|-$/g, "")}
                                         className={`montserrat-regular font-semibold mt-6 mb-3 leading-snug ${
                                             contentOnly ? "text-sm" : "text-xl"
                                         }`}

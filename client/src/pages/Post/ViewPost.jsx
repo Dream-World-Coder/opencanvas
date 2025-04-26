@@ -26,7 +26,7 @@ import {
     ThemedMarkdownPreview,
 } from "./components";
 
-const ViewPost = ({ isArticle = true }) => {
+const ViewPost = () => {
     const location = useLocation();
     const { currentUser, setCurrentUser } = useAuth();
     const { postId } = useParams();
@@ -39,7 +39,6 @@ const ViewPost = ({ isArticle = true }) => {
         followUser,
     } = useDataService();
     const isDark = useDarkMode();
-    const [focusMode] = useState(!!true);
 
     const [post, setPost] = useState(null);
     const [likes, setLikes] = useState(0);
@@ -100,10 +99,11 @@ const ViewPost = ({ isArticle = true }) => {
                 setLoading(false);
             }
         }
+
         if (!location.state) {
             fetchPost();
         } else {
-            const postData = location.state?.post;
+            const postData = location.state.post;
             setPost(postData);
             setLikes(postData.totalLikes);
             setIsLiked(
@@ -294,12 +294,11 @@ const ViewPost = ({ isArticle = true }) => {
                 <div
                     className={`flex flex-col md:flex-row min-h-screen max-w-screen-xl mx-auto bg-white ${darkTheme.colors.bg} text-gray-900 ${darkTheme.colors.primaryText}`}
                 >
-                    {/* Left sidebar - Read Options or folder structure in case of collection */}
-                    <LeftSidebar focusMode={focusMode} isArticle={isArticle} />
+                    <LeftSidebar />
 
                     {/* Main content */}
                     <main
-                        className={`flex-1 p-4 md:p-6 lg:p-8 min-h-screen max-w-3xl ${!focusMode ? `border-r border-gray-200 ${darkTheme.colors.border}` : ""}`}
+                        className={`flex-1 py-4 md:py-6 lg:py-8 px-6 md:px-2 lg:px-0 min-h-screen max-w-3xl`}
                     >
                         {/* Article header */}
                         <ArticleHeader
@@ -369,18 +368,16 @@ const ViewPost = ({ isArticle = true }) => {
                         <RelatedPostsDropdown darkTheme={darkTheme} />
                     </main>
 
-                    {/* Right sidebar - empty */}
-                    <RightSidebar />
+                    <RightSidebar
+                        content={post.content}
+                        isArticle={post.type.toLowerCase() === "article"}
+                    />
                 </div>
 
                 <Footer />
             </div>
         </>
     );
-};
-
-ViewPost.propTypes = {
-    isArticle: PropTypes.bool,
 };
 
 export default ViewPost;
