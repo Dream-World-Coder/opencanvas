@@ -193,11 +193,11 @@ const ArticleFeed = () => {
                                         onClick={() => handlePostClick(post)}
                                     >
                                         {post.thumbnailUrl && (
-                                            <div className="overflow-hidden flex items-center justify-center bg-gray-200 dark:bg-[#333] max-h-72">
+                                            <div className="overflow-hidden flex items-center justify-center bg-gray-200 dark:bg-[#333] max-h-80">
                                                 <img
                                                     src={post.thumbnailUrl}
                                                     alt={post.title}
-                                                    className="object-contain aspect-video"
+                                                    className="object-contain _aspect-video"
                                                 />
                                             </div>
                                         )}
