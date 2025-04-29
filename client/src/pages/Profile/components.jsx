@@ -694,11 +694,17 @@ export const FeaturedWorks = ({ currentUser }) => {
                                 }}
                             >
                                 <div className="relative aspect-square overflow-hidden mb-4">
-                                    <img
-                                        src={item.itemThumbnail}
-                                        alt={item.itemTitle}
-                                        className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
-                                    />
+                                    {item.itemThumbnail ? (
+                                        <img
+                                            src={item.itemThumbnail}
+                                            alt={item.itemTitle}
+                                            className="object-cover size-full transition-transform duration-500 group-hover:scale-105"
+                                        />
+                                    ) : (
+                                        <div className="size-full transition-transform duration-500 group-hover:scale-105 border bg-zinc-100 dark:bg-zinc-900 p-5 font-serif">
+                                            {item.itemTitle}
+                                        </div>
+                                    )}
                                     {/* dark inset on hover */}
                                     <div className="absolute inset-0 bg-black/20 dark:bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"></div>
                                 </div>
