@@ -4,9 +4,12 @@ import Poem from "./images/poem.png";
 import Butterfly from "./images/butterfly.png";
 import { SlidingButton, Navbar, Footer } from "./components";
 import { Analytics } from "@vercel/analytics/react";
+import { useAuth } from "../../contexts/AuthContext";
+import ArticleFeed from "../Feeds/Articles";
 
 const LandingPage = () => {
-    return (
+    const { currentUser } = useAuth();
+    return !currentUser ? (
         <div className="min-h-auto md:min-h-screen min-w-screen h-[100dvh] md:h-auto bg-[#e2e4e0] relative overflow-hidden">
             <div className="max-w-7xl mx-auto relative h-screen">
                 <Navbar bg={"bg-[#e2e4e0]"} />
@@ -48,6 +51,8 @@ const LandingPage = () => {
 
             <Analytics />
         </div>
+    ) : (
+        <ArticleFeed />
     );
 };
 
