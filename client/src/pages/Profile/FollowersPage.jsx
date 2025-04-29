@@ -3,6 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import { CalendarDays } from "lucide-react";
@@ -153,7 +155,7 @@ const FollowersPage = () => {
     return (
         <div className="min-h-screen bg-white dark:bg-[#111] text-gray-800 dark:text-gray-100 p-4 md:p-0">
             <ProfileHeader />
-            <div className="max-w-3xl mx-auto pt-24">
+            <div className="max-w-3xl mx-auto pt-24 pb-80">
                 <div className="flex items-center justify-between mb-6 pb-4">
                     <h1 className="text-2xl md:text-3xl font-bold font-serif">
                         {currentProfile.fullName}&apos;s Followers
@@ -179,11 +181,17 @@ const FollowersPage = () => {
                             <CardContent className="p-4 flex items-center gap-4">
                                 <div className="flex-shrink-0">
                                     {follower.profilePicture ? (
-                                        <img
-                                            src={follower.profilePicture}
-                                            alt={follower.fullName}
-                                            className="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover border border-gray-200 dark:border-[#333]"
-                                        />
+                                        <Avatar className="text-xl font-thin size-12 md:size-14 border border-gray-200 dark:border-[#333]">
+                                            <AvatarImage
+                                                src={follower.profilePicture}
+                                                alt={follower.fullName}
+                                            />
+                                            <AvatarFallback>
+                                                {follower.fullName
+                                                    .slice(0, 2)
+                                                    .toUpperCase()}
+                                            </AvatarFallback>
+                                        </Avatar>
                                     ) : (
                                         <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gray-100 dark:bg-[#333] flex items-center justify-center text-lg font-medium">
                                             {follower.fullName.charAt(0)}
