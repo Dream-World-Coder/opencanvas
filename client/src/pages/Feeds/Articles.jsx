@@ -197,7 +197,7 @@ const ArticleFeed = () => {
                                                 <img
                                                     src={post.thumbnailUrl}
                                                     alt={post.title}
-                                                    className="object-contain _aspect-video"
+                                                    className="object-contain aspect-video w-full"
                                                 />
                                             </div>
                                         )}

@@ -971,12 +971,12 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                         {thumbnailUrl && !contentOnly && (
                             <div
                                 className="relative mb-8 w-full md:w-[110%] md:transform md:translate-x-[-5%] __max-h-[370px] bg-gray-200 dark:bg-[#333]
-                                rounded-lg overflow-hidden shadow-none border border-gray-200 dark:border-[#333] flex items-center justify-center"
+                                rounded-lg overflow-hidden shadow-none flex items-center justify-center"
                             >
                                 <img
                                     src={thumbnailUrl}
                                     alt={title || "Article thumbnail"}
-                                    className="__object-cover __aspect-video object-contain"
+                                    className="aspect-video object-contain w-full"
                                     loading="lazy"
                                 />
                             </div>

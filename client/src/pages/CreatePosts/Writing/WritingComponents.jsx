@@ -442,16 +442,13 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                         {/* thumbnail */}
                         {thumbnailUrl && !contentOnly && (
                             <div
-                                className="relative mb-8 w-full md:w-[110%] md:transform md:translate-x-[-5%] max-h-[370px] __bg-gray-200 __dark:bg-[#333]
-                                rounded-lg overflow-hidden shadow-none border border-gray-200 dark:border-[#333] flex items-center justify-center"
-                                // style={{
-                                //     background: `url(${thumbnailUrl}) center/cover no-repeat`,
-                                // }}
+                                className="relative mb-8 w-full md:w-[110%] md:transform md:translate-x-[-5%] max-h-[370px] bg-gray-200 dark:bg-[#333]
+                                rounded-lg overflow-hidden shadow-none flex items-center justify-center"
                             >
                                 <img
                                     src={thumbnailUrl}
                                     alt={title || "Article thumbnail"}
-                                    className="object-cover aspect-video"
+                                    className="aspect-video object-contain w-full"
                                     loading="lazy"
                                 />
                             </div>
@@ -1192,7 +1189,7 @@ export const ThumbnailUploader = ({
         try {
             setError("");
             setLoading(true);
-            await validateFile(file);
+            await validateFile(file, true);
             const objectUrl = URL.createObjectURL(file);
             setPreview(objectUrl);
             const { directLink, imgDeleteHash } = await uploadImage(file);
@@ -1227,7 +1224,7 @@ export const ThumbnailUploader = ({
         try {
             setError("");
             setLoading(true);
-            await validateFile(file);
+            await validateFile(file, true);
             const objectUrl = URL.createObjectURL(file);
             setPreview(objectUrl);
             const { directLink, imgDeleteHash } = await uploadImage(file);
