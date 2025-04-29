@@ -4,6 +4,7 @@ import { CircleCheck } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 
 import ProfileHeader from "../../components/Header/ProfileHeader";
@@ -195,13 +196,19 @@ const PublicProfile = () => {
                                     ) : (
                                         <div className="relative group">
                                             <div className="size-16 md:size-24 rounded-full overflow-hidden bg-gray-100 dark:bg-[#222]">
-                                                <img
-                                                    src={
-                                                        currentProfile.profilePicture
-                                                    }
-                                                    alt="Profile"
-                                                    className="w-full h-full object-cover"
-                                                />
+                                                <Avatar className="size-full text-xl font-thin">
+                                                    <AvatarImage
+                                                        src={
+                                                            currentUser.profilePicture
+                                                        }
+                                                        alt={`${currentUser.username}`}
+                                                    />
+                                                    <AvatarFallback>
+                                                        {currentUser.fullName
+                                                            .slice(0, 2)
+                                                            .toUpperCase()}
+                                                    </AvatarFallback>
+                                                </Avatar>
                                             </div>
                                             {currentUser?._id?.toString() !==
                                                 currentProfile._id?.toString() && (

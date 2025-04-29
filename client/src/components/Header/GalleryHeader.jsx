@@ -5,6 +5,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { createOptions } from "./createOptions";
 import SearchBar from "../SearchBar";
 import { useDataService } from "../../services/dataService";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const Header = ({ filters }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -82,11 +83,17 @@ const Header = ({ filters }) => {
                                     {link.href !== "/profile" ? (
                                         link.name
                                     ) : (
-                                        <img
-                                            src={currentUser.profilePicture}
-                                            className="size-6 md:size-8 rounded-full overflow-hidden object-cover block cursor-pointer"
-                                            alt="Profile"
-                                        />
+                                        <Avatar>
+                                            <AvatarImage
+                                                src={currentUser.profilePicture}
+                                                alt={`${currentUser.username}`}
+                                            />
+                                            <AvatarFallback>
+                                                {currentUser.fullName
+                                                    .slice(0, 2)
+                                                    .toUpperCase()}
+                                            </AvatarFallback>
+                                        </Avatar>
                                     )}
                                 </button>
                                 {index !== navLinks.length - 1 && (

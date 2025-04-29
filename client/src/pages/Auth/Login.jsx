@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FlowerIcon } from "./Flower";
 import { useAuth } from "../../contexts/AuthContext";
+import { toast } from "sonner";
 
 const LoginPage = ({ bgClr = "bg-cream-light" }) => {
     const navigate = useNavigate();
@@ -30,9 +31,12 @@ const LoginPage = ({ bgClr = "bg-cream-light" }) => {
 
                 <div className="space-y-4 text-center relative">
                     <h2 className="text-2xl font-[stardom] font-medium text-gray-400">
-                        <span className="font-['Six_Caps'] text-2xl tracking-wide">
+                        <a
+                            href="/"
+                            className="font-['Six_Caps'] text-2xl tracking-wide"
+                        >
                             opencanvas
-                        </span>
+                        </a>
                     </h2>
                     <h1 className="text-4xl font-serif">Welcome Back</h1>
                 </div>
@@ -79,7 +83,7 @@ const LoginPage = ({ bgClr = "bg-cream-light" }) => {
                             className="w-full flex items-center justify-center space-x-3 bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 p-6"
                             variant="outline"
                             onClick={() => {
-                                alert("will be available soon");
+                                toast("will be available soon");
                             }}
                         >
                             <svg

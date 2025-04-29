@@ -3,6 +3,7 @@ import { X, Menu } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export const Circle = ({
     radius = "300px",
@@ -91,11 +92,17 @@ export const Navbar = ({ bg }) => {
                                 {link.href !== "/profile" ? (
                                     link.name
                                 ) : (
-                                    <img
-                                        src={currentUser.profilePicture}
-                                        className="size-6 md:size-8 rounded-full overflow-hidden object-cover block cursor-pointer"
-                                        alt=""
-                                    />
+                                    <Avatar>
+                                        <AvatarImage
+                                            src={currentUser.profilePicture}
+                                            alt={`${currentUser.username}`}
+                                        />
+                                        <AvatarFallback>
+                                            {currentUser.fullName
+                                                .slice(0, 2)
+                                                .toUpperCase()}
+                                        </AvatarFallback>
+                                    </Avatar>
                                 )}
                             </a>
                             {index !== navLinks.length - 1 && (
