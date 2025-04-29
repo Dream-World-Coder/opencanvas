@@ -199,12 +199,12 @@ const PublicProfile = () => {
                                                 <Avatar className="size-full text-xl font-thin">
                                                     <AvatarImage
                                                         src={
-                                                            currentUser.profilePicture
+                                                            currentProfile.profilePicture
                                                         }
-                                                        alt={`${currentUser.username}`}
+                                                        alt={`${currentProfile.username}`}
                                                     />
                                                     <AvatarFallback>
-                                                        {currentUser.fullName
+                                                        {currentProfile.fullName
                                                             .slice(0, 2)
                                                             .toUpperCase()}
                                                     </AvatarFallback>
