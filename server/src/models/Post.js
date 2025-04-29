@@ -38,13 +38,9 @@ const postSchema = new Schema(
             ref: "User",
             required: true,
         },
-        // shall i store it ? or cuz i have to fetch the writer anyway to see his posts
-        // for " more from writer " section. -- needed still
         author: {
             name: { type: String, required: true },
-            username: { type: String, required: true },
             profilePicture: { type: String },
-            role: { type: String },
         },
         thumbnailUrl: { type: String, default: "" },
         premiumPost: { type: Boolean, default: false }, // will be set by the user not me, if premium i will take some charge

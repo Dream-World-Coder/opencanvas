@@ -84,6 +84,10 @@ router.post(
                     postData.thumbnailUrl || currentPost.thumbnailUrl;
                 currentPost.media = postData.media || [];
 
+                // update associated author details, or else need to cron this
+                currentPost.author.name = user.fullName;
+                currentPost.author.profilePicture = user.profilePicture;
+
                 savedPost = await currentPost.save();
             } else {
                 const post = new Post({
@@ -94,7 +98,6 @@ router.post(
                     author: {
                         name: user.fullName,
                         profilePicture: user.profilePicture,
-                        role: user.role,
                     },
                     tags: postData.tags,
                     isEdited: false,
@@ -103,12 +106,6 @@ router.post(
                     thumbnailUrl: postData.thumbnailUrl, //||generateRandomThumbnail(postData.artType),
                     readTime: postData.readTime,
                     media: postData.media || [],
-                    author: {
-                        name: user.fullName,
-                        username: user.username,
-                        profilePicture: user.profilePicture,
-                        role: user.role,
-                    },
                 });
 
                 savedPost = await post.save(); // returns the post
