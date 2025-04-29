@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import PropTypes from "prop-types";
@@ -608,7 +608,7 @@ ContactInformationDropdown.propTypes = {
     currentProfile: PropTypes.object,
 };
 
-export const FeaturedWorks = ({ currentUser }) => {
+export const FeaturedWorks = memo(function featuredWorks({ currentUser }) {
     const scrollContainerRef = useRef(null);
     const navigate = useNavigate();
     const [showLeftArrow, setShowLeftArrow] = useState(false);
@@ -743,7 +743,7 @@ export const FeaturedWorks = ({ currentUser }) => {
             )}
         </>
     );
-};
+});
 FeaturedWorks.propTypes = {
     currentUser: PropTypes.object,
 };
@@ -868,14 +868,14 @@ PostDetails.propTypes = {
     post: PropTypes.object,
 };
 
-export const PostList = ({
+export const PostList = memo(function postList({
     posts,
     setPosts,
     activeTab,
     loading,
     isDark,
     forPrivate,
-}) => {
+}) {
     const navigate = useNavigate();
     const handlePostClick = (post, forPrivate) => {
         if (forPrivate) return;
@@ -985,7 +985,7 @@ export const PostList = ({
             )}
         </div>
     );
-};
+});
 PostList.propTypes = {
     posts: PropTypes.array,
     setPosts: PropTypes.func,
