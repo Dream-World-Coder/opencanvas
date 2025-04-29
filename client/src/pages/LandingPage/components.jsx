@@ -92,7 +92,7 @@ export const Navbar = ({ bg }) => {
                                 {link.href !== "/profile" ? (
                                     link.name
                                 ) : (
-                                    <Avatar>
+                                    <Avatar className="size-6 md:size-8">
                                         <AvatarImage
                                             src={currentUser.profilePicture}
                                             alt={`${currentUser.username}`}
