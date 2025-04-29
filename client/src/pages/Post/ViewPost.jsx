@@ -279,7 +279,7 @@ const ViewPost = () => {
 
     return (
         <>
-            <PostHelmet post={post} />
+            <PostHelmet post={post} author={author} />
 
             <div
                 className={`w-full h-full grid place-items-center bg-white ${darkTheme.colors.bg} overflow-x-hidden pt-16`}

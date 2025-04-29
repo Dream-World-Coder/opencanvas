@@ -23,7 +23,7 @@
 -- [] Image viewer -> chobi boro kore dekhar moto jinis, like in gfg, click korle dekha jabe,
 ** maybe protita image inside article ke ekta onClick dite hobe just and Toaster er moto ekta viewer component niche laagiye debo, and then see enlarged image on click
 
--- [] add Avatar & fallback in profile & header like used in feed
+-- [x] add Avatar & fallback in profile & header like used in feed
 -- remove post.author things as much as  possible, fetch author, else have to update them
 -- only store author's name & image in the post, nothing else; fetch them in viewPost page,
 as in feed page only name & pic is sufficient, not username, also has to be updated

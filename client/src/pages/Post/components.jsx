@@ -62,7 +62,7 @@ function sharePost(post) {
  * @param {*} param0
  * @returns
  */
-export const PostHelmet = ({ post }) => {
+export const PostHelmet = ({ post, author }) => {
     function formatSchemaDate(date) {
         return new Date(date).toISOString();
     }
@@ -75,7 +75,7 @@ export const PostHelmet = ({ post }) => {
         dateModified: formatSchemaDate(post.modifiedAt),
         author: {
             "@type": "Person",
-            name: post.author.name,
+            name: author.fullName,
         },
         publisher: {
             "@type": "Organization",
@@ -137,6 +137,7 @@ export const PostHelmet = ({ post }) => {
 
 PostHelmet.propTypes = {
     post: PropTypes.object,
+    author: PropTypes.object,
 };
 
 /**
@@ -630,24 +631,29 @@ export const ArticleHeader = ({
                     <div
                         className="flex items-center cursor-pointer mr-12"
                         onClick={() => {
-                            navigate(`/u/${post.author.username}`);
-                            // navigate(`/u/${post.author.username}`, {
+                            navigate(`/u/${author.username}`);
+                            // navigate(`/u/${author.username}`, {
                             //     state: { author },
                             // });
                         }}
                     >
                         <Avatar className="h-10 w-10 mr-3">
                             <AvatarImage
-                                src={post.author.profilePicture}
-                                alt={post.author.name}
+                                src={
+                                    author.profilePicture ||
+                                    post.author.profilePicture
+                                }
+                                alt={author.fullName || "U"}
                             />
                             <AvatarFallback>
-                                {post.author.name.charAt(0)}
+                                {author.fullName.charAt(0) || "A"}
                             </AvatarFallback>
                         </Avatar>
                         <div className="">
                             <div className="font-medium flex items-center justify-start gap-2">
-                                {post.author.name}
+                                {author.fullName ||
+                                    post.author.name ||
+                                    "not found"}
 
                                 {currentUser?._id?.toString() !==
                                     post.authorId?.toString() && (
