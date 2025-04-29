@@ -37,6 +37,7 @@ import {
 
 import { useDarkMode } from "../../components/Hooks/darkMode";
 import { postDarkThemes } from "../../services/themes";
+import { copyHeaderLink } from "../../services/copyToClipBoard";
 /**
  *
  * @param {*} post
@@ -1149,11 +1150,14 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                                                 .replace(/-+/g, "-") // collapse multiple hyphens
                                                 .replace(/^-|-$/g, "") // trim hyphens from start/end
                                         }
-                                        className={`mt-12 mb-6 leading-tight tracking-tight ${
+                                        className={`mt-12 mb-6 leading-tight tracking-tight cursor-pointer ${
                                             contentOnly
                                                 ? "text-xl font-semibold font-sans"
                                                 : "text-4xl font-bold font-serif"
                                         }`}
+                                        onClick={() => {
+                                            copyHeaderLink(children);
+                                        }}
                                     >
                                         {children}
                                     </h1>
@@ -1167,11 +1171,14 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                                             .replace(/\s+/g, "-")
                                             .replace(/-+/g, "-")
                                             .replace(/^-|-$/g, "")}
-                                        className={`font-serif mt-10 mb-5 leading-tight tracking-tight ${
+                                        className={`font-serif mt-10 mb-5 leading-tight tracking-tight cursor-pointer ${
                                             contentOnly
                                                 ? "text-lg"
                                                 : "text-3xl font-bold"
                                         }`}
+                                        onClick={() => {
+                                            copyHeaderLink(children);
+                                        }}
                                     >
                                         {children}
                                     </h2>
@@ -1185,11 +1192,14 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                                             .replace(/\s+/g, "-")
                                             .replace(/-+/g, "-")
                                             .replace(/^-|-$/g, "")}
-                                        className={`font-serif mt-8 mb-4 leading-snug ${
+                                        className={`font-serif mt-8 mb-4 leading-snug cursor-pointer ${
                                             contentOnly
                                                 ? "text-base"
                                                 : "text-2xl font-bold"
                                         }`}
+                                        onClick={() => {
+                                            copyHeaderLink(children);
+                                        }}
                                     >
                                         {children}
                                     </h3>
@@ -1203,9 +1213,12 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                                             .replace(/\s+/g, "-")
                                             .replace(/-+/g, "-")
                                             .replace(/^-|-$/g, "")}
-                                        className={`montserrat-regular font-semibold mt-6 mb-3 leading-snug ${
+                                        className={`montserrat-regular font-semibold mt-6 mb-3 leading-snug cursor-pointer ${
                                             contentOnly ? "text-sm" : "text-xl"
                                         }`}
+                                        onClick={() => {
+                                            copyHeaderLink(children);
+                                        }}
                                     >
                                         {children}
                                     </h4>
