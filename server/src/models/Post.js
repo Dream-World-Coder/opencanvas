@@ -1,15 +1,3 @@
-/*
-{
-  "media": update as soon as an image is inserted, at least in the localStorage, and later in the database
-  else would not find if any image is deleted while editing,
-  delete these in bulk when post is deleted [for less api calls to imgur],
-  [no need to delete on every post delete, store deleteHashes of multiple deleted posts, then delete in bulk]
-  "media": [{
-      // "url": "https://example.com/uploads/image1.jpg",
-      "deleteHash": "abc" // only deleteHash is fine
-    },],
-}
-*/
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
@@ -107,11 +95,7 @@ const postSchema = new Schema(
     },
     { timestamps: true },
 );
+postSchema.index({ topics: 1, isPublic: 1, anonymousEngagementScore: -1 });
 
 const Post = mongoose.model("Post", postSchema);
 module.exports = Post;
-
-/*
-postSchema.index({ isPublic: 1, anonymousEngagementScore: -1 });
-postSchema.index({ topics: 1, isPublic: 1, anonymousEngagementScore: -1 });
-*/

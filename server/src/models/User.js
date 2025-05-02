@@ -181,6 +181,7 @@ const userSchema = new Schema(
     },
     { timestamps: true },
 );
+userSchema.index({ username: 1, email: 1 });
 
 // Limit featured items to 8
 userSchema.path("featuredItems").validate(function (value) {

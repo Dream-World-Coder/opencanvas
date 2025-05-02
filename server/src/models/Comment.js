@@ -42,11 +42,15 @@ const commentSchema = new Schema(
             type: Date,
             default: Date.now,
         },
+        updatedAt: {
+            type: Date,
+            default: Date.now,
+        },
     },
-    { timestamps: true },
+    { timestamps: false },
 );
 
-// Index for faster lookups
+// indexing
 commentSchema.index({ postId: 1, parentId: 1 });
 
 const Comment = mongoose.model("Comment", commentSchema);
