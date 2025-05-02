@@ -24,7 +24,7 @@ router.post(
     async (req, res) => {
         try {
             const newPostId = new mongoose.Types.ObjectId().toString();
-            res.status(200).json({
+            return res.status(200).json({
                 success: true,
                 newPostId: newPostId,
             });
