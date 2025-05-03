@@ -333,7 +333,7 @@ const ViewPost = () => {
                                 {post.tags.map((tag, index) => (
                                     <span
                                         key={index}
-                                        className={`text-xs px-2 py-1 rounded-full bg-gray-100 ${darkTheme.colors.tagBg} text-gray-700 ${darkTheme.colors.tagText}`}
+                                        className={`text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-[#171717] text-gray-700 dark:text-[#9da5b4]`}
                                     >
                                         {tag}
                                     </span>
@@ -354,6 +354,7 @@ const ViewPost = () => {
                             likes={likes}
                             commentTrayOpen={commentTrayOpen}
                             setCommentTrayOpen={setCommentTrayOpen}
+                            darkTheme={darkTheme}
                         />
 
                         <CommentsBox

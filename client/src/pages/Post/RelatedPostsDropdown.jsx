@@ -34,10 +34,16 @@ export const RelatedPostsDropdown = ({ darkTheme }) => {
     return (
         <div className={`mb-8`}>
             <div
-                className={`flex items-center justify-between cursor-pointer mb-2 bg-gray-50 ${darkTheme.colors.headerBg} p-4 rounded-lg hover:bg-gray-100 ${darkTheme.colors.hoverBg} transition-colors`}
+                className={`flex items-center justify-between cursor-pointer mb-2 bg-gray-50
+                    ${darkTheme.colors.headerBg} p-4 rounded-lg hover:bg-gray-100
+                    dark:hover:bg-[#313026] transition-colors`}
                 onClick={toggleDropdown}
             >
-                <h3 className={`text-xl font-bold`}>Related Posts</h3>
+                <h3
+                    className={`text-xl font-bold ${darkTheme.colors.primaryText}`}
+                >
+                    Related Posts
+                </h3>
                 {isOpen ? (
                     <ChevronUp
                         className={`h-5 w-5 text-gray-500 ${darkTheme.colors.primaryText}`}

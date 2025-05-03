@@ -73,7 +73,7 @@ export default function ProfileHeader() {
 
                     <button
                         onClick={() => navigate("/profile/settings")}
-                        className="p-2 !mr-2 text-gray-600 dark:text-gray-300 hover:bg-lime-300 dark:hover:bg-gray-800 rounded-full transition-all duration-200 border border-lime-300 dark:border-gray-800"
+                        className="p-2 !mr-2 text-gray-600 dark:text-neutral-300 hover:bg-lime-300 dark:hover:bg-neutral-800 rounded-full transition-all duration-200 border border-lime-300 dark:border-neutral-800"
                     >
                         <Settings className="w-5 h-5" />
                     </button>

@@ -244,7 +244,7 @@ export const TableOfContents = ({ tableOfContents, isArticle }) => {
                         className="flex items-center justify-start gap-1 py-2 cursor-pointer list-none"
                         onClick={() => setIsOpen(!isOpen)}
                     >
-                        <div className="font-serif text-xl px-2 bg-[#F0F1C5] rounded">
+                        <div className="font-serif text-xl px-2 bg-[#F0F1C5] dark:bg-neutral-700 rounded text-black dark:text-[#f8f8f8]">
                             Table of Contents
                         </div>
                         <div className="opencloseindicatorIcon">
@@ -270,7 +270,7 @@ export const TableOfContents = ({ tableOfContents, isArticle }) => {
                                         {title.text && (
                                             <a
                                                 href={`#${title.id}`}
-                                                className="font-bold text-neutral-800 hover:text-neutral-600"
+                                                className="font-bold text-neutral-800 dark:text-neutral-300 hover:text-neutral-600"
                                             >
                                                 {title.text}
                                             </a>
@@ -278,7 +278,7 @@ export const TableOfContents = ({ tableOfContents, isArticle }) => {
 
                                         {title.headings.length > 0 && (
                                             <details open className="pl-0 mt-1">
-                                                <summary className="list-none text-sm text-neutral-500 cursor-pointer">
+                                                <summary className="list-none text-sm text-neutral-500 dark:text-neutral-300 cursor-pointer">
                                                     Expand sections
                                                 </summary>
                                                 <ul className="pl-4 mt-1">
@@ -294,7 +294,7 @@ export const TableOfContents = ({ tableOfContents, isArticle }) => {
                                                                 {heading.text && (
                                                                     <a
                                                                         href={`#${heading.id}`}
-                                                                        className="font-medium text-neutral-700 hover:text-neutral-500"
+                                                                        className="font-medium text-neutral-700 dark:text-neutral-300 hover:text-neutral-500"
                                                                     >
                                                                         {
                                                                             heading.text
@@ -323,7 +323,7 @@ export const TableOfContents = ({ tableOfContents, isArticle }) => {
                                                                                         {subheading.text && (
                                                                                             <a
                                                                                                 href={`#${subheading.id}`}
-                                                                                                className="text-neutral-600 hover:text-neutral-400"
+                                                                                                className="text-neutral-600 dark:text-neutral-300 text-sm hover:text-neutral-400"
                                                                                             >
                                                                                                 {
                                                                                                     subheading.text
@@ -350,7 +350,7 @@ export const TableOfContents = ({ tableOfContents, isArticle }) => {
                                                                                                             >
                                                                                                                 <a
                                                                                                                     href={`#${h4.id}`}
-                                                                                                                    className="text-sm text-neutral-500 hover:text-neutral-300"
+                                                                                                                    className="text-neutral-500 hover:text-neutral-300 text-xs"
                                                                                                                 >
                                                                                                                     {
                                                                                                                         h4.text
@@ -524,21 +524,13 @@ export const ThemeSelector = ({ darkTheme, setDarkTheme }) => {
     function getPreviewColor(themeKey) {
         switch (themeKey) {
             case "monokai":
-                return "bg-[#f92672]";
-            case "atomDark":
-                return "bg-[#e06c75]";
+                return "bg-[#272822]";
             case "oneDarkPro":
-                return "bg-[#d3d7de]";
+                return "bg-[#282c34]";
             case "ayuDark":
-                return "bg-[#e6b450]";
-            case "dracula":
-                return "bg-[#8be9fd]";
-            case "solarizedDark":
-                return "bg-[#2aa198]";
-            case "nightOwl":
-                return "bg-[#c792ea]";
+                return "bg-[#0a0e14]";
             default:
-                return "bg-gray-400";
+                return "bg-gray-100";
         }
     }
 
@@ -546,10 +538,6 @@ export const ThemeSelector = ({ darkTheme, setDarkTheme }) => {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <div className="flex items-center">
-                    {/* <Palette className="size-4 mr-2 text-gray-600 dark:text-gray-300" />
-                    <span className="mr-2 text-sm font-medium hidden sm:inline">
-                        {darkTheme.name}
-                    </span> */}
                     <MoreHorizontal
                         className="size-4 cursor-pointer rounded px-2 py-1 box-content
                       hover:bg-gray-100 dark:hover:bg-[#333] text-black dark:text-white"
@@ -610,11 +598,15 @@ export const ArticleHeader = ({
 
     return (
         <div className="mb-2 md:mb-0">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between space-y-2 md:space-y-0 mb-4">
+            <div
+                className="flex flex-col md:flex-row items-start md:items-center
+                justify-between space-y-2 md:space-y-0 mb-4"
+            >
                 {/* back btn */}
                 <div className="flex justify-center items-center gap-2">
                     <button
-                        className="rounded-full text-sm bg-gray-100 hover:bg-gray-200 dark:bg-[#111] border box-content p-1 text-stone-600/80 dark:border-[#333] cursor-pointer"
+                        className="rounded-full text-sm bg-gray-100 hover:bg-gray-200 dark:bg-[#111]
+                        border box-content p-1 text-stone-600/80 dark:border-[#333] cursor-pointer"
                         onClick={() => {
                             navigate(-1);
                         }}
@@ -645,7 +637,9 @@ export const ArticleHeader = ({
                             </AvatarFallback>
                         </Avatar>
                         <div className="">
-                            <div className="font-medium flex items-center justify-start gap-2">
+                            <div
+                                className={`font-medium flex items-center justify-start gap-2 ${darkTheme.colors.primaryText}`}
+                            >
                                 {author.fullName ||
                                     post.author.name ||
                                     "not found"}
@@ -663,13 +657,16 @@ export const ArticleHeader = ({
                                             }
                                             await handleFollow(post.authorId);
                                         }}
-                                        className={`px-1 rounded text-xs cursor-pointer dark:invert ${following ? "bg-white text-black" : "bg-black text-white"}`}
+                                        className={`px-1 rounded text-xs cursor-pointer dark:invert
+                                            ${following ? "bg-white text-black" : "bg-black text-white"}`}
                                     >
                                         {following ? "Following" : "Follow"}
                                     </button>
                                 )}
                             </div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                            <div
+                                className={`text-sm text-gray-500 dark:text-gray-300`}
+                            >
                                 {author.role}
                             </div>
                         </div>
@@ -678,7 +675,7 @@ export const ArticleHeader = ({
 
                 {/* post options */}
                 <div
-                    className="text-sm text-gray-500 dark:text-gray-400 flex flex-row md:flex-col
+                    className="text-sm text-gray-500 dark:text-gray-300 flex flex-row md:flex-col
                     justify-between md:justify-center gap-2 md:gap-0 w-full md:w-fit mt-2 md:mt-0"
                 >
                     <div>
@@ -748,9 +745,12 @@ export const EngagementSection = ({
     likes,
     commentTrayOpen,
     setCommentTrayOpen,
+    darkTheme,
 }) => {
     return (
-        <div className="flex items-center justify-between border-t border-b py-4 mb-8 dark:border-[#333] border-gray-200">
+        <div
+            className={`flex items-center justify-between border-t border-b py-4 mb-8 dark:border-[#333] border-gray-200 ${darkTheme.colors.primaryText}`}
+        >
             <div className="flex items-center gap-4">
                 <Button
                     variant="ghost"
@@ -773,7 +773,7 @@ export const EngagementSection = ({
                     }}
                 >
                     <ThumbsUp
-                        className={`size-4 text-blue-600 ${isLiked ? "fill-blue-600" : ""}`}
+                        className={`size-4 text-blue-600 dark:text-white ${isLiked ? "fill-blue-600 dark:fill-white" : ""}`}
                     />
                     <span>{likes}</span>
                 </Button>
@@ -834,6 +834,7 @@ export const EngagementSection = ({
 };
 EngagementSection.propTypes = {
     post: PropTypes.object,
+    darkTheme: PropTypes.object,
     currentUser: PropTypes.object,
     handleLike: PropTypes.func,
     handleDislike: PropTypes.func,
@@ -991,19 +992,22 @@ export const CommentsBox = memo(function CommentsBox({
     return (
         <div
             data-lenis-prevent
-            className={`fixed inset-y-0 right-0 w-full md:w-96 bg-white dark:bg-gray-900 shadow-xl transform transition-transform duration-300 ease-in-out
+            className={`fixed inset-y-0 right-0 w-full md:w-96 bg-white dark:bg-neutral-900 shadow-xl transform transition-transform duration-300 ease-in-out
                 ${commentTrayOpen ? "translate-x-0" : "translate-x-full"} flex flex-col h-full z-50`}
         >
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-lg font-medium text-gray-800 dark:text-gray-100">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-neutral-700">
+                <h2 className="text-lg font-medium text-gray-800 dark:text-neutral-100">
                     Comments
                 </h2>
                 <button
                     onClick={() => setCommentTrayOpen(false)}
-                    className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+                    className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors duration-200"
                     aria-label="Close comments"
                 >
-                    <X size={20} className="text-gray-600 dark:text-gray-400" />
+                    <X
+                        size={20}
+                        className="text-gray-600 dark:text-neutral-400"
+                    />
                 </button>
             </div>
 
@@ -1030,7 +1034,7 @@ export const CommentsBox = memo(function CommentsBox({
                               </Avatar>
                               <div className="flex-1">
                                   <div className="flex items-baseline justify-between">
-                                      <h3 className="font-medium text-gray-900 dark:text-gray-100 flex items-center justify-center gap-3">
+                                      <h3 className="font-medium text-gray-900 dark:text-neutral-100 flex items-center justify-center gap-3">
                                           {comment.author.fullName}
                                           <div className="flex items-center justify-center gap-2">
                                               {comment.authorId.toString() ===
@@ -1083,7 +1087,7 @@ export const CommentsBox = memo(function CommentsBox({
                                               </div>
                                           </div>
                                       </h3>
-                                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                                      <span className="text-xs text-gray-500 dark:text-neutral-400">
                                           {timeAgo(comment.createdAt)}
                                       </span>
                                   </div>
@@ -1098,7 +1102,7 @@ export const CommentsBox = memo(function CommentsBox({
                                           edited
                                       </span>
                                   )}
-                                  <p className="mt-1 text-gray-800 dark:text-gray-200">
+                                  <p className="mt-1 text-gray-800 dark:text-neutral-200">
                                       {comment.content}
                                   </p>
                               </div>
@@ -1108,7 +1112,7 @@ export const CommentsBox = memo(function CommentsBox({
                 <div ref={commentsEndRef} />
             </div>
 
-            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="p-4 border-t border-gray-200 dark:border-neutral-700">
                 {!isEditing ? (
                     <div className="relative flex items-center">
                         <input
@@ -1117,14 +1121,14 @@ export const CommentsBox = memo(function CommentsBox({
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
                             placeholder="Add a comment..."
-                            className="flex-1 px-4 py-2 pr-10 bg-gray-100 dark:bg-gray-800 border-0 rounded-full text-gray-800 dark:text-gray-100
-                        placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-lime-500 transition-all duration-200"
+                            className="flex-1 px-4 py-2 pr-10 bg-gray-100 dark:bg-neutral-800 border-0 rounded-full text-gray-800 dark:text-neutral-100
+                        placeholder-gray-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-lime-500 transition-all duration-200"
                         />
                         <button
                             onClick={(e) => handleSubmit(e)}
                             disabled={!newComment?.trim() || false}
                             className="absolute right-2 p-1.5 rounded-full bg-lime-500 text-white disabled:opacity-50
-                        disabled:bg-gray-400 dark:disabled:bg-gray-700 transition-all duration-200"
+                        disabled:bg-gray-400 dark:disabled:bg-neutral-700 transition-all duration-200"
                             aria-label="Send comment"
                         >
                             <Send size={16} />
@@ -1138,8 +1142,8 @@ export const CommentsBox = memo(function CommentsBox({
                             type="text"
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
-                            className="flex-1 px-4 py-2 pr-10 bg-gray-100 dark:bg-gray-800 border-0 rounded-full text-gray-800 dark:text-gray-100
-                        placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-lime-500 transition-all duration-200"
+                            className="flex-1 px-4 py-2 pr-10 bg-gray-100 dark:bg-neutral-800 border-0 rounded-full text-gray-800 dark:text-neutral-100
+                        placeholder-gray-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-lime-500 transition-all duration-200"
                         />
                         <button
                             onClick={(e) =>
@@ -1147,7 +1151,7 @@ export const CommentsBox = memo(function CommentsBox({
                             }
                             disabled={!newComment.trim()}
                             className="absolute right-2 p-1.5 rounded-full bg-lime-500 text-white disabled:opacity-50
-                        disabled:bg-gray-400 dark:disabled:bg-gray-700 transition-all duration-200"
+                        disabled:bg-gray-400 dark:disabled:bg-neutral-700 transition-all duration-200"
                             aria-label="Send comment"
                         >
                             <Send size={16} />
@@ -1280,10 +1284,10 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                                 {!contentOnly && (
                                     <>
                                         <hr
-                                            className={`mt-6 mb-px border-t ${isDark ? `${darkTheme.border}` : "border-gray-200"}`}
+                                            className={`mt-6 mb-px border-t ${isDark ? `dark:border-gray-300` : "border-gray-200"}`}
                                         />
                                         <hr
-                                            className={`mb-6 border-t ${isDark ? `${darkTheme.border}` : "border-gray-200"}`}
+                                            className={`mb-6 border-t ${isDark ? `dark:border-gray-300` : "border-gray-200"}`}
                                         />
                                     </>
                                 )}
@@ -1293,7 +1297,7 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                         {/* thumbnail */}
                         {thumbnailUrl && !contentOnly && (
                             <div
-                                className="relative mb-8 w-full md:w-[110%] md:transform md:translate-x-[-5%] __max-h-[370px] bg-gray-200 dark:bg-[#333]
+                                className="relative mb-8 w-full md:w-[110%] md:transform md:translate-x-[-5%] __max-h-[370px] bg-gray-200 dark:bg-[#171717]
                                 rounded-lg overflow-hidden shadow-none flex items-center justify-center"
                             >
                                 <img

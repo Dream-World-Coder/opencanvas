@@ -73,10 +73,13 @@ export const AuthorPostsDropdown = ({
     return (
         <div className={`mb-12`}>
             <div
-                className={`flex items-center justify-between cursor-pointer mb-2 bg-gray-50 ${darkTheme.colors.headerBg} p-4 rounded-lg hover:bg-gray-100 ${darkTheme.colors.hoverBg} transition-colors`}
+                className={`flex items-center justify-between cursor-pointer mb-2 bg-gray-50 ${darkTheme.colors.headerBg}
+                    p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-[#313026] transition-colors`}
                 onClick={toggleDropdown}
             >
-                <h3 className={`text-xl font-bold`}>
+                <h3
+                    className={`text-xl font-bold ${darkTheme.colors.primaryText}`}
+                >
                     More from {author?.fullName}
                 </h3>
                 {isOpen ? (
@@ -122,7 +125,8 @@ export const AuthorPostsDropdown = ({
                                           state: { post },
                                       });
                                   }}
-                                  className={`flex flex-col border ${darkTheme.colors.border} hover:bg-gray-50 ${darkTheme.colors.hoverBg} p-3 rounded-xl transition-all duration-200 cursor-pointer`}
+                                  className={`flex flex-col border hover:bg-gray-50 p-3 rounded-xl transition-all duration-200 cursor-pointer
+                                      ${darkTheme.colors.cardBg} ${darkTheme.colors.primaryText} ${darkTheme.colors.border}`}
                               >
                                   <div className={`flex space-x-4`}>
                                       {post.thumbnailUrl && (
@@ -140,12 +144,12 @@ export const AuthorPostsDropdown = ({
 
                                       <div className={`flex-1`}>
                                           <h3
-                                              className={`font-medium text-lg text-gray-900 ${darkTheme.colors.primaryText} line-clamp-2 capitalize`}
+                                              className={`font-medium text-lg text-gray-900 dark:text-[#f8f8f8] line-clamp-2 capitalize`}
                                           >
                                               {post.title}
                                           </h3>
                                           <div
-                                              className={`flex items-center mt-2 text-sm text-gray-700 ${darkTheme.colors.secondaryText} space-x-3`}
+                                              className={`flex items-center mt-2 text-sm text-gray-700 dark:text-gray-300 space-x-3`}
                                           >
                                               <div
                                                   className={`flex items-center`}
