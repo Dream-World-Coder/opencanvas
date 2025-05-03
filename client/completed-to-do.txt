@@ -116,6 +116,15 @@ pass it as props then
 -- [x] imageUpload
 -- [-] add useStrict in main.jsx if needed
 
+-- [x] add Avatar & fallback in profile & header like used in feed
+-- [x] remove post.author things as much as  possible, fetch author, else have to update them
+-- [x] only store author's name & image in the post, nothing else; fetch them in viewPost page,
+as in feed page only name & pic is sufficient, not username, also has to be updated
+
+-- [x] post view page for private posts
+-- [x] in profile footer add `opencanvas`
+-- [x] index the db
+-- [x] comments
 
 -- [x] no need for intermediate post preview [like in profilepage] ---
     only 2 states: normal & in view -- less dbQuery
