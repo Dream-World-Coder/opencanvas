@@ -860,7 +860,6 @@ export const CommentsBox = memo(function CommentsBox({
 
     const commentsEndRef = useRef(null);
     const inputRef = useRef(null);
-    const buttonRef = useRef(null);
     const currentIndexRef = useRef(0);
     const editingCommentIdRef = useRef(null);
 
@@ -925,13 +924,6 @@ export const CommentsBox = memo(function CommentsBox({
             } finally {
                 setLoading(false);
             }
-        }
-    };
-
-    const handleKeyDown = (e) => {
-        if (e.key === "Enter" && newComment?.trim()) {
-            e.preventDefault();
-            buttonRef.current.click();
         }
     };
 
@@ -1124,13 +1116,11 @@ export const CommentsBox = memo(function CommentsBox({
                             type="text"
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
-                            onKeyDown={handleKeyDown}
                             placeholder="Add a comment..."
                             className="flex-1 px-4 py-2 pr-10 bg-gray-100 dark:bg-gray-800 border-0 rounded-full text-gray-800 dark:text-gray-100
                         placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-lime-500 transition-all duration-200"
                         />
                         <button
-                            ref={buttonRef}
                             onClick={(e) => handleSubmit(e)}
                             disabled={!newComment?.trim() || false}
                             className="absolute right-2 p-1.5 rounded-full bg-lime-500 text-white disabled:opacity-50
