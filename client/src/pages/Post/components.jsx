@@ -1,4 +1,4 @@
-import { useRef, useState, memo } from "react";
+import { useRef, useState, useEffect, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import PropTypes from "prop-types";
@@ -15,7 +15,10 @@ import {
     Check,
     ChevronDown,
     ChevronUp,
-    // Palette,
+    Send,
+    Edit,
+    Trash2,
+    Reply,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -35,12 +38,14 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { useAuth } from "../../contexts/AuthContext";
+import { useDataService } from "../../services/dataService";
 import { useDarkMode } from "../../components/Hooks/darkMode";
 import { postDarkThemes } from "../../services/themes";
 import { copyHeaderLink } from "../../services/copyToClipBoard";
+import { timeAgo } from "../../services/formatDate";
 /**
  *
- * @param {*} post
  */
 function sharePost(post) {
     const baseUrl = window.location.origin;
@@ -59,8 +64,6 @@ function sharePost(post) {
 
 /**
  *
- * @param {*} param0
- * @returns
  */
 export const PostHelmet = ({ post, author }) => {
     function formatSchemaDate(date) {
@@ -142,7 +145,6 @@ PostHelmet.propTypes = {
 
 /**
  *
- * @returns
  */
 export const LoadingPost = () => {
     return (
@@ -154,7 +156,6 @@ export const LoadingPost = () => {
 
 /**
  *
- * @returns
  */
 export const NotPost = () => {
     const navigate = useNavigate();
@@ -179,7 +180,6 @@ export const NotPost = () => {
 
 /**
  *
- * @returns
  */
 export const NotPublicPost = () => {
     return (
@@ -201,8 +201,6 @@ But with loading on, the return statement is only a simple html, so it works
 
 /**
  *
- * @param {*} param0
- * @returns
  */
 export const LeftSidebar = () => {
     // const readOptions = [
@@ -234,7 +232,6 @@ export const LeftSidebar = () => {
 
 /**
  *
- * @returns
  */
 export const TableOfContents = ({ tableOfContents, isArticle }) => {
     const [isOpen, setIsOpen] = useState(true);
@@ -587,8 +584,6 @@ ThemeSelector.propTypes = {
 };
 /**
  *
- * @param {*} param0
- * @returns
  */
 export const ArticleHeader = ({
     post,
@@ -740,8 +735,6 @@ ArticleHeader.propTypes = {
 
 /**
  *
- * @param {*} param0
- * @returns
  */
 export const EngagementSection = ({
     post,
@@ -753,6 +746,8 @@ export const EngagementSection = ({
     isDisliked,
     isSaved,
     likes,
+    commentTrayOpen,
+    setCommentTrayOpen,
 }) => {
     return (
         <div className="flex items-center justify-between border-t border-b py-4 mb-8 dark:border-[#333] border-gray-200">
@@ -802,6 +797,7 @@ export const EngagementSection = ({
                     variant="ghost"
                     size="sm"
                     className="flex items-center gap-2"
+                    onClick={() => setCommentTrayOpen(!commentTrayOpen)}
                 >
                     <MessageSquareText className="size-4" />
                     <span>{post.totalComments}</span>
@@ -842,12 +838,342 @@ EngagementSection.propTypes = {
     handleLike: PropTypes.func,
     handleDislike: PropTypes.func,
     handleSave: PropTypes.func,
+    setCommentTrayOpen: PropTypes.func,
+    commentTrayOpen: PropTypes.bool,
     isLiked: PropTypes.bool,
     isDisliked: PropTypes.bool,
     isSaved: PropTypes.bool,
     likes: PropTypes.number,
 };
 
+export const CommentsBox = memo(function CommentsBox({
+    post,
+    commentTrayOpen,
+    setCommentTrayOpen,
+}) {
+    const [comments, setComments] = useState([]);
+    const [newComment, setNewComment] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+
+    const { currentUser } = useAuth();
+
+    const commentsEndRef = useRef(null);
+    const inputRef = useRef(null);
+    const buttonRef = useRef(null);
+    const currentIndexRef = useRef(0);
+    const editingCommentIdRef = useRef(null);
+
+    const navigate = useNavigate();
+
+    const {
+        addNewComment,
+        editComment,
+        deleteComment,
+        newReply,
+        getComment,
+        getCommentsByIds,
+    } = useDataService();
+
+    // fetch comments
+    useEffect(() => {
+        async function loadComments() {
+            // if (commentTrayOpen) { // autofetch some at first
+            setLoading(true);
+            try {
+                const comments = await getCommentsByIds(post, currentIndexRef);
+                setComments(comments);
+                // no need to change no of comments using setPost
+                currentIndexRef.current += 10;
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        }
+        // }
+        loadComments();
+    }, [post]); //, commentTrayOpen]);
+
+    // Scroll to bottom when new comments are added
+    useEffect(() => {
+        if (commentTrayOpen && commentsEndRef.current) {
+            commentsEndRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [comments, commentTrayOpen]);
+
+    // Focus input when tray opens
+    useEffect(() => {
+        if (commentTrayOpen && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [commentTrayOpen]);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const content = newComment?.trim() || null;
+        if (content) {
+            setLoading(true);
+            try {
+                const res = await addNewComment(content, post._id);
+                console.log(res);
+                setComments([...comments, res.comment]);
+                setNewComment("");
+                toast.success(res.message);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter" && newComment?.trim()) {
+            e.preventDefault();
+            buttonRef.current.click();
+        }
+    };
+
+    const handleEdit = async (e, commentId) => {
+        e.preventDefault();
+        const content = newComment?.trim() || null;
+        if (content) {
+            setLoading(true);
+            try {
+                const res = await editComment(content, commentId);
+                setComments([
+                    ...comments.map((c) =>
+                        c._id.toString() === commentId.toString()
+                            ? res.comment
+                            : c,
+                    ),
+                ]);
+                setNewComment("");
+                toast.success(res.message);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setIsEditing(false);
+                setLoading(false);
+            }
+        }
+    };
+
+    const handleDelete = async (e, commentId) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            const res = await deleteComment(commentId);
+            setComments([
+                ...comments.filter(
+                    (c) => c._id.toString() !== commentId.toString(),
+                ),
+            ]);
+            toast.success(res.message);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleReply = async (e, commentId) => {
+        e.preventDefault();
+        const content = newComment?.trim() || null;
+        if (content) {
+            setLoading(true);
+            try {
+                const res = await editComment(content, commentId);
+                setComments([...comments, res.comment]);
+                setNewComment("");
+                toast.success(res.message);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
+    return (
+        <div
+            data-lenis-prevent
+            className={`fixed inset-y-0 right-0 w-full md:w-96 bg-white dark:bg-gray-900 shadow-xl transform transition-transform duration-300 ease-in-out
+                ${commentTrayOpen ? "translate-x-0" : "translate-x-full"} flex flex-col h-full z-50`}
+        >
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+                <h2 className="text-lg font-medium text-gray-800 dark:text-gray-100">
+                    Comments
+                </h2>
+                <button
+                    onClick={() => setCommentTrayOpen(false)}
+                    className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+                    aria-label="Close comments"
+                >
+                    <X size={20} className="text-gray-600 dark:text-gray-400" />
+                </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                {comments?.length > 0
+                    ? comments.map((comment) => (
+                          <div
+                              key={comment._id}
+                              className="flex space-x-3 group"
+                          >
+                              <Avatar
+                                  onClick={() =>
+                                      navigate(`/u/${comment.author.username}`)
+                                  }
+                                  className="w-8 h-8 rounded-full flex-shrink-0 cursor-pointer"
+                              >
+                                  <AvatarImage
+                                      src={comment.author.profilePicture}
+                                      alt={comment.author.fullName}
+                                  />
+                                  <AvatarFallback>
+                                      {comment.author.fullName.slice(0, 2)}
+                                  </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1">
+                                  <div className="flex items-baseline justify-between">
+                                      <h3 className="font-medium text-gray-900 dark:text-gray-100 flex items-center justify-center gap-3">
+                                          {comment.author.fullName}
+                                          <div className="flex items-center justify-center gap-2">
+                                              {comment.authorId.toString() ===
+                                                  currentUser._id.toString() && (
+                                                  <>
+                                                      <div
+                                                          className="cursor-pointer"
+                                                          onClick={() => {
+                                                              if (isEditing) {
+                                                                  setIsEditing(
+                                                                      false,
+                                                                  );
+                                                                  editingCommentIdRef.current =
+                                                                      null;
+                                                                  setNewComment(
+                                                                      "",
+                                                                  );
+                                                              } else {
+                                                                  setIsEditing(
+                                                                      true,
+                                                                  );
+                                                                  editingCommentIdRef.current =
+                                                                      comment._id;
+                                                                  setNewComment(
+                                                                      comment.content,
+                                                                  );
+                                                              }
+                                                          }}
+                                                      >
+                                                          <Edit className="size-4" />
+                                                      </div>
+                                                      <div
+                                                          className="cursor-pointer"
+                                                          onClick={(e) =>
+                                                              handleDelete(
+                                                                  e,
+                                                                  comment._id,
+                                                              )
+                                                          }
+                                                      >
+                                                          <Trash2 className="size-4" />
+                                                      </div>
+                                                  </>
+                                              )}
+                                              <div
+                                                  className="cursor-pointer"
+                                                  onClick={handleReply}
+                                              >
+                                                  <Reply className="size-4" />
+                                              </div>
+                                          </div>
+                                      </h3>
+                                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                                          {timeAgo(comment.createdAt)}
+                                      </span>
+                                  </div>
+                                  {comment.authorId.toString() ===
+                                      post.authorId.toString() && (
+                                      <span className="bg-lime-200 rounded-full px-2 text-xs mr-2">
+                                          Author
+                                      </span>
+                                  )}
+                                  {comment.createdAt !== comment.updatedAt && (
+                                      <span className="bg-gray-200 rounded-full px-2 text-xs">
+                                          edited
+                                      </span>
+                                  )}
+                                  <p className="mt-1 text-gray-800 dark:text-gray-200">
+                                      {comment.content}
+                                  </p>
+                              </div>
+                          </div>
+                      ))
+                    : "no comments until now"}
+                <div ref={commentsEndRef} />
+            </div>
+
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                {!isEditing ? (
+                    <div className="relative flex items-center">
+                        <input
+                            ref={inputRef}
+                            type="text"
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            placeholder="Add a comment..."
+                            className="flex-1 px-4 py-2 pr-10 bg-gray-100 dark:bg-gray-800 border-0 rounded-full text-gray-800 dark:text-gray-100
+                        placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-lime-500 transition-all duration-200"
+                        />
+                        <button
+                            ref={buttonRef}
+                            onClick={(e) => handleSubmit(e)}
+                            disabled={!newComment?.trim() || false}
+                            className="absolute right-2 p-1.5 rounded-full bg-lime-500 text-white disabled:opacity-50
+                        disabled:bg-gray-400 dark:disabled:bg-gray-700 transition-all duration-200"
+                            aria-label="Send comment"
+                        >
+                            <Send size={16} />
+                        </button>
+                    </div>
+                ) : (
+                    // removed using refs in here, although would have been fine,
+                    // cuz only one block renders at a time based on editing
+                    <div className="relative flex items-center">
+                        <input
+                            type="text"
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                            className="flex-1 px-4 py-2 pr-10 bg-gray-100 dark:bg-gray-800 border-0 rounded-full text-gray-800 dark:text-gray-100
+                        placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-lime-500 transition-all duration-200"
+                        />
+                        <button
+                            onClick={(e) =>
+                                handleEdit(e, editingCommentIdRef.current)
+                            }
+                            disabled={!newComment.trim()}
+                            className="absolute right-2 p-1.5 rounded-full bg-lime-500 text-white disabled:opacity-50
+                        disabled:bg-gray-400 dark:disabled:bg-gray-700 transition-all duration-200"
+                            aria-label="Send comment"
+                        >
+                            <Send size={16} />
+                        </button>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+});
+CommentsBox.propTypes = {
+    post: PropTypes.object,
+    currentUser: PropTypes.object,
+    setCommentTrayOpen: PropTypes.func,
+    commentTrayOpen: PropTypes.bool,
+};
 // ***************************************************
 // ***************************************************
 // ***************************************************

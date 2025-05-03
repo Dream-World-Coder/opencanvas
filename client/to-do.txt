@@ -1,24 +1,25 @@
--- [] index the db
--- [] comments
--- [] interested topics add in settings
+-- [x] index the db
+-- [x] comments
+-- [] interested topics add in profile settings
 
--- [] saved page ->> liked & other collections
+-- [] saved posts page ->> liked & other collections
 -- [] make dynamic sitemap
 
---- [] study concept of react query and remake the whole
+-- [] study concept of react query and remake the whole
 
--- [] post view page for private posts
--- [] in profile footer add `opencanvas`
+-- [x] post view page for private posts
+-- [x] in profile footer add `opencanvas`
 -- [] gap button in editor
--- [] store fetched posts of feed [use context or cache]
 -- [] UI-UX and design upgrade needed
--- [] sliding effect in header, highlight current route, and traverse the green box to other
+
+-- [] if post.type !== article then only show the back button, [else table of contents is creating problems]
 
 -- [] Magazine [week - month - year] : best articles or collections [any one], best stories & poems [in different sections[max 8]]
 -- [] caching is available in sever environments, but something similar can be made, i.e. if same arguments then same result, no api call needed, [store the previous in some ref / context]
 
 -- [] I think another attribute `timesFetched` can be added, to easily cache proper posts, its not necessary only a more fetched post will always be on trending,
 
+-- [] loading when liking disliking a post
 -- [] drag & drop not functional in regular image upload inside articles
 -- [] Image viewer -> chobi boro kore dekhar moto jinis, like in gfg, click korle dekha jabe,
 ** maybe protita image inside article ke ekta onClick dite hobe just and Toaster er moto ekta viewer component niche laagiye debo, and then see enlarged image on click
