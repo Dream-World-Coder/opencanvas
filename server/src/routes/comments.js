@@ -25,7 +25,7 @@ router.post(
             !commentInformation.content ||
             !commentInformation.postId
         ) {
-            return res.status(404).json({
+            return res.status(400).json({
                 success: false,
                 message: "comment information not found",
             });
@@ -110,7 +110,7 @@ router.put(
             !commentInformation.commentId ||
             !commentInformation.content
         ) {
-            return res.status(404).json({
+            return res.status(400).json({
                 success: false,
                 message: "comment information not found",
             });
@@ -251,7 +251,7 @@ router.post(
             !commentInformation.postId ||
             !commentInformation.parentId
         ) {
-            return res.status(404).json({
+            return res.status(400).json({
                 success: false,
                 message: "comment information not found",
             });
@@ -341,7 +341,7 @@ router.get("/p/comments/:commentId", authenticateToken, async (req, res) => {
     const { commentId } = req.params;
 
     if (!commentId) {
-        return res.status(404).json({
+        return res.status(400).json({
             success: false,
             message: "No comment ID provided",
         });
