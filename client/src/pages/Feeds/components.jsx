@@ -215,6 +215,13 @@ export const PostStats = ({ post }) => {
                     </b>
                     Likes
                 </div>
+                <div className="flex items-center">
+                    <b>
+                        {post.totalComments || 0}
+                        &nbsp;
+                    </b>
+                    Comments
+                </div>
             </div>
             <div className="flex items-center">
                 <BookOpen className="h-4 w-4 mr-1.5" />

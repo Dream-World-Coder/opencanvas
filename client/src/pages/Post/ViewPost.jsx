@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import PropTypes from "prop-types";
+// import PropTypes from "prop-types";
 
 import { toast } from "sonner";
 
@@ -22,6 +22,7 @@ import {
     LeftSidebar,
     RightSidebar,
     EngagementSection,
+    CommentsBox,
     ArticleHeader,
     ThemedMarkdownPreview,
 } from "./components";
@@ -43,12 +44,12 @@ const ViewPost = () => {
     const [post, setPost] = useState(null);
     const [likes, setLikes] = useState(0);
     const [author, setAuthor] = useState(null);
-    // const [comments, setComments] = useState(0);
     const [following, setFollowing] = useState(false);
     const [loading, setLoading] = useState(true);
     const [isLiked, setIsLiked] = useState(false);
     const [isDisliked, setIsDisliked] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
+    const [commentTrayOpen, setCommentTrayOpen] = useState(false);
 
     // needed here to fetch freshly instead prefetched
     const [authorPosts, setAuthorPosts] = useState([]);
@@ -351,6 +352,14 @@ const ViewPost = () => {
                             isDisliked={isDisliked}
                             isSaved={isSaved}
                             likes={likes}
+                            commentTrayOpen={commentTrayOpen}
+                            setCommentTrayOpen={setCommentTrayOpen}
+                        />
+
+                        <CommentsBox
+                            post={post}
+                            commentTrayOpen={commentTrayOpen}
+                            setCommentTrayOpen={setCommentTrayOpen}
                         />
 
                         {/* More from author section */}

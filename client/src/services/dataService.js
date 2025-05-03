@@ -191,8 +191,10 @@ export const useDataService = () => {
 
     const deleteComment = async (commentId) => {
         try {
-            const data = { commentId };
-            const response = await authAxios.delete(`/delete-comment`, data);
+            // for axios.delete has to be get, cuz it does not send any data
+            const response = await authAxios.delete(
+                `/delete-comment?commentId=${commentId}`,
+            );
             return response.data;
         } catch (error) {
             toast.error(error.response.data.message);
