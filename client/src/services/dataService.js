@@ -4,6 +4,8 @@ import { toast } from "sonner";
 export const useDataService = () => {
     const { authAxios } = useAuth();
 
+    // user related
+    // ---------------------------------
     const getAuthorProfile = async (authorId) => {
         try {
             const response = await authAxios.get(`/author/${authorId}`);
@@ -59,8 +61,8 @@ export const useDataService = () => {
         }
     };
 
-    // Post related functions
-    // -------------------------------------------------------------------------------------------
+    // Post related
+    // ---------------------------------
     const getNewPostId = async () => {
         try {
             const response = await authAxios.post("/get-new-postId");
@@ -72,7 +74,6 @@ export const useDataService = () => {
         }
     };
 
-    // handle errors if post not found
     const getPostById = async (postId) => {
         try {
             const response = await authAxios.get(`/p/${postId}`);
@@ -83,7 +84,9 @@ export const useDataService = () => {
             throw error;
         }
     };
-    // here post media will also be reveled, so auth needed, else anyone can delete the images via imgur api
+    // here post media also has to be reveled,
+    // so auth needed, else anyone can delete the
+    // images inside the post using imgur api
     const getPostByIdSecured = async (postId) => {
         try {
             const response = await authAxios.get(`/secure/p/${postId}`);
@@ -160,7 +163,85 @@ export const useDataService = () => {
         }
     };
 
-    // Collection related functions
+    // Comments related
+    // ---------------------------------
+    const addNewComment = async (content, postId) => {
+        try {
+            const data = { content, postId };
+            const response = await authAxios.post(`/new-comment`, data);
+            return response.data;
+        } catch (error) {
+            toast.error(error.response.data.message);
+            console.error("Error adding comment:", error);
+            throw error;
+        }
+    };
+
+    const editComment = async (content, commentId) => {
+        try {
+            const data = { content, commentId };
+            const response = await authAxios.put(`/edit-comment`, data);
+            return response.data;
+        } catch (error) {
+            toast.error(error.response.data.message);
+            console.error("Error editing comment:", error);
+            throw error;
+        }
+    };
+
+    const deleteComment = async (commentId) => {
+        try {
+            const data = { commentId };
+            const response = await authAxios.delete(`/delete-comment`, data);
+            return response.data;
+        } catch (error) {
+            toast.error(error.response.data.message);
+            console.error("Error deleting comment:", error);
+            throw error;
+        }
+    };
+
+    const newReply = async (content, postId, parentId) => {
+        try {
+            const data = { content, postId, parentId };
+            const response = await authAxios.post(`/reply-to-a-comment`, data);
+            return response.data;
+        } catch (error) {
+            toast.error(error.response.data.message);
+            console.error("Error adding comment:", error);
+            throw error;
+        }
+    };
+
+    const getComment = async (commentId) => {
+        try {
+            const response = await authAxios.get(`/p/comments/${commentId}`);
+            return response.data.comment;
+        } catch (error) {
+            toast.error(error.response.data.message);
+            console.error("Error fetching comment:", error);
+            throw error;
+        }
+    };
+
+    const getCommentsByIds = async (post, currentIndex) => {
+        if (post.comments.length === 0) return [];
+        const commentIds = post.comments
+            // .slice(currentIndex + 0, currentIndex + 10)
+            .join(",");
+        const data = { commentIds };
+        try {
+            const response = await authAxios.post(`/get-comments-byids`, data);
+            return response.data.comments;
+        } catch (error) {
+            toast.error(error.response.data.message);
+            console.error("Error fetching comments:", error);
+            throw error;
+        }
+    };
+
+    // Collection related
+    // ---------------------------------
     const createCollection = async (collectionData) => {
         try {
             const response = await authAxios.post(
@@ -254,7 +335,6 @@ export const useDataService = () => {
 
     return {
         // User
-        // getUserProfile,
         getAuthorProfile,
         updateUserProfile,
         followUser,
@@ -269,6 +349,14 @@ export const useDataService = () => {
         dislikePost,
         savePost,
         changePostVisibility,
+
+        // Comments
+        addNewComment,
+        editComment,
+        deleteComment,
+        newReply,
+        getComment,
+        getCommentsByIds,
 
         // Collections
         createCollection,
