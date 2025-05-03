@@ -8,3 +8,4 @@ node_modules/
 .env*
 t.js
 db_backups
+src/routes/backup

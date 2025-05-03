@@ -3,10 +3,13 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Comment = require("../models/Comment");
 const Post = require("../models/Post");
+const User = require("../models/User");
 const {
     authenticateToken,
     checkUserExists,
 } = require("../middlewares/authorisation");
+
+// when a post is deletd then schedule all its comments deletion
 
 /**
  * new comment
@@ -14,10 +17,14 @@ const {
 router.post(
     "/new-comment",
     authenticateToken,
-    // checkUserExists,
+    checkUserExists,
     async (req, res) => {
         const commentInformation = req.body;
-        if (!commentInformation) {
+        if (
+            !commentInformation ||
+            !commentInformation.content ||
+            !commentInformation.postId
+        ) {
             return res.status(404).json({
                 success: false,
                 message: "comment information not found",
@@ -42,8 +49,6 @@ router.post(
             return res.status(400).json({ error: "Invalid author ID" });
         }
 
-        const session = await mongoose.startSession();
-        session.startTransaction();
         try {
             const post = await Post.findById(postId);
             if (!post) {
@@ -58,20 +63,27 @@ router.post(
                 authorId,
                 postId,
             });
-            const newComment = await comment.save({ session });
+            const newComment = await comment.save();
 
             post.comments.push(comment._id);
             post.totalComments += 1;
-            await post.save({ session });
-            await session.commitTransaction();
+            await post.save();
+
+            const commentObj = newComment.toObject();
+            commentObj.author = {
+                _id: req.user._id,
+                fullName: req.user.fullName,
+                username: req.user.username,
+                profilePicture: req.user.profilePicture,
+                role: req.user.role,
+            };
 
             return res.status(200).json({
                 success: true,
                 message: "comment added.",
-                comment: newComment,
+                comment: commentObj,
             });
         } catch (error) {
-            await session.abortTransaction();
             console.error(error);
             return res.status(500).json({
                 success: false,
@@ -80,8 +92,6 @@ router.post(
                         ? error.message
                         : "Server error",
             });
-        } finally {
-            session.endSession();
         }
     },
 );
@@ -92,10 +102,14 @@ router.post(
 router.put(
     "/edit-comment",
     authenticateToken,
-    // checkUserExists,
+    checkUserExists,
     async (req, res) => {
         const commentInformation = req.body;
-        if (!commentInformation) {
+        if (
+            !commentInformation ||
+            !commentInformation.commentId ||
+            !commentInformation.content
+        ) {
             return res.status(404).json({
                 success: false,
                 message: "comment information not found",
@@ -132,11 +146,19 @@ router.put(
             currentComment.content = commentContent;
 
             const comment = await currentComment.save();
+            const commentObj = comment.toObject();
+            commentObj.author = {
+                _id: req.user._id,
+                fullName: req.user.fullName,
+                username: req.user.username,
+                profilePicture: req.user.profilePicture,
+                role: req.user.role,
+            };
 
             return res.status(200).json({
                 success: true,
                 message: "comment updated.",
-                comment,
+                comment: commentObj,
             });
         } catch (error) {
             console.error(error);
@@ -157,19 +179,17 @@ router.put(
 router.delete(
     "/delete-comment",
     authenticateToken,
-    // checkUserExists,
+    checkUserExists,
     async (req, res) => {
-        const commentInformation = req.body;
-        if (!commentInformation) {
-            return res.status(404).json({
+        const commentId = req.query.commentId;
+
+        if (!commentId) {
+            return res.status(400).json({
                 success: false,
-                message: "comment information not found",
+                message: "No comment ID provided",
             });
         }
 
-        const commentId = commentInformation.commentId;
-        const session = await mongoose.startSession();
-        session.startTransaction();
         try {
             const currentComment = await Comment.findById(commentId);
 
@@ -190,24 +210,20 @@ router.delete(
             if (currentComment.replies.length > 0) {
                 currentComment.content = "deleted";
                 currentComment.authorId = "deletedAccount";
-                await currentComment.save({ session });
+                await currentComment.save();
             } else {
-                await currentComment.remove({ session });
-                // await Comment.findByIdAndDelete(commentId);
+                await Comment.findByIdAndDelete(commentId);
             }
 
             const post = await Post.findById(currentComment.postId);
             post.totalComments -= 1;
-            await post.save({ session });
-
-            await session.commitTransaction();
+            await post.save();
 
             return res.status(200).json({
                 success: true,
                 message: "comment deleted.",
             });
         } catch (error) {
-            await session.abortTransaction();
             console.error(error);
             return res.status(500).json({
                 success: false,
@@ -216,8 +232,6 @@ router.delete(
                         ? error.message
                         : "Server error",
             });
-        } finally {
-            session.endSession();
         }
     },
 );
@@ -228,10 +242,15 @@ router.delete(
 router.post(
     "/reply-to-a-comment",
     authenticateToken,
-    // checkUserExists,
+    checkUserExists,
     async (req, res) => {
         const commentInformation = req.body;
-        if (!commentInformation) {
+        if (
+            !commentInformation ||
+            !commentInformation.content ||
+            !commentInformation.postId ||
+            !commentInformation.parentId
+        ) {
             return res.status(404).json({
                 success: false,
                 message: "comment information not found",
@@ -261,8 +280,6 @@ router.post(
             return res.status(400).json({ error: "Invalid parent comment ID" });
         }
 
-        const session = await mongoose.startSession();
-        session.startTransaction();
         try {
             const parentComment = await Comment.findById(parentId);
             if (!parentComment) {
@@ -279,17 +296,24 @@ router.post(
                 isReply,
                 parentId,
             });
-            const newReply = await comment.save({ session });
+            const newReply = await comment.save();
 
-            //
+            newReply.author = {
+                _id: req.user._id,
+                fullName: req.user.fullName,
+                username: req.user.username,
+                profilePicture: req.user.profilePicture,
+                role: req.user.role,
+            };
+
+            // updating parent comment
             parentComment.replies.push(newReply._id);
-            await parentComment.save({ session });
-            await session.commitTransaction();
+            await parentComment.save();
 
             // increasing post total-comments
             const post = await Post.findById(postId);
             post.totalComments += 1;
-            await post.save({ session });
+            await post.save();
 
             return res.status(200).json({
                 success: true,
@@ -297,7 +321,6 @@ router.post(
                 comment: newReply,
             });
         } catch (error) {
-            await session.abortTransaction();
             console.error(error);
             return res.status(500).json({
                 success: false,
@@ -306,15 +329,13 @@ router.post(
                         ? error.message
                         : "Server error",
             });
-        } finally {
-            session.endSession();
         }
     },
 );
 
 // fetch comments
 /**
- * fetch single comment with all replies
+ * fetch single comment with all replies : fetch author info here
  */
 router.get("/p/comments/:commentId", authenticateToken, async (req, res) => {
     const { commentId } = req.params;
@@ -363,13 +384,14 @@ router.get("/p/comments/:commentId", authenticateToken, async (req, res) => {
 
 /**
  * fetch multiple comments by their ids
+ * need to add a cursor based approach instead getting all
  */
 router.post("/get-comments-byids", authenticateToken, async (req, res) => {
     try {
         // query string, need to split
         const data = req.body;
 
-        if (!data) {
+        if (!data || !data.commentIds) {
             return res.status(400).json({
                 success: false,
                 message: "No post IDs provided",
@@ -392,9 +414,24 @@ router.post("/get-comments-byids", authenticateToken, async (req, res) => {
             _id: { $in: commentIds },
         }).sort({ createdAt: -1 }); // newest first // query string is in that order but still sorting
 
+        const commentsWithAuthorInfo = [];
+        // fetch author of every comment and then add them in a new `author` attribute
+        for (let comment of comments) {
+            const commentObj = comment.toObject();
+            let authorInfo = await User.findById(comment.authorId).select({
+                _id: 1,
+                fullName: 1,
+                username: 1,
+                profilePicture: 1,
+                role: 1,
+            });
+            commentObj.author = authorInfo;
+            commentsWithAuthorInfo.push(commentObj);
+        }
+
         return res.status(200).json({
             success: true,
-            comments,
+            comments: commentsWithAuthorInfo,
         });
     } catch (error) {
         console.error("Error getting comments by IDs:", error);
