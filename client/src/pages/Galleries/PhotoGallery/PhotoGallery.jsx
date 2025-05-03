@@ -123,7 +123,11 @@ const GalleryPage = ({ bgClr = "bg-cream-light" }) => {
                 <div className="max-w-[1600px] mx-auto px-4 sm:px-8 py-4 sm:py-6">
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-4">
-                            <h1 className="text-2xl font-serif">Gallery</h1>
+                            <a href="/">
+                                <h1 className="text-2xl font-serif">
+                                    OpenCanvas
+                                </h1>
+                            </a>
                             {/* Mobile Menu Button */}
                             <button
                                 onClick={() => setIsMobileMenuOpen(true)}
