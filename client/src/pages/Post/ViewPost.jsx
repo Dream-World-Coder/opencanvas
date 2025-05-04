@@ -293,13 +293,14 @@ const ViewPost = () => {
                     darkBg={`${darkTheme.colors.headerBg}`}
                 />
                 <div
-                    className={`flex flex-col md:flex-row min-h-screen max-w-screen-xl mx-auto bg-white ${darkTheme.colors.bg} text-gray-900 ${darkTheme.colors.primaryText}`}
+                    className={`flex flex-col md:flex-row min-h-screen max-w-screen-xl mx-auto bg-white
+                        ${darkTheme.colors.bg} text-gray-900 ${darkTheme.colors.primaryText}`}
                 >
                     <LeftSidebar />
 
                     {/* Main content */}
                     <main
-                        className={`flex-1 py-4 md:py-6 lg:py-8 px-6 md:px-2 lg:px-0 min-h-screen max-w-3xl`}
+                        className={`flex-1 py-4 md:py-6 lg:py-8 px-4 md:px-2 lg:px-0 min-h-screen max-w-[calc(100vw-1rem)] md:max-w-3xl`}
                     >
                         {/* Article header */}
                         <ArticleHeader

@@ -1286,7 +1286,7 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                                 className={`pt-2 mb-10 leading-tight tracking-tight capitalize  ${
                                     contentOnly
                                         ? "text-xl font-semibold font-sans"
-                                        : "text-4xl font-bold font-serif"
+                                        : "text-3xl md:text-4xl font-bold font-serif"
                                 }
                                 ${artType === "poem" ? "!max-w-[600px] !font-boskaBold" : ""}
                                 ${darkTheme.primaryText}`}
@@ -1490,7 +1490,7 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                                         className={`mt-12 mb-6 leading-tight tracking-tight cursor-pointer ${
                                             contentOnly
                                                 ? "text-xl font-semibold font-sans"
-                                                : "text-4xl font-bold font-serif"
+                                                : "text-3xl md:text-4xl font-bold font-serif"
                                         }`}
                                         onClick={() => {
                                             copyHeaderLink(children);
@@ -1511,7 +1511,7 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                                         className={`font-serif mt-10 mb-5 leading-tight tracking-tight cursor-pointer ${
                                             contentOnly
                                                 ? "text-lg"
-                                                : "text-3xl font-bold"
+                                                : "text-2xl md:text-3xl font-bold"
                                         }`}
                                         onClick={() => {
                                             copyHeaderLink(children);
@@ -1532,7 +1532,7 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                                         className={`font-serif mt-8 mb-4 leading-snug cursor-pointer ${
                                             contentOnly
                                                 ? "text-base"
-                                                : "text-2xl font-bold"
+                                                : "text-xl md:text-2xl font-bold"
                                         }`}
                                         onClick={() => {
                                             copyHeaderLink(children);
@@ -1551,7 +1551,9 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                                             .replace(/-+/g, "-")
                                             .replace(/^-|-$/g, "")}
                                         className={`montserrat-regular font-semibold mt-6 mb-3 leading-snug cursor-pointer ${
-                                            contentOnly ? "text-sm" : "text-xl"
+                                            contentOnly
+                                                ? "text-sm"
+                                                : "text-lg md:text-xl"
                                         }`}
                                         onClick={() => {
                                             copyHeaderLink(children);
@@ -1563,7 +1565,9 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                                 h5: ({ children }) => (
                                     <h5
                                         className={`montserrat-regular font-semibold mt-5 mb-3 leading-snug ${
-                                            contentOnly ? "text-sm" : "text-lg"
+                                            contentOnly
+                                                ? "text-sm"
+                                                : "text-base md:text-lg"
                                         }`}
                                     >
                                         {children}
@@ -1632,17 +1636,17 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                                 ),
 
                                 ul: ({ children }) => (
-                                    <ul className="montserrat-regular list-disc pl-6 md:pl-8 my-5 space-y-2">
+                                    <ul className="montserrat-regular list-disc pl-6 md:pl-8 my-3 md:my-4 space-y-2">
                                         {children}
                                     </ul>
                                 ),
                                 ol: ({ children }) => (
-                                    <ol className="montserrat-regular list-decimal pl-6 md:pl-8 my-5 space-y-2">
+                                    <ol className="montserrat-regular list-decimal pl-6 md:pl-8 my-3 md:my-4 space-y-2">
                                         {children}
                                     </ol>
                                 ),
                                 li: ({ children }) => (
-                                    <li className="montserrat-regular leading-relaxed text-base md:text-lg">
+                                    <li className="montserrat-regular leading-snug md:leading-normal text-base md:text-lg">
                                         {children}
                                     </li>
                                 ),
