@@ -911,6 +911,10 @@ export const CommentsBox = memo(function CommentsBox({
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!currentUser) {
+            toast.error("Login first.");
+            return;
+        }
         const content = newComment?.trim() || null;
         if (content) {
             setLoading(true);
@@ -929,6 +933,10 @@ export const CommentsBox = memo(function CommentsBox({
     };
 
     const handleEdit = async (e, commentId) => {
+        if (!currentUser) {
+            toast.error("Login first.");
+            return;
+        }
         e.preventDefault();
         const content = newComment?.trim() || null;
         if (content) {
@@ -972,6 +980,10 @@ export const CommentsBox = memo(function CommentsBox({
     };
 
     const handleReply = async (e, commentId) => {
+        if (!currentUser) {
+            toast.error("Login first.");
+            return;
+        }
         e.preventDefault();
         const content = newComment?.trim() || null;
         if (content) {
@@ -1038,7 +1050,7 @@ export const CommentsBox = memo(function CommentsBox({
                                           {comment.author.fullName}
                                           <div className="flex items-center justify-center gap-2">
                                               {comment.authorId.toString() ===
-                                                  currentUser._id.toString() && (
+                                                  currentUser?._id.toString() && (
                                                   <>
                                                       <div
                                                           className="cursor-pointer"
@@ -1164,7 +1176,6 @@ export const CommentsBox = memo(function CommentsBox({
 });
 CommentsBox.propTypes = {
     post: PropTypes.object,
-    currentUser: PropTypes.object,
     setCommentTrayOpen: PropTypes.func,
     commentTrayOpen: PropTypes.bool,
 };
