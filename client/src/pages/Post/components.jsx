@@ -234,7 +234,10 @@ export const LeftSidebar = () => {
 /**
  *
  */
-export const TableOfContents = ({ tableOfContents, isArticle }) => {
+export const TableOfContents = memo(function Toc({
+    tableOfContents,
+    isArticle,
+}) {
     const [isOpen, setIsOpen] = useState(true);
 
     return (
@@ -259,14 +262,18 @@ export const TableOfContents = ({ tableOfContents, isArticle }) => {
 
                         {/* for mobile */}
                         <div className="flex lg:hidden w-full justify-end">
-                            <List className="size-5 bg-gray-300 dark:bg-neutral-700 box-content p-2 rounded" />
+                            {isOpen ? (
+                                <X className="size-4 bg-neutral-200 dark:bg-neutral-700 box-content p-1 rounded" />
+                            ) : (
+                                <List className="size-4 bg-neutral-200 dark:bg-neutral-700 box-content p-1 rounded" />
+                            )}
                         </div>
                     </summary>
 
                     {isOpen && (
                         <div
                             data-lenis-prevent
-                            className="dropdown max-h-[600px] overflow-y-auto pb-4 bg-gray-300 dark:bg-neutral-700 rounded lg:bg-transparent lg:dark:bg-transparent"
+                            className="dropdown max-h-[600px] overflow-y-auto pb-4 bg-neutral-200 dark:bg-neutral-700 rounded lg:bg-transparent lg:dark:bg-transparent"
                         >
                             <ul className="pl-1 pt-2">
                                 {tableOfContents.map((title, titleIndex) => (
@@ -390,12 +397,15 @@ export const TableOfContents = ({ tableOfContents, isArticle }) => {
             )}
         </aside>
     );
-};
+});
 TableOfContents.propTypes = {
     tableOfContents: PropTypes.array,
     isArticle: PropTypes.bool,
 };
-export const RightSidebar = ({ content, isArticle = true }) => {
+export const RightSidebar = memo(function rightSidebar({
+    content,
+    isArticle = true,
+}) {
     // Parse content to build the table of contents
     const parseTableOfContents = (content) => {
         if (!content) return [];
@@ -508,7 +518,8 @@ export const RightSidebar = ({ content, isArticle = true }) => {
             isArticle={isArticle}
         />
     );
-};
+});
+
 RightSidebar.propTypes = {
     content: PropTypes.string,
     isArticle: PropTypes.bool,
