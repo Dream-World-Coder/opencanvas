@@ -19,6 +19,7 @@ import {
     Edit,
     Trash2,
     Reply,
+    List,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -237,29 +238,35 @@ export const TableOfContents = ({ tableOfContents, isArticle }) => {
     const [isOpen, setIsOpen] = useState(true);
 
     return (
-        <aside className="w-full md:w-72 p-4 hidden lg:block relative">
+        <aside className="w-full md:w-72 p-4 relative">
             {isArticle && (
-                <div className="fixed top-24 right-0 w-72 px-0">
+                <div className="fixed top-20 right-4 w-52 lg:top-24 lg:right-0 lg:w-72 px-0">
                     <summary
                         className="flex items-center justify-start gap-1 py-2 cursor-pointer list-none"
                         onClick={() => setIsOpen(!isOpen)}
                     >
-                        <div className="font-serif text-xl px-2 bg-[#F0F1C5] dark:bg-neutral-700 rounded text-black dark:text-[#f8f8f8]">
+                        {/* for desktop */}
+                        <div className="hidden lg:block font-serif text-xl px-2 bg-[#F0F1C5] dark:bg-neutral-700 rounded text-black dark:text-[#f8f8f8]">
                             Table of Contents
                         </div>
-                        <div className="opencloseindicatorIcon">
+                        <div className="hidden lg:block">
                             {isOpen ? (
                                 <ChevronUp size={16} />
                             ) : (
                                 <ChevronDown size={16} />
                             )}
                         </div>
+
+                        {/* for mobile */}
+                        <div className="flex lg:hidden w-full justify-end">
+                            <List className="size-5 bg-gray-300 dark:bg-neutral-700 box-content p-2 rounded" />
+                        </div>
                     </summary>
 
                     {isOpen && (
                         <div
                             data-lenis-prevent
-                            className="dropdown max-h-[600px] overflow-y-auto pb-4"
+                            className="dropdown max-h-[600px] overflow-y-auto pb-4 bg-gray-300 dark:bg-neutral-700 rounded lg:bg-transparent lg:dark:bg-transparent"
                         >
                             <ul className="pl-1 pt-2">
                                 {tableOfContents.map((title, titleIndex) => (
@@ -602,17 +609,19 @@ export const ArticleHeader = ({
                 className="flex flex-col md:flex-row items-start md:items-center
                 justify-between space-y-2 md:space-y-0 mb-4"
             >
-                {/* back btn */}
                 <div className="flex justify-center items-center gap-2">
-                    <button
-                        className="rounded-full text-sm bg-gray-100 hover:bg-gray-200 dark:bg-[#111]
+                    {/* back btn */}
+                    {post.type.toLowerCase() !== "article" && (
+                        <button
+                            className="rounded-full text-sm bg-gray-100 hover:bg-gray-200 dark:bg-[#111]
                         border box-content p-1 text-stone-600/80 dark:border-[#333] cursor-pointer"
-                        onClick={() => {
-                            navigate(-1);
-                        }}
-                    >
-                        <ChevronLeft className="size-6" />
-                    </button>
+                            onClick={() => {
+                                navigate(-1);
+                            }}
+                        >
+                            <ChevronLeft className="size-6" />
+                        </button>
+                    )}
 
                     {/* author details */}
                     <div
