@@ -386,7 +386,7 @@ router.get("/p/comments/:commentId", authenticateToken, async (req, res) => {
  * fetch multiple comments by their ids
  * need to add a cursor based approach instead getting all
  */
-router.post("/get-comments-byids", authenticateToken, async (req, res) => {
+router.post("/get-comments-byids", async (req, res) => {
     try {
         // query string, need to split
         const data = req.body;
