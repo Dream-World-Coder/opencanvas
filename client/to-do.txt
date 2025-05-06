@@ -12,12 +12,17 @@
 -- [] drag & drop not functional in regular image upload inside articles
 -- [] do mo use const <var> in components, use useref or usestate, [table of contents component]
 
++++++++++++++
+-- [] post recommendation system based on heading & tags [careful analysis]
+claculate heading and tags in depth, check all associations of tags 2**5 = 32, and verify the tags with content first,
++++++++++++++
+
 -- [] Image viewer -> chobi boro kore dekhar moto jinis, like in gfg, click korle dekha jabe,
 ** maybe protita image inside article ke ekta onClick dite hobe just and Toaster er moto ekta viewer component niche laagiye debo, and then see enlarged image on click
 
 -- first i have to learn it that how much does it help, and whats wrong when fetching a author as soon as post, it might be better than changing all posts if username or profile pic changes,
 
-^^^ ISSUES: open hashes, eg `##` on preview mode of editor creating errors
+^^^ ISSUES: [x] open hashes, eg `##` on preview mode of editor creating errors
 
 In dark mode, heading and texts are in same color which looks bad, ViewPost
 

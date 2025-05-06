@@ -440,7 +440,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                 ${artType === "poem" ? "!max-w-[600px] !font-boskaBold" : ""}`}
                             >
                                 {title}
-                                {!contentOnly && (
+                                {!contentOnly && false && (
                                     <>
                                         <hr
                                             className={`mt-6 mb-px border-t ${isDark ? "border-oneDarkBorder" : "border-gray-200"}`}
@@ -573,7 +573,8 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                                                     "Copy";
                                                             }, 1000);
                                                         }}
-                                                        className="text-black dark:text-white p-1 text-xs rounded hover:bg-[#ddd] dark:hover:bg-[#333] focus:outline-none z-10"
+                                                        className={`text-black dark:text-white p-1 text-xs rounded
+                                                            hover:bg-[#ddd] dark:hover:bg-[#333] focus:outline-none ${contentOnly ? "" : "z-10"}`}
                                                     >
                                                         Copy
                                                     </button>

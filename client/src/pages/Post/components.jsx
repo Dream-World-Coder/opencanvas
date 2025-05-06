@@ -407,6 +407,9 @@ export const RightSidebar = memo(function rightSidebar({
     content,
     isArticle = true,
 }) {
+    // ignore contents inside code block, i.e. enclosed by ` or ```
+    content = content.replace(/```[\s\S]*?```|`[\s\S]*?`/g, "");
+
     // Parse content to build the table of contents
     const parseTableOfContents = (content) => {
         if (!content) return [];
@@ -1326,7 +1329,7 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                                 ${darkTheme.primaryText}`}
                             >
                                 {title}
-                                {!contentOnly && (
+                                {!contentOnly && false && (
                                     <>
                                         <hr
                                             className={`mt-6 mb-px border-t ${isDark ? `dark:border-gray-300` : "border-gray-200"}`}

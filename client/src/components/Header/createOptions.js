@@ -9,6 +9,13 @@ import {
 
 export const createOptions = [
     {
+        id: "article",
+        href: "/createpost/article",
+        icon: NotebookPen,
+        label: "New Article",
+        color: "bg-amber-500",
+    },
+    {
         id: "poem",
         href: "/createpost/poem",
         icon: Pen,
@@ -22,13 +29,6 @@ export const createOptions = [
         label: "New Story",
         color: "bg-blue-500",
     },
-    {
-        id: "article",
-        href: "/createpost/article",
-        icon: NotebookPen,
-        label: "New Article",
-        color: "bg-amber-500",
-    },
     // {
     //     id: "picture",
     //     href: "/createpost/image",
@@ -37,17 +37,17 @@ export const createOptions = [
     //     color: "bg-emerald-500",
     // },
     {
-        id: "mybook",
-        href: "/createpost/book",
-        icon: Book,
-        label: "Create Book",
-        color: "bg-indigo-500",
-    },
-    {
         id: "collection",
         href: "/createpost/collection",
         icon: Library,
         label: "Create Collection",
         color: "bg-rose-500",
+    },
+    {
+        id: "mybook",
+        href: "/createpost/book",
+        icon: Book,
+        label: "Create Book",
+        color: "bg-indigo-500",
     },
 ];
