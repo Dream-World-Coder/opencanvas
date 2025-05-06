@@ -10,12 +10,16 @@
 -- [] I think another attribute `timesFetched` can be added, to easily cache proper posts, its not necessary only a more fetched post will always be on trending,
 -- [] loading when liking disliking a post
 -- [] drag & drop not functional in regular image upload inside articles
+-- [] do mo use const <var> in components, use useref or usestate, [table of contents component]
 
 -- [] Image viewer -> chobi boro kore dekhar moto jinis, like in gfg, click korle dekha jabe,
 ** maybe protita image inside article ke ekta onClick dite hobe just and Toaster er moto ekta viewer component niche laagiye debo, and then see enlarged image on click
 
 -- first i have to learn it that how much does it help, and whats wrong when fetching a author as soon as post, it might be better than changing all posts if username or profile pic changes,
 
+^^^ ISSUES: open hashes, eg `##` on preview mode of editor creating errors
+
+In dark mode, heading and texts are in same color which looks bad, ViewPost
 
 * less imp
     [-] html in export formats

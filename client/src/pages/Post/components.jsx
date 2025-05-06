@@ -15,6 +15,7 @@ import {
     Check,
     ChevronDown,
     ChevronUp,
+    Copy,
     Send,
     Edit,
     Trash2,
@@ -1238,10 +1239,23 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
     lightModeBg = "bg-white",
     insidePost = false,
     darkBg = "bg-[#222]",
-    contentOnly = false,
+    contentOnly = false, // always false here
     artType = "written",
     darkTheme = null,
 }) {
+    function generateId(children) {
+        if (!children) return window.crypto.randomUUID().toString();
+        else {
+            return children
+                .toString()
+                .toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, "") // remove special chars except space and hyphen
+                .replace(/\s+/g, "-") // replace spaces/tabs with hyphens
+                .replace(/-+/g, "-") // collapse multiple hyphens
+                .replace(/^-|-$/g, ""); // trim hyphens from start/end
+        }
+    }
+
     //useref to store settings for all images individually
     const imageSettingsRef = useRef({});
 
@@ -1431,22 +1445,25 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                                                     {match[1]}
                                                 </span>
                                                 {/* Copy button */}
-                                                <button
-                                                    onClick={(e) => {
-                                                        navigator.clipboard.writeText(
-                                                            codeString,
-                                                        );
-                                                        e.target.textContent =
-                                                            "Copied!";
-                                                        setTimeout(() => {
+                                                <div className="flex justify-center items-center gap-1">
+                                                    <Copy size={12} />
+                                                    <button
+                                                        onClick={(e) => {
+                                                            navigator.clipboard.writeText(
+                                                                codeString,
+                                                            );
                                                             e.target.textContent =
-                                                                "Copy";
-                                                        }, 1000);
-                                                    }}
-                                                    className="bg-[#222] text-white px-3 py-1 text-xs rounded hover:bg-[#444] focus:outline-none z-10"
-                                                >
-                                                    Copy
-                                                </button>
+                                                                "Copied!";
+                                                            setTimeout(() => {
+                                                                e.target.textContent =
+                                                                    "Copy";
+                                                            }, 1000);
+                                                        }}
+                                                        className="text-black dark:text-white p-1 text-xs rounded hover:bg-[#ddd] dark:hover:bg-[#333] focus:outline-none z-10"
+                                                    >
+                                                        Copy
+                                                    </button>
+                                                </div>
                                             </div>
 
                                             {/* code card */}
@@ -1498,15 +1515,7 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
 
                                 h1: ({ children }) => (
                                     <h1
-                                        id={
-                                            children
-                                                .toString()
-                                                .toLowerCase()
-                                                .replace(/[^a-z0-9\s-]/g, "") // remove special chars except space and hyphen
-                                                .replace(/\s+/g, "-") // replace spaces/tabs with hyphens
-                                                .replace(/-+/g, "-") // collapse multiple hyphens
-                                                .replace(/^-|-$/g, "") // trim hyphens from start/end
-                                        }
+                                        id={generateId(children)}
                                         className={`mt-12 mb-6 leading-tight tracking-tight cursor-pointer ${
                                             contentOnly
                                                 ? "text-xl font-semibold font-sans"
@@ -1521,13 +1530,7 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                                 ),
                                 h2: ({ children }) => (
                                     <h2
-                                        id={children
-                                            .toString()
-                                            .toLowerCase()
-                                            .replace(/[^a-z0-9\s-]/g, "")
-                                            .replace(/\s+/g, "-")
-                                            .replace(/-+/g, "-")
-                                            .replace(/^-|-$/g, "")}
+                                        id={generateId(children)}
                                         className={`font-serif mt-10 mb-5 leading-tight tracking-tight cursor-pointer ${
                                             contentOnly
                                                 ? "text-lg"
@@ -1542,13 +1545,7 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                                 ),
                                 h3: ({ children }) => (
                                     <h3
-                                        id={children
-                                            .toString()
-                                            .toLowerCase()
-                                            .replace(/[^a-z0-9\s-]/g, "")
-                                            .replace(/\s+/g, "-")
-                                            .replace(/-+/g, "-")
-                                            .replace(/^-|-$/g, "")}
+                                        id={generateId(children)}
                                         className={`font-serif mt-8 mb-4 leading-snug cursor-pointer ${
                                             contentOnly
                                                 ? "text-base"
@@ -1563,13 +1560,7 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                                 ),
                                 h4: ({ children }) => (
                                     <h4
-                                        id={children
-                                            .toString()
-                                            .toLowerCase()
-                                            .replace(/[^a-z0-9\s-]/g, "")
-                                            .replace(/\s+/g, "-")
-                                            .replace(/-+/g, "-")
-                                            .replace(/^-|-$/g, "")}
+                                        id={generateId(children)}
                                         className={`montserrat-regular font-semibold mt-6 mb-3 leading-snug cursor-pointer ${
                                             contentOnly
                                                 ? "text-sm"

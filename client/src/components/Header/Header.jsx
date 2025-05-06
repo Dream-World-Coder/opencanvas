@@ -6,6 +6,7 @@ import { createOptions } from "./createOptions";
 import SearchBar from "../SearchBar";
 import { useDataService } from "../../services/dataService";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import PropTypes from "prop-types";
 
 const Header = ({
     noBlur = false,
@@ -275,5 +276,12 @@ const Header = ({
         </header>
     );
 };
-
+Header.propTypes = {
+    currentUser: PropTypes.object,
+    noBlur: PropTypes.bool,
+    abs: PropTypes.bool,
+    ballClr: PropTypes.string,
+    darkBg: PropTypes.string,
+    exclude: PropTypes.array,
+};
 export default Header;
