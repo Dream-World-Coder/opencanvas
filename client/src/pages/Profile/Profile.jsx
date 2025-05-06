@@ -48,10 +48,10 @@ const Profile = () => {
 
             // post IDs to query string
             const postIdsParam = currentUser.posts
-                .slice(0 + postsToFetchIndex, 10 + postsToFetchIndex)
+                .slice(0 + postsToFetchIndex, 20 + postsToFetchIndex)
                 .join(",");
 
-            setPostsToFetchIndex(postsToFetchIndex + 10);
+            setPostsToFetchIndex(postsToFetchIndex + 20);
 
             const response = await fetch(
                 `http://localhost:3000/u/posts/byids`,

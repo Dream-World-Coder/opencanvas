@@ -54,10 +54,10 @@ const PublicProfile = () => {
 
             // post IDs to query string
             const postIdsParam = user.posts
-                .slice(0 + postsToFetch, 10 + postsToFetch)
+                .slice(0 + postsToFetch, 20 + postsToFetch)
                 .join(",");
 
-            setPostsToFetch(postsToFetch + 10);
+            setPostsToFetch(postsToFetch + 20);
 
             const response = await fetch(
                 `http://localhost:3000/author/posts/byids`,
