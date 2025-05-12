@@ -21,6 +21,7 @@ import {
     Trash2,
     Reply,
     List,
+    PlusCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -871,6 +872,118 @@ EngagementSection.propTypes = {
     likes: PropTypes.number,
 };
 
+const Comment = ({
+    comment,
+    currentUser,
+    post,
+
+    setIsEditing,
+    editingCommentIdRef,
+
+    setIsReplying,
+    parentCommentRef,
+
+    setNewComment,
+    handleDelete,
+}) => {
+    const navigate = useNavigate();
+
+    return (
+        <div className="flex space-x-3 py-3 group text-wrap">
+            <Avatar
+                onClick={() => navigate(`/u/${comment.author.username}`)}
+                className="w-8 h-8 rounded-full flex-shrink-0 cursor-pointer"
+            >
+                <AvatarImage
+                    src={comment.author.profilePicture}
+                    alt={comment.author.fullName}
+                />
+                <AvatarFallback className="font-thin">
+                    {comment.author.fullName.slice(0, 2).toUpperCase()}
+                </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+                <div className="flex items-baseline justify-between">
+                    <h3 className="font-medium text-gray-900 dark:text-neutral-100 flex items-center justify-center gap-3">
+                        {comment.author.fullName}
+                        <div className="flex items-center justify-center gap-2">
+                            {comment.authorId.toString() ===
+                                currentUser?._id.toString() && (
+                                <>
+                                    <div
+                                        className="cursor-pointer"
+                                        onClick={() => {
+                                            setIsEditing(true);
+                                            editingCommentIdRef.current =
+                                                comment._id;
+                                            setNewComment(comment.content);
+                                        }}
+                                    >
+                                        <Edit className="size-4" />
+                                    </div>
+                                    <div
+                                        className="cursor-pointer"
+                                        onClick={(e) =>
+                                            handleDelete(e, comment._id)
+                                        }
+                                    >
+                                        <Trash2 className="size-4" />
+                                    </div>
+                                </>
+                            )}
+                            <div
+                                className="cursor-pointer"
+                                onClick={() => {
+                                    setIsReplying(true);
+                                    parentCommentRef.current = comment;
+                                }}
+                            >
+                                <Reply className="size-4" />
+                            </div>
+                        </div>
+                    </h3>
+                    <span className="text-xs text-gray-500 dark:text-neutral-400">
+                        {timeAgo(comment.createdAt)}
+                    </span>
+                </div>
+                {comment.authorId.toString() === post.authorId.toString() && (
+                    <span className="bg-lime-200 dark:bg-lime-700 rounded-full px-2 text-xs mr-2">
+                        Author
+                    </span>
+                )}
+                {comment.createdAt !== comment.modifiedAt && (
+                    <span className="bg-gray-200 dark:bg-neutral-700 rounded-full px-2 text-xs">
+                        edited
+                    </span>
+                )}
+                <p className="mt-1 text-gray-800 dark:text-neutral-200 text-wrap break-words max-w-[304px]">
+                    {comment.content}
+                </p>
+                {comment.replies?.length > 0 && (
+                    <div
+                        onClick={() => {}}
+                        className="flex items-center justify-start gap-2 pl-6 text-neutral-600 dark:text-neutral-400 text-sm mt-2 cursor-pointer"
+                    >
+                        <PlusCircle size={16} />
+                        {comment.replies?.length} replies
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+Comment.propTypes = {
+    comment: PropTypes.object,
+    currentUser: PropTypes.object,
+    post: PropTypes.object,
+    setIsEditing: PropTypes.func,
+    editingCommentIdRef: PropTypes.object,
+    setIsReplying: PropTypes.func,
+    parentCommentRef: PropTypes.object,
+    setNewComment: PropTypes.func,
+    handleDelete: PropTypes.func,
+};
+
 export const CommentsBox = memo(function CommentsBox({
     post,
     commentTrayOpen,
@@ -880,6 +993,7 @@ export const CommentsBox = memo(function CommentsBox({
     const [newComment, setNewComment] = useState("");
     const [loading, setLoading] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [isReplying, setIsReplying] = useState(false);
 
     const { currentUser } = useAuth();
 
@@ -887,8 +1001,7 @@ export const CommentsBox = memo(function CommentsBox({
     const inputRef = useRef(null);
     const currentIndexRef = useRef(0);
     const editingCommentIdRef = useRef(null);
-
-    const navigate = useNavigate();
+    const parentCommentRef = useRef(null);
 
     const {
         addNewComment,
@@ -939,7 +1052,7 @@ export const CommentsBox = memo(function CommentsBox({
             toast.error("Login first.");
             return;
         }
-        const content = newComment?.trim() || null;
+        const content = newComment.trim();
         if (content) {
             setLoading(true);
             try {
@@ -962,7 +1075,7 @@ export const CommentsBox = memo(function CommentsBox({
             return;
         }
         e.preventDefault();
-        const content = newComment?.trim() || null;
+        const content = newComment.trim();
         if (content) {
             setLoading(true);
             try {
@@ -975,6 +1088,7 @@ export const CommentsBox = memo(function CommentsBox({
                     ),
                 ]);
                 setNewComment("");
+                editingCommentIdRef.current = null;
                 toast.success(res.message);
             } catch (err) {
                 console.error(err);
@@ -1003,23 +1117,32 @@ export const CommentsBox = memo(function CommentsBox({
         }
     };
 
-    const handleReply = async (e, commentId) => {
+    const handleReply = async (e, postId, parentId) => {
         if (!currentUser) {
-            toast.error("Login first.");
+            toast.error("You need to Login first.");
             return;
         }
         e.preventDefault();
-        const content = newComment?.trim() || null;
+        const content = newComment.trim();
         if (content) {
             setLoading(true);
             try {
-                const res = await editComment(content, commentId);
-                setComments([...comments, res.comment]);
+                const res = await newReply(content, postId, parentId);
+                setComments([
+                    ...comments.map((c) =>
+                        c._id.toString() ===
+                        parentCommentRef.current._id.toString()
+                            ? { ...c, replies: [...c.replies, res.comment] }
+                            : c,
+                    ),
+                ]);
                 setNewComment("");
+                parentCommentRef.current = null;
                 toast.success(res.message);
             } catch (err) {
                 console.error(err);
             } finally {
+                setIsReplying(false);
                 setLoading(false);
             }
         }
@@ -1029,7 +1152,7 @@ export const CommentsBox = memo(function CommentsBox({
         <div
             data-lenis-prevent
             className={`fixed inset-y-0 right-0 w-full md:w-96 bg-white dark:bg-neutral-900 shadow-xl transform transition-transform duration-300 ease-in-out
-                ${commentTrayOpen ? "translate-x-0" : "translate-x-full"} flex flex-col h-full z-50`}
+                ${commentTrayOpen ? "translate-x-0" : "translate-x-full"} flex flex-col h-full z-50 scrollbar-hide`}
         >
             <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-neutral-700">
                 <h2 className="text-lg font-medium text-gray-800 dark:text-neutral-100">
@@ -1047,153 +1170,93 @@ export const CommentsBox = memo(function CommentsBox({
                 </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 divide-y-2">
                 {comments?.length > 0
                     ? comments.map((comment) => (
-                          <div
+                          <Comment
                               key={comment._id}
-                              className="flex space-x-3 group"
-                          >
-                              <Avatar
-                                  onClick={() =>
-                                      navigate(`/u/${comment.author.username}`)
-                                  }
-                                  className="w-8 h-8 rounded-full flex-shrink-0 cursor-pointer"
-                              >
-                                  <AvatarImage
-                                      src={comment.author.profilePicture}
-                                      alt={comment.author.fullName}
-                                  />
-                                  <AvatarFallback>
-                                      {comment.author.fullName.slice(0, 2)}
-                                  </AvatarFallback>
-                              </Avatar>
-                              <div className="flex-1">
-                                  <div className="flex items-baseline justify-between">
-                                      <h3 className="font-medium text-gray-900 dark:text-neutral-100 flex items-center justify-center gap-3">
-                                          {comment.author.fullName}
-                                          <div className="flex items-center justify-center gap-2">
-                                              {comment.authorId.toString() ===
-                                                  currentUser?._id.toString() && (
-                                                  <>
-                                                      <div
-                                                          className="cursor-pointer"
-                                                          onClick={() => {
-                                                              if (isEditing) {
-                                                                  setIsEditing(
-                                                                      false,
-                                                                  );
-                                                                  editingCommentIdRef.current =
-                                                                      null;
-                                                                  setNewComment(
-                                                                      "",
-                                                                  );
-                                                              } else {
-                                                                  setIsEditing(
-                                                                      true,
-                                                                  );
-                                                                  editingCommentIdRef.current =
-                                                                      comment._id;
-                                                                  setNewComment(
-                                                                      comment.content,
-                                                                  );
-                                                              }
-                                                          }}
-                                                      >
-                                                          <Edit className="size-4" />
-                                                      </div>
-                                                      <div
-                                                          className="cursor-pointer"
-                                                          onClick={(e) =>
-                                                              handleDelete(
-                                                                  e,
-                                                                  comment._id,
-                                                              )
-                                                          }
-                                                      >
-                                                          <Trash2 className="size-4" />
-                                                      </div>
-                                                  </>
-                                              )}
-                                              <div
-                                                  className="cursor-pointer"
-                                                  onClick={handleReply}
-                                              >
-                                                  <Reply className="size-4" />
-                                              </div>
-                                          </div>
-                                      </h3>
-                                      <span className="text-xs text-gray-500 dark:text-neutral-400">
-                                          {timeAgo(comment.createdAt)}
-                                      </span>
-                                  </div>
-                                  {comment.authorId.toString() ===
-                                      post.authorId.toString() && (
-                                      <span className="bg-lime-200 rounded-full px-2 text-xs mr-2">
-                                          Author
-                                      </span>
-                                  )}
-                                  {comment.createdAt !== comment.updatedAt && (
-                                      <span className="bg-gray-200 rounded-full px-2 text-xs">
-                                          edited
-                                      </span>
-                                  )}
-                                  <p className="mt-1 text-gray-800 dark:text-neutral-200">
-                                      {comment.content}
-                                  </p>
-                              </div>
-                          </div>
+                              comment={comment}
+                              currentUser={currentUser}
+                              post={post}
+                              setIsEditing={setIsEditing}
+                              editingCommentIdRef={editingCommentIdRef}
+                              setIsReplying={setIsReplying}
+                              parentCommentRef={parentCommentRef}
+                              setNewComment={setNewComment}
+                              handleDelete={handleDelete}
+                          />
                       ))
                     : "no comments until now"}
                 <div ref={commentsEndRef} />
             </div>
 
             <div className="p-4 border-t border-gray-200 dark:border-neutral-700">
-                {!isEditing ? (
-                    <div className="relative flex items-center">
-                        <input
-                            ref={inputRef}
-                            type="text"
-                            value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
-                            placeholder="Add a comment..."
-                            className="flex-1 px-4 py-2 pr-10 bg-gray-100 dark:bg-neutral-800 border-0 rounded-full text-gray-800 dark:text-neutral-100
-                        placeholder-gray-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-lime-500 transition-all duration-200"
+                {/* message */}
+                {isEditing && (
+                    <div className="dark:text-white px-2 pb-4 pt-0 text-sm w-full flex items-center justify-between">
+                        Editing
+                        <X
+                            className="cursor-pointer"
+                            size={16}
+                            onClick={() => {
+                                setIsEditing(false);
+                                editingCommentIdRef.current = null;
+                            }}
                         />
-                        <button
-                            onClick={(e) => handleSubmit(e)}
-                            disabled={!newComment?.trim() || false}
-                            className="absolute right-2 p-1.5 rounded-full bg-lime-500 text-white disabled:opacity-50
-                        disabled:bg-gray-400 dark:disabled:bg-neutral-700 transition-all duration-200"
-                            aria-label="Send comment"
-                        >
-                            <Send size={16} />
-                        </button>
-                    </div>
-                ) : (
-                    // removed using refs in here, although would have been fine,
-                    // cuz only one block renders at a time based on editing
-                    <div className="relative flex items-center">
-                        <input
-                            type="text"
-                            value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
-                            className="flex-1 px-4 py-2 pr-10 bg-gray-100 dark:bg-neutral-800 border-0 rounded-full text-gray-800 dark:text-neutral-100
-                        placeholder-gray-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-lime-500 transition-all duration-200"
-                        />
-                        <button
-                            onClick={(e) =>
-                                handleEdit(e, editingCommentIdRef.current)
-                            }
-                            disabled={!newComment.trim()}
-                            className="absolute right-2 p-1.5 rounded-full bg-lime-500 text-white disabled:opacity-50
-                        disabled:bg-gray-400 dark:disabled:bg-neutral-700 transition-all duration-200"
-                            aria-label="Send comment"
-                        >
-                            <Send size={16} />
-                        </button>
                     </div>
                 )}
+                {isReplying && (
+                    <div className="dark:text-white px-2 pb-4 pt-0 text-sm w-full flex items-center justify-between">
+                        <span>
+                            Replying to{" "}
+                            <u>@{parentCommentRef.current.author.username}</u>
+                        </span>
+                        <X
+                            className="cursor-pointer"
+                            size={16}
+                            onClick={() => {
+                                setIsReplying(false);
+                                parentCommentRef.current = null;
+                            }}
+                        />
+                    </div>
+                )}
+                <div className="relative flex items-center">
+                    <input
+                        ref={inputRef}
+                        type="text"
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        placeholder={
+                            isEditing || isReplying ? "" : "Add a comment..."
+                        }
+                        className="flex-1 px-4 py-2 pr-10 bg-gray-100 dark:bg-neutral-800 border-0 rounded-full text-gray-800 dark:text-neutral-100
+                        placeholder-gray-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-lime-500 transition-all duration-200"
+                    />
+                    <button
+                        onClick={(e) => {
+                            if (isEditing && !isReplying) {
+                                handleEdit(e, editingCommentIdRef.current);
+                            } else if (isReplying && !isEditing) {
+                                handleReply(
+                                    e,
+                                    post._id,
+                                    parentCommentRef.current._id,
+                                );
+                            } else if (!isReplying && !isEditing) {
+                                handleSubmit(e);
+                            } else {
+                                console.log("will handle later");
+                            }
+                        }}
+                        disabled={!newComment.trim()}
+                        className="absolute right-2 p-1.5 rounded-full bg-lime-500 text-white disabled:opacity-50
+                        disabled:bg-gray-400 dark:disabled:bg-neutral-700 transition-all duration-200"
+                        aria-label="Send comment"
+                    >
+                        <Send size={16} />
+                    </button>
+                </div>
             </div>
         </div>
     );

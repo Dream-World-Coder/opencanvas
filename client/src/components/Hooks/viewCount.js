@@ -22,9 +22,10 @@ export const useViewTracker = (postId) => {
 
                     if (response.data.counted) {
                         setViewCounted(true);
-                        console.log("View counted successfully");
+                        // console.log("View counted successfully");
                     } else {
-                        console.log(response.data.message);
+                        // console.log(response.data.message);
+                        console.log(" ");
                     }
                 }, 10000);
             } catch (error) {
