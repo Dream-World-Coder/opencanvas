@@ -22,6 +22,7 @@ import {
     Reply,
     List,
     PlusCircle,
+    MinusCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -40,6 +41,17 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 import { useAuth } from "../../contexts/AuthContext";
 import { useDataService } from "../../services/dataService";
@@ -872,19 +884,22 @@ EngagementSection.propTypes = {
     likes: PropTypes.number,
 };
 
+// comments related
+// ---------------------
 const Comment = ({
     comment,
     currentUser,
     post,
 
     setIsEditing,
-    editingCommentIdRef,
+    editingCommentRef,
 
     setIsReplying,
     parentCommentRef,
 
     setNewComment,
     handleDelete,
+    replyingTo,
 }) => {
     const navigate = useNavigate();
 
@@ -892,7 +907,7 @@ const Comment = ({
         <div className="flex space-x-3 py-3 group text-wrap">
             <Avatar
                 onClick={() => navigate(`/u/${comment.author.username}`)}
-                className="w-8 h-8 rounded-full flex-shrink-0 cursor-pointer"
+                className="size-6 rounded-full flex-shrink-0 cursor-pointer"
             >
                 <AvatarImage
                     src={comment.author.profilePicture}
@@ -904,42 +919,79 @@ const Comment = ({
             </Avatar>
             <div className="flex-1">
                 <div className="flex items-baseline justify-between">
-                    <h3 className="font-medium text-gray-900 dark:text-neutral-100 flex items-center justify-center gap-3">
+                    <h3 className="font-medium text-sm text-gray-900 dark:text-neutral-100 flex items-center justify-center gap-3">
                         {comment.author.fullName}
                         <div className="flex items-center justify-center gap-2">
                             {comment.authorId.toString() ===
                                 currentUser?._id.toString() && (
                                 <>
+                                    {/* edit comment */}
                                     <div
                                         className="cursor-pointer"
                                         onClick={() => {
+                                            setIsReplying(false);
                                             setIsEditing(true);
-                                            editingCommentIdRef.current =
-                                                comment._id;
+                                            editingCommentRef.current = comment;
                                             setNewComment(comment.content);
                                         }}
                                     >
                                         <Edit className="size-4" />
                                     </div>
-                                    <div
-                                        className="cursor-pointer"
-                                        onClick={(e) =>
-                                            handleDelete(e, comment._id)
-                                        }
-                                    >
-                                        <Trash2 className="size-4" />
-                                    </div>
+
+                                    {/* delete comment */}
+                                    <AlertDialog className="cursor-pointer">
+                                        <AlertDialogTrigger
+                                            className="size-4 p-0 m-0"
+                                            asChild
+                                        >
+                                            <Button variant="outline">
+                                                <Trash2 className="size-4" />
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>
+                                                    Are you absolutely sure?
+                                                </AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    This action cannot be
+                                                    undone. This will
+                                                    permanently delete your
+                                                    comment.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>
+                                                    Cancel
+                                                </AlertDialogCancel>
+                                                <AlertDialogAction
+                                                    onClick={(e) =>
+                                                        handleDelete(
+                                                            e,
+                                                            comment._id,
+                                                        )
+                                                    }
+                                                >
+                                                    Continue
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
                                 </>
                             )}
-                            <div
-                                className="cursor-pointer"
-                                onClick={() => {
-                                    setIsReplying(true);
-                                    parentCommentRef.current = comment;
-                                }}
-                            >
-                                <Reply className="size-4" />
-                            </div>
+                            {/* reply to a comment */}
+                            {!comment.isReply && (
+                                <div
+                                    className="cursor-pointer"
+                                    onClick={() => {
+                                        setIsEditing(false);
+                                        setIsReplying(true);
+                                        parentCommentRef.current = comment;
+                                    }}
+                                >
+                                    <Reply className="size-4" />
+                                </div>
+                            )}
                         </div>
                     </h3>
                     <span className="text-xs text-gray-500 dark:text-neutral-400">
@@ -956,18 +1008,14 @@ const Comment = ({
                         edited
                     </span>
                 )}
-                <p className="mt-1 text-gray-800 dark:text-neutral-200 text-wrap break-words max-w-[304px]">
+                <p className="mt-1 text-gray-800 dark:text-neutral-200 text-wrap break-words max-w-72 text-sm font-light">
+                    {comment.isReply && (
+                        <span className="font-semibold">
+                            @{replyingTo.username}
+                        </span>
+                    )}{" "}
                     {comment.content}
                 </p>
-                {comment.replies?.length > 0 && (
-                    <div
-                        onClick={() => {}}
-                        className="flex items-center justify-start gap-2 pl-6 text-neutral-600 dark:text-neutral-400 text-sm mt-2 cursor-pointer"
-                    >
-                        <PlusCircle size={16} />
-                        {comment.replies?.length} replies
-                    </div>
-                )}
             </div>
         </div>
     );
@@ -976,8 +1024,9 @@ Comment.propTypes = {
     comment: PropTypes.object,
     currentUser: PropTypes.object,
     post: PropTypes.object,
+    replyingTo: PropTypes.object,
     setIsEditing: PropTypes.func,
-    editingCommentIdRef: PropTypes.object,
+    editingCommentRef: PropTypes.object,
     setIsReplying: PropTypes.func,
     parentCommentRef: PropTypes.object,
     setNewComment: PropTypes.func,
@@ -995,13 +1044,33 @@ export const CommentsBox = memo(function CommentsBox({
     const [isEditing, setIsEditing] = useState(false);
     const [isReplying, setIsReplying] = useState(false);
 
+    // would have been better to use set instead array
+    const [replies, setReplies] = useState([]); // stores fetched replies for clicked comments, { comment: res.comment, replies: res.replies },
+    const [replyOpenStatus, setReplyOpenStatus] = useState([]); // [{commentId, replyopen},{}]
+
     const { currentUser } = useAuth();
 
     const commentsEndRef = useRef(null);
     const inputRef = useRef(null);
     const currentIndexRef = useRef(0);
-    const editingCommentIdRef = useRef(null);
+    const editingCommentRef = useRef(null);
     const parentCommentRef = useRef(null);
+
+    function fetchedRepliesPresent(comment) {
+        return (
+            replies.find(
+                (item) =>
+                    item.comment._id.toString() === comment._id.toString(),
+            )?.replies || false
+        );
+    }
+
+    function isReplyOpen(id) {
+        const match = replyOpenStatus.find(
+            (i) => i.commentId.toString() === id.toString(),
+        );
+        return match?.openStatus || false;
+    }
 
     const {
         addNewComment,
@@ -1066,6 +1135,9 @@ export const CommentsBox = memo(function CommentsBox({
             } finally {
                 setLoading(false);
             }
+        } else {
+            toast.error("No content found for comment");
+            return;
         }
     };
 
@@ -1080,15 +1152,41 @@ export const CommentsBox = memo(function CommentsBox({
             setLoading(true);
             try {
                 const res = await editComment(content, commentId);
-                setComments([
-                    ...comments.map((c) =>
-                        c._id.toString() === commentId.toString()
-                            ? res.comment
-                            : c,
-                    ),
-                ]);
+                if (editingCommentRef.isReply) {
+                    let parentCommentId = editingCommentRef.parentId;
+
+                    setReplies((prev) => [
+                        ...prev.map((i) =>
+                            i.comment._id.toString() ===
+                            parentCommentId.toString()
+                                ? {
+                                      ...i,
+                                      replies: [
+                                          ...i.replies.map((r) =>
+                                              r._id.toString() ===
+                                              commentId.toString()
+                                                  ? {
+                                                        ...r,
+                                                        content: res.comment,
+                                                    }
+                                                  : r,
+                                          ),
+                                      ],
+                                  }
+                                : i,
+                        ),
+                    ]);
+                } else {
+                    setComments((comms) => [
+                        ...comms.map((c) =>
+                            c._id.toString() === commentId.toString()
+                                ? res.comment
+                                : c,
+                        ),
+                    ]);
+                }
                 setNewComment("");
-                editingCommentIdRef.current = null;
+                editingCommentRef.current = null;
                 toast.success(res.message);
             } catch (err) {
                 console.error(err);
@@ -1096,6 +1194,9 @@ export const CommentsBox = memo(function CommentsBox({
                 setIsEditing(false);
                 setLoading(false);
             }
+        } else {
+            toast.error("No content found for comment");
+            return;
         }
     };
 
@@ -1145,6 +1246,27 @@ export const CommentsBox = memo(function CommentsBox({
                 setIsReplying(false);
                 setLoading(false);
             }
+        } else {
+            toast.error("No content found for comment");
+            return;
+        }
+    };
+
+    // load 20 replies later, now just load all replies,
+    // keep an ref of comments whose replies are needed,
+    // like {comm1: repliesfetched:20; comm2: repliesfetched:40} etc, refresh in new post
+    const loadCommentsFamily = async (commentId) => {
+        setLoading(true);
+        try {
+            const res = await getComment(commentId);
+            setReplies((prev) => [
+                ...prev,
+                { comment: res.comment, replies: res.replies },
+            ]);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -1152,7 +1274,7 @@ export const CommentsBox = memo(function CommentsBox({
         <div
             data-lenis-prevent
             className={`fixed inset-y-0 right-0 w-full md:w-96 bg-white dark:bg-neutral-900 shadow-xl transform transition-transform duration-300 ease-in-out
-                ${commentTrayOpen ? "translate-x-0" : "translate-x-full"} flex flex-col h-full z-50 scrollbar-hide`}
+                ${commentTrayOpen ? "translate-x-0" : "translate-x-full"} flex flex-col h-full z-50`}
         >
             <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-neutral-700">
                 <h2 className="text-lg font-medium text-gray-800 dark:text-neutral-100">
@@ -1173,18 +1295,101 @@ export const CommentsBox = memo(function CommentsBox({
             <div className="flex-1 overflow-y-auto p-4 space-y-4 divide-y-2">
                 {comments?.length > 0
                     ? comments.map((comment) => (
-                          <Comment
-                              key={comment._id}
-                              comment={comment}
-                              currentUser={currentUser}
-                              post={post}
-                              setIsEditing={setIsEditing}
-                              editingCommentIdRef={editingCommentIdRef}
-                              setIsReplying={setIsReplying}
-                              parentCommentRef={parentCommentRef}
-                              setNewComment={setNewComment}
-                              handleDelete={handleDelete}
-                          />
+                          <div key={comment._id}>
+                              <Comment
+                                  comment={comment}
+                                  currentUser={currentUser}
+                                  post={post}
+                                  setIsEditing={setIsEditing}
+                                  editingCommentRef={editingCommentRef}
+                                  setIsReplying={setIsReplying}
+                                  parentCommentRef={parentCommentRef}
+                                  setNewComment={setNewComment}
+                                  handleDelete={handleDelete}
+                              />
+                              {/* load replies */}
+                              {comment.replies?.length > 0 &&
+                                  !isReplyOpen(comment._id) && (
+                                      <div
+                                          onClick={async () => {
+                                              await loadCommentsFamily(
+                                                  comment._id,
+                                              );
+                                              setReplyOpenStatus((prev) => [
+                                                  ...prev,
+                                                  {
+                                                      commentId: comment._id,
+                                                      openStatus: true,
+                                                  },
+                                              ]);
+                                          }}
+                                          className="flex items-center justify-start gap-2 pl-6 text-neutral-600 dark:text-neutral-400 text-sm mt-2 cursor-pointer"
+                                      >
+                                          <PlusCircle size={16} />
+                                          {comment.replies?.length} replies
+                                      </div>
+                                  )}
+
+                              {/* close replies */}
+                              {comment.replies?.length > 0 &&
+                                  isReplyOpen(comment._id) && (
+                                      <div
+                                          onClick={() => {
+                                              setReplyOpenStatus((prev) => [
+                                                  ...prev.filter(
+                                                      (i) =>
+                                                          i.commentId.toString() !==
+                                                          comment._id.toString(),
+                                                  ),
+                                              ]);
+                                          }}
+                                          className="flex items-center justify-start gap-2 pl-8 text-neutral-600 dark:text-neutral-400 text-sm mt-2 cursor-pointer"
+                                      >
+                                          <MinusCircle size={16} />
+                                          {comment.replies?.length} replies
+                                      </div>
+                                  )}
+
+                              {/* replies */}
+                              <div className={`pl-8`}>
+                                  {isReplyOpen(comment._id) &&
+                                      fetchedRepliesPresent(comment) && (
+                                          <div className="pl-2">
+                                              {fetchedRepliesPresent(
+                                                  comment,
+                                              ).map((reply, index) => (
+                                                  <Comment
+                                                      key={index}
+                                                      comment={reply}
+                                                      currentUser={currentUser}
+                                                      post={post}
+                                                      setIsEditing={
+                                                          setIsEditing
+                                                      }
+                                                      editingCommentRef={
+                                                          editingCommentRef
+                                                      }
+                                                      setIsReplying={
+                                                          setIsReplying
+                                                      }
+                                                      parentCommentRef={
+                                                          parentCommentRef
+                                                      }
+                                                      setNewComment={
+                                                          setNewComment
+                                                      }
+                                                      handleDelete={
+                                                          handleDelete
+                                                      }
+                                                      replyingTo={
+                                                          comment.author
+                                                      }
+                                                  />
+                                              ))}
+                                          </div>
+                                      )}
+                              </div>
+                          </div>
                       ))
                     : "no comments until now"}
                 <div ref={commentsEndRef} />
@@ -1200,7 +1405,7 @@ export const CommentsBox = memo(function CommentsBox({
                             size={16}
                             onClick={() => {
                                 setIsEditing(false);
-                                editingCommentIdRef.current = null;
+                                editingCommentRef.current = null;
                             }}
                         />
                     </div>
@@ -1236,7 +1441,7 @@ export const CommentsBox = memo(function CommentsBox({
                     <button
                         onClick={(e) => {
                             if (isEditing && !isReplying) {
-                                handleEdit(e, editingCommentIdRef.current);
+                                handleEdit(e, editingCommentRef.current._id);
                             } else if (isReplying && !isEditing) {
                                 handleReply(
                                     e,
@@ -1247,6 +1452,7 @@ export const CommentsBox = memo(function CommentsBox({
                                 handleSubmit(e);
                             } else {
                                 console.log("will handle later");
+                                return;
                             }
                         }}
                         disabled={!newComment.trim()}

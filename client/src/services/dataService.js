@@ -218,7 +218,7 @@ export const useDataService = () => {
     const getComment = async (commentId) => {
         try {
             const response = await authAxios.get(`/p/comments/${commentId}`);
-            return response.data.comment;
+            return response.data;
         } catch (error) {
             toast.error(error.response.data.message);
             console.error("Error fetching comment:", error);
