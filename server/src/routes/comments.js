@@ -144,6 +144,7 @@ router.put(
             }
 
             currentComment.content = commentContent;
+            currentComment.modifiedAt = Date.now();
 
             const comment = await currentComment.save();
             const commentObj = comment.toObject();
@@ -216,6 +217,9 @@ router.delete(
             }
 
             const post = await Post.findById(currentComment.postId);
+            post.comments.filter(
+                (c) => c._id.toString() !== currentComment._id.toString(),
+            );
             post.totalComments -= 1;
             await post.save();
 
@@ -289,6 +293,14 @@ router.post(
                 });
             }
 
+            // only happen if someone intentionally does this through coding
+            if (parentComment.isReply) {
+                return res.status(403).json({
+                    success: false,
+                    message: "cannot reply to a reply for now",
+                });
+            }
+
             const comment = new Comment({
                 content: commentContent,
                 authorId,
@@ -298,7 +310,8 @@ router.post(
             });
             const newReply = await comment.save();
 
-            newReply.author = {
+            const newReplyObj = newReply.toObject();
+            newReplyObj.author = {
                 _id: req.user._id,
                 fullName: req.user.fullName,
                 username: req.user.username,
@@ -318,7 +331,7 @@ router.post(
             return res.status(200).json({
                 success: true,
                 message: "reply added.",
-                comment: newReply,
+                comment: newReplyObj,
             });
         } catch (error) {
             console.error(error);
@@ -347,7 +360,7 @@ router.get("/p/comments/:commentId", authenticateToken, async (req, res) => {
         });
     }
     try {
-        const comment = await Comment.findById({ commentId });
+        const comment = await Comment.findById(commentId);
         if (!comment) {
             return res.status(404).json({
                 success: false,
@@ -359,8 +372,19 @@ router.get("/p/comments/:commentId", authenticateToken, async (req, res) => {
         if (comment.replies.length > 0) {
             for (let i = 0; i < comment.replies.length; i++) {
                 let commentId = comment.replies[i];
-                let comment = Comment.findById(commentId);
-                replies.push(comment);
+                let rep = await Comment.findById(commentId);
+                let author = await User.findById(rep.authorId);
+
+                let repObj = rep.toObject();
+                repObj.author = {
+                    _id: author._id,
+                    fullName: author.fullName,
+                    username: author.username,
+                    profilePicture: author.profilePicture,
+                    role: author.role,
+                };
+
+                replies.push(repObj);
             }
         }
 

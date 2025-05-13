@@ -9,3 +9,4 @@ node_modules/
 t.js
 db_backups
 src/routes/backup
+__eg*
