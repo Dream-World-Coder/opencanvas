@@ -1,4 +1,4 @@
-import { useState, useEffect, memo } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 import { toast } from "sonner";
 import { Helmet } from "react-helmet-async";
 import {
@@ -77,7 +77,7 @@ import { useAuth } from "../../../contexts/AuthContext";
 
 const WritingPad = memo(function WritingPad({ artType = "article" }) {
     const { currentUser } = useAuth();
-
+    const publishBtnRef = useRef(null);
     // const navigate = useNavigate();
 
     const [postId, setPostId] = useState("");
@@ -85,7 +85,7 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
         setPostId(localStorage.getItem("newPostId", ""));
     }, [postId]);
 
-    const [frontendOnly, _] = useState(false);
+    const frontendOnly = false;
 
     // const isActiveTab = useSingleTab();
     // customized  redirect path:
@@ -117,6 +117,8 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
 
     // Editor formatting functionality
     const {
+        // selectedText,
+        // setSelectedText,
         textAlignment,
         setTextAlignment,
         handleContentChange,
@@ -161,6 +163,60 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
 
     const lastButton = formattingButtons[formattingButtons.length - 1];
     const LastIcon = lastButton.icon;
+
+    // listen for keystrokes and apply formatting
+    // cmd+b:handleFormat(bold), cmd+i:handleFormat(italics), cmd+u:handleFormat(underline), cmd+h:handleFormat(highlight)
+    // use control instead cmd for windows
+    // and for cmd+s, click the publish button, publishBtnRef.current.click()
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            // Check if cmd key (Mac) or ctrl key (Windows/Linux) is pressed
+            const isCmdOrCtrlPressed = e.metaKey || e.ctrlKey;
+
+            if (!isCmdOrCtrlPressed) return;
+
+            // console.log(
+            //     "Key pressed:",
+            //     e.key,
+            //     "Cmd/Ctrl pressed:",
+            //     isCmdOrCtrlPressed,
+            // );
+
+            // Prevent default behavior for our shortcut keys
+            if (isCmdOrCtrlPressed) {
+                if (e.key === "b" || e.key === "B") {
+                    e.preventDefault();
+                    handleFormat("bold");
+                } else if (e.key === "i" || e.key === "I") {
+                    e.preventDefault();
+                    handleFormat("italic");
+                } else if (e.key === "u" || e.key === "U") {
+                    e.preventDefault();
+                    handleFormat("underline");
+                } else if (e.key === "h" || e.key === "H") {
+                    // For ⌘+H, browsers often have default behaviors
+                    e.preventDefault();
+                    e.stopPropagation(); // Add this to ensure it doesn't bubble up
+                    handleFormat("highlight");
+                } else if (e.key === "s" || e.key === "S") {
+                    // For ⌘+S, browsers always try to save the page
+                    e.preventDefault();
+                    e.stopPropagation(); // Add this to ensure it doesn't bubble up
+                    if (publishBtnRef.current) {
+                        publishBtnRef.current.click();
+                    }
+                }
+            }
+        };
+
+        // Add event listener
+        document.addEventListener("keydown", handleKeyDown);
+
+        // Clean up event listener on component unmount
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [handleFormat]); // Add handleFormat to dependency array since we're using it in the effect
 
     return (
         <>
@@ -224,6 +280,7 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
                                 <Dialog>
                                     <DialogTrigger asChild>
                                         <button
+                                            ref={publishBtnRef}
                                             className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm bg-lime-500 text-white`}
                                         >
                                             publish

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "sonner";
 
 export function useEditorFormatting(content, setContent) {
     const [undoStack, setUndoStack] = useState([]);
@@ -26,17 +27,6 @@ export function useEditorFormatting(content, setContent) {
         e.target.style.height = "auto";
         e.target.style.height = e.target.scrollHeight + "px";
     };
-    /*
-    const handleContentChange = (e) => {
-        const newContent = e.target.value;
-        addToUndoStack(content);
-        setContent(newContent);
-        // setWordCount(newContent.trim().split(/\s+/).filter(Boolean).length);
-        setIsSaved(false);
-        e.target.style.height = "auto"; // reset the height for proper increase
-        e.target.style.height = e.target.scrollHeight + "px"; // Set new height based on content
-    };
-    */
 
     const handleUndo = () => {
         if (undoStack.length > 0) {
@@ -65,7 +55,10 @@ export function useEditorFormatting(content, setContent) {
         const end = textarea.selectionEnd;
         const selectedText = content.substring(start, end);
 
-        if (!selectedText) return;
+        if (!selectedText) {
+            toast.error("Select some text first");
+            return;
+        }
 
         let newText = content;
         switch (format) {
