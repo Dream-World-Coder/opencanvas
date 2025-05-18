@@ -11,6 +11,14 @@ blockquote {
     }
 }
 
+article ul ul,
+article ol ul,
+article ul ol,
+article ol ol {
+    margin: 0 !important;
+    /* padding: 0 !important; */
+}
+
 em strong {
     font-style: italic !important;
     font-family: serif !important;
