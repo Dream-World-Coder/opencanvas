@@ -608,11 +608,20 @@ ContactInformationDropdown.propTypes = {
     currentProfile: PropTypes.object,
 };
 
-export const FeaturedWorks = memo(function featuredWorks({ currentUser }) {
+export const FeaturedWorks = memo(function FeaturedWorks({ currentUser }) {
     const scrollContainerRef = useRef(null);
     const navigate = useNavigate();
     const [showLeftArrow, setShowLeftArrow] = useState(false);
     const [showRightArrow, setShowRightArrow] = useState(false);
+
+    const colors = [
+        "bg-[#C1DBB3]/100 dark:bg-zinc-900 border-[#C1DBB3] dark:border-neutral-800 dark:text-neutral-200",
+        "bg-[#A0C878]/100 dark:bg-zinc-900 border-[#A0C878] dark:border-neutral-800 dark:text-neutral-200",
+        "bg-[#DBFFCB]/100 dark:bg-zinc-900 border-[#DBFFCB] dark:border-neutral-800 dark:text-neutral-200",
+        "bg-[#A4B465]/100 dark:bg-zinc-900 border-[#A4B465] dark:border-neutral-800 dark:text-neutral-200",
+        "bg-[#FBF3C1]/100 dark:bg-zinc-900 border-[#FBF3C1] dark:border-neutral-800 dark:text-neutral-200",
+        "bg-[#FE7743]/100 dark:bg-zinc-900 border-[#FE7743] dark:border-neutral-800 dark:text-neutral-200",
+    ];
 
     // Check if scrolling is available
     const checkScroll = () => {
@@ -653,7 +662,7 @@ export const FeaturedWorks = memo(function featuredWorks({ currentUser }) {
             {currentUser.featuredItems.length > 0 && (
                 <div className="mb-24 relative px-4 md:px-0">
                     <h2 className="text-2xl font-semibold tracking-tight mb-8 dark:text-[#f0f0f0]">
-                        <span className="bg-lime-100 dark:bg-[#222] rounded-md box-content px-2 py-1">
+                        <span className="border border-gray-200 dark:border-[#222] rounded-md box-content px-2 py-1">
                             Featured Works
                         </span>
                     </h2>
@@ -683,7 +692,7 @@ export const FeaturedWorks = memo(function featuredWorks({ currentUser }) {
                         className="flex gap-6 overflow-x-auto scrollbar-hide flex-nowrap pb-4"
                         onScroll={checkScroll}
                     >
-                        {featuredItems.map((item) => (
+                        {featuredItems.map((item, index) => (
                             <div
                                 key={item.itemId}
                                 className="group cursor-pointer min-w-[200px] md:min-w-[300px] max-w-[200px] md:max-w-[300px]"
@@ -701,14 +710,16 @@ export const FeaturedWorks = memo(function featuredWorks({ currentUser }) {
                                             className="object-cover size-full transition-transform duration-500 group-hover:scale-105"
                                         />
                                     ) : (
-                                        <div className="size-full transition-transform duration-500 group-hover:scale-105 border bg-zinc-100 dark:bg-zinc-900 p-5 font-serif">
+                                        <div
+                                            className={`size-full transition-transform duration-500 group-hover:scale-105 border ${colors[index % colors.length]} p-5 text-xl font-serif overflow-hidden`}
+                                        >
                                             {item.itemTitle}
                                         </div>
                                     )}
                                     {/* dark inset on hover */}
-                                    <div className="absolute inset-0 bg-black/20 dark:bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"></div>
+                                    <div className="absolute inset-0 bg-black/10 dark:bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"></div>
                                 </div>
-                                <h3 className="text-lg font-medium mb-1 flex justify-between dark:text-[#e8e8e8]">
+                                <h3 className="text-base font-medium mb-1 flex justify-between dark:text-[#e8e8e8]">
                                     {item.itemTitle}
                                     <Share2
                                         className="w-6 h-6 min-h-[24px] min-w-[24px] text-black dark:text-white rounded-lg p-1 hover:bg-yellow-200 dark:hover:bg-[#2c2c2c]"
@@ -817,7 +828,7 @@ MockFeatureItem.propTypes = {
 
 export const PostStats = ({ post }) => {
     return (
-        <div className="flex flex-wrap gap-4 items-center text-sm">
+        <div className="flex flex-wrap gap-4 items-center text-xs">
             {/* views */}
             <div className="flex items-center gap-1">
                 <Eye className="w-4 h-4 block sm:hidden" />
@@ -840,7 +851,7 @@ export const PostStats = ({ post }) => {
             </div>
 
             {/* read time */}
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+            <span className="text-gray-500 dark:text-gray-400">
                 {post.readTime}
             </span>
         </div>
@@ -851,16 +862,31 @@ PostStats.propTypes = {
 };
 export const PostDetails = ({ post }) => {
     return (
-        <div className="flex flex-col lg:flex-row items-start lg:items-center lg:space-x-2">
-            <span className="text-sm text-gray-600 dark:text-gray-400">
-                created {formatDates(post.createdAt)}
-            </span>
-            <span className="text-gray-400 dark:text-gray-500 hidden lg:block">
-                ·
-            </span>
-            <span className="text-sm text-gray-600 dark:text-gray-400">
-                last edited {formatDates(post.modifiedAt)}
-            </span>
+        <div className="">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center lg:space-x-2">
+                <span className="text-xs text-gray-600 dark:text-gray-400">
+                    created {formatDates(post.createdAt)}
+                </span>
+                <span className="text-gray-400 dark:text-gray-500 hidden lg:block">
+                    ·
+                </span>
+                <span className="text-xs text-gray-600 dark:text-gray-400">
+                    last edited {formatDates(post.modifiedAt)}
+                </span>
+            </div>
+            {post.tags && (
+                <div className="flex flex-wrap gap-2 text-xs text-black dark:text-neutral-300 mt-2">
+                    Tags:
+                    {post.tags?.map((tag) => (
+                        <span
+                            className="bg-gray-200 dark:bg-neutral-700 rounded-full px-1"
+                            key={tag}
+                        >
+                            {tag}
+                        </span>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };
@@ -868,7 +894,7 @@ PostDetails.propTypes = {
     post: PropTypes.object,
 };
 
-export const PostList = memo(function postList({
+export const PostList = memo(function PostList({
     posts,
     setPosts,
     activeTab,
@@ -897,11 +923,11 @@ export const PostList = memo(function postList({
                                 {/* Post metadata and title section */}
                                 <div className="w-full">
                                     {/* tag based on post type */}
-                                    <div className="mb-2">
+                                    {/* <div className="mb-2">
                                         <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-full px-2 py-1 box-content font-medium">
                                             {post.type}
                                         </span>
-                                    </div>
+                                    </div> */}
 
                                     {/* Content area with thumbnail (if available) */}
                                     <div className="flex flex-col sm:flex-row gap-4">
@@ -927,7 +953,7 @@ export const PostList = memo(function postList({
                                                         content={
                                                             post.content.slice(
                                                                 0,
-                                                                350,
+                                                                700,
                                                             ) + "..." || ""
                                                         }
                                                         thumbnailUrl={
@@ -979,7 +1005,7 @@ export const PostList = memo(function postList({
                             </div>
 
                             {/* divider */}
-                            <div className="mt-8 border-b border-gray-100 dark:border-[#333]"></div>
+                            <div className="mt-8 border-b border-gray-200 dark:border-[#333]"></div>
                         </div>
                     ),
             )}

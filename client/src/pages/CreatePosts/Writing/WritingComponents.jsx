@@ -358,6 +358,8 @@ export const MarkdownPreview = memo(function MarkdownPreview({
     contentOnly = false, // preview in feed or profile
     artType = "written",
 }) {
+    const insideGallery = contentOnly;
+
     function generateId(children) {
         if (!children) return window.crypto.randomUUID().toString();
         else {
@@ -432,29 +434,19 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                         {/* title */}
                         {title && (
                             <div
-                                className={`pt-2 mb-10 leading-tight tracking-tight capitalize ${
-                                    contentOnly
-                                        ? "text-xl font-semibold font-sans"
-                                        : "text-4xl font-bold font-serif"
+                                className={`leading-tight tracking-tight capitalize ${
+                                    insideGallery
+                                        ? "text-xl font-semibold font-sans pt-0 mb-4"
+                                        : "text-4xl font-bold font-serif pt-2 mb-10"
                                 }
                                 ${artType === "poem" ? "!max-w-[600px] !font-boskaBold" : ""}`}
                             >
                                 {title}
-                                {!contentOnly && false && (
-                                    <>
-                                        <hr
-                                            className={`mt-6 mb-px border-t ${isDark ? "border-oneDarkBorder" : "border-gray-200"}`}
-                                        />
-                                        <hr
-                                            className={`mb-6 border-t ${isDark ? "border-oneDarkBorder" : "border-gray-200"}`}
-                                        />
-                                    </>
-                                )}
                             </div>
                         )}
 
                         {/* thumbnail */}
-                        {thumbnailUrl && !contentOnly && (
+                        {thumbnailUrl && !insideGallery && (
                             <div
                                 className="relative mb-8 w-full md:w-[110%] md:transform md:translate-x-[-5%] max-h-[370px] bg-gray-200 dark:bg-[#333]
                                 rounded-lg overflow-hidden shadow-none flex items-center justify-center"
@@ -467,6 +459,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                 />
                             </div>
                         )}
+
                         {/* markdown content */}
                         <ReactMarkdown
                             remarkPlugins={[
@@ -516,7 +509,8 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                 hr(props) {
                                     return (
                                         <hr
-                                            className={`my-6 border-t ${isDark ? "border-oneDarkBorder" : "border-gray-200"}`}
+                                            className={`border-t ${isDark ? "border-oneDarkBorder" : "border-gray-200"}
+                                                ${insideGallery ? `my-1` : `my-6`}`}
                                             {...props}
                                         />
                                     );
@@ -574,7 +568,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                                             }, 1000);
                                                         }}
                                                         className={`text-black dark:text-white p-1 text-xs rounded
-                                                            hover:bg-[#ddd] dark:hover:bg-[#333] focus:outline-none ${contentOnly ? "" : "z-10"}`}
+                                                            hover:bg-[#ddd] dark:hover:bg-[#333] focus:outline-none ${insideGallery ? "" : "z-10"}`}
                                                     >
                                                         Copy
                                                     </button>
@@ -608,7 +602,8 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                     ) : (
                                         // inline code
                                         <code
-                                            className={`px-1 py-0.5 rounded text-sm font-mono
+                                            className={`rounded
+                                            ${insideGallery ? "p-0.5 text-xs" : "px-1 py-0.5 montserrat-bold"}
                                             ${isDark ? "text-oneDarkTagClr bg-oneDarkTagClr/10" : "bg-gray-200"}`}
                                         >
                                             {/* ${isDark ? "text-[#ffd085] bg-[#ffd085]/10" : "bg-gray-200"}`} */}
@@ -617,10 +612,15 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                     );
                                 },
 
+                                // blockquote styles are fixed in app.css
                                 blockquote({ children }) {
-                                    return (
+                                    return insideGallery ? (
+                                        <p className="border-l-2 pl-2">
+                                            {children}
+                                        </p>
+                                    ) : (
                                         <blockquote
-                                            className={`border-l-4 px-4 py-1 my-4 italic
+                                            className={`italic border-l-4 px-4 py-1 my-4
                                                 ${isDark ? "border-[#999] bg-[#999]/0 text-[#ddd]" : "border-gray-400 bg-gray-100/0 text-gray-700"}`}
                                         >
                                             {children}
@@ -631,10 +631,10 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                 h1: ({ children }) => (
                                     <h1
                                         id={generateId(children)}
-                                        className={`mt-12 mb-6 leading-tight tracking-tight ${
-                                            contentOnly
-                                                ? "text-xl font-semibold font-sans"
-                                                : "text-4xl font-bold font-serif"
+                                        className={`leading-tight tracking-tight ${
+                                            insideGallery
+                                                ? "text-xl font-semibold font-sans mt-2 mb-1"
+                                                : "text-4xl font-bold font-serif mt-12 mb-6"
                                         }`}
                                     >
                                         {children}
@@ -643,10 +643,10 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                 h2: ({ children }) => (
                                     <h2
                                         id={generateId(children)}
-                                        className={`font-serif mt-10 mb-5 leading-tight tracking-tight ${
-                                            contentOnly
-                                                ? "text-lg"
-                                                : "text-3xl font-bold"
+                                        className={`font-serif leading-tight tracking-tight ${
+                                            insideGallery
+                                                ? "text-lg my-2"
+                                                : "text-3xl font-bold mt-10 mb-5"
                                         }`}
                                     >
                                         {children}
@@ -655,10 +655,10 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                 h3: ({ children }) => (
                                     <h3
                                         id={generateId(children)}
-                                        className={`font-serif mt-8 mb-4 leading-snug ${
-                                            contentOnly
-                                                ? "text-base"
-                                                : "text-2xl font-bold"
+                                        className={`font-serif leading-snug ${
+                                            insideGallery
+                                                ? "text-base my-1"
+                                                : "text-2xl font-bold mt-8 mb-4"
                                         }`}
                                     >
                                         {children}
@@ -667,8 +667,10 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                 h4: ({ children }) => (
                                     <h4
                                         id={generateId(children)}
-                                        className={`montserrat-regular font-semibold mt-6 mb-3 leading-snug ${
-                                            contentOnly ? "text-sm" : "text-xl"
+                                        className={`montserrat-regular font-semibold leading-snug ${
+                                            insideGallery
+                                                ? "text-sm my-1"
+                                                : "text-xl mt-6 mb-3"
                                         }`}
                                     >
                                         {children}
@@ -676,8 +678,10 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                 ),
                                 h5: ({ children }) => (
                                     <h5
-                                        className={`montserrat-regular font-semibold mt-5 mb-3 leading-snug ${
-                                            contentOnly ? "text-sm" : "text-lg"
+                                        className={`montserrat-regular font-semibold leading-snug ${
+                                            insideGallery
+                                                ? "text-sm my-1"
+                                                : "text-lg mt-5 mb-3"
                                         }`}
                                     >
                                         {children}
@@ -685,10 +689,10 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                 ),
                                 h6: ({ children }) => (
                                     <h6
-                                        className={`montserrat-regular font-semibold mt-4 mb-2 uppercase tracking-wider ${
-                                            contentOnly
-                                                ? "text-sm"
-                                                : "text-base"
+                                        className={`montserrat-regular font-semibold uppercase tracking-wider ${
+                                            insideGallery
+                                                ? "text-sm mb-1"
+                                                : "text-base mt-4 mb-2"
                                         }`}
                                     >
                                         {children}
@@ -697,9 +701,17 @@ export const MarkdownPreview = memo(function MarkdownPreview({
 
                                 p: ({ children }) => (
                                     <p
-                                        className={`my-8 max-w-prose
-                                            ${contentOnly ? "text-xs leading-relaxed" : "text-base md:text-lg md:leading-[28px]"}
-                                            ${artType === "poem" ? "!font-boskaLight !text-xl !leading-[32px] !my-0" : ""}`}
+                                        className={`
+                                            ${
+                                                insideGallery
+                                                    ? "text-xs leading-relaxed my-2 max-w-[110ch]"
+                                                    : "text-base md:text-lg md:leading-[28px] my-8 max-w-prose"
+                                            }
+                                            ${
+                                                artType === "poem"
+                                                    ? "!font-boskaLight !text-xl !leading-[32px] !my-0"
+                                                    : ""
+                                            }`}
                                     >
                                         {/* initially it was : leading-[40px] */}
                                         {children}
@@ -708,7 +720,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
 
                                 strong: ({ children }) => (
                                     <strong
-                                        className={`font-semibold montserrat-bold`}
+                                        className={`font-semibold ${insideGallery ? "" : "montserrat-bold"}`}
                                     >
                                         {children}
                                     </strong>
@@ -758,7 +770,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                 li: ({ children }) => (
                                     <li
                                         className={
-                                            contentOnly
+                                            insideGallery
                                                 ? "text-xs leading-tighter"
                                                 : "montserrat-regular leading-relaxed text-base md:text-lg"
                                         }
@@ -793,14 +805,14 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                 ),
                                 th: ({ children }) => (
                                     <th
-                                        className={`border ${contentOnly ? "text-xs" : "montserrat-bold"} border-gray-300 dark:border-[#3e4451] px-4 py-2 bg-gray-100 dark:bg-[#21252b]`}
+                                        className={`border ${insideGallery ? "text-xs" : "montserrat-bold"} border-gray-300 dark:border-[#3e4451] px-4 py-2 bg-gray-100 dark:bg-[#21252b]`}
                                     >
                                         {children}
                                     </th>
                                 ),
                                 td: ({ children }) => (
                                     <td
-                                        className={`border border-gray-300 dark:border-[#3e4451] px-4 py-2 dark:bg-[#282c34] ${contentOnly ? "text-xs" : "montserrat-regular"}`}
+                                        className={`border border-gray-300 dark:border-[#3e4451] px-4 py-2 dark:bg-[#282c34] ${insideGallery ? "text-xs" : "montserrat-regular"}`}
                                     >
                                         {children}
                                     </td>

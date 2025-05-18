@@ -214,7 +214,7 @@ const ArticleFeed = () => {
                                                         content={
                                                             post.content.slice(
                                                                 0,
-                                                                350,
+                                                                700,
                                                             ) + "..." || ""
                                                         }
                                                         thumbnailUrl={

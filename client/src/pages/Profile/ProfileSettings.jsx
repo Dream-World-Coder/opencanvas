@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
@@ -50,7 +50,7 @@ import { useDataService } from "../../services/dataService";
 
 const ProfileSettings = () => {
     const baseUrl = window.location.origin;
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const { currentUser, setCurrentUser, logout } = useAuth();
     const [darkMode, setDarkMode] = useState(false);
     const [activeTab, setActiveTab] = useState("general");
@@ -199,7 +199,7 @@ const ProfileSettings = () => {
             <div className="space-y-6 dark:text-white">
                 <div className="flex flex-col sm:flex-row gap-6 items-start">
                     <div className="flex flex-col items-center gap-2">
-                        <Avatar className="h-24 w-24  dark:text-black">
+                        <Avatar className="h-24 w-24 _dark:text-black">
                             <AvatarImage
                                 src={currentUser.profilePicture}
                                 alt="Profile picture"
