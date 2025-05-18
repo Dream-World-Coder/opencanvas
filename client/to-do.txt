@@ -11,7 +11,7 @@
 -- [] loading when liking disliking a post
 -- [] drag & drop not functional in regular image upload inside articles
 -- [] do mo use const <var> in components, use useref or usestate, [table of contents component]
-
+-- [] save as draft & drafts section
 +++++++++++++
 -- [] post recommendation system based on heading & tags [careful analysis]
 claculate heading and tags in depth, check all associations of tags 2**5 = 32, and verify the tags with content first,

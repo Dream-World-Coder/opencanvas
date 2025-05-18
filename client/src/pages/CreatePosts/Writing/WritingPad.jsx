@@ -3,9 +3,9 @@ import { toast } from "sonner";
 import { Helmet } from "react-helmet-async";
 import {
     X,
-    Sun,
+    // Sun,
     Eye,
-    Moon,
+    // Moon,
     Undo,
     Redo,
     Edit,
@@ -139,7 +139,7 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
         setSepia,
         lightModeBg,
         isDark,
-        setIsDark,
+        // setIsDark,
         helpOpen,
         setHelpOpen,
         optionsDropdownOpen,
@@ -231,9 +231,10 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
                     {JSON.stringify(getSchemaData(title))}
                 </script>
             </Helmet>
+
             <div
                 className={`min-h-screen transition-all duration-0 relative h-fit ${isSerif ? `font-serif` : ""}
-                ${isDark ? "bg-[#222] text-white" : `${lightModeBg} text-black`}`}
+                ${isDark ? "bg-[#222] text-[#f0f0f0]" : `${lightModeBg} text-black`}`}
             >
                 {/* Top Bar */}
                 <div
@@ -400,7 +401,7 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
                                 </DropdownMenu>
 
                                 {/* dark mode button */}
-                                <button
+                                {/* <button
                                     onClick={() => {
                                         setIsDark(!isDark);
                                     }}
@@ -411,7 +412,7 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
                                     ) : (
                                         <Moon className="size-5" />
                                     )}
-                                </button>
+                                </button> */}
 
                                 {/* addtional more button */}
                                 <DropdownMenu
