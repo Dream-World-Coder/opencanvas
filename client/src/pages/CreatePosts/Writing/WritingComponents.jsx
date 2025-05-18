@@ -345,6 +345,127 @@ LinkInsertButton.propTypes = {
  *
  *
  */
+export const CodeBlock = ({
+    isDark,
+    inline,
+    className,
+    children,
+    ...props
+}) => {
+    const match = /language-(\w+)/.exec(className || "");
+    const codeString = String(children).replace(/\n$/, "");
+
+    return !inline && match ? (
+        // block code
+        <div
+            className={`relative my-4 overflow-hidden rounded-sm flex flex-col
+         ${isDark ? "bg-[#171717]" : "bg-[#e8eae6]"}`}
+        >
+            {/* codeHeader */}
+            <div
+                className={`flex items-center justify-between px-6 pt-2 ${
+                    isDark ? "bg-[#171717]" : "bg-[#e8eae6]"
+                }`}
+            >
+                {/* lagguage */}
+                <span className="text-sm font-sans">{match[1]}</span>
+                {/* Copy button */}
+                <div className="flex justify-center items-center gap-1">
+                    <Copy size={12} />
+                    <button
+                        onClick={(e) => {
+                            navigator.clipboard.writeText(codeString);
+                            e.target.textContent = "Copied!";
+                            setTimeout(() => {
+                                e.target.textContent = "Copy";
+                            }, 1000);
+                        }}
+                        className="text-black dark:text-white p-1 text-xs rounded hover:bg-[#ddd] dark:hover:bg-[#333] focus:outline-none z-10"
+                    >
+                        Copy
+                    </button>
+                </div>
+            </div>
+
+            {/* code card */}
+            <div className="rounded-sm overflow-hidden border-none">
+                <SyntaxHighlighter
+                    style={isDark ? atomDark : oneLight}
+                    language={match[1]}
+                    PreTag="div"
+                    wrapLongLines
+                    codeTagProps={{
+                        style: {
+                            fontSize: "0.875rem",
+                            lineHeight: "1.2",
+                        },
+                    }}
+                    {...props}
+                >
+                    {codeString}
+                </SyntaxHighlighter>
+            </div>
+        </div>
+    ) : (
+        // inline code
+        <code
+            className={`rounded px-1 py-0.5 montserrat-bold
+         ${isDark ? "text-oneDarkTagClr bg-oneDarkTagClr/10" : "bg-gray-200"}`}
+        >
+            {children}
+        </code>
+    );
+};
+CodeBlock.propTypes = {
+    isDark: PropTypes.bool,
+    inline: PropTypes.bool,
+    className: PropTypes.any,
+    children: PropTypes.any,
+};
+
+export const ImageRender = ({ setActiveImageId, getImageSettings, props }) => {
+    // console.log(
+    //     `Image details: ${props.node} ${props.src} ${props.alt}`,
+    //     props,
+    // );
+    const { node, src, alt, ...rest } = props;
+    // unique ID for each image based on src and alt
+    const imageId = `img-${src || ""}${alt || ""}`.replace(
+        /[^a-zA-Z0-9]/g,
+        "-",
+    );
+    const settings = getImageSettings(imageId);
+
+    return (
+        <div
+            className={`markdown-image-container-div relative cursor-pointer z-15 overflow-hidden
+                                                flex items-center`}
+            style={{
+                justifyContent: `${settings.alignment}`,
+                marginTop: `${settings.marginTop}px`,
+                marginBottom: `${settings.marginBottom}px`,
+            }}
+            onClick={() => setActiveImageId(imageId)}
+        >
+            <img
+                className={`relative object-contain`}
+                style={{
+                    maxHeight: `${settings.maxHeight}px`,
+                    maxWidth: `${settings.maxWidth}px`,
+                }}
+                src={src}
+                alt={alt}
+                {...rest}
+            />
+        </div>
+    );
+};
+ImageRender.propTypes = {
+    setActiveImageId: PropTypes.func,
+    getImageSettings: PropTypes.func,
+    props: PropTypes.any,
+};
+
 export const MarkdownPreview = memo(function MarkdownPreview({
     title,
     content,
@@ -469,158 +590,47 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                             ]}
                             rehypePlugins={[rehypeRaw, rehypeKatex]}
                             components={{
-                                img(props) {
-                                    const { node, src, alt, ...rest } = props;
-                                    // unique ID for each image based on src and alt
-                                    const imageId =
-                                        `img-${src || ""}${alt || ""}`.replace(
-                                            /[^a-zA-Z0-9]/g,
-                                            "-",
-                                        );
-                                    const settings = getImageSettings(imageId);
+                                img: (props) => (
+                                    <ImageRender
+                                        setActiveImageId={setActiveImageId}
+                                        getImageSettings={getImageSettings}
+                                        props={props}
+                                    />
+                                ),
 
-                                    return (
-                                        <div
-                                            className={`markdown-image-container-div relative cursor-pointer z-15 overflow-hidden
-                                                                                flex items-center`}
-                                            style={{
-                                                justifyContent: `${settings.alignment}`,
-                                                marginTop: `${settings.marginTop}px`,
-                                                marginBottom: `${settings.marginBottom}px`,
-                                            }}
-                                            onClick={() =>
-                                                setActiveImageId(imageId)
-                                            }
-                                        >
-                                            <img
-                                                className={`relative object-contain`}
-                                                style={{
-                                                    maxHeight: `${settings.maxHeight}px`,
-                                                    maxWidth: `${settings.maxWidth}px`,
-                                                }}
-                                                src={src}
-                                                alt={alt}
-                                                {...rest}
-                                            />
-                                        </div>
-                                    );
-                                },
-
-                                hr(props) {
-                                    return (
-                                        <hr
-                                            className={`border-t ${isDark ? "border-oneDarkBorder" : "border-gray-200"}
+                                hr: (props) => (
+                                    <hr
+                                        className={`border-t ${isDark ? "border-oneDarkBorder" : "border-gray-200"}
                                                 ${insideGallery ? `my-1` : `my-6`}`}
-                                            {...props}
-                                        />
-                                    );
-                                },
+                                        {...props}
+                                    />
+                                ),
 
-                                code({
+                                code: ({
                                     inline,
                                     className,
                                     children,
                                     ...props
-                                }) {
-                                    const match = /language-(\w+)/.exec(
-                                        className || "",
-                                    );
-                                    const codeString = String(children).replace(
-                                        /\n$/,
-                                        "",
-                                    );
-
-                                    return !inline && match ? (
-                                        // block code
-                                        <div
-                                            className={`relative my-4 overflow-hidden rounded-sm flex flex-col
-                                            ${
-                                                isDark
-                                                    ? "bg-[#171717]"
-                                                    : "bg-[#e8eae6]"
-                                            }`}
-                                        >
-                                            {/* codeHeader */}
-                                            <div
-                                                className={`flex items-center justify-between px-6 pt-2 ${
-                                                    isDark
-                                                        ? "bg-[#171717]"
-                                                        : "bg-[#e8eae6]"
-                                                }`}
-                                            >
-                                                {/* lagguage */}
-                                                <span className="text-sm font-sans">
-                                                    {match[1]}
-                                                </span>
-                                                {/* Copy button */}
-                                                <div className="flex justify-center items-center gap-1">
-                                                    <Copy size={12} />
-                                                    <button
-                                                        onClick={(e) => {
-                                                            navigator.clipboard.writeText(
-                                                                codeString,
-                                                            );
-                                                            e.target.textContent =
-                                                                "Copied!";
-                                                            setTimeout(() => {
-                                                                e.target.textContent =
-                                                                    "Copy";
-                                                            }, 1000);
-                                                        }}
-                                                        className={`text-black dark:text-white p-1 text-xs rounded
-                                                            hover:bg-[#ddd] dark:hover:bg-[#333] focus:outline-none ${insideGallery ? "" : "z-10"}`}
-                                                    >
-                                                        Copy
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            {/* code card */}
-                                            <div className="rounded-sm overflow-hidden border-none">
-                                                <SyntaxHighlighter
-                                                    style={
-                                                        isDark
-                                                            ? atomDark
-                                                            : oneLight
-                                                    }
-                                                    language={match[1]}
-                                                    PreTag="div"
-                                                    wrapLongLines
-                                                    codeTagProps={{
-                                                        style: {
-                                                            fontSize:
-                                                                "0.875rem",
-                                                            lineHeight: "1.2",
-                                                        },
-                                                    }}
-                                                    {...props}
-                                                >
-                                                    {codeString}
-                                                </SyntaxHighlighter>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        // inline code
-                                        <code
-                                            className={`rounded
-                                            ${insideGallery ? "p-0.5 text-xs" : "px-1 py-0.5 montserrat-bold"}
-                                            ${isDark ? "text-oneDarkTagClr bg-oneDarkTagClr/10" : "bg-gray-200"}`}
-                                        >
-                                            {/* ${isDark ? "text-[#ffd085] bg-[#ffd085]/10" : "bg-gray-200"}`} */}
-                                            {children}
-                                        </code>
-                                    );
-                                },
+                                }) => (
+                                    <CodeBlock
+                                        isDark={isDark}
+                                        inline={inline}
+                                        className={className}
+                                        {...props}
+                                    >
+                                        {children}
+                                    </CodeBlock>
+                                ),
 
                                 // blockquote styles are fixed in app.css
-                                blockquote({ children }) {
+                                blockquote: ({ children }) => {
                                     return insideGallery ? (
                                         <p className="border-l-2 pl-2">
                                             {children}
                                         </p>
                                     ) : (
                                         <blockquote
-                                            className={`italic border-l-4 px-4 py-1 my-4
+                                            className={`italic border-l-4 pl-4 py-1 my-3
                                                 ${isDark ? "border-[#999] bg-[#999]/0 text-[#ddd]" : "border-gray-400 bg-gray-100/0 text-gray-700"}`}
                                         >
                                             {children}
@@ -758,12 +768,18 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                 ),
 
                                 ul: ({ children }) => (
-                                    <ul className="montserrat-regular list-disc pl-6 md:pl-8 my-5 space-y-2">
+                                    <ul
+                                        className="montserrat-regular list-disc
+                                        pl-6 md:pl-8 my-3 md:my-4 space-y-4"
+                                    >
                                         {children}
                                     </ul>
                                 ),
                                 ol: ({ children }) => (
-                                    <ol className="montserrat-regular list-decimal pl-6 md:pl-8 my-5 space-y-2">
+                                    <ol
+                                        className="montserrat-regular list-decimal
+                                        pl-6 md:pl-8 my-3 md:my-4 space-y-4"
+                                    >
                                         {children}
                                     </ol>
                                 ),
@@ -772,7 +788,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                         className={
                                             insideGallery
                                                 ? "text-xs leading-tighter"
-                                                : "montserrat-regular leading-relaxed text-base md:text-lg"
+                                                : "montserrat-regular leading-snug md:leading-normal text-base md:text-lg"
                                         }
                                     >
                                         {children}
@@ -818,10 +834,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                                     </td>
                                 ),
                             }}
-                            className="prose-base prose-p:my-4 prose-headings:font-semibold prose-a:text-blue-600
-                            hover:prose-a:text-blue-800 prose-blockquote:border-l-4 prose-blockquote:pl-4
-                            prose-blockquote:italic prose-blockquote:text-gray-600 prose-code:bg-gray-100
-                            prose-code:px-1 prose-code:py-0.5 prose-code:rounded"
+                            className="prose-base"
                         >
                             {content}
                         </ReactMarkdown>
@@ -830,7 +843,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                 <CardFooter className="bg-transparent h-[15vh]" />
             </Card>
 
-            {/* create a seperate comp */}
+            {/* create a seperate comp later */}
             {!insidePost && activeImageId && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div

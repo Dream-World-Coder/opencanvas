@@ -44,7 +44,9 @@ export const uploadImage = async (file) => {
     const formData = new FormData();
     formData.append("image", file);
 
-    const response = await fetch("http://localhost:3000/api/uploadImage", {
+    // const apiUrl = "http://localhost:3000/api/uploadImage";
+    const apiUrl = "https://encryptease.pythonanywhere.com/api/uploadImage";
+    const response = await fetch(apiUrl, {
         method: "POST",
         body: formData,
     });

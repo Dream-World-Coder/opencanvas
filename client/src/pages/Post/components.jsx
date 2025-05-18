@@ -15,7 +15,6 @@ import {
     Check,
     ChevronDown,
     ChevronUp,
-    Copy,
     Send,
     Edit,
     Trash2,
@@ -32,9 +31,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Header from "../../components/Header/Header";
 
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -59,6 +55,7 @@ import { useDarkMode } from "../../components/Hooks/darkMode";
 import { postDarkThemes } from "../../services/themes";
 import { copyHeaderLink } from "../../services/copyToClipBoard";
 import { timeAgo } from "../../services/formatDate";
+import { CodeBlock } from "../CreatePosts/Writing/WritingComponents";
 /**
  *
  */
@@ -1495,11 +1492,52 @@ import rehypeRaw from "rehype-raw";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import {
-    oneLight,
-    atomDark,
-} from "react-syntax-highlighter/dist/esm/styles/prism";
+
+function getSettingsFromAlt(altText) {
+    if ((altText.match(/#/g) || []).length !== 1) return {};
+
+    const settingsPart = altText.split("#")[1];
+    const result = {
+        w: null,
+        h: null,
+        mt: null,
+        mb: null,
+        p: null,
+    };
+
+    // Match all settings with their values
+    const regex = /(w|h|mt|mb)\.(\d+)|p\.([CSEcse])/g;
+    let match;
+
+    while ((match = regex.exec(settingsPart)) !== null) {
+        const [_, key, value, pos] = match;
+
+        if (key === "w" || key === "h") {
+            const val = Math.min(parseInt(value), 678);
+            if (!isNaN(val)) result[key] = val;
+        } else if (key === "mt" || key === "mb") {
+            const val = Math.min(parseInt(value), 100);
+            if (!isNaN(val)) result[key] = val;
+        } else if (pos) {
+            result.p = pos.toUpperCase(); // Normalize to uppercase
+        }
+    }
+
+    if (!result.p) return result;
+
+    if (result.p.toLowerCase() === "c") {
+        result.p = "center";
+    } else if (result.p.toLowerCase() === "s") {
+        result.p = "flex-start";
+    } else if (result.p.toLowerCase() === "e") {
+        result.p = "flex-end";
+    } else {
+        result.p = "center";
+    }
+
+    // console.log(result);
+    return result;
+}
 
 export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
     title,
@@ -1509,9 +1547,7 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
     isDark = false,
     textAlignment = "left",
     lightModeBg = "bg-white",
-    insidePost = false,
-    darkBg = "bg-[#222]",
-    contentOnly = false, // always false here
+    darkBg = "bg-[#222222]",
     artType = "written",
     darkTheme = null,
 }) {
@@ -1528,645 +1564,299 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
         }
     }
 
-    //useref to store settings for all images individually
-    const imageSettingsRef = useRef({});
-
-    //to track which image's settings are being edited
-    const [activeImageId, setActiveImageId] = useState(null);
-
-    // force re-render when settings change
-    const [, forceUpdate] = useState({});
-
-    //get the default settings for an image or use existing settings
-    const getImageSettings = (imageId) => {
-        if (!imageSettingsRef.current[imageId]) {
-            imageSettingsRef.current[imageId] = {
-                maxWidth: 468,
-                maxHeight: 468,
-                alignment: "center",
-                marginTop: 35,
-                marginBottom: 35,
-            };
-        }
-        return imageSettingsRef.current[imageId];
-    };
-
-    //update a specific setting for an image
-    const updateImageSetting = (imageId, setting, value) => {
-        const settings = getImageSettings(imageId);
-        settings[setting] = value;
-        imageSettingsRef.current[imageId] = settings;
-        forceUpdate({});
-    };
-
-    function convertFlexAlignment(alignment) {
-        switch (alignment) {
-            case "flex-start":
-                return "left";
-            case "center":
-                return "center";
-            case "flex-end":
-                return "right";
-            default:
-                return alignment;
-        }
-    }
-
     if (!isVisible) return null;
 
     return (
-        <>
-            <Card
-                className={`w-full max-w-4xl mx-auto bg-white border-none shadow-none
+        <Card
+            className={`w-full max-w-3xl mx-auto bg-white border-none shadow-none rounded-none
                 ${isDark ? `${darkBg} ${darkTheme.primaryText} border-none` : lightModeBg}
                 ${textAlignment === "center" ? "text-center" : "text-left"}`}
-            >
-                <CardContent className="p-0">
-                    <div
-                        id="export"
-                        className="prose prose-slate max-w-none montserrat-regular"
-                    >
-                        {/* title */}
-                        {title && (
-                            <div
-                                className={`pt-2 mb-10 leading-tight tracking-tight capitalize  ${
-                                    contentOnly
-                                        ? "text-xl font-semibold font-sans"
-                                        : "text-3xl md:text-4xl font-bold font-serif"
-                                }
+        >
+            <CardContent className="p-0">
+                <div
+                    id="export"
+                    className="prose prose-slate max-w-none montserrat-regular"
+                >
+                    {/* title */}
+                    {title && (
+                        <div
+                            className={`pt-2 mb-10 leading-tight tracking-tight capitalize text-3xl md:text-4xl font-bold font-serif
                                 ${artType === "poem" ? "!max-w-[600px] !font-boskaBold" : ""}
                                 ${darkTheme.primaryText}`}
-                            >
-                                {title}
-                                {!contentOnly && false && (
-                                    <>
-                                        <hr
-                                            className={`mt-6 mb-px border-t ${isDark ? `dark:border-gray-300` : "border-gray-200"}`}
-                                        />
-                                        <hr
-                                            className={`mb-6 border-t ${isDark ? `dark:border-gray-300` : "border-gray-200"}`}
-                                        />
-                                    </>
-                                )}
-                            </div>
-                        )}
-
-                        {/* thumbnail */}
-                        {thumbnailUrl && !contentOnly && (
-                            <div
-                                className="relative mb-8 w-full md:w-[110%] md:transform md:translate-x-[-5%] __max-h-[370px] bg-gray-200 dark:bg-[#171717]
-                                rounded-lg overflow-hidden shadow-none flex items-center justify-center"
-                            >
-                                <img
-                                    src={thumbnailUrl}
-                                    alt={title || "Article thumbnail"}
-                                    className="aspect-video object-contain w-full"
-                                    loading="lazy"
-                                />
-                            </div>
-                        )}
-                        {/* markdown content */}
-                        <ReactMarkdown
-                            remarkPlugins={[
-                                remarkGfm,
-                                remarkBreaks,
-                                remarkMath,
-                            ]}
-                            rehypePlugins={[rehypeRaw, rehypeKatex]}
-                            components={{
-                                img(props) {
-                                    const { node, src, alt, ...rest } = props;
-                                    // unique ID for each image based on src and alt
-                                    const imageId =
-                                        `img-${src || ""}${alt || ""}`.replace(
-                                            /[^a-zA-Z0-9]/g,
-                                            "-",
-                                        );
-                                    const settings = getImageSettings(imageId);
-
-                                    return (
-                                        <div
-                                            className={`markdown-image-container-div relative cursor-pointer z-15 overflow-hidden
-                                                                                flex items-center`}
-                                            style={{
-                                                justifyContent: `${settings.alignment}`,
-                                                marginTop: `${settings.marginTop}px`,
-                                                marginBottom: `${settings.marginBottom}px`,
-                                            }}
-                                            onClick={() =>
-                                                setActiveImageId(imageId)
-                                            }
-                                        >
-                                            <img
-                                                className={`relative object-contain`}
-                                                style={{
-                                                    maxHeight: `${settings.maxHeight}px`,
-                                                    maxWidth: `${settings.maxWidth}px`,
-                                                }}
-                                                src={src}
-                                                alt={alt}
-                                                {...rest}
-                                            />
-                                        </div>
-                                    );
-                                },
-
-                                hr(props) {
-                                    return (
-                                        <hr
-                                            className={`my-6 border-t ${isDark ? `${darkTheme.border}` : "border-gray-200"}`}
-                                            {...props}
-                                        />
-                                    );
-                                },
-
-                                code({
-                                    inline,
-                                    className,
-                                    children,
-                                    ...props
-                                }) {
-                                    const match = /language-(\w+)/.exec(
-                                        className || "",
-                                    );
-                                    const codeString = String(children).replace(
-                                        /\n$/,
-                                        "",
-                                    );
-
-                                    return !inline && match ? (
-                                        // block code
-                                        <div
-                                            className={`relative my-4 overflow-hidden rounded-sm flex flex-col
-                                            ${
-                                                isDark
-                                                    ? "bg-[#171717]"
-                                                    : "bg-[#e8eae6]"
-                                            }`}
-                                        >
-                                            {/* codeHeader */}
-                                            <div
-                                                className={`flex items-center justify-between px-6 pt-2 ${
-                                                    isDark
-                                                        ? "bg-[#171717]"
-                                                        : "bg-[#e8eae6]"
-                                                }`}
-                                            >
-                                                {/* lagguage */}
-                                                <span className="text-sm font-sans">
-                                                    {match[1]}
-                                                </span>
-                                                {/* Copy button */}
-                                                <div className="flex justify-center items-center gap-1">
-                                                    <Copy size={12} />
-                                                    <button
-                                                        onClick={(e) => {
-                                                            navigator.clipboard.writeText(
-                                                                codeString,
-                                                            );
-                                                            e.target.textContent =
-                                                                "Copied!";
-                                                            setTimeout(() => {
-                                                                e.target.textContent =
-                                                                    "Copy";
-                                                            }, 1000);
-                                                        }}
-                                                        className="text-black dark:text-white p-1 text-xs rounded hover:bg-[#ddd] dark:hover:bg-[#333] focus:outline-none z-10"
-                                                    >
-                                                        Copy
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            {/* code card */}
-                                            <div className="rounded-sm overflow-hidden border-none">
-                                                <SyntaxHighlighter
-                                                    style={
-                                                        isDark
-                                                            ? atomDark
-                                                            : oneLight
-                                                    }
-                                                    language={match[1]}
-                                                    PreTag="div"
-                                                    wrapLongLines
-                                                    codeTagProps={{
-                                                        style: {
-                                                            fontSize:
-                                                                "0.875rem",
-                                                            lineHeight: "1.2",
-                                                        },
-                                                    }}
-                                                    {...props}
-                                                >
-                                                    {codeString}
-                                                </SyntaxHighlighter>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        // inline code
-                                        <code
-                                            className={`px-1 py-0.5 rounded text-sm font-mono
-                                            ${isDark ? "text-oneDarkTagClr bg-oneDarkTagClr/10" : "bg-gray-200"}`}
-                                        >
-                                            {/* ${isDark ? "text-[#ffd085] bg-[#ffd085]/10" : "bg-gray-200"}`} */}
-                                            {children}
-                                        </code>
-                                    );
-                                },
-
-                                blockquote({ children }) {
-                                    return (
-                                        <blockquote
-                                            className={`border-l-4 px-4 py-1 my-4 italic
-                                                ${isDark ? "border-[#999] bg-[#999]/0 text-[#ddd]" : "border-gray-400 bg-gray-100/0 text-gray-700"}`}
-                                        >
-                                            {children}
-                                        </blockquote>
-                                    );
-                                },
-
-                                h1: ({ children }) => (
-                                    <h1
-                                        id={generateId(children)}
-                                        className={`mt-12 mb-6 leading-tight tracking-tight cursor-pointer ${
-                                            contentOnly
-                                                ? "text-xl font-semibold font-sans"
-                                                : "text-3xl md:text-4xl font-bold font-serif"
-                                        }`}
-                                        onClick={() => {
-                                            copyHeaderLink(children);
-                                        }}
-                                    >
-                                        {children}
-                                    </h1>
-                                ),
-                                h2: ({ children }) => (
-                                    <h2
-                                        id={generateId(children)}
-                                        className={`font-serif mt-10 mb-5 leading-tight tracking-tight cursor-pointer ${
-                                            contentOnly
-                                                ? "text-lg"
-                                                : "text-2xl md:text-3xl font-bold"
-                                        }`}
-                                        onClick={() => {
-                                            copyHeaderLink(children);
-                                        }}
-                                    >
-                                        {children}
-                                    </h2>
-                                ),
-                                h3: ({ children }) => (
-                                    <h3
-                                        id={generateId(children)}
-                                        className={`font-serif mt-8 mb-4 leading-snug cursor-pointer ${
-                                            contentOnly
-                                                ? "text-base"
-                                                : "text-xl md:text-2xl font-bold"
-                                        }`}
-                                        onClick={() => {
-                                            copyHeaderLink(children);
-                                        }}
-                                    >
-                                        {children}
-                                    </h3>
-                                ),
-                                h4: ({ children }) => (
-                                    <h4
-                                        id={generateId(children)}
-                                        className={`montserrat-regular font-semibold mt-6 mb-3 leading-snug cursor-pointer ${
-                                            contentOnly
-                                                ? "text-sm"
-                                                : "text-lg md:text-xl"
-                                        }`}
-                                        onClick={() => {
-                                            copyHeaderLink(children);
-                                        }}
-                                    >
-                                        {children}
-                                    </h4>
-                                ),
-                                h5: ({ children }) => (
-                                    <h5
-                                        className={`montserrat-regular font-semibold mt-5 mb-3 leading-snug ${
-                                            contentOnly
-                                                ? "text-sm"
-                                                : "text-base md:text-lg"
-                                        }`}
-                                    >
-                                        {children}
-                                    </h5>
-                                ),
-                                h6: ({ children }) => (
-                                    <h6
-                                        className={`montserrat-regular font-semibold mt-4 mb-2 uppercase tracking-wider ${
-                                            contentOnly
-                                                ? "text-sm"
-                                                : "text-base"
-                                        }`}
-                                    >
-                                        {children}
-                                    </h6>
-                                ),
-
-                                p: ({ children }) => (
-                                    <p
-                                        className={`my-8 max-w-prose
-                                            ${contentOnly ? "text-xs leading-relaxed" : "text-base md:text-lg md:leading-[28px]"}
-                                            ${artType === "poem" ? "!font-boskaLight !text-xl !leading-[32px] !my-0" : ""}`}
-                                    >
-                                        {/* initially it was : leading-[40px] */}
-                                        {children}
-                                    </p>
-                                ),
-
-                                strong: ({ children }) => (
-                                    <strong
-                                        className={`font-semibold montserrat-bold`}
-                                    >
-                                        {children}
-                                    </strong>
-                                ),
-
-                                em: ({ children }) => (
-                                    <em
-                                        className={`italic ${artType === "poem" ? "font-boska" : "font-boska"}`}
-                                    >
-                                        {children}
-                                    </em>
-                                ),
-
-                                a: ({ href, children }) => (
-                                    <a
-                                        href={href}
-                                        className={`border-b border-current pb-0.5 font-medium montserrat-regular transition-colors duration-200 ${
-                                            isDark
-                                                ? "text-blue-300 hover:text-blue-400"
-                                                : "text-blue-600 hover:text-blue-800"
-                                        }`}
-                                        target={
-                                            href.startsWith("http")
-                                                ? "_blank"
-                                                : "_self"
-                                        }
-                                        rel={
-                                            href.startsWith("http")
-                                                ? "noopener noreferrer"
-                                                : ""
-                                        }
-                                    >
-                                        {children}
-                                    </a>
-                                ),
-
-                                ul: ({ children }) => (
-                                    <ul className="montserrat-regular list-disc pl-6 md:pl-8 my-3 md:my-4 space-y-2">
-                                        {children}
-                                    </ul>
-                                ),
-                                ol: ({ children }) => (
-                                    <ol className="montserrat-regular list-decimal pl-6 md:pl-8 my-3 md:my-4 space-y-2">
-                                        {children}
-                                    </ol>
-                                ),
-                                li: ({ children }) => (
-                                    <li className="montserrat-regular leading-snug md:leading-normal text-base md:text-lg">
-                                        {children}
-                                    </li>
-                                ),
-
-                                table: ({ children }) => (
-                                    <div className="overflow-x-auto">
-                                        <table
-                                            className={`border border-gray-400 ${darkTheme.table.border} bg-white ${darkTheme.table.rowBg} w-full text-gray-900 ${darkTheme.primaryText}`}
-                                        >
-                                            {children}
-                                        </table>
-                                    </div>
-                                ),
-                                thead: ({ children }) => (
-                                    <thead
-                                        className={`bg-gray-200 ${darkTheme.table.headerBg}`}
-                                    >
-                                        {children}
-                                    </thead>
-                                ),
-                                tbody: ({ children }) => (
-                                    <tbody
-                                        className={`${darkTheme.table.rowBg}`}
-                                    >
-                                        {children}
-                                    </tbody>
-                                ),
-                                tr: ({ children }) => (
-                                    <tr
-                                        className={`border border-gray-300 ${darkTheme.table.border}`}
-                                    >
-                                        {children}
-                                    </tr>
-                                ),
-                                th: ({ children }) => (
-                                    <th
-                                        className={`border ${contentOnly ? "text-xs" : "montserrat-bold"} border-gray-300 ${darkTheme.table.border} px-4 py-2 bg-gray-100 ${darkTheme.table.headerBg}`}
-                                    >
-                                        {children}
-                                    </th>
-                                ),
-                                td: ({ children }) => (
-                                    <td
-                                        className={`border border-gray-300 ${darkTheme.table.border} px-4 py-2 ${darkTheme.table.rowBg} ${contentOnly ? "text-xs" : "montserrat-regular"}`}
-                                    >
-                                        {children}
-                                    </td>
-                                ),
-                            }}
-                            className="prose-base prose-p:my-4 prose-headings:font-semibold prose-a:text-blue-600
-                            hover:prose-a:text-blue-800 prose-blockquote:border-l-4 prose-blockquote:pl-4
-                            prose-blockquote:italic prose-blockquote:text-gray-600 prose-code:bg-gray-100
-                            prose-code:px-1 prose-code:py-0.5 prose-code:rounded"
                         >
-                            {content}
-                        </ReactMarkdown>
-                    </div>
-                </CardContent>
-                <CardFooter className="bg-transparent h-[15vh]" />
-            </Card>
-
-            {/* create a seperate comp */}
-            {!insidePost && activeImageId && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div
-                        className={`relative bg-white text-black rounded-lg p-6 w-80`}
-                    >
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="absolute right-2 top-2"
-                            onClick={() => setActiveImageId(null)}
-                        >
-                            <X className="h-4 w-4" />
-                        </Button>
-
-                        <h3 className="text-lg font-semibold mb-4">
-                            Image Settings
-                        </h3>
-
-                        <div className="grid grid-cols-1 gap-6">
-                            {/* Margin Top */}
-                            <div className="space-y-2">
-                                <Label>
-                                    Margin Top:{" "}
-                                    {
-                                        imageSettingsRef.current[activeImageId]
-                                            ?.marginTop
-                                    }
-                                    px
-                                </Label>
-                                <Slider
-                                    value={[
-                                        imageSettingsRef.current[activeImageId]
-                                            ?.marginTop,
-                                    ]}
-                                    min={35}
-                                    max={100}
-                                    step={1}
-                                    onValueChange={(value) =>
-                                        updateImageSetting(
-                                            activeImageId,
-                                            "marginTop",
-                                            value[0],
-                                        )
-                                    }
-                                />
-                            </div>
-
-                            {/* Margin Bottom */}
-                            <div className="space-y-2">
-                                <Label>
-                                    Margin Bottom:{" "}
-                                    {
-                                        imageSettingsRef.current[activeImageId]
-                                            ?.marginBottom
-                                    }
-                                    px
-                                </Label>
-                                <Slider
-                                    value={[
-                                        imageSettingsRef.current[activeImageId]
-                                            ?.marginBottom,
-                                    ]}
-                                    min={35}
-                                    max={100}
-                                    step={1}
-                                    onValueChange={(value) =>
-                                        updateImageSetting(
-                                            activeImageId,
-                                            "marginBottom",
-                                            value[0],
-                                        )
-                                    }
-                                />
-                            </div>
-
-                            {/* Max Height */}
-                            <div className="space-y-2">
-                                <Label>
-                                    Max Height:{" "}
-                                    {
-                                        imageSettingsRef.current[activeImageId]
-                                            ?.maxHeight
-                                    }
-                                    px
-                                </Label>
-                                <Slider
-                                    value={[
-                                        imageSettingsRef.current[activeImageId]
-                                            ?.maxHeight,
-                                    ]}
-                                    min={360}
-                                    max={800}
-                                    step={10}
-                                    onValueChange={(value) =>
-                                        updateImageSetting(
-                                            activeImageId,
-                                            "maxHeight",
-                                            value[0],
-                                        )
-                                    }
-                                />
-                            </div>
-
-                            {/* Max Width */}
-                            <div className="space-y-2">
-                                <Label>
-                                    Max Width:{" "}
-                                    {
-                                        imageSettingsRef.current[activeImageId]
-                                            ?.maxWidth
-                                    }
-                                    px
-                                </Label>
-                                <Slider
-                                    value={[
-                                        imageSettingsRef.current[activeImageId]
-                                            ?.maxWidth,
-                                    ]}
-                                    min={500}
-                                    max={1000}
-                                    step={10}
-                                    onValueChange={(value) =>
-                                        updateImageSetting(
-                                            activeImageId,
-                                            "maxWidth",
-                                            value[0],
-                                        )
-                                    }
-                                />
-                            </div>
-
-                            {/* Position */}
-                            <div className="space-y-2">
-                                <Label>Position</Label>
-                                <RadioGroup
-                                    value={
-                                        imageSettingsRef.current[activeImageId]
-                                            ?.alignment
-                                    }
-                                    onValueChange={(value) =>
-                                        updateImageSetting(
-                                            activeImageId,
-                                            "alignment",
-                                            value,
-                                        )
-                                    }
-                                    className="flex space-x-4"
-                                >
-                                    {["flex-start", "center", "flex-end"].map(
-                                        (position) => (
-                                            <div
-                                                className="flex items-center space-x-2"
-                                                key={position}
-                                            >
-                                                <RadioGroupItem
-                                                    value={position}
-                                                    id={`${activeImageId}-${position}`}
-                                                />
-                                                <Label
-                                                    htmlFor={`${activeImageId}-${position}`}
-                                                >
-                                                    {convertFlexAlignment(
-                                                        position,
-                                                    )}
-                                                </Label>
-                                            </div>
-                                        ),
-                                    )}
-                                </RadioGroup>
-                            </div>
+                            {title}
                         </div>
-                    </div>
+                    )}
+
+                    {/* thumbnail */}
+                    {thumbnailUrl && (
+                        <div
+                            className="relative mb-8 w-full md:w-[110%] md:transform md:translate-x-[-5%] __max-h-[370px] bg-gray-200 dark:bg-[#171717]
+                                rounded-lg overflow-hidden shadow-none flex items-center justify-center"
+                        >
+                            <img
+                                src={thumbnailUrl}
+                                alt={title || "Article thumbnail"}
+                                className="aspect-video object-contain w-full"
+                                loading="lazy"
+                            />
+                        </div>
+                    )}
+                    {/* markdown content */}
+                    <ReactMarkdown
+                        remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
+                        rehypePlugins={[rehypeRaw, rehypeKatex]}
+                        components={{
+                            img: (props) => {
+                                /**
+                                * For now encode image properties inside alt text,
+                                alt --> acctual alt text or empty # w.W,h.H,p.C,mt.MT,mb.MB
+                                #-> special symbol for splitting,
+                                w.WIDTH_VALUE_INT, eg w.230
+                                for position -> (C-enter/S-tart/E-nd)
+                                mb, mt -> max 100
+                                w, h max 678
+                                */
+                                const { node, src, alt, ...rest } = props;
+                                const { w, h, mt, mb, p } =
+                                    getSettingsFromAlt(alt);
+                                return (
+                                    <div
+                                        className={`markdown-image-container-div relative cursor-pointer z-15 overflow-hidden flex items-center`}
+                                        style={{
+                                            justifyContent: p || `center`,
+                                            marginTop: mt || `35px`,
+                                            marginBottom: mb || `35px`,
+                                        }}
+                                    >
+                                        <img
+                                            className={`relative object-contain`}
+                                            style={{
+                                                maxHeight: h || `468px`,
+                                                maxWidth: w || `468px`,
+                                            }}
+                                            src={src}
+                                            alt={alt}
+                                            {...rest}
+                                        />
+                                    </div>
+                                );
+                            },
+
+                            hr: (props) => (
+                                <hr
+                                    className={`my-6 border-t ${isDark ? `${darkTheme.border}` : "border-gray-200"}`}
+                                    {...props}
+                                />
+                            ),
+
+                            code: ({
+                                inline,
+                                className,
+                                children,
+                                ...props
+                            }) => (
+                                <CodeBlock
+                                    isDark={isDark}
+                                    inline={inline}
+                                    className={className}
+                                    {...props}
+                                >
+                                    {children}
+                                </CodeBlock>
+                            ),
+
+                            // blockquote styles are fixed in app.css
+                            blockquote: ({ children }) => (
+                                <blockquote
+                                    className={`italic border-l-4 pl-4 py-1 my-3
+                                                ${isDark ? "border-[#999] bg-[#999]/0 text-[#ddd]" : "border-gray-400 bg-gray-100/0 text-gray-700"}`}
+                                >
+                                    {children}
+                                </blockquote>
+                            ),
+
+                            h1: ({ children }) => (
+                                <h1
+                                    id={generateId(children)}
+                                    className={`mt-12 mb-6 leading-tight tracking-tight cursor-pointer text-3xl md:text-4xl font-bold font-serif`}
+                                    onClick={() => {
+                                        copyHeaderLink(children);
+                                    }}
+                                >
+                                    {children}
+                                </h1>
+                            ),
+                            h2: ({ children }) => (
+                                <h2
+                                    id={generateId(children)}
+                                    className={`font-serif mt-10 mb-5 leading-tight tracking-tight cursor-pointer text-2xl md:text-3xl font-bold`}
+                                    onClick={() => {
+                                        copyHeaderLink(children);
+                                    }}
+                                >
+                                    {children}
+                                </h2>
+                            ),
+                            h3: ({ children }) => (
+                                <h3
+                                    id={generateId(children)}
+                                    className={`font-serif mt-8 mb-4 leading-snug cursor-pointer text-xl md:text-2xl font-bold`}
+                                    onClick={() => {
+                                        copyHeaderLink(children);
+                                    }}
+                                >
+                                    {children}
+                                </h3>
+                            ),
+                            h4: ({ children }) => (
+                                <h4
+                                    id={generateId(children)}
+                                    className={`montserrat-regular font-semibold mt-6 mb-3 leading-snug cursor-pointer text-lg md:text-xl`}
+                                    onClick={() => {
+                                        copyHeaderLink(children);
+                                    }}
+                                >
+                                    {children}
+                                </h4>
+                            ),
+                            h5: ({ children }) => (
+                                <h5
+                                    className={`montserrat-regular font-semibold mt-5 mb-3 leading-snug text-base md:text-lg`}
+                                >
+                                    {children}
+                                </h5>
+                            ),
+                            h6: ({ children }) => (
+                                <h6
+                                    className={`montserrat-regular font-semibold mt-4 mb-2 uppercase tracking-wider text-base`}
+                                >
+                                    {children}
+                                </h6>
+                            ),
+
+                            p: ({ children }) => (
+                                <p
+                                    className={`my-8 max-w-prose text-base md:text-lg md:leading-[28px]
+                                            ${artType === "poem" ? "!font-boskaLight !text-xl !leading-[32px] !my-0" : ""}`}
+                                >
+                                    {/* initially it was : leading-[40px] */}
+                                    {children}
+                                </p>
+                            ),
+
+                            strong: ({ children }) => (
+                                <strong
+                                    className={`font-semibold montserrat-bold`}
+                                >
+                                    {children}
+                                </strong>
+                            ),
+
+                            em: ({ children }) => (
+                                <em
+                                    className={`italic ${artType === "poem" ? "font-boska" : "font-boska"}`}
+                                >
+                                    {children}
+                                </em>
+                            ),
+
+                            a: ({ href, children }) => (
+                                <a
+                                    href={href}
+                                    className={`border-b border-current pb-0.5 font-medium montserrat-regular transition-colors duration-200 ${
+                                        isDark
+                                            ? "text-blue-300 hover:text-blue-400"
+                                            : "text-blue-600 hover:text-blue-800"
+                                    }`}
+                                    target={
+                                        href.startsWith("http")
+                                            ? "_blank"
+                                            : "_self"
+                                    }
+                                    rel={
+                                        href.startsWith("http")
+                                            ? "noopener noreferrer"
+                                            : ""
+                                    }
+                                >
+                                    {children}
+                                </a>
+                            ),
+
+                            ul: ({ children }) => (
+                                <ul
+                                    className="montserrat-regular list-disc
+                                        pl-6 md:pl-8 my-3 md:my-4 space-y-4"
+                                >
+                                    {children}
+                                </ul>
+                            ),
+                            ol: ({ children }) => (
+                                <ol
+                                    className="montserrat-regular list-decimal
+                                        pl-6 md:pl-8 my-3 md:my-4 space-y-4"
+                                >
+                                    {children}
+                                </ol>
+                            ),
+                            li: ({ children }) => (
+                                <li className="montserrat-regular leading-snug md:leading-normal text-base md:text-lg">
+                                    {children}
+                                </li>
+                            ),
+
+                            table: ({ children }) => (
+                                <div className="overflow-x-auto">
+                                    <table
+                                        className={`border border-gray-400 ${darkTheme.table.border} bg-white ${darkTheme.table.rowBg} w-full text-gray-900 ${darkTheme.primaryText}`}
+                                    >
+                                        {children}
+                                    </table>
+                                </div>
+                            ),
+                            thead: ({ children }) => (
+                                <thead
+                                    className={`bg-gray-200 ${darkTheme.table.headerBg}`}
+                                >
+                                    {children}
+                                </thead>
+                            ),
+                            tbody: ({ children }) => (
+                                <tbody className={`${darkTheme.table.rowBg}`}>
+                                    {children}
+                                </tbody>
+                            ),
+                            tr: ({ children }) => (
+                                <tr
+                                    className={`border border-gray-300 ${darkTheme.table.border}`}
+                                >
+                                    {children}
+                                </tr>
+                            ),
+                            th: ({ children }) => (
+                                <th
+                                    className={`border montserrat-bold border-gray-300 ${darkTheme.table.border} px-4 py-2 bg-gray-100 ${darkTheme.table.headerBg}`}
+                                >
+                                    {children}
+                                </th>
+                            ),
+                            td: ({ children }) => (
+                                <td
+                                    className={`border border-gray-300 ${darkTheme.table.border} px-4 py-2 ${darkTheme.table.rowBg} montserrat-regular`}
+                                >
+                                    {children}
+                                </td>
+                            ),
+                        }}
+                        className="prose-base"
+                    >
+                        {content}
+                    </ReactMarkdown>
                 </div>
-            )}
-        </>
+            </CardContent>
+            <CardFooter className="bg-transparent h-[15vh]" />
+        </Card>
     );
 });
 
@@ -2175,11 +1865,9 @@ ThemedMarkdownPreview.propTypes = {
     content: PropTypes.any,
     thumbnailUrl: PropTypes.any,
     isVisible: PropTypes.bool,
-    contentOnly: PropTypes.bool,
     isDark: PropTypes.bool,
     textAlignment: PropTypes.string,
     lightModeBg: PropTypes.string,
-    insidePost: PropTypes.bool,
     darkBg: PropTypes.string,
     artType: PropTypes.string,
     darkTheme: PropTypes.object,

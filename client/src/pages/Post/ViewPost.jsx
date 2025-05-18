@@ -317,19 +317,20 @@ const ViewPost = () => {
 
                         {/* Article content */}
                         <div className="prose dark:prose-invert max-w-none pt-4 mb-16">
-                            <ThemedMarkdownPreview
-                                title={post.title}
-                                content={post.content}
-                                thumbnailUrl={post.thumbnailUrl}
-                                isDark={isDark}
-                                darkBg={darkTheme.colors.bg}
-                                darkTheme={darkTheme.colors}
-                                textAlignment={
-                                    post.type !== "poem" ? "left" : "center"
-                                }
-                                insidePost={true}
-                                artType={post.type}
-                            />
+                            <article className="w-full max-w-4xl mx-auto">
+                                <ThemedMarkdownPreview
+                                    title={post.title}
+                                    content={post.content}
+                                    thumbnailUrl={post.thumbnailUrl}
+                                    isDark={isDark}
+                                    darkBg={darkTheme.colors.bg}
+                                    darkTheme={darkTheme.colors}
+                                    textAlignment={
+                                        post.type !== "poem" ? "left" : "center"
+                                    }
+                                    artType={post.type}
+                                />
+                            </article>
                             <div className="flex flex-wrap gap-2 mb-6">
                                 {post.tags.map((tag, index) => (
                                     <span
