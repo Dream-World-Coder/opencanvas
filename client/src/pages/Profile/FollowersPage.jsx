@@ -28,7 +28,7 @@ const FollowersPage = () => {
     }
 
     setIsLoading(true);
-    const apiUrl = `http://localhost:3000/u/${username}`;
+    const apiUrl = `${import.meta.env.VITE_BACKEND_URL}/u/${username}`;
 
     try {
       const res = await fetch(apiUrl);

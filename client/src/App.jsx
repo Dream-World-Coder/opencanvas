@@ -27,6 +27,7 @@ const ProfileSettings = lazy(() => import("./pages/Profile/ProfileSettings"));
 const PublicProfile = lazy(() => import("./pages/Profile/PublicProfile"));
 const FollowersPage = lazy(() => import("./pages/Profile/FollowersPage"));
 const FollowingPage = lazy(() => import("./pages/Profile/FollowingPage"));
+const SavedPosts = lazy(() => import("./pages/Profile/SavedPosts"));
 
 const ViewPost = lazy(() => import("./pages/Post/ViewPost"));
 const PrivatePostView = lazy(() => import("./pages/Post/PrivatePostView"));
@@ -75,8 +76,8 @@ export default function App() {
               <Suspense fallback={<LoadingPage bgClr="bg-white" />}>
                 <Routes>
                   {/* <Route
-                        path="/turing"
-                        element={<TuringMachineVisualizer />}
+                      path="/turing"
+                      element={<TuringMachineVisualizer />}
                     /> */}
                   {/* public */}
                   {/* *************** */}
@@ -142,6 +143,7 @@ export default function App() {
                       path="/profile/settings"
                       element={<ProfileSettings />}
                     />
+                    <Route path="/saved-posts" element={<SavedPosts />} />
                     <Route
                       path="/private/p/:postId"
                       element={<PrivatePostView />}

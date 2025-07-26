@@ -70,16 +70,19 @@ const FollowingPage = () => {
 
       setFollowingToFetch(followingToFetch + 10);
 
-      const response = await fetch(`http://localhost:3000/u/following/byids`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/u/following/byids`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            followingIds: followingIdsQS,
+          }),
         },
-        body: JSON.stringify({
-          followingIds: followingIdsQS,
-        }),
-      });
+      );
 
       const data = await response.json();
 
