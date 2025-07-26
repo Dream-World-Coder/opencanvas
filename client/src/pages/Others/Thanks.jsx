@@ -2,21 +2,21 @@ import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/GalleryFooter";
 
 const Thanks = ({ bgClr = "bg-cream-light" }) => {
-    return (
-        <>
-            <Header noBlur={true} />
-            <div
-                className={`relative size-full min-h-dvh ${bgClr} dark:bg-[#111] dark:text-white flex flex-col items-center justify-center text-lg gap-6`}
-            >
-                <div className="text-center font-semibold font-serif text-3xl sm:text-4xl text-stone-600/80 dark:text-white transform -translate-y-20">
-                    &quot;Thank you for contacting,
-                    <br />
-                    I&apos;ll get in touch as soon as possible.&quot;
-                </div>
-            </div>
-            <Footer />
-        </>
-    );
+  return (
+    <>
+      <Header noBlur={true} />
+      <div
+        className={`relative size-full min-h-dvh ${bgClr} dark:bg-[#111] dark:text-white flex flex-col items-center justify-center text-lg gap-6`}
+      >
+        <div className="text-center font-semibold font-serif text-3xl sm:text-4xl text-stone-600/80 dark:text-white transform -translate-y-20">
+          &quot;Thank you for contacting,
+          <br />
+          I&apos;ll get in touch as soon as possible.&quot;
+        </div>
+      </div>
+      <Footer />
+    </>
+  );
 };
 
 export default Thanks;

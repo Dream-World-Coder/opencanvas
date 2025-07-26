@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 export const createOptions = [
+    //social, type:social
     {
         id: "article",
         href: "/createpost/article",

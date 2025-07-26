@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
-import { BookOpen, Clock } from "lucide-react";
+import { Filter, BookOpen, Clock } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -8,13 +8,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import { useAuth } from "../../contexts/AuthContext";
 import { timeAgo } from "../../services/formatDate";
-import { useState } from "react";
-import { PanelLeftClose } from "lucide-react";
-import { PanelRightClose } from "lucide-react";
 
 export const LeftSideBar = ({ selectedTopics, setSelectedTopics }) => {
-  const [sidebarClosed, setSidebarClosed] = useState(false); // need to use some context here
-
   const feedOptions = [
     { name: "For You" },
     { name: "Following" },
@@ -41,77 +36,59 @@ export const LeftSideBar = ({ selectedTopics, setSelectedTopics }) => {
   };
 
   return (
-    <div
-      className={`p-4 bg-white dark:bg-[#222] rounded-none shadow-none ${sidebarClosed ? "border-none" : "border-r"} border-gray-100 dark:border-[#333] h-screen`}
-    >
-      <div
-        className={`absolute top-4 text-neutral-500 dark:text-neutral-500 cursor-pointer ${sidebarClosed ? "left-4" : "right-4"}`}
-        onClick={() => setSidebarClosed(!sidebarClosed)}
-      >
-        {sidebarClosed ? (
-          <PanelRightClose size={20} className="font-thin" />
-        ) : (
-          <PanelLeftClose size={20} className="font-thin" />
-        )}
+    <div className="p-4 bg-white dark:bg-[#222] rounded-xl shadow-sm">
+      <div className="space-y-2 border dark:border-[#333] p-4 rounded-xl">
+        <div className="font-bold mb-4">Feed Options</div>
+        {feedOptions.map((link, index) => (
+          <div
+            key={index}
+            className="block p-2 rounded hover:bg-gray-100 dark:hover:bg-[#222] transition duration-0 cursor-pointer"
+          >
+            {link.name}
+          </div>
+        ))}
       </div>
-
-      {!sidebarClosed && (
-        <>
-          <div className="border-none dark:border-[#333] p-4 rounded-xl">
-            <div className="font-bold mb-4">Feed Options</div>
-            {feedOptions.map((link, index) => (
+      <div className="mt-8 border dark:border-[#333] p-4 rounded-xl">
+        <div className="font-bold mb-4 flex items-center">
+          <Filter className="w-4 h-4 mr-2" />
+          Topics
+        </div>
+        <div className="space-y-2">
+          {filters.map((topic) => (
+            <div key={topic} className="flex items-center">
               <div
-                key={index}
-                className="block p-1.5 rounded hover:bg-lime-50 dark:hover:bg-[#171717] transition duration-0 cursor-pointer"
+                className="w-4 h-4 mr-2 border border-gray-300 rounded cursor-pointer flex items-center justify-center"
+                onClick={(e) => {
+                  e.preventDefault();
+                  toggleTopic(topic);
+                }}
+                role="checkbox"
+                aria-checked={selectedTopics.includes(topic.toLowerCase())}
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    toggleTopic(topic);
+                  }
+                }}
               >
-                {link.name}
+                {selectedTopics.includes(topic.toLowerCase()) && (
+                  <div className="w-2 h-2 bg-blue-500 rounded-sm"></div>
+                )}
               </div>
-            ))}
-          </div>
-
-          <div className="mt-8 border-none dark:border-[#333] p-4 rounded-xl">
-            <div className="font-bold mb-4 flex items-center">
-              {/* <Filter className="w-4 h-4 mr-2" /> */}
-              Trending Topics
+              <div
+                className="cursor-pointer select-none"
+                onClick={(e) => {
+                  e.preventDefault();
+                  toggleTopic(topic);
+                }}
+              >
+                {topic}
+              </div>
             </div>
-            <div className="space-y-2">
-              {filters.map((topic) => (
-                <div key={topic} className="flex items-center">
-                  <div
-                    className="w-4 h-4 mr-2 border border-gray-300 cursor-pointer flex items-center justify-center rounded-full"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      toggleTopic(topic);
-                    }}
-                    role="checkbox"
-                    aria-checked={selectedTopics.includes(topic.toLowerCase())}
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        toggleTopic(topic);
-                      }
-                    }}
-                  >
-                    {selectedTopics.includes(topic.toLowerCase()) && (
-                      <div className="w-2 h-2 bg-lime-500 rounded-sm"></div>
-                    )}
-                  </div>
-                  <div
-                    className="cursor-pointer select-none"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      toggleTopic(topic);
-                    }}
-                  >
-                    {topic}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
@@ -126,9 +103,29 @@ export const RightSideBar = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="p-4 bg-white dark:bg-[#222] rounded-none shadow-none h-[88dvh] flex flex-col justify-between">
+    <div className="p-4 bg-white dark:bg-[#222] rounded-xl shadow-sm">
+      <div className="p-4 border border-gray-200 dark:border-[#333] rounded-lg mb-6">
+        <h3 className="font-bold mb-3">Trending Topics</h3>
+        <div className="space-y-2">
+          {[
+            "#Technology",
+            "#Writing",
+            "#Programming",
+            "#ArtificialIntelligence",
+            "#CreativeWriting",
+          ].map((tag) => (
+            <div
+              key={tag}
+              className="text-sm cursor-pointer hover:text-blue-500"
+            >
+              {tag}
+            </div>
+          ))}
+        </div>
+      </div>
+
       {currentUser ? (
-        <div className="p-4 border border-gray-100 dark:border-[#333] rounded-lg">
+        <div className="p-4 border border-gray-200 dark:border-[#333] rounded-lg">
           <h3 className="font-bold mb-3">Suggested Writers</h3>
           <div className="space-y-3">
             {Array(3)
@@ -168,7 +165,6 @@ export const RightSideBar = () => {
           </Button>
         </div>
       )}
-      <div className="text-xs">© OPENCANVAS 2025 All rights reserved</div>
     </div>
   );
 };
@@ -191,11 +187,11 @@ ErrorDisplay.propTypes = {
 
 export const PostStats = ({ post }) => {
   return (
-    <div className="flex items-center justify-between p-2 border-y border-gray-200 border-dashed dark:border-[#333] text-gray-700 dark:text-gray-300 text-sm">
+    <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-[#2a2a2a] text-gray-700 dark:text-gray-300 text-sm">
       <div className="flex items-center space-x-4">
         <div className="flex items-center">
           {/* <Eye className="h-4 w-4 mr-1.5" />
-              <span>{post.totalViews || 0}</span> */}
+                    <span>{post.totalViews || 0}</span> */}
           <b>
             {post.totalViews || 0}
             &nbsp;

@@ -8,11 +8,11 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import Header from "../../components/Header/Header";
-import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
-import { useDarkMode } from "../../components/Hooks/darkMode";
+import Header from "../../../components/Header/Header";
+import { MarkdownPreview } from "../../CreatePosts/Writing/WritingComponents";
+import { useDarkMode } from "../../../components/Hooks/darkMode";
 
-import { LeftSideBar, RightSideBar } from "./components";
+import { LeftSideBar, RightSideBar } from "../components";
 
 const ArticleFeed = () => {
     const navigate = useNavigate();
@@ -412,9 +412,9 @@ import { Helmet } from "react-helmet-async";
 
 import { toast } from "sonner";
 
-import Header from "../../components/Header/Header";
-import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
-import { useDarkMode } from "../../components/Hooks/darkMode";
+import Header from "../../../components/Header/Header";
+import { MarkdownPreview } from "../../CreatePosts/Writing/WritingComponents";
+import { useDarkMode } from "../../../components/Hooks/darkMode";
 
 import {
     LeftSideBar,
@@ -426,7 +426,7 @@ import {
     EndOfFeed,
     LoadingSkeleton,
     PostAuthorInfo,
-} from "./components";
+} from "../components";
 
 const ArticleFeed = () => {
     const navigate = useNavigate();
@@ -732,9 +732,9 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { toast } from "sonner";
 
-import Header from "../../components/Header/Header";
-import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
-import { useDarkMode } from "../../components/Hooks/darkMode";
+import Header from "../../../components/Header/Header";
+import { MarkdownPreview } from "../../CreatePosts/Writing/WritingComponents";
+import { useDarkMode } from "../../../components/Hooks/darkMode";
 
 import {
     LeftSideBar,
@@ -746,7 +746,7 @@ import {
     EndOfFeed,
     LoadingSkeleton,
     PostAuthorInfo,
-} from "./components";
+} from "../components";
 
 const ArticleFeed = () => {
     const navigate = useNavigate();

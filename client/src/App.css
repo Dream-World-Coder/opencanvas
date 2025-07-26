@@ -1,133 +1,178 @@
 @import url("https://fonts.googleapis.com/css2?family=Handlee&family=Six+Caps&family=Montserrat:wght@400;600&display=swap");
 
+@font-face {
+  font-family: scribe;
+  src: url("/fonts/military-scribe.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: stardom;
+  src: url("/fonts/Stardom.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: Boska-Bold;
+  src: url("/fonts/Boska-Bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: Boska-Light;
+  src: url("/fonts/Boska-Light.woff2") format("woff2");
+}
+@font-face {
+  font-family: Boska-Regular;
+  src: url("/fonts/Boska-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Sentient-Italic";
+  src: url("/fonts/Sentient-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+  font-style: italic;
+}
+@font-face {
+  font-family: "Sentient-Medium";
+  src: url("/fonts/Sentient-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Sentient-Regular";
+  src: url("/fonts/Sentient-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+
 blockquote {
-    padding-top: 8px !important;
-    padding-bottom: 8px !important;
-    & p {
-        margin-top: 0 !important;
-        margin-bottom: 0 !important;
-        line-height: 1.5rem !important;
-        font-size: medium !important;
-    }
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+  & p {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    line-height: 1.5rem !important;
+    font-size: medium !important;
+  }
 }
 
 article ul ul,
 article ol ul,
 article ul ol,
 article ol ol {
-    margin: 0 !important;
-    /* padding: 0 !important; */
+  margin: 0 !important;
+  /* padding: 0 !important; */
 }
 
 em strong {
-    font-style: italic !important;
-    font-family: serif !important;
-    font-weight: 700 !important;
+  font-style: italic !important;
+  font-family: serif !important;
+  font-weight: 700 !important;
 }
 
 .montserrat-regular {
-    font-family:
-        "Montserrat",
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Oxygen,
-        Ubuntu,
-        Cantarell,
-        "Open Sans",
-        "Helvetica Neue",
-        sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
+  font-family:
+    "Montserrat",
+    system-ui,
+    -apple-system,
+    "Helvetica Neue",
+    sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
 }
 .montserrat-bold {
-    font-family:
-        "Montserrat",
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Oxygen,
-        Ubuntu,
-        Cantarell,
-        "Open Sans",
-        "Helvetica Neue",
-        sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 600;
-    font-style: normal;
+  font-family:
+    "Montserrat",
+    system-ui,
+    -apple-system,
+    "Helvetica Neue",
+    sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.sentient-regular {
+  font-family:
+    "Sentient-Regular",
+    system-ui,
+    -apple-system,
+    "Helvetica Neue",
+    sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+.sentient-italic {
+  font-family:
+    "Sentient-Italic",
+    system-ui,
+    -apple-system,
+    "Helvetica Neue",
+    sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: italic;
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+}
+.sentient-bold {
+  font-family:
+    "Sentient-Medium",
+    system-ui,
+    -apple-system,
+    "Helvetica Neue",
+    sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
 }
 
 :root {
-    --font-sans:
-        system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial,
-        sans-serif;
-    --font-serif:
-        "Merriweather", Georgia, Cambria, "Times New Roman", Times, serif;
-    --text-base-size: 1.125rem;
-    --line-height-normal: 1.6;
-    --line-height-tight: 1.3;
-    --text-spacing: 0.5rem;
+  --font-sans:
+    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial,
+    sans-serif;
+  --font-serif:
+    "Merriweather", Georgia, Cambria, "Times New Roman", Times, serif;
+  --text-base-size: 1.125rem;
+  --line-height-normal: 1.6;
+  --line-height-tight: 1.3;
+  --text-spacing: 0.5rem;
 }
 
 article {
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 1rem;
-    font-family: var(--font-sans);
-    font-size: var(--text-base-size);
-    line-height: var(--line-height-normal);
-    color: #333;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 1rem;
+  font-family: var(--font-sans);
+  font-size: var(--text-base-size);
+  line-height: var(--line-height-normal);
+  color: #333;
 }
 
 article p {
-    margin-bottom: 1.75rem;
+  margin-bottom: 1.75rem;
 }
 
-@font-face {
-    font-family: scribe;
-    src: url("/fonts/military-scribe.woff2") format("woff2");
-    font-style: normal;
-    font-weight: 400;
-}
-@font-face {
-    font-family: stardom;
-    src: url("/fonts/Stardom.woff2") format("woff2");
-    font-style: normal;
-    font-weight: 400;
-}
-@font-face {
-    font-family: Boska-Bold;
-    src: url("/fonts/Boska-Bold.woff2") format("woff2");
-}
-@font-face {
-    font-family: Boska-Light;
-    src: url("/fonts/Boska-Light.woff2") format("woff2");
-}
-@font-face {
-    font-family: Boska-Regular;
-    src: url("/fonts/Boska-Regular.woff2") format("woff2");
-}
-@font-face {
-    font-family: Zodiak;
-    src: url("/fonts/Zodiak-Light.woff2") format("woff2");
-}
 @media screen and (min-width: 1400px) {
-    .desktop-xl {
-        padding-top: 24%;
-    }
+  .desktop-xl {
+    padding-top: 24%;
+  }
 }
 
 /* Hide scrollbar for WebKit (Chrome, Safari, Edge) */
 .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 
 /* Hide scrollbar for Firefox */
 .scrollbar-hide {
-    scrollbar-width: none;
+  scrollbar-width: none;
+}
+
+.highlighted__heading {
+  background-color: yellow !important;
+  color: black !important;
 }

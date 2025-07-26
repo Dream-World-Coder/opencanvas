@@ -136,6 +136,11 @@ as in feed page only name & pic is sufficient, not username, also has to be upda
 
 -- [x] in more from author section same posts are staying again and again, cuz they are not refetched, so the solution will be to force shut the drawer and clean the html/i mean stateVariable,,, when new post loads, so it has to be manually opened, and if it is not
 
+-- [+] UI-UX and design upgrade needed
+-- [+] saved posts page ->> liked & other collections
+-- [+] full commenting system
+-- [+] if post.type !== article then only show the back button, [else table of contents is creating problems]
+
 
 
 /*****************

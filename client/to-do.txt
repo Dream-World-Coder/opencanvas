@@ -1,17 +1,46 @@
 -- [] interested topics add in profile settings
--- [] saved posts page ->> liked & other collections
+-- [easy back option to articlepage]
+-- special alert btn in profile pages to avoid confusion in public & private page, + admin
+-- need to store recent activity of user
+
 -- [] make dynamic sitemap
 -- [] study concept of react query and remake the whole
--- [] gap button in editor
--- [] UI-UX and design upgrade needed
--- [] if post.type !== article then only show the back button, [else table of contents is creating problems]
+-- [-] gap button in editor
+
 -- [] Magazine [week - month - year] : best articles or collections [any one], best stories & poems [in different sections[max 8]]
--- [] caching is available in sever environments, but something similar can be made, i.e. if same arguments then same result, no api call needed, [store the previous in some ref / context]
+-- [] caching is available in server environments, but something similar can be made, i.e. if same arguments then same result, no api call needed, [store the previous in some ref / context]
 -- [] I think another attribute `timesFetched` can be added, to easily cache proper posts, its not necessary only a more fetched post will always be on trending,
 -- [] loading when liking disliking a post
 -- [] drag & drop not functional in regular image upload inside articles
 -- [] do mo use const <var> in components, use useref or usestate, [table of contents component]
 -- [] save as draft & drafts section
+
+not to do ----
+-- change of /articles to /browse or some thing else that generalises articles & art etc
+-- add a simple input for creating social posts
+-- video upload
+-- optimise authcontext using useMemo and useCallback
+-- use cookie instead of localstorage for auth token,
+-- for newPostId also use hook & context instead of localstorage, make obj of multiple newPostId for multiple new post at once
+
+opencanvas  (git)-[main]- ➤ letft sidebar -> '
+quote> 1. for you
+quote> 2. following
+quote> 3. followers
+quote>
+quote> 4. Trending
+quote>
+quote> ---
+quote> in `for you` show topics selected in settings for logged in users
+quote> ---
+quote> Topics:
+quote> Physics, Economics, Maths, Quantitatives/quant, Arts, Chemistry etc
+quote>
+quote> Right sidebar -->
+quote>
+quote> suggest users: forums & groups + notices'
+
+
 +++++++++++++
 -- [] post recommendation system based on heading & tags [careful analysis]
 claculate heading and tags in depth, check all associations of tags 2**5 = 32, and verify the tags with content first,

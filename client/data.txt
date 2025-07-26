@@ -1,1 +1,8 @@
 favicon font family: Six Caps
+
+For the image upload service, use frontend, & .env so that no one can use the api even through curl etc, only in we --> wrong
+
+if not logged in, disable evrything, wait & then navigate
+else show log in pop up, not instanteous login page navigate
+
+most likely an imgur problem, but mught bay that somebody find the encryptease url, thats why 429 for the ip

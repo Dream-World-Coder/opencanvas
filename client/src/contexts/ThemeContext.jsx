@@ -3,44 +3,42 @@ import { createContext, useContext, useEffect, useState } from "react";
 const DarkModeContext = createContext();
 
 export function DarkModeProvider({ children }) {
-    const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
 
-    // Apply class to <html>
-    const applyDarkMode = (isDark) => {
-        if (isDark) {
-            document.documentElement.classList.add("dark");
-        } else {
-            document.documentElement.classList.remove("dark");
-        }
-    };
+  // Apply class to <html>
+  const applyDarkMode = (isDark) => {
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  };
 
-    useEffect(() => {
-        const savedDarkMode = localStorage.getItem("darkThemeChoice");
+  useEffect(() => {
+    const savedDarkMode = localStorage.getItem("darkThemeChoice");
 
-        const initialDarkMode = savedDarkMode
-            ? JSON.parse(savedDarkMode)
-            : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const initialDarkMode = savedDarkMode ? JSON.parse(savedDarkMode) : false; //window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-        setDarkMode(initialDarkMode);
-        applyDarkMode(initialDarkMode);
-    }, []);
+    setDarkMode(initialDarkMode);
+    applyDarkMode(initialDarkMode);
+  }, []);
 
-    const toggleDarkMode = (value) => {
-        setDarkMode(value);
-        localStorage.setItem("darkThemeChoice", JSON.stringify(value));
-        applyDarkMode(value);
-    };
+  const toggleDarkMode = (value) => {
+    setDarkMode(value);
+    localStorage.setItem("darkThemeChoice", JSON.stringify(value));
+    applyDarkMode(value);
+  };
 
-    return (
-        <DarkModeContext.Provider value={{ darkMode, toggleDarkMode }}>
-            {children}
-        </DarkModeContext.Provider>
-    );
+  return (
+    <DarkModeContext.Provider value={{ darkMode, toggleDarkMode }}>
+      {children}
+    </DarkModeContext.Provider>
+  );
 }
 
 // its not used once
 export function useDarkModeContext() {
-    return useContext(DarkModeContext);
+  return useContext(DarkModeContext);
 }
 
 /*client  (git)-[main]- ➤ rg useDarkModeContext
