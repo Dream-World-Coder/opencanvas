@@ -61,7 +61,7 @@ const postSchema = new Schema(
         type: {
             type: String,
             default: "written",
-            enum: ["written", "article", "poem", "story"],
+            enum: ["written", "article", "poem", "story", "social"],
         },
 
         // array of deleteHash

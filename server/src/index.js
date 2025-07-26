@@ -69,6 +69,8 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.set("trust proxy", true); // not needed now
+
 // middlewares
 // app.use(authenticateToken); // only use for specific routes
 app.use(errorHandler);
@@ -79,7 +81,7 @@ app.use(userRoutes);
 app.use(postRoutes);
 app.use(commentRoutes);
 app.use(followerRoutes);
-app.use(feedRoutes);
+app.use("/feed", feedRoutes);
 app.use("/api", imageService);
 
 cron.schedule("*/15 * * * *", () => {
@@ -99,5 +101,3 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
-
-// module.exports = app;
