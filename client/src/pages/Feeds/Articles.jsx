@@ -148,7 +148,7 @@ const ArticleFeed = () => {
             <main className="w-full lg:max-w-2xl mx-auto lg:mx-6 mt-0">
               {/* Mobile topics menu */}
               <div className="lg:hidden mb-4">
-                <div className="bg-white dark:bg-[#222] p-4 rounded-xl shadow-sm">
+                <div className="bg-white dark:bg-[#222] p-4 rounded-xl shadow-none border border-neutral-200 dark:border-[#333]">
                   <details>
                     <summary className="font-medium text-gray-700 dark:text-gray-200 cursor-pointer">
                       Topics ({selectedTopics.length})

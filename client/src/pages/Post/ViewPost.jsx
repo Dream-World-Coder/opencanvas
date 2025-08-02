@@ -323,7 +323,7 @@ const ViewPost = () => {
 
             {/* Article content */}
             <div className="prose dark:prose-invert max-w-none pt-4 mb-16">
-              <article className="w-full max-w-4xl mx-auto">
+              <article className="w-full max-w-4xl mx-auto p-0">
                 <ThemedMarkdownPreview
                   title={post.title}
                   content={post.content}

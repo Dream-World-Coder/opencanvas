@@ -636,6 +636,11 @@ export const ArticleHeader = ({
                       e.stopPropagation();
                       if (!currentUser) {
                         toast.error("you need to log in first to follow");
+                        localStorage.setItem(
+                          "urlToRedirectAfterLogin",
+                          window.location.pathname,
+                        );
+                        navigate("/login-needed");
                         return;
                       }
                       await handleFollow(post.authorId);
@@ -670,6 +675,11 @@ export const ArticleHeader = ({
               onClick={async () => {
                 if (!currentUser) {
                   toast.error("you need to log in first to save post");
+                  localStorage.setItem(
+                    "urlToRedirectAfterLogin",
+                    window.location.pathname,
+                  );
+                  navigate("/login-needed");
                 } else {
                   await handleSave(post._id);
                 }
@@ -722,6 +732,8 @@ export const EngagementSection = ({
   setCommentTrayOpen,
   darkTheme,
 }) => {
+  const navigate = useNavigate();
+
   return (
     <div
       className={`flex items-center justify-between border-t border-b py-4 mb-8 dark:border-[#333] border-gray-200 ${darkTheme.colors.primaryText}`}
@@ -742,6 +754,11 @@ export const EngagementSection = ({
           onClick={async () => {
             if (!currentUser) {
               toast.error("you need to log in first to like");
+              localStorage.setItem(
+                "urlToRedirectAfterLogin",
+                window.location.pathname,
+              );
+              navigate("/login-needed");
             } else {
               await handleLike(post._id);
             }
@@ -759,6 +776,11 @@ export const EngagementSection = ({
           onClick={async () => {
             if (!currentUser) {
               toast.error("you need to log in first to dislike");
+              localStorage.setItem(
+                "urlToRedirectAfterLogin",
+                window.location.pathname,
+              );
+              navigate("/login-needed");
             } else {
               await handleDislike(post._id);
             }
@@ -785,6 +807,11 @@ export const EngagementSection = ({
           onClick={async () => {
             if (!currentUser) {
               toast.error("you need to log in first to save post");
+              localStorage.setItem(
+                "urlToRedirectAfterLogin",
+                window.location.pathname,
+              );
+              navigate("/login-needed");
             } else {
               await handleSave(post._id);
             }
@@ -966,6 +993,7 @@ export const CommentsBox = memo(function CommentsBox({
   const [replyOpenStatus, setReplyOpenStatus] = useState([]); // [{commentId, replyopen},{}]
 
   const { currentUser } = useAuth();
+  const navigate = useNavigate();
 
   const commentsEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -1035,6 +1063,8 @@ export const CommentsBox = memo(function CommentsBox({
     e.preventDefault();
     if (!currentUser) {
       toast.error("Login first.");
+      localStorage.setItem("urlToRedirectAfterLogin", window.location.pathname);
+      navigate("/login-needed"); // a state can be added
       return;
     }
     const content = newComment.trim();
@@ -1060,6 +1090,8 @@ export const CommentsBox = memo(function CommentsBox({
   const handleEdit = async (e, commentId) => {
     if (!currentUser) {
       toast.error("Login first.");
+      localStorage.setItem("urlToRedirectAfterLogin", window.location.pathname);
+      navigate("/login-needed");
       return;
     }
     e.preventDefault();
@@ -1131,6 +1163,8 @@ export const CommentsBox = memo(function CommentsBox({
   const handleReply = async (e, postId, parentId) => {
     if (!currentUser) {
       toast.error("You need to Login first.");
+      localStorage.setItem("urlToRedirectAfterLogin", window.location.pathname);
+      navigate("/login-needed");
       return;
     }
     e.preventDefault();
@@ -1473,8 +1507,8 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
           {/* thumbnail */}
           {thumbnailUrl && (
             <div
-              className="relative mb-8 w-full md:w-[110%] md:transform md:translate-x-[-5%] __max-h-[370px] bg-gray-200 dark:bg-[#171717]
-                                rounded-lg overflow-hidden shadow-none flex items-center justify-center"
+              className="relative mb-8 w-full md:w-[110%] md:transform md:translate-x-[-5%] __max-h-[370px] _bg-gray-200 _dark:_bg-[#171717]
+                rounded-lg overflow-hidden shadow-none flex items-center justify-center bg-transparent"
             >
               <img
                 src={thumbnailUrl}

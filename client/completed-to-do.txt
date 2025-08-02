@@ -140,7 +140,7 @@ as in feed page only name & pic is sufficient, not username, also has to be upda
 -- [+] saved posts page ->> liked & other collections
 -- [+] full commenting system
 -- [+] if post.type !== article then only show the back button, [else table of contents is creating problems]
-
+-- [+] special alert btn in profile pages to avoid confusion in public & private page, + admin
 
 
 /*****************

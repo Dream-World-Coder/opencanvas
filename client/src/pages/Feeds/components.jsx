@@ -42,7 +42,7 @@ export const LeftSideBar = ({ selectedTopics, setSelectedTopics }) => {
 
   return (
     <div
-      className={`p-4 bg-white dark:bg-[#222] rounded-none shadow-none ${sidebarClosed ? "border-none" : "border-r"} border-gray-100 dark:border-[#333] h-screen`}
+      className={`p-4 bg-white dark:bg-[#222] rounded-none shadow-none ${sidebarClosed ? "border-none" : "border-r-0 md:border-r"} border-gray-100 dark:border-[#333] h-screen`}
     >
       <div
         className={`absolute top-4 text-neutral-500 dark:text-neutral-500 cursor-pointer ${sidebarClosed ? "left-4" : "right-4"}`}
@@ -221,7 +221,12 @@ export const PostStats = ({ post }) => {
       </div>
       <div className="flex items-center">
         <BookOpen className="h-4 w-4 mr-1.5" />
-        <span>{post.readTime || "2 min read"}</span>
+        <span className="hidden md:inline">
+          {post?.readTime || "2 min read"}
+        </span>
+        <span className="md:hidden">
+          {`${post?.readTime?.split(" ")[0]} ${post?.readTime?.split(" ")[1]}`}
+        </span>
       </div>
     </div>
   );

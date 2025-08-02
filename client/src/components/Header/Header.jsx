@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, X, ChevronDown, ChevronUp, Plus } from "lucide-react";
-import { useAuth } from "../../contexts/AuthContext";
-import { createOptions } from "./createOptions";
-import SearchBar from "../SearchBar";
-import { useDataService } from "../../services/dataService";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import PropTypes from "prop-types";
+
+import { useAuth } from "../../contexts/AuthContext";
+import { useDataService } from "../../services/dataService";
 import AppLogo from "../AppLogo";
+import SearchBar from "../SearchBar";
+import { CreateMenuDesktop } from "./CreateMenu";
+import { MobileNav } from "./MobileNav";
 
 const Header = ({
   noBlur = false,
@@ -40,11 +42,9 @@ const Header = ({
     setLoading(false);
   }
 
-  // Navigation Links
   let navLinks = [
     { name: "Articles", href: "/articles" },
     { name: "Social", href: "/social" },
-    { name: "Photos", href: "/photo-gallery" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
   ];
@@ -119,126 +119,54 @@ const Header = ({
                 </button>
               )}
 
-              {/* Create Menu Dropdown --desktop */}
+              {/* Create Menu Dropdown -- desktop */}
               {createMenuOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#111] border border-gray-100 dark:border-[#333] rounded-lg shadow-lg py-2 z-50">
-                  {createOptions.map((option) => (
-                    <button
-                      key={option.id}
-                      className={`w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-[#333] transition-colors group
-                        ${loading ? "pointer-events-none opacity-70" : ""}`}
-                      onClick={() => {
-                        handlePostCreate(option);
-                      }}
-                      disabled={loading}
-                    >
-                      <div className={`p-2 rounded-full ${option.color}`}>
-                        {loading ? (
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <option.icon className="w-4 h-4 text-white" />
-                        )}
-                      </div>
-                      <span className="flex items-center justify-center gap-3">
-                        {loading ? "Loading..." : option.label}{" "}
-                        {!loading && (
-                          <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700 dark:text-stone-200" />
-                        )}
-                      </span>
-                    </button>
-                  ))}
-                </div>
+                <CreateMenuDesktop
+                  loading={loading}
+                  handlePostCreate={handlePostCreate}
+                />
               )}
             </div>
           </div>
 
-          <div className="md:hidden flex items-center justify-center gap-2">
-            {/* mobile create button */}
-            {currentUser && (
-              <button
-                onClick={() => setCreateMenuOpen(!createMenuOpen)}
-                className="w-fit p-1 flex items-center justify-center bg-black text-white rounded-full hover:bg-stone-800/90 transition-colors dark:invert"
-              >
-                {createMenuOpen ? (
-                  <X className="w-4 h-4" />
-                ) : (
-                  <Plus className="w-4 h-4" />
-                )}
-              </button>
-            )}
-
-            {/* mobile menu button */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 hover:bg-white/50 rounded-sm transition-colors dark:hover:bg-[#222]/50"
-              aria-label="Toggle menu"
-            >
-              {isMenuOpen ? (
-                <X className="h-6 w-6 text-stone-600 dark:text-gray-200" />
-              ) : (
-                <Menu className="h-6 w-6 text-stone-600 dark:text-gray-200" />
-              )}
-            </button>
-
-            {/* mobile phones */}
-            {createMenuOpen && (
-              <div
-                className="absolute top-20 right-0 w-64 bg-white border border-gray-100
-                                rounded-lg shadow-lg py-2 z-50 dark:bg-[#111] dark:border-[#333]"
-              >
-                {createOptions.map((option) => (
-                  <button
-                    key={option.id}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50
-                                        dark:hover:bg-[#333] transition-colors group ${loading ? "pointer-events-none opacity-70" : ""}`}
-                    onClick={() => {
-                      handlePostCreate(option);
-                    }}
-                    disabled={loading}
-                  >
-                    <div className={`p-2 rounded-full ${option.color}`}>
-                      {loading ? (
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <option.icon className="w-4 h-4 text-white" />
-                      )}
-                    </div>
-                    <span className="flex items-center justify-center gap-3">
-                      {loading ? "Loading..." : option.label}{" "}
-                      {!loading && (
-                        <Plus className="w-4 h-4 opacity-0 group-hover:opacity-[100] transition-all duration-150 text-stone-700 dark:text-stone-200" />
-                      )}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          <MobileNav
+            loading={loading}
+            handlePostCreate={handlePostCreate}
+            setCreateMenuOpen={setCreateMenuOpen}
+            createMenuOpen={createMenuOpen}
+            setIsMenuOpen={setIsMenuOpen}
+            isMenuOpen={isMenuOpen}
+          />
         </nav>
 
         {/* mobile menu */}
         <div
-          className={`md:hidden absolute left-0 right-0 bg-white dark:bg-[#111] backdrop-blur-md border-b border-stone-200/50 dark:border-stone-700/50 transition-all duration-300 ease-in-out ${
-            isMenuOpen
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 -translate-y-2 pointer-events-none"
-          }`}
+          className={`md:hidden absolute left-0 right-0 bg-white dark:bg-[#111] backdrop-blur-md shadow-lg
+            border-b border-stone-200/50 dark:border-stone-700/50 transition-all duration-300 ease-in-out ${
+              isMenuOpen
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 -translate-y-2 pointer-events-none"
+            }`}
         >
           <div className="px-4 py-6 space-y-6">
             {/* mobile nav links */}
             <div className="flex flex-col">
-              {navLinks.map((link, index) => (
-                <button
-                  key={index}
-                  className="py-2 pl-4 rounded-lg text-stone-600 dark:text-gray-300 hover:text-stone-800 dark:hover:text-gray-200 hover:bg-lime-300/50 transition-colors"
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    navigate(link.href);
-                  }}
-                >
-                  {link.name}
-                </button>
-              ))}
+              {navLinks.map(
+                (link, index) =>
+                  !exclude.includes(link.href) && (
+                    <button
+                      key={index}
+                      className="py-2 pl-4 rounded-lg text-stone-600 dark:text-gray-300 hover:text-stone-800
+                  dark:hover:text-gray-200 hover:bg-lime-300/50 transition-colors flex items-center justify-start"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        navigate(link.href);
+                      }}
+                    >
+                      {link.name}
+                    </button>
+                  ),
+              )}
             </div>
           </div>
         </div>
@@ -250,8 +178,11 @@ Header.propTypes = {
   currentUser: PropTypes.object,
   noBlur: PropTypes.bool,
   abs: PropTypes.bool,
+  noShadow: PropTypes.bool,
   ballClr: PropTypes.string,
   darkBg: PropTypes.string,
+  borderClrLight: PropTypes.string,
   exclude: PropTypes.array,
 };
+
 export default Header;

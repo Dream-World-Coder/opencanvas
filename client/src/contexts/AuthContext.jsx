@@ -78,8 +78,20 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("authToken", token);
       navigate(location.pathname, { replace: true }); // remove token from browser history, not needed though
       try {
+        const redirectUrl = localStorage.getItem(
+          "urlToRedirectAfterLogin",
+          null,
+        );
+
         await loadUserData();
-        navigate("/profile");
+        // navigate("/profile");
+
+        if (redirectUrl) {
+          localStorage.removeItem("urlToRedirectAfterLogin");
+          navigate(redirectUrl);
+        } else {
+          navigate("/profile");
+        }
       } catch (error) {
         console.error("Failed during Google auth:", error);
         toast.error("Authentication failed, redirected to login");

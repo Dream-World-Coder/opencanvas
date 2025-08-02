@@ -14,7 +14,7 @@ export default function SearchBar({ round = false, hideSubmitBtn = false }) {
   return (
     <form
       onSubmit={handleSearch}
-      className="flex w-[150px] md:w-auto max-w-[200px] items-center space-x-2"
+      className="hidden md:flex w-[150px] md:w-auto max-w-[200px] items-center space-x-2"
     >
       <div className="relative w-full">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />

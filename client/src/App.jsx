@@ -94,6 +94,11 @@ export default function App() {
                   />
                   <Route path="/register" element={<LoginPage />} />
                   <Route path="/signup" element={<LoginPage />} />
+                  <Route
+                    path="/login-needed"
+                    element={<LoginPage backBtn={true} />}
+                  />
+
                   <Route path="/auth/success" element={<AuthSuccess />} />
                   {/* *************** */}
 

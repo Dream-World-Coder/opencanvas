@@ -587,16 +587,45 @@ export const FeaturedWorks = memo(function FeaturedWorks({ currentUser }) {
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
 
+  // const colors1 = [
+  //   // Soft lime greens
+  //   "bg-[#E8F5E8]/100 dark:bg-zinc-900 border-[#E8F5E8] dark:border-neutral-800 dark:text-neutral-200",
+  //   "bg-[#D4F1D4]/100 dark:bg-zinc-900 border-[#D4F1D4] dark:border-neutral-800 dark:text-neutral-200",
+  //   "bg-[#C8E6C9]/100 dark:bg-zinc-900 border-[#C8E6C9] dark:border-neutral-800 dark:text-neutral-200",
+
+  //   // Pastel lime-yellows
+  //   "bg-[#F0F8D0]/100 dark:bg-zinc-900 border-[#F0F8D0] dark:border-neutral-800 dark:text-neutral-200",
+  //   "bg-[#E8F5CD]/100 dark:bg-zinc-900 border-[#E8F5CD] dark:border-neutral-800 dark:text-neutral-200",
+  //   "bg-[#F5F8E1]/100 dark:bg-zinc-900 border-[#F5F8E1] dark:border-neutral-800 dark:text-neutral-200",
+
+  //   // Complementary pastels
+  //   "bg-[#E1F5FE]/100 dark:bg-zinc-900 border-[#E1F5FE] dark:border-neutral-800 dark:text-neutral-200", // Soft blue
+  //   "bg-[#FCE4EC]/100 dark:bg-zinc-900 border-[#FCE4EC] dark:border-neutral-800 dark:text-neutral-200", // Soft pink
+  //   "bg-[#F3E5F5]/100 dark:bg-zinc-900 border-[#F3E5F5] dark:border-neutral-800 dark:text-neutral-200", // Soft lavender
+  //   "bg-[#FFF3E0]/100 dark:bg-zinc-900 border-[#FFF3E0] dark:border-neutral-800 dark:text-neutral-200", // Soft peach
+  // ];
+
   const colors = [
-    "bg-[#C1DBB3]/100 dark:bg-zinc-900 border-[#C1DBB3] dark:border-neutral-800 dark:text-neutral-200",
-    "bg-[#A0C878]/100 dark:bg-zinc-900 border-[#A0C878] dark:border-neutral-800 dark:text-neutral-200",
-    "bg-[#DBFFCB]/100 dark:bg-zinc-900 border-[#DBFFCB] dark:border-neutral-800 dark:text-neutral-200",
-    "bg-[#A4B465]/100 dark:bg-zinc-900 border-[#A4B465] dark:border-neutral-800 dark:text-neutral-200",
-    "bg-[#FBF3C1]/100 dark:bg-zinc-900 border-[#FBF3C1] dark:border-neutral-800 dark:text-neutral-200",
-    "bg-[#FE7743]/100 dark:bg-zinc-900 border-[#FE7743] dark:border-neutral-800 dark:text-neutral-200",
+    // Soft lime green
+    "bg-gradient-to-br from-[#E8F5E8] to-[#D4F1D4] dark:bg-zinc-900 border-[#E8F5E8] dark:border-neutral-800 dark:text-neutral-200",
+
+    // Pastel lime-yellow
+    "bg-gradient-to-br from-[#F0F8D0] to-[#E8F5CD] dark:bg-zinc-900 border-[#F0F8D0] dark:border-neutral-800 dark:text-neutral-200",
+
+    // Mint to sage
+    "bg-gradient-to-br from-[#C8E6C9] to-[#B8D4B8] dark:bg-zinc-900 border-[#C8E6C9] dark:border-neutral-800 dark:text-neutral-200",
+
+    // Soft blue complement
+    "bg-gradient-to-br from-[#E1F5FE] to-[#B3E5FC] dark:bg-zinc-900 border-[#E1F5FE] dark:border-neutral-800 dark:text-neutral-200",
+
+    // Peachy pink
+    "bg-gradient-to-br from-[#FFF3E0] to-[#FFE0B2] dark:bg-zinc-900 border-[#FFF3E0] dark:border-neutral-800 dark:text-neutral-200",
+
+    // Soft lavender
+    "bg-gradient-to-br from-[#F3E5F5] to-[#E1BEE7] dark:bg-zinc-900 border-[#F3E5F5] dark:border-neutral-800 dark:text-neutral-200",
   ];
 
-  // Check if scrolling is available
+  // checkk if scrolling is available
   const checkScroll = () => {
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -627,7 +656,7 @@ export const FeaturedWorks = memo(function FeaturedWorks({ currentUser }) {
     return () => window.removeEventListener("resize", checkScroll);
   }, []);
 
-  const featuredItems = currentUser.featuredItems.reverse();
+  const featuredItems = currentUser.featuredItems; //.reverse();
 
   return (
     <>

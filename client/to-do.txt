@@ -1,7 +1,8 @@
 -- [] interested topics add in profile settings
 -- [easy back option to articlepage]
--- special alert btn in profile pages to avoid confusion in public & private page, + admin
+
 -- need to store recent activity of user
+-- contact info not synced on userame update, also rate limit it
 
 -- [] make dynamic sitemap
 -- [] study concept of react query and remake the whole
@@ -12,7 +13,6 @@
 -- [] I think another attribute `timesFetched` can be added, to easily cache proper posts, its not necessary only a more fetched post will always be on trending,
 -- [] loading when liking disliking a post
 -- [] drag & drop not functional in regular image upload inside articles
--- [] do mo use const <var> in components, use useref or usestate, [table of contents component]
 -- [] save as draft & drafts section
 
 not to do ----

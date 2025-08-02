@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { CircleCheck } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
@@ -26,7 +26,6 @@ import { useDarkMode } from "../../components/Hooks/darkMode";
 const PublicProfile = () => {
   const isDark = useDarkMode();
   const navigate = useNavigate();
-  const location = useLocation();
   const { username } = useParams();
   const { currentUser, setCurrentUser } = useAuth();
   const { followUser } = useDataService();
@@ -152,6 +151,15 @@ const PublicProfile = () => {
     }
   }
 
+  useEffect(() => {
+    if (currentProfile?._id?.toString() === currentUser?._id?.toString()) {
+      toast.info("This is your public profile", {
+        duration: 10000,
+        action: { label: "Close", onClick: () => {} },
+      });
+    }
+  }, [currentUser?._id, currentProfile?._id]);
+
   if (isLoading)
     return (
       <div className="flex justify-center items-center h-screen">
@@ -179,7 +187,7 @@ const PublicProfile = () => {
       >
         <ProfileHeader />
 
-        <main className="pt-28 px-2 md:px-8 min-h-screen">
+        <main className="pt-28 px-2 md:px-8 min-h-[90dvh]">
           <div className="max-w-7xl mx-auto pb-[20vh]">
             <div className="flex flex-col md:flex-row justify-between items-start gap-6 md:gap-16 mb-12 md:mb-24 px-4 md:px-0">
               {/* User Details */}
@@ -206,6 +214,11 @@ const PublicProfile = () => {
                           onClick={async () => {
                             if (!currentUser) {
                               toast.error("you need to log in first to follow");
+                              localStorage.setItem(
+                                "urlToRedirectAfterLogin",
+                                window.location.pathname,
+                              );
+                              navigate("/login-needed");
                               return;
                             }
                             await handleFollow(currentProfile._id);
