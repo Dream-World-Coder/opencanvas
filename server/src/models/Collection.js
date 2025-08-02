@@ -8,10 +8,13 @@ const collectionSchema = new Schema(
       required: true,
       trim: true,
     },
-    authorId: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+    description: {
+      type: String,
+      default: "",
+    },
+    thumbnailUrl: {
+      type: String,
+      trim: true,
     },
     tags: [
       // add max 5 limit, default "regular", so 4 more possible
@@ -20,9 +23,15 @@ const collectionSchema = new Schema(
         trim: true,
       },
     ],
-    thumbnailUrl: {
-      type: String,
-      trim: true,
+    isPrivate: {
+      type: Boolean,
+      default: false,
+    },
+
+    authorId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
     posts: [
       {
@@ -30,22 +39,10 @@ const collectionSchema = new Schema(
         ref: "Post",
       },
     ],
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-    description: {
-      type: String,
-      default: "",
-    },
-    isPrivate: {
-      type: Boolean,
-      default: false,
-    },
     // collections will be promoted through tags similarities of insider posts, their own tags
-    // & upvotes
+    // & totalLikes
     // ai based content scanning can be implemented also
-    upvotes: {
+    totalLikes: {
       type: Number,
       default: 0,
     },

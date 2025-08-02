@@ -102,7 +102,7 @@ router.put(
  *******************************************************
  * get followers by ids
  */
-router.post("/u/followers/byids", authenticateToken, async (req, res) => {
+router.post("/u/followers/byids", async (req, res) => {
   try {
     const data = req.body;
 

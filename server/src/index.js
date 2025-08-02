@@ -26,18 +26,18 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 mongoose
-    .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/opencanvas")
-    .then(() => console.log("Connected to MongoDB"))
-    .catch((err) => console.error("MongoDB connection error:", err));
+  .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/opencanvas")
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
 // necessary middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
-    cors({
-        origin: ["http://localhost:5173"],
-        credentials: true,
-    }),
+  cors({
+    origin: ["http://localhost:5173", "http://10.223.67.1:5173"],
+    credentials: true,
+  }),
 );
 
 app.use(helmet()); // Security headers
@@ -45,24 +45,23 @@ app.use(morgan("dev")); // logger
 
 // Session configuration
 app.use(
-    session({
-        secret: process.env.SESSION_SECRET,
-        resave: false,
-        saveUninitialized: false,
-        store: MongoStore.create({
-            mongoUrl:
-                process.env.MONGODB_URI ||
-                "mongodb://localhost:27017/opencanvas",
-            ttl: 14 * 24 * 60 * 60, // sessions expire in 14 days
-            autoRemove: "native",
-        }),
-        cookie: {
-            secure: process.env.NODE_ENV === "production", // secure cookies in production
-            httpOnly: true, // Prevents client-side access to cookies
-            sameSite: "strict", // csrf
-            maxAge: 24 * 60 * 60 * 1000, // 1 day session duration
-        },
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl:
+        process.env.MONGODB_URI || "mongodb://localhost:27017/opencanvas",
+      ttl: 14 * 24 * 60 * 60, // sessions expire in 14 days
+      autoRemove: "native",
     }),
+    cookie: {
+      secure: process.env.NODE_ENV === "production", // secure cookies in production
+      httpOnly: true, // Prevents client-side access to cookies
+      sameSite: "strict", // csrf
+      maxAge: 24 * 60 * 60 * 1000, // 1 day session duration
+    },
+  }),
 );
 
 // init passport
@@ -85,19 +84,19 @@ app.use("/feed", feedRoutes);
 app.use("/api", imageService);
 
 cron.schedule("*/15 * * * *", () => {
-    console.log("Running scheduled update...");
-    updateDefaultEngagementScore().catch((err) => {
-        console.error("Scheduled task failed:", err);
-    });
+  console.log("Running scheduled update...");
+  updateDefaultEngagementScore().catch((err) => {
+    console.error("Scheduled task failed:", err);
+  });
 });
 
 app.get("/", (req, res) => {
-    res.json({
-        message: "Welcome to OpenCanvas API",
-        environment: process.env.NODE_ENV.toString(),
-    });
+  res.json({
+    message: "Welcome to OpenCanvas API",
+    environment: process.env.NODE_ENV.toString(),
+  });
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server is running on port ${PORT}`);
 });
