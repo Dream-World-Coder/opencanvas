@@ -22,7 +22,7 @@ router.put(
   async (req, res) => {
     try {
       const user = req.user;
-      const {
+      let {
         username,
         fullName,
         role,
@@ -30,6 +30,11 @@ router.put(
         notifications,
         contactInformation,
       } = req.body;
+
+      username = username.trim();
+      fullName = fullName.trim();
+      role = role.trim();
+      aboutMe = aboutMe.trim();
 
       // Check if username is being changed
       if (username && username !== user.username) {
@@ -58,7 +63,7 @@ router.put(
         }
 
         // should contain only A-z, 0-9, and _
-        if (!/^[A-Za-z0-9_]+$/.test(username)) {
+        if (!/^(?!\d+$)[a-z0-9_]+$/.test(username)) {
           return res.status(400).json({
             success: false,
             message:
@@ -70,7 +75,7 @@ router.put(
       }
 
       // Validate and update fullName if provided
-      if (fullName !== undefined) {
+      if (fullName) {
         if (fullName && (fullName.length < 4 || fullName.length > 32)) {
           return res.status(400).json({
             success: false,
@@ -83,29 +88,29 @@ router.put(
         user.fullName = fullName;
       }
 
-      if (role !== undefined) {
-        if (role.length > 32) {
+      if (role) {
+        if (role.length > 40) {
           return res.status(400).json({
             success: false,
-            message: "Role can be 32 characters or less",
+            message: "Designation can be 40 characters or less",
           });
         }
         user.role = role;
       }
 
       // Update aboutMe if provided
-      if (aboutMe !== undefined) {
+      if (aboutMe) {
         if (aboutMe && aboutMe.length > 300) {
           return res.status(400).json({
             success: false,
-            message: "Bio must be 300 characters or less",
+            message: "About must be 300 characters or less",
           });
         }
         user.aboutMe = aboutMe;
       }
 
       // Update notifications choices if provided
-      if (notifications !== undefined) {
+      if (notifications) {
         if (notifications && typeof notifications !== "object") {
           return res.status(400).json({
             success: false,

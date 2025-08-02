@@ -8,7 +8,7 @@ const cache = apicache.middleware;
 
 const User = require("../models/User");
 const {
-  generateRandomAlphanumeric,
+  generateUniqueUsername,
   generateRandomThumbnail,
 } = require("../utils/helper");
 
@@ -63,9 +63,7 @@ const verifyCallback = async (
     } else {
       // new user creating
       const newUser = new User({
-        username:
-          profile.emails[0].value.split("@")[0].slice(0, 4) +
-          generateRandomAlphanumeric(4).toLowerCase(), // total 8 chars
+        username: await generateUniqueUsername(),
         fullName: profile.displayName.slice(0, 32) || "User",
         email: profile.emails[0].value,
         provider: "google",

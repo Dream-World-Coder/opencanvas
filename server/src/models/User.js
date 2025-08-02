@@ -60,6 +60,10 @@ const userSchema = new Schema(
       trim: true,
       minlength: [4, "Username must be at least 4 characters long"],
       maxlength: [16, "Username can be 16 characters long at max"],
+      match: [
+        /^(?!\d+$)[a-z0-9_]+$/,
+        "Username must contain only lowercase letters, numbers, or underscores, and cannot be only numbers",
+      ],
     },
     fullName: {
       type: String,
@@ -85,11 +89,11 @@ const userSchema = new Schema(
       default: "https://opencanvas.blog/defaults/profile.jpeg",
     },
     // <<<<>>>>
-    // its not traditional role, i have used 'relationship' for that, its users job description
+    // its user's job description, not traditional role, i have used 'relationship' for that
     role: {
       type: String,
-      default: "user",
-      maxlength: [32, "Role can be 32 characters or less"],
+      default: "Learner",
+      maxlength: [40, "Designation can be 40 characters or less"],
     },
     relationship: {
       type: String,
