@@ -6,7 +6,7 @@ export const CreateMenuMobile = ({ loading, handlePostCreate }) => {
   return (
     <div
       className="fixed bottom-24 right-4 w-64 bg-white border border-gray-100
-                  rounded-lg shadow-lg py-2 z-50 dark:bg-[#111] dark:border-[#333]"
+        rounded-lg shadow-lg py-2 z-50 dark:bg-[#111] dark:border-[#333]"
     >
       {createOptions.map((option) => (
         <button

@@ -53,16 +53,19 @@ const Profile = () => {
 
       setPostsToFetchIndex(postsToFetchIndex + 20);
 
-      const response = await fetch(`http://localhost:3000/u/posts/byids`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/u/posts/byids`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            postIds: postIdsParam,
+          }),
         },
-        body: JSON.stringify({
-          postIds: postIdsParam,
-        }),
-      });
+      );
 
       const data = await response.json();
 
@@ -98,7 +101,7 @@ const Profile = () => {
       >
         <ProfileHeader />
 
-        <main className="pt-28 px-2 md:px-0 min-h-[90dvh]">
+        <main className="pt-24 md:pt-28 px-2 md:px-0 min-h-[90dvh]">
           <div className="max-w-7xl mx-auto pb-[20vh]">
             {/* <div className="grid md:grid-cols-[1.62fr,1fr] gap-16 mb-24 border border-black"> */}
             <div className="flex flex-col md:flex-row justify-between items-start gap-6 md:gap-16 mb-12 md:mb-24 px-4 md:px-0">
@@ -137,9 +140,15 @@ const Profile = () => {
                         <Skeleton className="h-5 md:h-6 w-1/2" />
                       </div>
                     ) : (
-                      <h1 className="text-2xl md:text-3xl lg:text-4xl font-boskaBold leading-tight md:leading-[0.95] tracking-tight pointer-events-none md:pointer-events-auto capitalize dark:text-[#fff] truncate">
+                      <h1
+                        className="text-xl md:text-3xl lg:text-4xl font-sans md:font-boskaBold
+                        leading-tight md:leading-[0.95] tracking-tight pointer-events-none md:pointer-events-auto capitalize dark:text-[#fff] truncate"
+                      >
                         {currentUser.fullName}
-                        <span className="block mt-1 md:mt-2 text-lg md:text-xl lg:text-2xl font-boska font-normal tracking-normal capitalize text-lime-700 dark:text-lime-600">
+                        <span
+                          className="block mt-1 md:mt-2 text-base md:text-xl lg:text-2xl font-sans md:font-boska font-normal
+                          tracking-normal capitalize text-lime-700 dark:text-lime-600"
+                        >
                           {currentUser.role}
                         </span>
                       </h1>
@@ -155,7 +164,10 @@ const Profile = () => {
                   </div>
                 ) : (
                   currentUser.aboutMe && (
-                    <p className="text-stone-700 dark:text-[#d0d0d0] sentient-italic text-base md:text-lg leading-tight tracking-normal pointer-events-none md:pointer-events-auto">
+                    <p
+                      className="text-stone-700 dark:text-[#d0d0d0] sentient-italic text-sm md:text-lg max-w-[65ch]
+                      leading-tight tracking-normal pointer-events-none md:pointer-events-auto text-wrap overflow-hidden !no-underline"
+                    >
                       {currentUser.aboutMe}
                     </p>
                   )

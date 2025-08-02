@@ -44,7 +44,7 @@ export const uploadImage = async (file) => {
   const formData = new FormData();
   formData.append("image", file);
 
-  const apiUrl = "http://localhost:3000/api/uploadImage";
+  const apiUrl = `${import.meta.env.VITE_BACKEND_URL}/api/uploadImage`;
   const response = await fetch(apiUrl, {
     method: "POST",
     body: formData,

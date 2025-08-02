@@ -5,13 +5,13 @@ const LoadingPage = ({ bgClr = "bg-white" }) => {
       style={{ minHeight: "100dvh" }}
     >
       <div
-        className="relative text-center font-semibold font-serif text-3xl sm:text-4xl text-stone-700/80 dark:text-white"
+        className="relative text-center font-normal font-sans text-2xl sm:text-4xl text-stone-800/80 dark:text-white"
         style={{ transform: "translateY(-6rem)" }}
       >
         <span style={{ position: "relative", zIndex: 10 }}>
-          Loading,
+          Loading...
           <br />
-          please wait...
+          please wait
         </span>
       </div>
     </div>

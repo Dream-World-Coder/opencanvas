@@ -86,14 +86,17 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
 
       const token = localStorage.getItem("authToken");
 
-      const response = await fetch("http://localhost:3000/save-written-post", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/save-written-post`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(postData),
         },
-        body: JSON.stringify(postData),
-      });
+      );
 
       const data = await response.json();
 

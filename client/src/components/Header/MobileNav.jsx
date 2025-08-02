@@ -2,6 +2,7 @@ import { Menu, Plus, Search, X } from "lucide-react";
 import PropTypes from "prop-types";
 
 import { CreateMenuMobile } from "./CreateMenu";
+import { useAuth } from "../../contexts/AuthContext";
 
 export const MobileNav = ({
   loading,
@@ -11,6 +12,8 @@ export const MobileNav = ({
   setIsMenuOpen,
   isMenuOpen,
 }) => {
+  const { currentUser } = useAuth();
+
   return (
     <div className="md:hidden flex items-center justify-center gap-0">
       {/* mobile search btn */}
@@ -19,17 +22,19 @@ export const MobileNav = ({
       </button>
 
       {/* mobile create button */}
-      <button
-        onClick={() => setCreateMenuOpen(!createMenuOpen)}
-        className="w-fit p-2 flex items-center justify-center bg-black text-white rounded-full hover:bg-stone-800/90
+      {currentUser && (
+        <button
+          onClick={() => setCreateMenuOpen(!createMenuOpen)}
+          className="w-fit p-2 flex items-center justify-center bg-black text-white rounded-full hover:bg-stone-800/90
     transition-colors dark:invert fixed bottom-10 right-6 shadow-lg"
-      >
-        {createMenuOpen ? (
-          <X className="size-5" />
-        ) : (
-          <Plus className="size-5" />
-        )}
-      </button>
+        >
+          {createMenuOpen ? (
+            <X className="size-5" />
+          ) : (
+            <Plus className="size-5" />
+          )}
+        </button>
+      )}
 
       {/* mobile menu button */}
       <button

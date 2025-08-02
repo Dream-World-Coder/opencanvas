@@ -58,15 +58,18 @@ const PublicProfile = () => {
 
       setPostsToFetch(postsToFetch + 20);
 
-      const response = await fetch(`http://localhost:3000/author/posts/byids`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/author/posts/byids`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            postIds: postIdsParam,
+          }),
         },
-        body: JSON.stringify({
-          postIds: postIdsParam,
-        }),
-      });
+      );
 
       const data = await response.json();
 
@@ -96,7 +99,7 @@ const PublicProfile = () => {
       }
 
       setIsLoading(true);
-      const apiUrl = `http://localhost:3000/u/${username}`;
+      const apiUrl = `${import.meta.env.VITE_BACKEND_URL}/u/${username}`;
 
       try {
         const res = await fetch(apiUrl);
@@ -130,14 +133,24 @@ const PublicProfile = () => {
     let res = await followUser(userId);
     if (res.success && res.message === "followed") {
       setFollowing(true);
-      toast.success(res.message);
+      toast.success(res.message, {
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
       setCurrentUser((currentUser) => ({
         ...currentUser,
         following: [...currentUser.following, { userId, since: Date.now() }],
       }));
     } else if (res.success && res.message === "unfollowed") {
       setFollowing(false);
-      toast.success(res.message);
+      toast.success(res.message, {
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
       setCurrentUser((currentUser) => ({
         ...currentUser,
         following: [
@@ -152,7 +165,10 @@ const PublicProfile = () => {
   }
 
   useEffect(() => {
-    if (currentProfile?._id?.toString() === currentUser?._id?.toString()) {
+    if (
+      currentUser &&
+      currentProfile?._id?.toString() === currentUser?._id?.toString()
+    ) {
       toast.info("This is your public profile", {
         duration: 10000,
         action: { label: "Close", onClick: () => {} },
@@ -187,7 +203,7 @@ const PublicProfile = () => {
       >
         <ProfileHeader />
 
-        <main className="pt-28 px-2 md:px-8 min-h-[90dvh]">
+        <main className="pt-24 md:pt-28 px-2 md:px-8 min-h-[90dvh]">
           <div className="max-w-7xl mx-auto pb-[20vh]">
             <div className="flex flex-col md:flex-row justify-between items-start gap-6 md:gap-16 mb-12 md:mb-24 px-4 md:px-0">
               {/* User Details */}
@@ -223,8 +239,8 @@ const PublicProfile = () => {
                             }
                             await handleFollow(currentProfile._id);
                           }}
-                          className={`absolute bottom-0 ${following ? "right-0 group-hover:-right-4" : "right-0"} bg-lime-600 dark:bg-[#333]
-                                                        text-white p-2 rounded-full transition-opacity text-xs cursor-pointer flex items-center justify-center gap-1`}
+                          className={`absolute bottom-0 ${following ? "right-0 group-hover:-right-4" : "right-0"} bg-black dark:bg-[#333]
+                                                        text-white px-1 py-1 md:px-2 md:py-1 rounded-md md:rounded-md transition-opacity text-xs cursor-pointer flex items-center justify-center gap-1`}
                         >
                           {following ? <CircleCheck className="size-4" /> : ""}
                           <span
@@ -243,9 +259,15 @@ const PublicProfile = () => {
                         <Skeleton className="h-5 md:h-6 w-1/2" />
                       </div>
                     ) : (
-                      <h1 className="text-2xl md:text-3xl lg:text-4xl font-boskaBold leading-tight md:leading-[0.95] tracking-tight pointer-events-none md:pointer-events-auto capitalize dark:text-[#fff] truncate">
+                      <h1
+                        className="text-xl md:text-3xl lg:text-4xl font-sans md:font-boskaBold
+                        leading-tight md:leading-[0.95] tracking-tight pointer-events-none md:pointer-events-auto capitalize dark:text-[#fff] truncate"
+                      >
                         {currentProfile.fullName}
-                        <span className="block mt-1 md:mt-2 text-lg md:text-xl lg:text-2xl font-boska font-normal tracking-normal capitalize text-lime-700 dark:text-lime-600">
+                        <span
+                          className="block mt-1 md:mt-2 text-base md:text-xl lg:text-2xl font-sans md:font-boska font-normal
+                          tracking-normal capitalize text-lime-700 dark:text-lime-600"
+                        >
                           {currentProfile.role}
                         </span>
                       </h1>
@@ -261,7 +283,10 @@ const PublicProfile = () => {
                   </div>
                 ) : (
                   currentProfile.aboutMe && (
-                    <p className="text-stone-700 dark:text-[#d0d0d0] sentient-italic text-base md:text-lg leading-tight tracking-normal pointer-events-none md:pointer-events-auto">
+                    <p
+                      className="text-stone-700 dark:text-[#d0d0d0] sentient-italic text-sm md:text-lg overflow-hidden
+                      leading-tight tracking-normal pointer-events-none md:pointer-events-auto max-w-[65ch] text-wrap !no-underline"
+                    >
                       {currentProfile.aboutMe}
                     </p>
                   )

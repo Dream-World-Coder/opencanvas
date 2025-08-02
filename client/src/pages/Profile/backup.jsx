@@ -70,16 +70,19 @@ const Profile = () => {
 
       setPostsToFetch(postsToFetch + 10);
 
-      const response = await fetch(`http://localhost:3000/u/posts/byids`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/u/posts/byids`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            postIds: postIdsParam,
+          }),
         },
-        body: JSON.stringify({
-          postIds: postIdsParam,
-        }),
-      });
+      );
 
       const data = await response.json();
 

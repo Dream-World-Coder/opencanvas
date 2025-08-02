@@ -10,7 +10,6 @@ import {
   Trash2,
   MoreHorizontal,
   Share2,
-  Info,
   Copy,
   ChevronLeft,
   ChevronRight,
@@ -19,6 +18,7 @@ import {
   SquareChartGantt,
   Users,
   UserCheck,
+  Contact,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -149,13 +149,14 @@ export const QuickStatsProfile = ({ currentUser }) => {
   ];
 
   return (
-    <div className="w-full md:w-[300px] lg:w-[400px] font-sans border border-gray-100 dark:border-[#222] mt-6 md:mt-0 rounded-lg bg-white dark:bg-[#171717] overflow-hidden">
+    <div className="w-full md:w-[300px] lg:w-[400px] font-sans border border-gray-300 md:border-gray-200 dark:border-[#222] mt-6 md:mt-0 rounded-lg bg-white dark:bg-[#171717] overflow-hidden">
       {userStats.map((item, index) => (
         <a
           key={index}
-          className={`flex items-center justify-between px-4 py-3 border-b last:border-b-0 border-gray-100 dark:border-[#222] hover:bg-gray-50 dark:hover:bg-[#111] transition-all duration-300 ease-in-out ${
-            hoveredItem === index ? "bg-gray-50 dark:bg-[#222]" : ""
-          }`}
+          className={`flex items-center justify-between px-4 py-3 border-b last:border-b-0 border-gray-300 md:border-gray-200 dark:border-[#222]
+            hover:bg-gray-50 dark:hover:bg-[#111] transition-all duration-300 ease-in-out ${
+              hoveredItem === index ? "bg-gray-50 dark:bg-[#222]" : ""
+            }`}
           href={item.href}
           onMouseEnter={() => setHoveredItem(index)}
           onMouseLeave={() => setHoveredItem(null)}
@@ -309,7 +310,12 @@ function sharePost(post) {
     : navigator.clipboard
         .writeText(postUrl)
         .then(() => {
-          toast.success("Link copied to clipboard");
+          toast.success("Link copied to clipboard", {
+            action: {
+              label: "Close",
+              onClick: () => console.log("Close"),
+            },
+          });
         })
         .catch((err) => {
           console.error("Failed to copy link:", err);
@@ -420,7 +426,12 @@ export const PostActions = ({ post, setPosts, loading }) => {
               onClick={async () => {
                 let tmp = await changePostVisibility(post._id, !post.isPublic);
                 if (tmp.success) {
-                  toast.success(tmp.message);
+                  toast.success(tmp.message, {
+                    action: {
+                      label: "Close",
+                      onClick: () => console.log("Close"),
+                    },
+                  });
                   setPosts((prevPosts) =>
                     prevPosts.map((p) =>
                       p._id === post._id
@@ -445,7 +456,12 @@ export const PostActions = ({ post, setPosts, loading }) => {
               onClick={async () => {
                 let res = await changeFeaturedSettings(post._id, "Post");
                 if (res.success && res.added == true) {
-                  toast.success(res.message);
+                  toast.success(res.message, {
+                    action: {
+                      label: "Close",
+                      onClick: () => console.log("Close"),
+                    },
+                  });
                   setCurrentUser((currentUser) => ({
                     ...currentUser,
                     featuredItems: [
@@ -459,7 +475,12 @@ export const PostActions = ({ post, setPosts, loading }) => {
                     ],
                   }));
                 } else if (res.success && res.added == false) {
-                  toast.success(res.message);
+                  toast.success(res.message, {
+                    action: {
+                      label: "Close",
+                      onClick: () => console.log("Close"),
+                    },
+                  });
                   setCurrentUser((currentUser) => ({
                     ...currentUser,
                     featuredItems: [
@@ -544,7 +565,7 @@ export const ContactInformationDropdown = ({ currentProfile }) => {
   return (
     <AlertDialog>
       <AlertDialogTrigger className="flex items-center justify-center gap-2">
-        <Info className="size-5" /> Contact
+        <Contact className="size-5" /> Contact
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -558,7 +579,12 @@ export const ContactInformationDropdown = ({ currentProfile }) => {
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(item.url);
-                      toast.success("url copied to clipboard");
+                      toast.success("url copied to clipboard", {
+                        action: {
+                          label: "Close",
+                          onClick: () => console.log("Close"),
+                        },
+                      });
                     }}
                   >
                     <Copy />
@@ -734,7 +760,12 @@ export const FeaturedWorks = memo(function FeaturedWorks({ currentUser }) {
                       await navigator.clipboard.writeText(
                         `${baseUrl}/${typ}/${item.itemId}`,
                       );
-                      toast.success("link copied to clipboard");
+                      toast.success("link copied to clipboard", {
+                        action: {
+                          label: "Close",
+                          onClick: () => console.log("Close"),
+                        },
+                      });
                     }}
                   />
                 </h3>
@@ -802,7 +833,12 @@ const MockFeatureItem = ({ post = null, collection = null }) => {
             await navigator.clipboard.writeText(
               `${baseUrl}/${typ}/${item.itemId}`,
             );
-            toast.success("link copied to clipboard");
+            toast.success("link copied to clipboard", {
+              action: {
+                label: "Close",
+                onClick: () => console.log("Close"),
+              },
+            });
           }}
         />
       </h3>
@@ -936,7 +972,7 @@ export const PostList = memo(function PostList({
                     {/* Content preview */}
                     <div className="w-full flex flex-col justify-start items-start">
                       {/* preview snippet */}
-                      <div className="relative mb-4 max-h-[150px] overflow-hidden">
+                      <div className="relative mb-4 max-h-[150px] max-w-[300px] md:max-w-none overflow-hidden">
                         <div className="prose prose-sm dark:prose-invert">
                           <MarkdownPreview
                             title={post.title}

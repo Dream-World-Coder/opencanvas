@@ -25,15 +25,18 @@ export const AuthorPostsDropdown = ({
       setLoading(true);
       // fetch 6 posts instead of 4 to makeup for private posts
       const postIdsParam = author.posts.slice(0, 6).join(",");
-      const response = await fetch(`http://localhost:3000/author/posts/byids`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/author/posts/byids`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            postIds: postIdsParam,
+          }),
         },
-        body: JSON.stringify({
-          postIds: postIdsParam,
-        }),
-      });
+      );
       const data = await response.json();
       if (data.success) {
         setAuthorPosts(data.posts);

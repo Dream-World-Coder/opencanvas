@@ -70,16 +70,19 @@ const FollowersPage = () => {
 
       setFollowersToFetch(followersToFetch + 10);
 
-      const response = await fetch(`http://localhost:3000/u/followers/byids`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/u/followers/byids`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            followerIds: followerIdsQS,
+          }),
         },
-        body: JSON.stringify({
-          followerIds: followerIdsQS,
-        }),
-      });
+      );
 
       const data = await response.json();
 
@@ -150,8 +153,8 @@ const FollowersPage = () => {
     <div className="min-h-screen bg-white dark:bg-[#111] text-gray-800 dark:text-gray-100 p-4 md:p-0">
       <ProfileHeader />
       <div className="max-w-3xl mx-auto pt-24 pb-80">
-        <div className="flex items-center justify-between mb-6 pb-4">
-          <h1 className="text-2xl md:text-3xl font-bold font-serif">
+        <div className="flex flex-col md:flex-row items-center justify-between mb-6 pb-4">
+          <h1 className="text-xl md:text-3xl font-bold font-serif capitalize">
             {currentProfile.fullName}&apos;s Followers
           </h1>
           <button
@@ -169,7 +172,7 @@ const FollowersPage = () => {
           {followers.map((follower, index) => (
             <Card
               key={follower._id}
-              className="border border-gray-100 dark:border-[#333] bg-transparent hover:bg-gray-50 dark:hover:bg-[#222] transition-all duration-300 cursor-pointer rounded-lg overflow-hidden shadow-none"
+              className="border border-gray-300 md:border-gray-100 dark:border-[#333] bg-transparent hover:bg-gray-50 dark:hover:bg-[#222] transition-all duration-300 cursor-pointer rounded-lg overflow-hidden shadow-none"
               onClick={() => navigate(`/u/${follower.username}`)}
             >
               <CardContent className="p-4 flex items-center gap-4">

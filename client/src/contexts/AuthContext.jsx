@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const API_URL = import.meta.env.BACKEND_API_URL || "http://localhost:3000";
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
 
   const authAxios = axios.create({
     baseURL: API_URL,

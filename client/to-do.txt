@@ -7,6 +7,8 @@
 -- collectionssssssss
 -- image magnifier
 -- dismiss options in toasts
+-- remove createoptions btns for loggedout users in mobiles
+-- handle loading etc in createoptions
 
 -- [] make dynamic sitemap
 -- [] study concept of react query and remake the whole

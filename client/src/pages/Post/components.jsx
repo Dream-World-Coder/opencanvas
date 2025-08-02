@@ -66,7 +66,12 @@ function sharePost(post) {
   navigator.clipboard
     .writeText(postUrl)
     .then(() => {
-      toast.success("Link copied to clipboard");
+      toast.success("Link copied to clipboard", {
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
     })
     .catch((err) => {
       console.error("Failed to copy link:", err);
@@ -268,9 +273,9 @@ export const TableOfContents = memo(function Toc({
             {/* for mobile */}
             <div className="flex lg:hidden w-full justify-end">
               {isOpen ? (
-                <X className="size-4 bg-neutral-200 dark:bg-neutral-700 box-content p-1 rounded" />
+                <X className="size-4 bg-lime-200 dark:bg-neutral-700 box-content p-1 rounded" />
               ) : (
-                <List className="size-4 bg-neutral-200 dark:bg-neutral-700 box-content p-1 rounded" />
+                <List className="size-4 bg-lime-200 dark:bg-neutral-700 box-content p-1 rounded" />
               )}
             </div>
           </summary>
@@ -278,7 +283,8 @@ export const TableOfContents = memo(function Toc({
           {isOpen && (
             <div
               data-lenis-prevent
-              className="dropdown max-h-[600px] overflow-y-auto pb-4 bg-neutral-200 dark:bg-neutral-700 rounded lg:bg-transparent lg:dark:bg-transparent"
+              className="dropdown max-h-[600px] overflow-y-auto pb-4 bg-lime-100 dark:bg-neutral-700
+              rounded lg:bg-transparent lg:dark:bg-transparent shadow-md md:shadow-none"
             >
               <ul className="pl-1 pt-2">
                 {tableOfContents.map((title, titleIndex) => (
@@ -1075,7 +1081,12 @@ export const CommentsBox = memo(function CommentsBox({
         console.log(res);
         setComments([...comments, res.comment]);
         setNewComment("");
-        toast.success(res.message);
+        toast.success(res.message, {
+          action: {
+            label: "Close",
+            onClick: () => console.log("Close"),
+          },
+        });
       } catch (err) {
         console.error(err);
       } finally {
@@ -1087,6 +1098,7 @@ export const CommentsBox = memo(function CommentsBox({
     }
   };
 
+  // not showing realtime update, problem
   const handleEdit = async (e, commentId) => {
     if (!currentUser) {
       toast.error("Login first.");
@@ -1131,7 +1143,12 @@ export const CommentsBox = memo(function CommentsBox({
         }
         setNewComment("");
         editingCommentRef.current = null;
-        toast.success(res.message);
+        toast.success(res.message, {
+          action: {
+            label: "Close",
+            onClick: () => console.log("Close"),
+          },
+        });
       } catch (err) {
         console.error(err);
       } finally {
@@ -1152,7 +1169,12 @@ export const CommentsBox = memo(function CommentsBox({
       setComments([
         ...comments.filter((c) => c._id.toString() !== commentId.toString()),
       ]);
-      toast.success(res.message);
+      toast.success(res.message, {
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
     } catch (err) {
       console.error(err);
     } finally {
@@ -1182,7 +1204,12 @@ export const CommentsBox = memo(function CommentsBox({
         ]);
         setNewComment("");
         parentCommentRef.current = null;
-        toast.success(res.message);
+        toast.success(res.message, {
+          action: {
+            label: "Close",
+            onClick: () => console.log("Close"),
+          },
+        });
       } catch (err) {
         console.error(err);
       } finally {
@@ -1485,8 +1512,8 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
   return (
     <Card
       className={`w-full max-w-3xl mx-auto bg-white border-none shadow-none rounded-none
-                ${isDark ? `${darkBg} ${darkTheme.primaryText} border-none` : lightModeBg}
-                ${textAlignment === "center" ? "text-center" : "text-left"}`}
+        ${isDark ? `${darkBg} ${darkTheme.primaryText} border-none` : lightModeBg}
+        ${textAlignment === "center" ? "text-center" : "text-left"}`}
     >
       <CardContent className="p-0">
         <div
@@ -1497,8 +1524,8 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
           {title && (
             <div
               className={`pt-2 mb-10 leading-tight tracking-tight capitalize text-3xl md:text-4xl font-bold font-serif
-                                ${artType === "poem" ? "!max-w-[600px] !font-boskaBold" : ""}
-                                ${darkTheme.primaryText}`}
+                ${artType === "poem" ? "!max-w-[600px] !font-boskaBold" : ""}
+                ${darkTheme.primaryText}`}
             >
               {title}
             </div>
@@ -1648,7 +1675,7 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
               p: ({ children }) => (
                 <p
                   className={`my-8 max-w-prose text-base md:text-lg md:leading-[28px] ${darkTheme.secondaryText}
-                    ${artType === "poem" ? "!font-boskaLight !text-xl !leading-[32px] !my-0" : ""}`}
+                    ${artType === "poem" ? "font-serif md:font-boskaLight text-base md:text-xl leading-[28px] md:leading-[32px] !my-0" : ""}`}
                 >
                   {/* initially it was : leading-[40px] */}
                   {children}

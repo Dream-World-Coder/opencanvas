@@ -264,9 +264,9 @@ PostTags.propTypes = {
 export const PostAuthorInfo = ({ post }) => {
   return (
     <div className="flex items-center mb-4">
-      <Avatar className="h-10 w-10 ring-2 ring-white dark:ring-[#333] mr-3">
+      <Avatar className="size-8 md:size-10 ring-2 ring-white dark:ring-[#333] mr-3">
         <AvatarImage src={post.author?.profilePicture} />
-        <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white">
+        <AvatarFallback className="bg-gradient-to-br from-lime-500 to-green-500 text-white">
           {post.author?.name?.charAt(0) || "U"}
         </AvatarFallback>
       </Avatar>

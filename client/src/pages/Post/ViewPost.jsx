@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
-// import PropTypes from "prop-types";
-
 import { toast } from "sonner";
 
 import Header from "../../components/Header/Header";
@@ -152,7 +150,12 @@ const ViewPost = () => {
     // now like
     let res = await likePost(postId);
     if (res.success) {
-      toast.success(res.message);
+      toast.success(res.message, {
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
       if (res.increase === "increase") {
         setLikes(likes + 1);
         setCurrentUser((currentUser) => ({
@@ -201,7 +204,12 @@ const ViewPost = () => {
     // now handle the dislike
     let res = await dislikePost(postId);
     if (res.success) {
-      toast.success(res.message);
+      toast.success(res.message, {
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
       setIsDisliked(!isDisliked);
       setCurrentUser((currentUser) => ({
         ...currentUser,
@@ -216,14 +224,24 @@ const ViewPost = () => {
     let res = await savePost(postId);
     if (res.success && res.saved == true) {
       setIsSaved(true);
-      toast.success(res.message);
+      toast.success(res.message, {
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
       setCurrentUser((currentUser) => ({
         ...currentUser,
         savedPosts: [...currentUser.savedPosts, postId],
       }));
     } else if (res.success && res.saved != true) {
       setIsSaved(false);
-      toast.success(res.message);
+      toast.success(res.message, {
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
       setCurrentUser((currentUser) => ({
         ...currentUser,
         savedPosts: [
@@ -241,14 +259,24 @@ const ViewPost = () => {
     let res = await followUser(userId);
     if (res.success && res.message === "followed") {
       setFollowing(true);
-      toast.success(res.message);
+      toast.success(res.message, {
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
       setCurrentUser((currentUser) => ({
         ...currentUser,
         following: [...currentUser.following, { userId, since: Date.now() }],
       }));
     } else if (res.success && res.message === "unfollowed") {
       setFollowing(false);
-      toast.success(res.message);
+      toast.success(res.message, {
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
       setCurrentUser((currentUser) => ({
         ...currentUser,
         following: [

@@ -67,7 +67,7 @@ const LoginPage = ({ bgClr = "bg-cream-light", backBtn = false }) => {
               className="w-full flex items-center justify-center space-x-3 bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 p-6"
               variant="outline"
               onClick={() => {
-                window.location.href = "http://localhost:3000/auth/google";
+                window.location.href = `${import.meta.env.VITE_BACKEND_URL}/auth/google`;
               }}
             >
               <svg className="w-6 h-12" viewBox="0 0 24 24">

@@ -25,7 +25,7 @@ const ArticleFeed = () => {
   const focusMode = false;
   const [selectedTopics, setSelectedTopics] = useState([]);
 
-  const apiUrl = "http://localhost:3000/feed/articles/anonymous-user";
+  const apiUrl = `${import.meta.env.VITE_BACKEND_URL}/feed/articles/anonymous-user`;
 
   // Function to handle post click navigation
   const handlePostClick = (post) => {
@@ -192,7 +192,8 @@ const ArticleFeed = () => {
                           />
                         </div>
                       )}
-                      <div className="p-5 sm:p-6">
+
+                      <div className="p-2 sm:p-6">
                         <PostAuthorInfo post={post} />
 
                         <h2 className="text-xl sm:text-2xl font-bold mb-3 text-gray-900 dark:text-white">

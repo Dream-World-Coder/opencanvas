@@ -129,15 +129,16 @@ export default function App() {
                   />
                   {/* *************** */}
 
+                  <Route
+                    path="/u/:username/followers"
+                    element={<FollowersPage />} //followers public but following login needed
+                  />
+
                   {/* protected */}
                   <Route element={<ProtectedRoute />}>
                     <Route
                       path="/profile"
                       element={<Profile bgClr="bg-white" />}
-                    />
-                    <Route
-                      path="/u/:username/followers"
-                      element={<FollowersPage />}
                     />
                     <Route
                       path="/u/:username/following"

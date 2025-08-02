@@ -28,7 +28,7 @@ const FollowingPage = () => {
     }
 
     setIsLoading(true);
-    const apiUrl = `http://localhost:3000/u/${username}`;
+    const apiUrl = `${import.meta.env.VITE_BACKEND_URL}/u/${username}`;
 
     try {
       const res = await fetch(apiUrl);
@@ -153,8 +153,8 @@ const FollowingPage = () => {
     <div className="min-h-screen bg-white dark:bg-[#111] text-gray-800 dark:text-gray-100 p-4 md:p-0">
       <ProfileHeader />
       <div className="max-w-3xl mx-auto pt-24 pb-80">
-        <div className="flex items-center justify-between mb-6 pb-4">
-          <h1 className="text-2xl md:text-3xl font-bold font-serif">
+        <div className="flex flex-col md:flex-row items-center justify-between mb-6 pb-4">
+          <h1 className="text-xl md:text-3xl font-bold font-serif capitalize">
             People Followed by {currentProfile.fullName}
           </h1>
           <button
@@ -172,7 +172,7 @@ const FollowingPage = () => {
           {following.map((follower, index) => (
             <Card
               key={follower._id}
-              className="border border-gray-100 dark:border-[#333] bg-transparent hover:bg-gray-50 dark:hover:bg-[#222] transition-all duration-300 cursor-pointer rounded-lg overflow-hidden shadow-none"
+              className="border border-gray-300 md:border-gray-100 dark:border-[#333] bg-transparent hover:bg-gray-50 dark:hover:bg-[#222] transition-all duration-300 cursor-pointer rounded-lg overflow-hidden shadow-none"
               onClick={() => navigate(`/u/${follower.username}`)}
             >
               <CardContent className="p-4 flex items-center gap-4">

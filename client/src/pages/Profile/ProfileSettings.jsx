@@ -163,7 +163,12 @@ const ProfileSettings = () => {
         role: formValues.role.trim().toLowerCase(),
         aboutMe: formValues.aboutMe.trim().toLowerCase(),
       }));
-      toast.success("Your profile information has been updated successfully.");
+      toast.success("Your profile information has been updated successfully.", {
+        action: {
+          label: "Close",
+          onClick: () => console.log("Close"),
+        },
+      });
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
@@ -226,7 +231,12 @@ const ProfileSettings = () => {
                     navigator.clipboard.writeText(
                       `${baseUrl}/u/${formValues.username}`,
                     );
-                    toast.success("copied!");
+                    toast.success("copied!", {
+                      action: {
+                        label: "Close",
+                        onClick: () => console.log("Close"),
+                      },
+                    });
                   }}
                 />
               </CardTitle>
@@ -923,7 +933,12 @@ const ProfileSettings = () => {
                           navigator.clipboard.writeText(
                             `${baseUrl}/u/${formValues.username}`,
                           );
-                          toast.success("copied!");
+                          toast.success("copied!", {
+                            action: {
+                              label: "Close",
+                              onClick: () => console.log("Close"),
+                            },
+                          });
                         }}
                       />
                     </CardTitle>

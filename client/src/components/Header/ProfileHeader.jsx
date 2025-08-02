@@ -30,21 +30,29 @@ export default function ProfileHeader() {
     if (!currentUser) {
       toast.error("you need to Log In first");
       localStorage.setItem("urlToRedirectAfterLogin", window.location.pathname);
-      navigate("/login-needed");
+      setLoading(false);
 
       setTimeout(() => {
-        navigate("/login");
+        navigate("/login-needed");
       }, 500);
-    } else {
-      localStorage.removeItem("blogPost");
-      localStorage.removeItem("newPostId");
-      setCreateMenuOpen(false);
+
+      return;
+    }
+
+    localStorage.removeItem("blogPost");
+    localStorage.removeItem("newPostId");
+    setCreateMenuOpen(false);
+
+    try {
       let newPostId = await getNewPostId();
       localStorage.setItem("newPostId", newPostId);
-      // console.log(`newPostId writingPad: ${newPostId}`);
-
-      navigate(option.href);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
     }
+
+    navigate(option.href);
 
     setLoading(false);
   }

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import PropTypes from "prop-types";
+import { toast } from "sonner";
 
 import { useAuth } from "../../contexts/AuthContext";
 import { useDataService } from "../../services/dataService";
@@ -28,18 +29,29 @@ const Header = ({
   const [loading, setLoading] = useState(false);
 
   async function handlePostCreate(option) {
+    if (!currentUser) {
+      toast.error("You need to login first");
+      return;
+    }
+
     setLoading(true);
     localStorage.removeItem("blogPost");
     localStorage.removeItem("newPostId");
     setCreateMenuOpen(false);
-    let newPostId = await getNewPostId();
-    localStorage.setItem("newPostId", newPostId);
+
+    try {
+      let newPostId = await getNewPostId();
+      localStorage.setItem("newPostId", newPostId);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
 
     setTimeout(() => {
       // window.location.href = option.href;
       navigate(option.href);
     }, 300);
-    setLoading(false);
   }
 
   let navLinks = [
