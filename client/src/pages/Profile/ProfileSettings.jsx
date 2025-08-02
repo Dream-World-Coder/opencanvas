@@ -65,7 +65,7 @@ const ProfileSettings = () => {
   const [formValues, setFormValues] = useState({
     username: currentUser.username.toLowerCase() ?? "null",
     fullName: currentUser.fullName ?? "",
-    role: currentUser.role ?? "user",
+    role: currentUser.role ?? "Learner",
     aboutMe: currentUser.aboutMe ?? "",
     notifications: {
       email: currentUser.notifications.emailNotification,
@@ -136,13 +136,35 @@ const ProfileSettings = () => {
   async function updateUser() {
     setLoading(true);
     try {
-      if (!/^[A-Za-z0-9_]+$/.test(formValues.username)) {
+      if (!/^(?!\d+$)[a-z0-9_]+$/.test(formValues.username)) {
         toast.error(
-          "Username can only contain letters, numbers, and underscores",
+          "Username can only contain letters, numbers, underscores and at least one letter is mandatory.",
         );
         return;
       }
+
+      if (formValues.username?.length > 16 || formValues.username?.length < 4) {
+        toast.error("Username should be 4-16 characters");
+        return;
+      }
+
+      if (formValues.role?.length > 40) {
+        toast.error("Designation can be max 40 characters");
+        return;
+      }
+
+      if (formValues.fullName?.length > 32 || formValues.fullName?.length < 4) {
+        toast.error("Full name should be 4-32 characters");
+        return;
+      }
+
+      if (formValues.aboutMe?.length > 300) {
+        toast.error("About should be max 300 characters");
+        return;
+      }
+
       await updateUserProfile(formValues);
+
       setFormValues((prevValues) => ({
         ...prevValues,
         contactInformation: [
@@ -180,6 +202,7 @@ const ProfileSettings = () => {
   }
 
   const handleContactInfoChange = (index, field, value) => {
+    // not only url can be ph no also
     const updatedContactInfo = [...formValues.contactInformation];
     updatedContactInfo[index] = {
       ...updatedContactInfo[index],
@@ -280,7 +303,7 @@ const ProfileSettings = () => {
                     onChange={(e) =>
                       setFormValues({
                         ...formValues,
-                        username: e.target.value.toLowerCase(),
+                        username: e.target.value?.toLowerCase(),
                       })
                     }
                     className="dark:bg-[#171717] dark:text-white dark:border-[#333]"

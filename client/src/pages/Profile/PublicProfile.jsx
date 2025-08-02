@@ -18,6 +18,7 @@ import {
   FeaturedWorks,
   PostFilterTabs,
   PostList,
+  NameDesignation,
 } from "./components";
 import { useDataService } from "../../services/dataService";
 import { useAuth } from "../../contexts/AuthContext";
@@ -239,8 +240,8 @@ const PublicProfile = () => {
                             }
                             await handleFollow(currentProfile._id);
                           }}
-                          className={`absolute bottom-0 ${following ? "right-0 group-hover:-right-4" : "right-0"} bg-black dark:bg-[#333]
-                                                        text-white px-1 py-1 md:px-2 md:py-1 rounded-md md:rounded-md transition-opacity text-xs cursor-pointer flex items-center justify-center gap-1`}
+                          className={`absolute bottom-0 ${following ? "right-0 group-hover:-right-4" : "right-0"} bg-lime-300 dark:bg-lime-600
+                            text-lime-900 dark:text-lime-50 p-1 md:p-2 rounded-full transition-opacity text-xs cursor-pointer flex items-center justify-center gap-1`}
                         >
                           {following ? <CircleCheck className="size-4" /> : ""}
                           <span
@@ -259,18 +260,10 @@ const PublicProfile = () => {
                         <Skeleton className="h-5 md:h-6 w-1/2" />
                       </div>
                     ) : (
-                      <h1
-                        className="text-xl md:text-3xl lg:text-4xl font-sans md:font-boskaBold
-                        leading-tight md:leading-[0.95] tracking-tight pointer-events-none md:pointer-events-auto capitalize dark:text-[#fff] truncate"
-                      >
-                        {currentProfile.fullName}
-                        <span
-                          className="block mt-1 md:mt-2 text-base md:text-xl lg:text-2xl font-sans md:font-boska font-normal
-                          tracking-normal capitalize text-lime-700 dark:text-lime-600"
-                        >
-                          {currentProfile.role}
-                        </span>
-                      </h1>
+                      <NameDesignation
+                        name={currentProfile.fullName}
+                        designation={currentProfile.role}
+                      />
                     )}
                   </div>
                 </div>

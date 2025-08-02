@@ -15,6 +15,7 @@ import {
   FeaturedWorks,
   PostFilterTabs,
   PostList,
+  NameDesignation,
 } from "./components";
 import { useAuth } from "../../contexts/AuthContext";
 import { useDarkMode } from "../../components/Hooks/darkMode";
@@ -140,18 +141,10 @@ const Profile = () => {
                         <Skeleton className="h-5 md:h-6 w-1/2" />
                       </div>
                     ) : (
-                      <h1
-                        className="text-xl md:text-3xl lg:text-4xl font-sans md:font-boskaBold
-                        leading-tight md:leading-[0.95] tracking-tight pointer-events-none md:pointer-events-auto capitalize dark:text-[#fff] truncate"
-                      >
-                        {currentUser.fullName}
-                        <span
-                          className="block mt-1 md:mt-2 text-base md:text-xl lg:text-2xl font-sans md:font-boska font-normal
-                          tracking-normal capitalize text-lime-700 dark:text-lime-600"
-                        >
-                          {currentUser.role}
-                        </span>
-                      </h1>
+                      <NameDesignation
+                        name={currentUser.fullName}
+                        designation={currentUser.role}
+                      />
                     )}
                   </div>
                 </div>

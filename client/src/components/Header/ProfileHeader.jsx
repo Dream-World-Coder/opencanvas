@@ -70,7 +70,7 @@ export default function ProfileHeader() {
                 onClick={() => {
                   navigate(link.href);
                 }}
-                className={`px-3 py-1 box-content rounded-md hover:bg-lime-300 dark:hover:bg-[#333] transition-all duration-200`}
+                className={`px-3 py-1 box-content rounded-md hover:bg-lime-200 dark:hover:bg-[#333] transition-all duration-200`}
               >
                 {link.label}
               </button>

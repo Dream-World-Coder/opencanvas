@@ -1039,3 +1039,25 @@ PostList.propTypes = {
   isDark: PropTypes.bool,
   forPrivate: PropTypes.bool,
 };
+
+export const NameDesignation = ({ name, designation }) => {
+  return (
+    <h1
+      className="text-xl md:text-3xl lg:text-4xl font-sans md:font-stardom text-black  dark:text-[#fff]
+        leading-tight md:leading-[0.95] tracking-tight pointer-events-none md:pointer-events-auto capitalize truncate"
+    >
+      {name}
+
+      <span
+        className="block mt-1 md:mt-2 text-sm md:text-xl font-sans md:font-['Sentient-Regular'] font-normal
+          tracking-normal capitalize text-neutral-900 dark:text-neutral-50"
+      >
+        {designation}
+      </span>
+    </h1>
+  );
+};
+NameDesignation.propTypes = {
+  name: PropTypes.string,
+  designation: PropTypes.string,
+};
