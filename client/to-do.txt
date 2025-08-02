@@ -6,6 +6,7 @@
 -- [] repost someones post
 -- collectionssssssss
 -- image magnifier
+-- dismiss options in toasts
 
 -- [] make dynamic sitemap
 -- [] study concept of react query and remake the whole
