@@ -11,6 +11,7 @@ import { timeAgo } from "../../services/formatDate";
 import { useState } from "react";
 import { PanelLeftClose } from "lucide-react";
 import { PanelRightClose } from "lucide-react";
+import { X } from "lucide-react";
 
 export const LeftSideBar = ({ selectedTopics, setSelectedTopics }) => {
   const [sidebarClosed, setSidebarClosed] = useState(false); // need to use some context here
@@ -125,11 +126,18 @@ export const RightSideBar = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
+  const [suggestedWritersVisible, setSuggestedWritersVisible] = useState(true);
+
   return (
     <div className="p-4 bg-white dark:bg-[#222] rounded-none shadow-none h-[88dvh] flex flex-col justify-between">
       {currentUser ? (
-        <div className="p-4 border border-gray-100 dark:border-[#333] rounded-lg">
-          <h3 className="font-bold mb-3">Suggested Writers</h3>
+        <div
+          className={`p-4 border border-gray-100 dark:border-[#333] rounded-lg ${suggestedWritersVisible ? "opacity-100" : "opacity-0"}`}
+        >
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="font-bold size-full">Suggested Writers</h3>
+            <X size={16} onClick={() => setSuggestedWritersVisible(false)} />
+          </div>
           <div className="space-y-3">
             {Array(3)
               .fill(0)
@@ -241,7 +249,7 @@ export const PostTags = ({ post }) => {
       {post.tags.map((topic) => (
         <span
           key={topic}
-          className="bg-gray-100 dark:bg-[#313131] text-xs px-3 py-1 rounded-full font-medium text-gray-700 dark:text-gray-300"
+          className="bg-gray-100 dark:bg-[#313131] text-xs px-3 py-1 rounded-full font-medium text-gray-800 dark:text-gray-300"
         >
           {topic}
         </span>
