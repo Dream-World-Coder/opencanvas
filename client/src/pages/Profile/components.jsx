@@ -849,6 +849,7 @@ export const PostStats = ({ post }) => {
 PostStats.propTypes = {
   post: PropTypes.object,
 };
+
 export const PostDetails = ({ post }) => {
   return (
     <div className="">
@@ -868,7 +869,7 @@ export const PostDetails = ({ post }) => {
           Tags:
           {post.tags?.map((tag) => (
             <span
-              className="bg-gray-200 dark:bg-neutral-700 rounded-full px-1"
+              className="bg-lime-200 dark:bg-neutral-700 rounded-full px-2"
               key={tag}
             >
               {tag}

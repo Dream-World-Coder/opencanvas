@@ -335,11 +335,12 @@ const ViewPost = () => {
                   artType={post.type}
                 />
               </article>
+
               <div className="flex flex-wrap gap-2 mb-6">
                 {post.tags.map((tag, index) => (
                   <span
                     key={index}
-                    className={`text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-[#171717] text-gray-700 dark:text-[#9da5b4]`}
+                    className={`text-xs px-2 py-1 rounded-lg bg-lime-100 dark:bg-[#171717] text-neutral-700 dark:text-[#9da5b4]`}
                   >
                     {tag}
                   </span>

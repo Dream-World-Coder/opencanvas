@@ -258,7 +258,7 @@ export const TableOfContents = memo(function Toc({
             onClick={() => setIsOpen(!isOpen)}
           >
             {/* for desktop */}
-            <div className="hidden lg:block font-serif text-xl px-2 bg-[#F0F1C5] dark:bg-neutral-700 rounded text-black dark:text-[#f8f8f8]">
+            <div className="hidden lg:block font-serif text-xl px-2 bg-lime-200 dark:bg-neutral-700 rounded text-black dark:text-[#f8f8f8]">
               Table of Contents
             </div>
             <div className="hidden lg:block">
@@ -765,7 +765,7 @@ export const EngagementSection = ({
           }}
         >
           <ThumbsUp
-            className={`size-4 text-blue-600 dark:text-white ${isLiked ? "fill-blue-600 dark:fill-white" : ""}`}
+            className={`size-4 text-lime-600 dark:text-white ${isLiked ? "fill-lime-600 dark:fill-white" : ""}`}
           />
           <span>{likes}</span>
         </Button>
@@ -1560,7 +1560,7 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
 
               hr: (props) => (
                 <hr
-                  className={`my-6 border-t ${isDark ? `${darkTheme.border}` : "border-gray-200"}`}
+                  className={`my-6 border-t ${isDark ? `${darkTheme.border}` : "border-neutral-200"}`}
                   {...props}
                 />
               ),
