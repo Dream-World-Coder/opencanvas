@@ -1,14 +1,16 @@
 import { ChevronRight } from "lucide-react";
+
 import BlueFlowerImg from "./images/blue-flower.png";
 import Poem from "./images/poem.png";
 import Butterfly from "./images/butterfly.png";
-import { SlidingButton, Navbar, Footer } from "./components";
-import { Analytics } from "@vercel/analytics/react";
+
 import { useAuth } from "../../contexts/AuthContext";
+import { SlidingButton, Navbar, Footer } from "./components";
 import ArticleFeed from "../Feeds/Articles";
 
 const LandingPage = () => {
   const { currentUser } = useAuth();
+
   return !currentUser ? (
     <div className="min-h-auto md:min-h-screen min-w-screen h-[100dvh] md:h-auto bg-[#e2e4e0] relative overflow-hidden">
       <div className="max-w-7xl mx-auto relative h-screen">
@@ -40,16 +42,18 @@ const LandingPage = () => {
 
         <Footer />
       </div>
-      {/* poem hidden md:block */}
-      <div className="size-[65%] md:size-[35%] top-[50%] md:top-0 left-[-125px] absolute opacity-70 mix-blend-multiply">
+      {/* poem */}
+      <div className="hidden md:block size-[65%] md:size-[35%] top-[50%] md:top-0 left-[-125px] absolute opacity-70 mix-blend-multiply">
         <img className="object-cover" src={Poem} alt="" />
       </div>
-      {/* flower */}
-      <div className="size-[50%] md:size-[45%] bottom-[40%] md:bottom-[110px] right-[-100px] md:right-[-280px] absolute opacity-80 z-20">
-        <img className="object-cover" src={BlueFlowerImg} alt="" />
-      </div>
 
-      <Analytics />
+      {/* flower */}
+      <div
+        className="size-[60%] bottom-[-237px] md:size-[45%] md:bottom-[110px] md:right-[-280px] absolute opacity-80 z-20 transform"
+        style={{ transform: "rotateY(0deg)" }}
+      >
+        <img className="object-cover relative" src={BlueFlowerImg} alt="" />
+      </div>
     </div>
   ) : (
     <ArticleFeed />

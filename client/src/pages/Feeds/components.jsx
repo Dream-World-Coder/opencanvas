@@ -14,7 +14,9 @@ import { PanelRightClose } from "lucide-react";
 import { X } from "lucide-react";
 
 export const LeftSideBar = ({ selectedTopics, setSelectedTopics }) => {
-  const [sidebarClosed, setSidebarClosed] = useState(false); // need to use some context here
+  const [sidebarClosed, setSidebarClosed] = useState(
+    JSON.parse(localStorage.getItem("feedSidebarClosed")),
+  );
 
   const feedOptions = [
     { name: "For You" },
@@ -47,7 +49,10 @@ export const LeftSideBar = ({ selectedTopics, setSelectedTopics }) => {
     >
       <div
         className={`absolute top-4 text-neutral-500 dark:text-neutral-500 cursor-pointer ${sidebarClosed ? "left-4" : "right-4"}`}
-        onClick={() => setSidebarClosed(!sidebarClosed)}
+        onClick={() => {
+          localStorage.setItem("feedSidebarClosed", !sidebarClosed);
+          setSidebarClosed(!sidebarClosed);
+        }}
       >
         {sidebarClosed ? (
           <PanelRightClose size={20} className="font-thin" />
@@ -136,7 +141,12 @@ export const RightSideBar = () => {
         >
           <div className="flex justify-between items-center mb-3">
             <h3 className="font-bold size-full">Suggested Writers</h3>
-            <X size={16} onClick={() => setSuggestedWritersVisible(false)} />
+            <X
+              size={16}
+              onClick={() => {
+                setSuggestedWritersVisible(false);
+              }}
+            />
           </div>
           <div className="space-y-3">
             {Array(3)
