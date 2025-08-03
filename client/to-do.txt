@@ -5,7 +5,7 @@
 -- contact info not synced on userame update, also rate limit it
 -- [] repost someones post
 -- collectionssssssss
--- image magnifier
+-- [*] image magnifier
 -- dismiss options in toasts
 -- remove createoptions btns for loggedout users in mobiles
 -- handle loading etc in createoptions

@@ -1482,6 +1482,71 @@ function getSettingsFromAlt(altText) {
   return result;
 }
 
+/**
+ * For now encode image properties inside alt text,
+ * alt --> acctual alt text or empty # w.W,h.H,p.C,mt.MT,mb.MB
+ * #-> special symbol for splitting,
+ * w.WIDTH_VALUE_INT, eg w.230
+ * for position -> (C-enter/S-tart/E-nd)
+ * mb, mt -> max 100
+ * w, h max 678
+ */
+const MarkdownImage = (props) => {
+  const { src, alt, ...rest } = props;
+  const [isOpen, setIsOpen] = useState(false);
+
+  const { w, h, mt, mb, p } = getSettingsFromAlt(alt);
+
+  return (
+    <>
+      {/* Inline image preview */}
+      <div
+        className="markdown-image-container-div relative cursor-pointer z-10 overflow-hidden flex items-center"
+        style={{
+          justifyContent: p || `center`,
+          marginTop: mt || `35px`,
+          marginBottom: mb || `35px`,
+        }}
+        onClick={() => setIsOpen(true)}
+      >
+        <img
+          className="relative object-contain transition-transform duration-300 hover:scale-[1.03]"
+          style={{
+            maxHeight: h || `468px`,
+            maxWidth: w || `468px`,
+          }}
+          src={src}
+          alt={alt}
+          {...rest}
+        />
+      </div>
+
+      {/* fullscreen modal */}
+      {isOpen && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center p-4">
+          <button
+            onClick={() => setIsOpen(false)}
+            className="absolute top-4 right-4 text-white text-3xl font-bold focus:outline-none"
+            aria-label="Close"
+          >
+            &times;
+          </button>
+          <img
+            src={src}
+            alt={alt}
+            className="max-w-full max-h-full object-contain"
+          />
+        </div>
+      )}
+    </>
+  );
+};
+
+MarkdownImage.propTypes = {
+  src: PropTypes.string.isRequired,
+  alt: PropTypes.string,
+};
+
 export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
   title,
   content,
@@ -1545,45 +1610,13 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
               />
             </div>
           )}
+
           {/* markdown content */}
           <ReactMarkdown
             remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
             rehypePlugins={[rehypeRaw, rehypeKatex]}
             components={{
-              img: (props) => {
-                /**
-                  * For now encode image properties inside alt text,
-                  alt --> acctual alt text or empty # w.W,h.H,p.C,mt.MT,mb.MB
-                  #-> special symbol for splitting,
-                  w.WIDTH_VALUE_INT, eg w.230
-                  for position -> (C-enter/S-tart/E-nd)
-                  mb, mt -> max 100
-                  w, h max 678
-                  */
-                const { node, src, alt, ...rest } = props;
-                const { w, h, mt, mb, p } = getSettingsFromAlt(alt);
-                return (
-                  <div
-                    className={`markdown-image-container-div relative cursor-pointer z-15 overflow-hidden flex items-center`}
-                    style={{
-                      justifyContent: p || `center`,
-                      marginTop: mt || `35px`,
-                      marginBottom: mb || `35px`,
-                    }}
-                  >
-                    <img
-                      className={`relative object-contain`}
-                      style={{
-                        maxHeight: h || `468px`,
-                        maxWidth: w || `468px`,
-                      }}
-                      src={src}
-                      alt={alt}
-                      {...rest}
-                    />
-                  </div>
-                );
-              },
+              img: MarkdownImage,
 
               hr: (props) => (
                 <hr
