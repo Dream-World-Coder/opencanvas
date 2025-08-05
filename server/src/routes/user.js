@@ -25,7 +25,7 @@ router.put(
       let {
         username,
         fullName,
-        role,
+        designation,
         aboutMe,
         notifications,
         contactInformation,
@@ -33,7 +33,7 @@ router.put(
 
       username = username.trim();
       fullName = fullName.trim();
-      role = role.trim();
+      designation = designation.trim();
       aboutMe = aboutMe.trim();
 
       // Check if username is being changed
@@ -88,14 +88,14 @@ router.put(
         user.fullName = fullName;
       }
 
-      if (role) {
-        if (role.length > 40) {
+      if (designation) {
+        if (designation.length > 40) {
           return res.status(400).json({
             success: false,
             message: "Designation can be 40 characters or less",
           });
         }
-        user.role = role;
+        user.designation = designation;
       }
 
       // Update aboutMe if provided

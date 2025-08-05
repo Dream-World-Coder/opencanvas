@@ -75,7 +75,7 @@ router.post(
         fullName: req.user.fullName,
         username: req.user.username,
         profilePicture: req.user.profilePicture,
-        role: req.user.role,
+        designation: req.user.designation,
       };
 
       return res.status(200).json({
@@ -153,7 +153,7 @@ router.put(
         fullName: req.user.fullName,
         username: req.user.username,
         profilePicture: req.user.profilePicture,
-        role: req.user.role,
+        designation: req.user.designation,
       };
 
       return res.status(200).json({
@@ -350,7 +350,7 @@ router.post(
         fullName: req.user.fullName,
         username: req.user.username,
         profilePicture: req.user.profilePicture,
-        role: req.user.role,
+        designation: req.user.designation,
       };
 
       // updating parent comment
@@ -415,7 +415,7 @@ router.get("/p/comments/:commentId", async (req, res) => {
           fullName: author.fullName,
           username: author.username,
           profilePicture: author.profilePicture,
-          role: author.role,
+          designation: author.designation,
         };
 
         replies.push(repObj);
@@ -479,7 +479,7 @@ router.post("/get-comments-byids", async (req, res) => {
         fullName: 1,
         username: 1,
         profilePicture: 1,
-        role: 1,
+        designation: 1,
       });
       commentObj.author = authorInfo;
       commentsWithAuthorInfo.push(commentObj);

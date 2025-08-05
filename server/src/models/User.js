@@ -88,14 +88,12 @@ const userSchema = new Schema(
       type: String,
       default: "https://opencanvas.blog/defaults/profile.jpeg",
     },
-    // <<<<>>>>
-    // its user's job description, not traditional role, i have used 'relationship' for that
-    role: {
+    designation: {
       type: String,
       default: "Learner",
       maxlength: [40, "Designation can be 40 characters or less"],
     },
-    relationship: {
+    role: {
       type: String,
       enum: ["user", "moderator", "admin"],
       // moderator -> bot
