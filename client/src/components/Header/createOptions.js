@@ -2,7 +2,7 @@ import {
   Book,
   FilePenLine,
   NotebookPen,
-  Library,
+  // Library,
   Pen,
   // Camera,
 } from "lucide-react";
@@ -37,18 +37,18 @@ export const createOptions = [
   //     label: "Upload Picture",
   //     color: "bg-emerald-500",
   // },
-  {
-    id: "collection",
-    href: "/createpost/collection",
-    icon: Library,
-    label: "Create Collection",
-    color: "bg-rose-500",
-  },
+  // {
+  //   id: "collection",
+  //   href: "/createpost/collection",
+  //   icon: Library,
+  //   label: "Create Collection",
+  //   color: "bg-rose-500",
+  // },
   {
     id: "mybook",
     href: "/createpost/book",
     icon: Book,
-    label: "Create Book",
-    color: "bg-indigo-500",
+    label: "New Book",
+    color: "bg-rose-500",
   },
 ];

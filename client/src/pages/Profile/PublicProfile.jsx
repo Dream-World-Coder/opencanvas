@@ -171,7 +171,7 @@ const PublicProfile = () => {
       currentProfile?._id?.toString() === currentUser?._id?.toString()
     ) {
       toast.info("This is your public profile", {
-        duration: 10000,
+        duration: 15000,
         action: { label: "Close", onClick: () => {} },
       });
     }
@@ -262,7 +262,7 @@ const PublicProfile = () => {
                     ) : (
                       <NameDesignation
                         name={currentProfile.fullName}
-                        designation={currentProfile.role}
+                        designation={currentProfile.designation}
                       />
                     )}
                   </div>

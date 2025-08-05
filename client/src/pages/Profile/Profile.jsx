@@ -143,7 +143,7 @@ const Profile = () => {
                     ) : (
                       <NameDesignation
                         name={currentUser.fullName}
-                        designation={currentUser.role}
+                        designation={currentUser.designation}
                       />
                     )}
                   </div>

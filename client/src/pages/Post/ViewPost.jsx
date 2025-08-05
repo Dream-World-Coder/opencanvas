@@ -328,7 +328,7 @@ const ViewPost = () => {
         />
         <div
           className={`flex flex-col md:flex-row min-h-screen max-w-screen-xl mx-auto bg-white
-                        ${darkTheme.colors.bg} text-gray-900 ${darkTheme.colors.primaryText}`}
+            ${darkTheme.colors.bg} text-gray-900 ${darkTheme.colors.primaryText}`}
         >
           <LeftSidebar />
 

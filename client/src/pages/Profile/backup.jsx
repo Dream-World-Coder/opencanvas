@@ -154,7 +154,7 @@ const Profile = () => {
                       <h1 className="text-2xl md:text-3xl lg:text-4xl font-boskaBold leading-tight tracking-tight pointer-events-none md:pointer-events-auto capitalize dark:text-[#fff]">
                         {currentUser.fullName}
                         <span className="block mt-1 md:mt-2 text-lg md:text-xl lg:text-2xl font-boska font-normal tracking-normal capitalize text-lime-700 dark:text-lime-600">
-                          {currentUser.role}
+                          {currentUser.designation}
                         </span>
                       </h1>
                     )}

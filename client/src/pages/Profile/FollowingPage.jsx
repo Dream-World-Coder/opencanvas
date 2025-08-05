@@ -219,7 +219,7 @@ const FollowingPage = () => {
                     </div>
                   </div>
                   <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2 mt-2">
-                    {follower.role}
+                    {follower.designation}
                   </p>
                 </div>
               </CardContent>

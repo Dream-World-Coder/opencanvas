@@ -353,6 +353,7 @@ export const CodeBlock = ({
 }) => {
   const match = /language-(\w+)/.exec(className || "");
   const codeString = String(children).replace(/\n$/, "");
+  const [copied, setCopied] = useState(false);
 
   return !inline && match ? (
     // block code
@@ -368,22 +369,21 @@ export const CodeBlock = ({
       >
         {/* lagguage */}
         <span className="text-sm font-sans">{match[1]}</span>
+
         {/* Copy button */}
-        <div className="flex justify-center items-center gap-1">
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(codeString);
+            setCopied(true);
+            setTimeout(() => {
+              setCopied(false);
+            }, 500);
+          }}
+          className="text-black dark:text-white p-1 text-xs rounded hover:bg-[#ddd] dark:hover:bg-[#333] focus:outline-none z-10 flex justify-center items-center gap-1"
+        >
           <Copy size={12} />
-          <button
-            onClick={(e) => {
-              navigator.clipboard.writeText(codeString);
-              e.target.textContent = "Copied!";
-              setTimeout(() => {
-                e.target.textContent = "Copy";
-              }, 1000);
-            }}
-            className="text-black dark:text-white p-1 text-xs rounded hover:bg-[#ddd] dark:hover:bg-[#333] focus:outline-none z-10"
-          >
-            Copy
-          </button>
-        </div>
+          {copied ? "Copied" : "Copy"}
+        </button>
       </div>
 
       {/* code card */}

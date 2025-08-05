@@ -33,7 +33,7 @@ export const useDataService = () => {
       const response = await authAxios.put(`/update-user`, {
         username: formValues.username.toLowerCase(),
         fullName: formValues.fullName,
-        role: formValues.role,
+        designation: formValues.designation,
         aboutMe: formValues.aboutMe,
         notifications: formValues.notifications,
         contactInformation: formValues.contactInformation,

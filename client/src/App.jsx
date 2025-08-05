@@ -8,6 +8,7 @@ import "./App.css";
 
 import { AuthProvider } from "./contexts/AuthContext";
 import { DarkModeProvider } from "./contexts/ThemeContext";
+import { CollectionContextProvider } from "./contexts/CollectionContext";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import LoadingPage from "./pages/Others/LoadingPage";
@@ -52,114 +53,122 @@ export default function App() {
         <Router>
           <DarkModeProvider>
             <AuthProvider>
-              <Suspense fallback={<LoadingPage />}>
-                <Routes>
-                  {/* public
+              <CollectionContextProvider>
+                <Suspense fallback={<LoadingPage />}>
+                  <Routes>
+                    {/* public
                    ----------- */}
-                  <Route path="/" element={<LandingPage />} />
-                  <Route path="/home" element={<ArticleFeed />} />
-                  <Route path="/articles" element={<ArticleFeed />} />
-                  <Route path="/social" element={<SocialFeed />} />
-                  {/* --------------- */}
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/home" element={<ArticleFeed />} />
+                    <Route path="/articles" element={<ArticleFeed />} />
+                    <Route path="/social" element={<SocialFeed />} />
+                    {/* --------------- */}
 
-                  {/* Auth
+                    {/* Auth
                    --------- */}
-                  <Route
-                    path="/login"
-                    element={<LoginPage bgClr="bg-cream-light" />}
-                  />
-                  <Route path="/register" element={<LoginPage />} />
-                  <Route path="/signup" element={<LoginPage />} />
-                  <Route
-                    path="/login-needed"
-                    element={<LoginPage backBtn={true} />}
-                  />
+                    <Route
+                      path="/login"
+                      element={<LoginPage bgClr="bg-cream-light" />}
+                    />
+                    <Route path="/register" element={<LoginPage />} />
+                    <Route path="/signup" element={<LoginPage />} />
+                    <Route
+                      path="/login-needed"
+                      element={<LoginPage backBtn={true} />}
+                    />
 
-                  <Route path="/auth/success" element={<AuthSuccess />} />
-                  {/* --------------- */}
+                    <Route path="/auth/success" element={<AuthSuccess />} />
+                    {/* --------------- */}
 
-                  {/* About & contact
+                    {/* About & contact
                     ------------------- */}
-                  <Route
-                    path="/about"
-                    element={<AboutPage bgClr="bg-white" />}
-                  />
-                  <Route
-                    path="/contact"
-                    element={<ContactPage bgClr="bg-white" />}
-                  />
-                  {/* --------------- */}
+                    <Route
+                      path="/about"
+                      element={<AboutPage bgClr="bg-white" />}
+                    />
+                    <Route
+                      path="/contact"
+                      element={<ContactPage bgClr="bg-white" />}
+                    />
+                    {/* --------------- */}
 
-                  <Route path="/upload-image" element={<ImageUploadPage />} />
-                  <Route path="/thanks" element={<Thanks bgClr="bg-white" />} />
-                  <Route
-                    path="/loading"
-                    element={<LoadingPage bgClr="bg-white" />}
-                  />
+                    <Route path="/upload-image" element={<ImageUploadPage />} />
+                    <Route
+                      path="/thanks"
+                      element={<Thanks bgClr="bg-white" />}
+                    />
+                    <Route
+                      path="/loading"
+                      element={<LoadingPage bgClr="bg-white" />}
+                    />
 
-                  {/* --------------- */}
-                  <Route path="/p/:postId" element={<ViewPost />} />
-                  <Route
-                    path="/u/:username"
-                    element={<PublicProfile bgClr="bg-white" />}
-                  />
+                    {/* --------------- */}
+                    <Route path="/p/:postId" element={<ViewPost />} />
+                    <Route
+                      path="/u/:username"
+                      element={<PublicProfile bgClr="bg-white" />}
+                    />
 
-                  <Route
-                    path="/u/:username/followers"
-                    element={<FollowersPage />} //followers public but following login needed
-                  />
-                  {/* --------------- */}
+                    <Route
+                      path="/u/:username/followers"
+                      element={<FollowersPage />} //followers public but following login needed
+                    />
+                    {/* --------------- */}
 
-                  {/* protected
+                    {/* protected
                     ------------ */}
-                  <Route element={<ProtectedRoute />}>
-                    <Route
-                      path="/profile"
-                      element={<Profile bgClr="bg-white" />}
-                    />
-                    <Route
-                      path="/profile/settings"
-                      element={<ProfileSettings />}
-                    />
-                    <Route path="/saved-posts" element={<SavedPosts />} />
-                    <Route
-                      path="/u/:username/following"
-                      element={<FollowingPage />}
-                    />
-                    <Route
-                      path="/private/p/:postId"
-                      element={<PrivatePostView />}
-                    />
-                    <Route
-                      path="/createpost/poem"
-                      element={<WritingPad artType={"poem"} />}
-                    />
-                    <Route
-                      path="/createpost/story"
-                      element={<WritingPad artType={"story"} />}
-                    />
-                    <Route
-                      path="/createpost/article"
-                      element={<WritingPad artType={"article"} />}
-                    />
-                    <Route
-                      path="/edit-post"
-                      element={<WritingPad artType={"edit"} />}
-                    />
+                    <Route element={<ProtectedRoute />}>
+                      <Route
+                        path="/profile"
+                        element={<Profile bgClr="bg-white" />}
+                      />
+                      <Route
+                        path="/profile/settings"
+                        element={<ProfileSettings />}
+                      />
+                      <Route path="/saved-posts" element={<SavedPosts />} />
+                      <Route
+                        path="/u/:username/following"
+                        element={<FollowingPage />}
+                      />
+                      <Route
+                        path="/private/p/:postId"
+                        element={<PrivatePostView />}
+                      />
+                      <Route
+                        path="/createpost/poem"
+                        element={<WritingPad artType={"poem"} />}
+                      />
+                      <Route
+                        path="/createpost/story"
+                        element={<WritingPad artType={"story"} />}
+                      />
+                      <Route
+                        path="/createpost/article"
+                        element={<WritingPad artType={"article"} />}
+                      />
+                      <Route
+                        path="/edit-post"
+                        element={<WritingPad artType={"edit"} />}
+                      />
 
-                    {/* md2pdf ~~> make them public */}
-                    <Route path="/markdown2pdf" element={<Md2Pdf />} />
-                    <Route path="/md2pdf" element={<Md2Pdf />} />
-                    <Route path="/m/2/p" element={<Md2Pdf />} />
-                    <Route path="/m2p" element={<Md2Pdf />} />
-                  </Route>
+                      {/* md2pdf ~~> make them public */}
+                      <Route path="/markdown2pdf" element={<Md2Pdf />} />
+                      <Route path="/md2pdf" element={<Md2Pdf />} />
+                      <Route path="/m/2/p" element={<Md2Pdf />} />
+                      <Route path="/m2p" element={<Md2Pdf />} />
+                    </Route>
 
-                  <Route path="*" element={<NotFoundPage bgClr="bg-white" />} />
-                </Routes>
-              </Suspense>
+                    <Route
+                      path="*"
+                      element={<NotFoundPage bgClr="bg-white" />}
+                    />
+                  </Routes>
+                </Suspense>
 
-              <Toaster />
-              <Analytics />
+                <Toaster />
+                <Analytics />
+              </CollectionContextProvider>
             </AuthProvider>
           </DarkModeProvider>
         </Router>

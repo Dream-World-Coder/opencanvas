@@ -65,7 +65,7 @@ const ProfileSettings = () => {
   const [formValues, setFormValues] = useState({
     username: currentUser.username.toLowerCase() ?? "null",
     fullName: currentUser.fullName ?? "",
-    role: currentUser.role ?? "Learner",
+    designation: currentUser.designation ?? "Learner",
     aboutMe: currentUser.aboutMe ?? "",
     notifications: {
       email: currentUser.notifications.emailNotification,
@@ -148,7 +148,7 @@ const ProfileSettings = () => {
         return;
       }
 
-      if (formValues.role?.length > 40) {
+      if (formValues.designation?.length > 40) {
         toast.error("Designation can be max 40 characters");
         return;
       }
@@ -182,7 +182,7 @@ const ProfileSettings = () => {
         ...oldCurrentUser,
         username: formValues.username.trim().toLowerCase(),
         fullName: formValues.fullName.trim().toLowerCase(),
-        role: formValues.role.trim().toLowerCase(),
+        designation: formValues.designation.trim().toLowerCase(),
         aboutMe: formValues.aboutMe.trim().toLowerCase(),
       }));
       toast.success("Your profile information has been updated successfully.", {
@@ -329,14 +329,14 @@ const ProfileSettings = () => {
 
               {/* Designation */}
               <div className="space-y-2">
-                <Label htmlFor="role">Designation</Label>
+                <Label htmlFor="designation">Designation</Label>
                 <Input
-                  id="role"
-                  value={formValues.role}
+                  id="designation"
+                  value={formValues.designation}
                   onChange={(e) =>
                     setFormValues({
                       ...formValues,
-                      role: e.target.value,
+                      designation: e.target.value,
                     })
                   }
                   className="dark:bg-[#171717] dark:text-white dark:border-[#333]"

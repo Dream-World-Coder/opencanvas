@@ -11,7 +11,7 @@ import {
   ThumbsDown,
   MessageSquareText,
   ChevronLeft,
-  MoreHorizontal,
+  Palette,
   Check,
   ChevronDown,
   ChevronUp,
@@ -22,6 +22,7 @@ import {
   List,
   PlusCircle,
   MinusCircle,
+  BookMarked,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -218,29 +219,25 @@ But with loading on, the return statement is only a simple html, so it works
  *
  */
 export const LeftSidebar = () => {
-  // const readOptions = [
-  //     { name: "Home" },
-  //     { name: "Discover" },
-  //     { name: "Bookmarks" },
-  //     { name: "Profile" },
-  //     { name: "My Feed" },
-  // ];
+  const readOptions = [
+    // for ads, or if its a part of a collection show the list
+  ];
 
   return (
-    <aside className={`relative w-full md:w-64 p-4 hidden md:block`}>
-      {/* <div className="sticky top-4">
-                <div className="font-bold mb-4">Read Options</div>
-                <nav className="space-y-2">
-                    {readOptions.map((link, index) => (
-                        <div
-                            key={index}
-                            className="block p-2 rounded hover:bg-gray-100 dark:hover:bg-[#222] transition duration-0"
-                        >
-                            {link.name}
-                        </div>
-                    ))}
-                </nav>
-            </div> */}
+    <aside className={`relative w-full md:w-64 p-4 hidden md:block Xborder`}>
+      <div className="sticky top-4">
+        {/* <div className="font-bold mb-4">Read Options</div>*/}
+        <nav className="space-y-2">
+          {readOptions.map((link, index) => (
+            <div
+              key={index}
+              className="block p-2 rounded hover:bg-gray-100 dark:hover:bg-[#222] transition duration-0"
+            >
+              {link.name}
+            </div>
+          ))}
+        </nav>
+      </div>
     </aside>
   );
 };
@@ -533,7 +530,7 @@ export const ThemeSelector = ({ darkTheme, setDarkTheme }) => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <div className="flex items-center">
-          <MoreHorizontal
+          <Palette
             className="size-4 cursor-pointer rounded px-2 py-1 box-content
               hover:bg-gray-100 dark:hover:bg-[#333] text-black dark:text-white"
           />
@@ -659,7 +656,7 @@ export const ArticleHeader = ({
                 )}
               </div>
               <div className={`text-sm text-gray-500 dark:text-gray-300`}>
-                {author.role}
+                {author.designation}
               </div>
             </div>
           </div>
@@ -668,7 +665,7 @@ export const ArticleHeader = ({
         {/* post options */}
         <div
           className="text-sm text-gray-500 dark:text-gray-300 flex flex-row md:flex-col
-                    justify-between md:justify-center gap-2 md:gap-0 w-full md:w-fit mt-2 md:mt-0"
+            justify-between md:justify-center gap-2 md:gap-0 w-full md:w-fit mt-2 md:mt-0"
         >
           <div>
             {formatDate(post.createdAt)} · {post.readTime || "2 min read"}
@@ -676,8 +673,8 @@ export const ArticleHeader = ({
           <div className="flex items-center justify-center text-white">
             <Bookmark
               className={`size-4 cursor-pointer rounded px-2 py-1 box-content
-                                hover:bg-gray-100 dark:hover:bg-[#333]
-                                ${isSaved ? "fill-lime-500 text-lime-500" : "dark:text-white text-black"}`}
+                hover:bg-gray-100 dark:hover:bg-[#333]
+                ${isSaved ? "fill-lime-500 text-lime-500" : "dark:text-white text-black"}`}
               onClick={async () => {
                 if (!currentUser) {
                   toast.error("you need to log in first to save post");
@@ -698,11 +695,15 @@ export const ArticleHeader = ({
               onClick={() => sharePost(post)}
             />
             <span className="w-px h-[15px] dark:bg-[#ccc]/60 bg-[#444]/60" />
-            {/* <MoreHorizontal
-                            className="size-4 cursor-pointer rounded px-2 py-1 box-content
-                        hover:bg-gray-100 dark:hover:bg-[#333] text-black dark:text-white"
-                        /> */}
             <ThemeSelector darkTheme={darkTheme} setDarkTheme={setDarkTheme} />
+
+            {/* save in collection */}
+            <span className="w-px h-[15px] dark:bg-[#ccc]/60 bg-[#444]/60" />
+            <BookMarked
+              className="size-4 cursor-pointer rounded px-2 py-1 box-content
+                            hover:bg-gray-100 dark:hover:bg-[#333] text-black dark:text-white"
+              onClick={() => {}}
+            />
           </div>
         </div>
       </div>
@@ -806,7 +807,9 @@ export const EngagementSection = ({
           <span>{post.totalComments}</span>
         </Button>
       </div>
+
       <div className="flex items-center gap-2">
+        {/* save */}
         <Button
           variant="ghost"
           size="sm"
@@ -827,6 +830,12 @@ export const EngagementSection = ({
             className={`size-4 ${isSaved ? "fill-lime-500 text-lime-500" : ""}`}
           />
         </Button>
+
+        {/* save in collection */}
+        <Button variant="ghost" size="sm" onClick={async () => {}}>
+          <BookMarked className={`size-4`} />
+        </Button>
+
         <Button variant="ghost" size="sm" onClick={() => sharePost(post)}>
           <Share2 className="size-4" />
         </Button>

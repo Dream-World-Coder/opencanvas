@@ -44,6 +44,7 @@ import { toast } from "sonner";
 import { useDataService } from "../../services/dataService";
 import { useAuth } from "../../contexts/AuthContext";
 import { formatDistanceToNow } from "date-fns";
+import { BookMarked } from "lucide-react";
 
 const formatDates = (date) => {
   try {
@@ -67,7 +68,7 @@ function getSchemaData(currentProfile) {
     description: currentProfile.aboutMe,
     url: `${origin}/u/${currentProfile.username}`,
     sameAs: currentProfile.contactInformation.map((contact) => contact.url),
-    jobTitle: currentProfile.role,
+    jobTitle: currentProfile.designation,
     mainEntityOfPage: {
       "@type": "WebPage",
       "@id": `${origin}/u/${currentProfile.username}`,
@@ -101,7 +102,7 @@ export const ProfileHelmet = ({ currentProfile }) => {
   const keywords = [
     currentProfile.fullName,
     currentProfile.fullName.split(" ")[0],
-    ...currentProfile.role
+    ...currentProfile.designation
       .toLowerCase()
       .split(/\s+/)
       .filter((word) => !stopWords.includes(word)),
@@ -420,6 +421,7 @@ export const PostActions = ({ post, setPosts, loading }) => {
         <DropdownMenuTrigger className="p-2 box-content hover:bg-gray-200 dark:hover:bg-[#444] rounded-full">
           <MoreHorizontal className="w-4 h-4 text-gray-600 dark:text-gray-300" />
         </DropdownMenuTrigger>
+
         <DropdownMenuContent>
           <DropdownMenuItem>
             <button
@@ -446,7 +448,7 @@ export const PostActions = ({ post, setPosts, loading }) => {
               }}
               className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
             >
-              make {post.isPublic ? "private" : "public"}
+              Make {post.isPublic ? "Private" : "Public"}
             </button>
           </DropdownMenuItem>
 
@@ -498,8 +500,17 @@ export const PostActions = ({ post, setPosts, loading }) => {
               {currentUser.featuredItems
                 .map((item) => item.itemId.toString())
                 .includes(post._id.toString())
-                ? "remove from featured"
-                : "feature at top"}
+                ? "Remove from Featured"
+                : "Feature at Top"}
+            </button>
+          </DropdownMenuItem>
+
+          {/* add post in collection */}
+          <DropdownMenuItem>
+            <button
+              className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
+            >
+              Save in Collection
             </button>
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -540,6 +551,20 @@ export const PostActionsPublic = ({ post }) => {
       >
         <Eye
           title="View"
+          className="w-4 h-4 text-gray-600 dark:text-gray-300 rounded-full"
+        />
+      </div>
+
+      {/* save in collection */}
+      <div
+        className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full"
+        title="Save in Collection"
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
+        <BookMarked
+          title="Save in Collection"
           className="w-4 h-4 text-gray-600 dark:text-gray-300 rounded-full"
         />
       </div>
