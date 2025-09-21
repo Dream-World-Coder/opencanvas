@@ -1,5 +1,9 @@
 -- [] interested topics add in profile settings
 -- [easy back option to articlepage]
+-- darkmode in editor: on theme toggle, why not updating? why need reload? check & fix, and also i have mixed up two things in dark mode, but this might not cause the problem. check comments/hooks and contexts/themecontext
+
+-- login test, diff browser diff acc
+-- request to update article / collaborate with author
 
 -- will use SSR, 1000chars will be in there -> SEO, rest will be fetched, so if not logged in, no read
 

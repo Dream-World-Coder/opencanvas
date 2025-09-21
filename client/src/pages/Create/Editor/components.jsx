@@ -718,8 +718,8 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                     href={href}
                     className={`border-b border-current pb-0.5 font-medium sentient-regular transition-colors duration-200 ${
                       isDark
-                        ? "text-blue-300 hover:text-blue-400"
-                        : "text-blue-600 hover:text-blue-800"
+                        ? "text-lime-300 hover:text-lime-400"
+                        : "text-lime-600 hover:text-lime-800"
                     }`}
                     target={href.startsWith("http") ? "_blank" : "_self"}
                     rel={href.startsWith("http") ? "noopener noreferrer" : ""}
@@ -729,18 +729,12 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                 ),
 
                 ul: ({ children }) => (
-                  <ul
-                    className="sentient-regular list-disc
-                                        pl-6 md:pl-8 my-3 md:my-4 space-y-4"
-                  >
+                  <ul className="sentient-regular list-disc pl-6 md:pl-8 my-3 md:my-4 space-y-4">
                     {children}
                   </ul>
                 ),
                 ol: ({ children }) => (
-                  <ol
-                    className="sentient-regular list-decimal
-                                        pl-6 md:pl-8 my-3 md:my-4 space-y-4"
-                  >
+                  <ol className="sentient-regular list-decimal pl-6 md:pl-8 my-3 md:my-4 space-y-4">
                     {children}
                   </ol>
                 ),
