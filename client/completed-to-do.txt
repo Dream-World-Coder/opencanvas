@@ -40,7 +40,6 @@
 
 -- [x] thumbnail in article
 
-
 -- [x] profile settings:
 1. genaral: theme
 2. notifications
@@ -157,7 +156,8 @@ as in feed page only name & pic is sufficient, not username, also has to be upda
 -- [*] loading improvement
 -- [*] back button functional for articles also, it will be good to preserve the scroll height also
 -- [*] modified the post routes -> no content / title or large payload handled
--- [*]
+-- [x] reset to single col when exporting
+-- [*] no backend related error msg in frontend only md2pdf
 -- [*]
 -- [*]
 -- [*]

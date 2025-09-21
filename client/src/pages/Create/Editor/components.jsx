@@ -17,6 +17,7 @@ import {
   Underline,
   LetterText,
   Highlighter,
+  ArrowDown,
   Strikethrough,
 } from "lucide-react";
 import PropTypes from "prop-types";
@@ -409,8 +410,9 @@ export const CodeBlock = ({
   ) : (
     // inline code
     <code
-      className={`rounded px-1.5 py-[0px] sentient-regular
-        ${isDark ? "text-oneDarkTagClr bg-oneDarkTagClr/10" : "bg-[#eaeaea]"}`}
+      className={`rounded px-1.5 py-[2px] sentient-regular break-words !font-mono
+        ${isDark ? "text-oneDarkTagClr bg-oneDarkTagClr/10" : "bg-[#f1f1f1]"}`}
+      style={{ fontSize: "smaller" }}
     >
       {children}
     </code>
@@ -943,9 +945,9 @@ MarkdownPreview.propTypes = {
 export const ScrollToBottomButton = ({
   position = "fixed",
   bottom = "bottom-8",
-  right = "right-4 md:right-8 lg:right-32",
-  theme = "bg-white text-black border border-[#333]/30",
-  rounded = "rounded-full",
+  right = "right-6 md:right-10 lg:right-32",
+  color = "bg-lime-600 hover:bg-lime-700 active:bg-lime-800",
+  textColor = "text-white",
   size = "p-4",
   isDark = false,
 }) => {
@@ -959,19 +961,28 @@ export const ScrollToBottomButton = ({
   return (
     <button
       onClick={scrollToBottom}
-      className={`${position} ${bottom} ${right} ${theme} ${rounded} ${size} ${isDark ? "invert" : ""} shadow-lg cursor-pointer z-20`}
+      className={`
+         ${position} ${bottom} ${right}
+         ${color} ${textColor} ${size}
+         rounded-full shadow-md
+         transition-colors duration-200
+         focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500
+         ${isDark ? "" : ""}
+         z-20 flex items-center justify-center
+       `}
       aria-label="Scroll to bottom"
     >
-      ↓
+      <ArrowDown className="h-6 w-6" />
     </button>
   );
 };
+
 ScrollToBottomButton.propTypes = {
   position: PropTypes.string,
   bottom: PropTypes.string,
   right: PropTypes.string,
-  theme: PropTypes.string,
-  rounded: PropTypes.string,
+  color: PropTypes.string,
+  textColor: PropTypes.string,
   size: PropTypes.string,
   isDark: PropTypes.bool,
 };
@@ -1306,232 +1317,304 @@ export function findAndReplace(content, setContent, toast) {
   }
 }
 
+export function TitleInput({
+  title,
+  setTitle,
+  setIsSaved,
+  isDark,
+  isPreview,
+  lightModeBg,
+}) {
+  return (
+    <input
+      type="text"
+      value={title}
+      onChange={(e) => {
+        setTitle(e.target.value);
+        setIsSaved(false);
+        e.target.style.height = e.target.scrollHeight + "px";
+      }}
+      placeholder="Title"
+      className={`w-full h-auto text-4xl font-bold font-serif mb-8 focus:outline-none transition-all duration-0
+      leading-tight tracking-tight capitalize
+      ${isDark ? "bg-[#222]" : lightModeBg}
+      ${isPreview ? "opacity-0" : "opacity-100"}`}
+    />
+  );
+}
+TitleInput.propTypes = {
+  title: PropTypes.any,
+  setTitle: PropTypes.func,
+  setIsSaved: PropTypes.func,
+  isDark: PropTypes.bool,
+  isPreview: PropTypes.bool,
+  lightModeBg: PropTypes.string,
+};
+
+export function ContentInput({
+  content,
+  isDark,
+  isPreview,
+  lightModeBg,
+  setIsSaved,
+  textAlignment,
+  handleContentChange,
+}) {
+  return (
+    <textarea
+      data-lenis-prevent
+      id="txtArea"
+      value={content}
+      onChange={(e) => {
+        handleContentChange(e, setIsSaved);
+      }}
+      placeholder="Fill your canvas..."
+      className={`w-full font-[montserrat] min-h-screen h-auto
+    resize-none focus:outline-none
+    text-lg text-left Xsentient-regular
+    transition-all duration-0
+    ${isDark ? "bg-[#222]" : lightModeBg}
+    ${isPreview ? "opacity-0 max-h-screen" : "opacity-100 max-h-auto"}
+    ${textAlignment === "center" ? "text-center" : "text-left"}`}
+    />
+  );
+}
+ContentInput.propTypes = {
+  content: PropTypes.any,
+  isDark: PropTypes.bool,
+  isPreview: PropTypes.bool,
+  lightModeBg: PropTypes.string,
+  textAlignment: PropTypes.string,
+  setIsSaved: PropTypes.func,
+  handleContentChange: PropTypes.func,
+};
+
 export const rawText = `
-  <p style="font-size: 18px; line-height: 1.5;"><span style="float: left; font-size: 3em; font-weight: bold; line-height: 1; margin-right: 8px;">M</span>arkdown is a lightweight markup language with plain text formatting syntax. This tutorial covers both the basics and some advanced features of Markdown.</p>
+<p style="font-size: 18px; line-height: 1.5;"><span style="float: left; font-size: 3em; font-weight: bold; line-height: 1; margin-right: 8px;">M</span>arkdown is a lightweight markup language with plain text formatting syntax. This tutorial covers both the basics and some advanced features of Markdown.</p>
 
-  <br /><br />
+<br /><br />
 
-  ## Table of Contents
+## Table of Contents
 
-  - [Introduction](#introduction)
-  - [Headers](#headers)
-  - [Text Formatting](#text-formatting)
-  - [Lists](#lists)
-      - [Unordered Lists](#unordered-lists)
-      - [Ordered Lists](#ordered-lists)
-  - [Links and Images](#links-and-images)
-  - [Code Blocks and Inline Code](#code-blocks-and-inline-code)
-  - [Blockquotes](#blockquotes)
-  - [Tables](#tables)
-  - [Footnotes](#footnotes)
-  - [Task Lists](#task-lists)
-  - [Conclusion](#conclusion)
+- [Introduction](#introduction)
+- [Headers](#headers)
+- [Text Formatting](#text-formatting)
+- [Lists](#lists)
+    - [Unordered Lists](#unordered-lists)
+    - [Ordered Lists](#ordered-lists)
+- [Links and Images](#links-and-images)
+- [Code Blocks and Inline Code](#code-blocks-and-inline-code)
+- [Blockquotes](#blockquotes)
+- [Tables](#tables)
+- [Footnotes](#footnotes)
+- [Task Lists](#task-lists)
+- [Conclusion](#conclusion)
 
-  <br /><br />
+<br /><br />
 
-  ## Introduction
+## Introduction
 
-  Markdown allows you to write using an easy-to-read, easy-to-write plain text format that can be converted into HTML and other formats. It’s perfect for writing documentation, notes, and even web content.
+Markdown allows you to write using an easy-to-read, easy-to-write plain text format that can be converted into HTML and other formats. It’s perfect for writing documentation, notes, and even web content.
 
-  <br /><br />
+<br /><br />
 
-  ## Headers
+## Headers
 
-  Headers are created using the \`#\` symbol. The number of \`#\` symbols indicates the header level.
+Headers are created using the \`#\` symbol. The number of \`#\` symbols indicates the header level.
 
-  ### Example:
+### Example:
 
-  \`\`\`markdown
-  # heading 1.
+\`\`\`markdown
+# heading 1.
 
-  ## heading 2.
+## heading 2.
 
-  ### heading 3.
+### heading 3.
 
-  #### heading 4.
+#### heading 4.
 
-  ##### heading 5.
+##### heading 5.
 
-  ###### heading 6.
-  \`\`\`
+###### heading 6.
+\`\`\`
 
-  # heading 1.
+# heading 1.
 
-  ## heading 2.
+## heading 2.
 
-  ### heading 3.
+### heading 3.
 
-  #### heading 4.
+#### heading 4.
 
-  ##### heading 5.
+##### heading 5.
 
-  ###### heading 6.
+###### heading 6.
 
-  <br /><br />
+<br /><br />
 
-  ## Text Formatting
+## Text Formatting
 
-  You can add emphasis to text using asterisks \`*\` or underscores \`_\`.
+You can add emphasis to text using asterisks \`*\` or underscores \`_\`.
 
-  - **Bold**: Use \`**Bold Text**\` or \`__Bold Text__\`
-  - _Italic_: Use \`*Italic Text*\` or \`_Italic Text_\`
-  - **_Bold and Italic_**: Use \`***Bold and Italic***\` or \`___Bold and Italic___\`
-  - ~~Strikethrough~~: Use \`~~Strikethrough~~\`
+- **Bold**: Use \`**Bold Text**\` or \`__Bold Text__\`
+- _Italic_: Use \`*Italic Text*\` or \`_Italic Text_\`
+- **_Bold and Italic_**: Use \`***Bold and Italic***\` or \`___Bold and Italic___\`
+- ~~Strikethrough~~: Use \`~~Strikethrough~~\`
 
-  ### Example:
+### Example:
 
-  \`\`\`markdown
-  **This text is bold**
+\`\`\`markdown
+**This text is bold**
 
-  _This text is italic_
+_This text is italic_
 
-  **_This text is both bold and italic_**
+**_This text is both bold and italic_**
 
-  ~~This text has a strikethrough~~
-  \`\`\`
+~~This text has a strikethrough~~
+\`\`\`
 
-  <br /><br />
+<br /><br />
 
-  ## Lists
+## Lists
 
-  ### Unordered Lists
+### Unordered Lists
 
-  Create unordered lists using dashes \`-\`, asterisks \`*\`, or plus signs \`+\`.
+Create unordered lists using dashes \`-\`, asterisks \`*\`, or plus signs \`+\`.
 
-  \`\`\`markdown
-  - Item 1
-  - Item 2
-      - Subitem 2.1
-      - Subitem 2.2
-  - Item 3
-  \`\`\`
+\`\`\`markdown
+- Item 1
+- Item 2
+    - Subitem 2.1
+    - Subitem 2.2
+- Item 3
+\`\`\`
 
-  ### Ordered Lists
+### Ordered Lists
 
-  Create ordered lists by starting lines with numbers followed by a period.
+Create ordered lists by starting lines with numbers followed by a period.
 
-  \`\`\`markdown
-  1. First item
-  2. Second item
-      1. Subitem 2.1
-      2. Subitem 2.2
-  3. Third item
-  \`\`\`
+\`\`\`markdown
+1. First item
+2. Second item
+    1. Subitem 2.1
+    2. Subitem 2.2
+3. Third item
+\`\`\`
 
-  <br /><br />
+<br /><br />
 
-  ## Links and Images
+## Links and Images
 
-  ### Links
+### Links
 
-  To create a link, wrap the link text in square brackets and the URL in parentheses.
+To create a link, wrap the link text in square brackets and the URL in parentheses.
 
-  \`\`\`markdown
-  [Visit](https://www.example.com)
-  \`\`\`
+\`\`\`markdown
+[Visit](https://www.example.com)
+\`\`\`
 
-  ### Images
+### Images
 
-  Images are inserted similarly to links but start with an exclamation mark \`!\`.
+Images are inserted similarly to links but start with an exclamation mark \`!\`.
 
-  \`\`\`markdown
-  ![A descriptive alt text](https://www.example.com/image.jpg)
-  \`\`\`
+\`\`\`markdown
+![A descriptive alt text](https://www.example.com/image.jpg)
+\`\`\`
 
-  <br /><br />
+<br /><br />
 
-  ## Code Blocks and Inline Code
+## Code Blocks and Inline Code
 
-  ### Inline Code
+### Inline Code
 
-  Wrap inline code in single backticks \`\` \` \`\`.
+Wrap inline code in single backticks \`\` \` \`\`.
 
-  \`\`\`markdown
-  Here is some inline code: \`print("Hello, World!")\`
-  \`\`\`
+\`\`\`markdown
+Here is some inline code: \`print("Hello, World!")\`
+\`\`\`
 
-  ### Code Blocks
+### Code Blocks
 
-  For longer sections of code, use triple backticks or indent with four spaces. You can also specify the language for syntax highlighting.
+For longer sections of code, use triple backticks or indent with four spaces. You can also specify the language for syntax highlighting.
 
-  \`\`\`python
-  def hello_world():
-      print("Hello, World!")
+\`\`\`python
+def hello_world():
+    print("Hello, World!")
 
-  hello_world()
-  \`\`\`
+hello_world()
+\`\`\`
 
-  <br /><br />
+<br /><br />
 
-  ## Blockquotes
+## Blockquotes
 
-  Blockquotes are created by starting a line with the \`>\` symbol.
+Blockquotes are created by starting a line with the \`>\` symbol.
 
-  \`\`\`markdown
-  > This is a blockquote.
-  >
-  > It can span multiple lines.
-  \`\`\`
+\`\`\`markdown
+> This is a blockquote.
+>
+> It can span multiple lines.
+\`\`\`
 
-  > This is a blockquote.
-  >
-  > It can span multiple lines.
+> This is a blockquote.
+>
+> It can span multiple lines.
 
-  <br /><br />
+<br /><br />
 
-  ## Tables
+## Tables
 
-  Tables can be created using pipes \`|\` to separate columns and hyphens \`-\` to create the header row.
+Tables can be created using pipes \`|\` to separate columns and hyphens \`-\` to create the header row.
 
-  | Column 1 | Column 2 | Column 3 |
-  | -------- | -------- | -------- |
-  | Row 1    | Data 1   | Data 2   |
-  | Row 2    | Data 3   | Data 4   |
+| Column 1 | Column 2 | Column 3 |
+| -------- | -------- | -------- |
+| Row 1    | Data 1   | Data 2   |
+| Row 2    | Data 3   | Data 4   |
 
-  <br /><br />
+<br /><br />
 
-  ## Footnotes
+## Footnotes
 
-  Some Markdown processors support footnotes for adding extra context.
+Some Markdown processors support footnotes for adding extra context.
 
-  \`\`\`markdown
-  Here is a statement that needs a footnote.[^1]
+\`\`\`markdown
+Here is a statement that needs a footnote.[^1]
 
-  [^1]: This is the footnote providing extra information.
-  \`\`\`
+[^1]: This is the footnote providing extra information.
+\`\`\`
 
-  Here is a statement that needs a footnote.[^1]
+Here is a statement that needs a footnote.[^1]
 
-  [^1]: This is the footnote providing extra information.
+[^1]: This is the footnote providing extra information.
 
-  <br /><br />
+<br /><br />
 
-  ## Task Lists
+## Task Lists
 
-  Task lists are useful for to-do lists or tracking progress. Use \`- [ ]\` for unchecked items and \`- [x]\` for checked items.
+Task lists are useful for to-do lists or tracking progress. Use \`- [ ]\` for unchecked items and \`- [x]\` for checked items.
 
-  \`\`\`markdown
-  - [ ] Task 1
-  - [x] Task 2 (completed)
-  - [ ] Task 3
-  \`\`\`
+\`\`\`markdown
+- [ ] Task 1
+- [x] Task 2 (completed)
+- [ ] Task 3
+\`\`\`
 
-  - [ ] Task 1
-  - [x] Task 2 (completed)
-  - [ ] Task 3
+- [ ] Task 1
+- [x] Task 2 (completed)
+- [ ] Task 3
 
-  <br /><br />
+<br /><br />
 
-  ## Additionals
+## Additionals
 
-  use \`<br />\` or if you want to add space between paragraphs, use can use many of them for more space
+use \`<br />\` or if you want to add space between paragraphs, use can use many of them for more space
 
-  use \`---\` to add a line
+use \`---\` to add a line
 
-  <br /><br />
+<br /><br />
 
-  ## Conclusion
+## Conclusion
 
-  This tutorial has covered a variety of Markdown features from headers to tables, code blocks, and more. Experiment with these elements to get comfortable with Markdown and enhance your documents.
+This tutorial has covered a variety of Markdown features from headers to tables, code blocks, and more. Experiment with these elements to get comfortable with Markdown and enhance your documents.
 
-  Happy writing!`;
+Happy writing!`;

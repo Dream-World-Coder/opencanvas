@@ -4,7 +4,7 @@ import { useDarkModeContext } from "@/contexts/ThemeContext";
 export function useEditorAppearance() {
   const [sepia, setSepia] = useState(false);
   const [lightModeBg, setLightModeBg] = useState("bg-white");
-  const { darkMode: isDark, toggleDarkMode: setIsDark } = useDarkModeContext();
+  const { darkMode: isDark, toggleDarkMode } = useDarkModeContext();
   const [helpOpen, setHelpOpen] = useState(false);
   const [optionsDropdownOpen, setOptionsDropdownOpen] = useState(false);
 
@@ -35,7 +35,7 @@ export function useEditorAppearance() {
     setSepia,
     lightModeBg,
     isDark,
-    setIsDark,
+    toggleDarkMode,
     helpOpen,
     setHelpOpen,
     optionsDropdownOpen,

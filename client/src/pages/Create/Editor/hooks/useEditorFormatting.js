@@ -132,7 +132,7 @@ export function useEditorFormatting(content, setContent) {
       case "code":
         newText =
           content.substring(0, start) +
-          `\`\`\`c\n${selectedText}\n\`\`\`` +
+          `\`\`\`txt\n${selectedText}\n\`\`\`` +
           content.substring(end);
         break;
 
@@ -174,6 +174,7 @@ export function useEditorFormatting(content, setContent) {
 
     addToUndoStack(content);
     setContent(newText);
+    setSelectedText(selectedText);
   };
 
   return {

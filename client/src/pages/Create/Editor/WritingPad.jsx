@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import PropTypes from "prop-types";
+
 import {
   X,
   Eye,
@@ -19,8 +21,9 @@ import {
   AlignCenter,
   AlertTriangle,
   MoreHorizontal,
+  Sun,
+  Moon,
 } from "lucide-react";
-import PropTypes from "prop-types";
 
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -50,7 +53,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  MarkdownPreview,
+  // MarkdownPreview,
   LinkInsertButton,
   ImageUploadButton,
   ScrollToBottomButton,
@@ -61,7 +64,11 @@ import {
   rawText,
   findAndReplace,
   getSchemaData,
+  TitleInput,
+  ContentInput,
 } from "./components";
+import { postDarkThemes } from "@/services/themes";
+import { ThemedMarkdownPreview } from "@/pages/PostView/components";
 
 // hooks
 import { useWritingPad } from "./hooks/useWritingPad";
@@ -71,7 +78,9 @@ import { useExport } from "./hooks/useExport";
 
 import { useAuth } from "@/contexts/AuthContext";
 
+// global const
 const frontendOnly = false;
+// ----------------------------
 
 const WritingPad = memo(function WritingPad({ artType = "article" }) {
   const { currentUser } = useAuth();
@@ -83,7 +92,6 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
     setPostId(localStorage.getItem("newPostId", ""));
   }, [postId]);
 
-  // main writing pad functionality
   const {
     title,
     setTitle,
@@ -104,7 +112,7 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
     setThumbnailUrl,
   } = useWritingPad({ postId, frontendOnly, artType });
 
-  // Editor formatting functionality
+  // formatting
   const {
     textAlignment,
     setTextAlignment,
@@ -122,13 +130,14 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
     setSepia,
     lightModeBg,
     isDark,
+    toggleDarkMode,
     helpOpen,
     setHelpOpen,
     optionsDropdownOpen,
     setOptionsDropdownOpen,
   } = useEditorAppearance();
 
-  // Export functionality
+  // Export
   const {
     isPreview,
     setIsPreview,
@@ -163,11 +172,6 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
         } else if (e.key === "u" || e.key === "U") {
           e.preventDefault();
           handleFormat("underline");
-        } else if (e.key === "h" || e.key === "H") {
-          // For ⌘+H, browsers often have default behaviors
-          e.preventDefault();
-          e.stopPropagation();
-          handleFormat("highlight");
         } else if (e.key === "s" || e.key === "S") {
           // For ⌘+S, browsers always try to save the page
           e.preventDefault();
@@ -185,6 +189,10 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
+
+  const [darkTheme, setDT] = useState(
+    isDark ? postDarkThemes.dark : postDarkThemes.light,
+  );
 
   return (
     <>
@@ -321,7 +329,10 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
                       <button
-                        onClick={handlePdfExport}
+                        onClick={() => {
+                          setTwoColumn(false);
+                          handlePdfExport();
+                        }}
                         className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
                       >
                         <FileText className="size-5" /> pdf
@@ -330,6 +341,7 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
                     <DropdownMenuItem>
                       <button
                         onClick={() => {
+                          setTwoColumn(false);
                           handleTxtExport("txt");
                         }}
                         className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
@@ -340,6 +352,7 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
                     <DropdownMenuItem>
                       <button
                         onClick={() => {
+                          setTwoColumn(false);
                           handleTxtExport("md");
                         }}
                         className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
@@ -350,7 +363,19 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
                   </DropdownMenuContent>
                 </DropdownMenu>
 
-                {/* addtional more button */}
+                {/* dark mode button */}
+                <button
+                  onClick={toggleDarkMode}
+                  className="hover:opacity-70 transition-opacity"
+                >
+                  {isDark ? (
+                    <Sun className="size-5" />
+                  ) : (
+                    <Moon className="size-5" />
+                  )}
+                </button>
+
+                {/* additional more button */}
                 <DropdownMenu
                   open={optionsDropdownOpen}
                   onOpenChange={setOptionsDropdownOpen}
@@ -645,40 +670,23 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
                     : ""
                 }
               >
-                {/* Title Input */}
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => {
-                    setTitle(e.target.value);
-                    setIsSaved(false);
-                    e.target.style.height = e.target.scrollHeight + "px";
-                  }}
-                  placeholder="Title"
-                  className={`w-full h-auto text-4xl font-bold font-serif mb-8 focus:outline-none transition-all duration-0
-                    leading-tight tracking-tight capitalize
-                    ${isDark ? "bg-[#222]" : lightModeBg}
-                    ${isPreview ? "opacity-0" : "opacity-100"}`}
+                <TitleInput
+                  title={title}
+                  setTitle={setTitle}
+                  setIsSaved={setIsSaved}
+                  isDark={isDark}
+                  isPreview={isPreview}
+                  lightModeBg={lightModeBg}
                 />
 
-                {/* content Textarea */}
-                <textarea
-                  data-lenis-prevent
-                  id="txtArea"
-                  value={content}
-                  onChange={(e) => {
-                    handleContentChange(e, setIsSaved);
-                  }}
-                  placeholder="Fill your canvas..."
-                  className={`w-full min-h-screen h-auto
-                    resize-none focus:outline-none
-                    text-lg text-left Xsentient-regular
-                    transition-all duration-0
-                    ${isDark ? "bg-[#222]" : lightModeBg}
-                    ${isPreview ? "opacity-0 max-h-screen" : "opacity-100 max-h-auto"}
-                    ${
-                      textAlignment === "center" ? "text-center" : "text-left"
-                    }`}
+                <ContentInput
+                  content={content}
+                  isDark={isDark}
+                  isPreview={isPreview}
+                  lightModeBg={lightModeBg}
+                  setIsSaved={setIsSaved}
+                  textAlignment={textAlignment}
+                  handleContentChange={handleContentChange}
                 />
               </div>
 
@@ -689,13 +697,16 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
                   ${!twoColumn ? "w-[100%] h-auto mx-auto absolute top-0 left-0" : "w-1/2 h-full"}
                   ${isPreview || twoColumn ? "" : "hidden"}`}
               >
-                <MarkdownPreview
+                <ThemedMarkdownPreview
                   title={title}
                   content={content}
                   isVisible={twoColumn ? true : isPreview}
                   isDark={isDark}
                   textAlignment={textAlignment}
                   lightModeBg={lightModeBg}
+                  artType={"markdown to pdf"}
+                  darkBg={darkTheme.colors.bg}
+                  darkTheme={darkTheme.colors}
                   // no need to add thumbnail here
                 />
               </div>

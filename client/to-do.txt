@@ -5,6 +5,7 @@
 
 -- remove this: const isDark = useDarkMode(); use the DarkModeContext instead
 -- no session use
+-- block code alignment
 
 -- remove prose classes, not needed
 -- view posts markdown preview is modified

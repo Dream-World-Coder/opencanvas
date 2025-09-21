@@ -23,7 +23,7 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
 
   // console.log(`newPostId 1: ${postId}`);
   useEffect(() => {
-    if (!postId) {
+    if (!frontendOnly && !postId) {
       // console.log(`newPostId 2: ${postId}`);
 
       console.error("postId not found");
@@ -167,7 +167,7 @@ export function useWritingPad({ postId, frontendOnly, artType }) {
 
     if (navigator.onLine && !frontendOnly) {
       await syncWithBackend();
-    } else {
+    } else if (!navigator.onLine && !frontendOnly) {
       toast.error("No Connection");
     }
     setShowUnsavedAlert(false);

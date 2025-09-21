@@ -233,22 +233,26 @@ export const LeftSidebar = () => {
   // for ads [bottom, fixed, masked] + playlist items top[scrollable]
 
   // const _list = Array.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10); // useMemo
-  const list = Array.from({ length: 10 }, (_, i) => i);
+  const list = Array.from({ length: 0 }, (_, i) => i);
 
   return (
     <>
       <div className="md:hidden w-full fixed bottom-0 dark:text-white">
         <Drawer>
-          <DrawerTrigger className="bg-lime-300 w-full py-2 rounded-t-xl z-[50000]">
-            serial num. Short title of current article
-            <br />
-            Lorem ipsum dolor sit amet.
-          </DrawerTrigger>
+          {list?.length > 0 && (
+            <DrawerTrigger className="bg-lime-300 w-full py-2 rounded-t-xl z-[50000]">
+              serial num. Short title of current article
+              <br />
+              Lorem ipsum dolor sit amet.
+            </DrawerTrigger>
+          )}
 
           <DrawerContent className="max-h-[60vh] flex flex-col">
-            <DrawerHeader>
-              <DrawerTitle>Collection Name</DrawerTitle>
-            </DrawerHeader>
+            {list?.length > 0 && (
+              <DrawerHeader>
+                <DrawerTitle>Collection Name</DrawerTitle>
+              </DrawerHeader>
+            )}
 
             {/* Scrollable body */}
             <div className="px-4 py-2 overflow-y-auto flex-1">
@@ -279,7 +283,7 @@ export const LeftSidebar = () => {
       >
         {/* listItems */}
         <div className="dark:text-white">
-          <div className="mb-4 pl-2">Collection Name</div>
+          {list?.length > 0 && <div className="mb-4 pl-2">Collection Name</div>}
 
           <div className="max-h-screen overflow-y-auto _thin_ no-scrollbar">
             {list.map((index) => (
@@ -296,7 +300,7 @@ export const LeftSidebar = () => {
           </div>
         </div>
 
-        {/* ads */}
+        {/* ads++ */}
         <div className=""></div>
       </aside>
     </>
@@ -1334,8 +1338,8 @@ export const CommentsBox = memo(function CommentsBox({
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4 divide-y-[1px]">
-        {/* {!loading && <p>Loading...</p>} */}
-        {comments?.length > 0
+        {loading && <p>Loading...</p>}
+        {!loading && comments?.length > 0
           ? comments.map((comment) => (
               <div key={comment._id}>
                 <Comment
@@ -1456,7 +1460,7 @@ export const CommentsBox = memo(function CommentsBox({
             onChange={(e) => setNewComment(e.target.value)}
             placeholder={isEditing || isReplying ? "" : "Add a comment..."}
             className="flex-1 px-4 py-2 pr-10 bg-gray-100 dark:bg-neutral-800 border-0 rounded-full text-gray-800 dark:text-neutral-100 no-resize no-scrollbar
-                        placeholder-gray-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-lime-500 transition-all duration-200"
+              placeholder-gray-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-lime-500 transition-all duration-200"
           />
           <button
             onClick={(e) => {
@@ -1473,7 +1477,7 @@ export const CommentsBox = memo(function CommentsBox({
             }}
             disabled={!newComment.trim()}
             className="absolute right-2 p-1.5 rounded-full bg-lime-500 text-white disabled:opacity-50
-                        disabled:bg-gray-400 dark:disabled:bg-neutral-700 transition-all duration-200"
+              disabled:bg-gray-400 dark:disabled:bg-neutral-700 transition-all duration-200"
             aria-label="Send comment"
           >
             <Send size={16} />
@@ -1488,15 +1492,6 @@ CommentsBox.propTypes = {
   setCommentTrayOpen: PropTypes.func,
   commentTrayOpen: PropTypes.bool,
 };
-// ***************************************************
-// ***************************************************
-// ***************************************************
-// ***************************************************
-// ***************************************************
-// ***************************************************
-// ***************************************************
-// ***************************************************
-// ***************************************************
 // ***************************************************
 // ***************************************************
 // import { useRef, useState, memo } from "react";
@@ -1808,10 +1803,10 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
             a: ({ href, children }) => (
               <a
                 href={href}
-                className={`border-b border-current pb-0.5 font-medium sentient-regular transition-colors duration-200 ${
+                className={`underline font-medium sentient-regular transition-colors duration-200 ${
                   isDark
-                    ? "text-blue-300 hover:text-blue-400"
-                    : "text-blue-600 hover:text-blue-800"
+                    ? "text-lime-300 hover:text-lime-400"
+                    : "text-lime-600 hover:text-lime-800"
                 }`}
                 target={href.startsWith("http") ? "_blank" : "_self"}
                 rel={href.startsWith("http") ? "noopener noreferrer" : ""}

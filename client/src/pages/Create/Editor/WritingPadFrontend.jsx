@@ -1,6 +1,8 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import { Helmet } from "react-helmet-async";
+import PropTypes from "prop-types";
+
 import {
   Save,
   Sun,
@@ -26,9 +28,8 @@ import {
   Columns2,
   Home,
 } from "lucide-react";
-import PropTypes from "prop-types";
-import { postDarkThemes } from "@/services/themes";
 
+import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   DropdownMenu,
@@ -45,6 +46,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
 import {
   // MarkdownPreview,
   LinkInsertButton,
@@ -53,7 +55,10 @@ import {
   formattingButtons,
   rawText,
   findAndReplace,
+  TitleInput,
+  ContentInput,
 } from "./components";
+import { postDarkThemes } from "@/services/themes";
 import { ThemedMarkdownPreview } from "@/pages/PostView/components";
 
 // hooks
@@ -62,10 +67,12 @@ import { useEditorFormatting } from "./hooks/useEditorFormatting";
 import { useEditorAppearance } from "./hooks/useEditorAppearance";
 import { useExport } from "./hooks/useExport";
 
-const WritingPadFrontendOnly = ({ artType = "markdown2pdf" }) => {
-  const postId = null;
-  const frontendOnly = true;
+// global const
+const postId = null;
+const frontendOnly = true;
+// --------------------------
 
+const WritingPadFrontendOnly = ({ artType = "markdown2pdf" }) => {
   const navigate = useNavigate();
 
   const {
@@ -101,7 +108,7 @@ const WritingPadFrontendOnly = ({ artType = "markdown2pdf" }) => {
     documentScroll,
     setDocumentScroll,
     isDark,
-    setIsDark,
+    toggleDarkMode,
     sepia,
     setSepia,
     lightModeBg,
@@ -122,7 +129,36 @@ const WritingPadFrontendOnly = ({ artType = "markdown2pdf" }) => {
     handleCopy,
   } = useExport(title, content);
 
-  const darkTheme = isDark ? postDarkThemes.dark : postDarkThemes.light;
+  const [darkTheme, setDT] = useState(
+    isDark ? postDarkThemes.dark : postDarkThemes.light,
+  );
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const isCmdOrCtrlPressed = e.metaKey || e.ctrlKey;
+
+      if (!isCmdOrCtrlPressed) return;
+
+      if (isCmdOrCtrlPressed) {
+        if (e.key === "b" || e.key === "B") {
+          e.preventDefault();
+          handleFormat("bold");
+        } else if (e.key === "i" || e.key === "I") {
+          e.preventDefault();
+          handleFormat("italic");
+        } else if (e.key === "u" || e.key === "U") {
+          e.preventDefault();
+          handleFormat("underline");
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   return (
     <>
@@ -133,6 +169,7 @@ const WritingPadFrontendOnly = ({ artType = "markdown2pdf" }) => {
           content="Powerful markdown & latex editor with images upload and pdf export."
         />
       </Helmet>
+
       <div
         className={`min-h-screen transition-all duration-0 relative h-fit ${isSerif ? `font-serif` : ""}
           ${isDark ? "bg-[#222] text-white" : `${lightModeBg} text-black`}`}
@@ -217,7 +254,10 @@ const WritingPadFrontendOnly = ({ artType = "markdown2pdf" }) => {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
                       <button
-                        onClick={handlePdfExport}
+                        onClick={() => {
+                          setTwoColumn(false);
+                          handlePdfExport();
+                        }}
                         className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
                       >
                         <FileText className="size-5" /> pdf
@@ -226,6 +266,7 @@ const WritingPadFrontendOnly = ({ artType = "markdown2pdf" }) => {
                     <DropdownMenuItem>
                       <button
                         onClick={() => {
+                          setTwoColumn(false);
                           handleTxtExport("txt");
                         }}
                         className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
@@ -236,6 +277,7 @@ const WritingPadFrontendOnly = ({ artType = "markdown2pdf" }) => {
                     <DropdownMenuItem>
                       <button
                         onClick={() => {
+                          setTwoColumn(false);
                           handleTxtExport("md");
                         }}
                         className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
@@ -248,7 +290,7 @@ const WritingPadFrontendOnly = ({ artType = "markdown2pdf" }) => {
 
                 {/* dark mode button */}
                 <button
-                  onClick={setIsDark}
+                  onClick={toggleDarkMode}
                   className="hover:opacity-70 transition-opacity"
                 >
                   {isDark ? (
@@ -258,7 +300,7 @@ const WritingPadFrontendOnly = ({ artType = "markdown2pdf" }) => {
                   )}
                 </button>
 
-                {/* addtional more button */}
+                {/* additional more button */}
                 <DropdownMenu
                   open={optionsDropdownOpen}
                   onOpenChange={setOptionsDropdownOpen}
@@ -458,7 +500,7 @@ const WritingPadFrontendOnly = ({ artType = "markdown2pdf" }) => {
           </div>
         </div>
 
-        {/* Custom Unsaved Changes Alert */}
+        {/* Unsaved Changes Alert */}
         {showUnsavedAlert && (
           <div className="fixed inset-0 bg-[#222] bg-opacity-20 flex items-center justify-center z-20">
             <Alert className="w-96 relative">
@@ -555,40 +597,27 @@ const WritingPadFrontendOnly = ({ artType = "markdown2pdf" }) => {
               <div
                 className={
                   twoColumn
-                    ? `border-r-2 w-1/2 h-full ${isDark ? "border-[#333]" : "border-gray-400"}`
+                    ? `border-r-2 w-1/2 h-[200%] pr-2 ${isDark ? "border-[#333]" : "border-gray-400"}`
                     : ""
                 }
               >
-                {/* Title Input */}
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => {
-                    setTitle(e.target.value);
-                    setIsSaved(false);
-                    e.target.style.height = e.target.scrollHeight + "px";
-                  }}
-                  placeholder="Title"
-                  className={`w-full h-auto text-4xl font-bold mb-8 focus:outline-none transition-all duration-0
-                    ${isDark ? "bg-[#222]" : lightModeBg}
-                    ${isPreview ? "opacity-0" : "opacity-100"}`}
+                <TitleInput
+                  title={title}
+                  setTitle={setTitle}
+                  setIsSaved={setIsSaved}
+                  isDark={isDark}
+                  isPreview={isPreview}
+                  lightModeBg={lightModeBg}
                 />
 
-                {/* Content Textarea */}
-                <textarea
-                  data-lenis-prevent
-                  id="txtArea"
-                  value={content}
-                  onChange={(e) => {
-                    handleContentChange(e, setIsSaved);
-                  }}
-                  placeholder="Fill your canvas..."
-                  className={`w-full font-[montserrat] min-h-screen h-auto resize-none focus:outline-none text-lg text-left transition-all duration-0
-                    ${isDark ? "bg-[#222]" : lightModeBg}
-                    ${isPreview ? "opacity-0 max-h-screen" : "opacity-100 max-h-auto"}
-                    ${
-                      textAlignment === "center" ? "text-center" : "text-left"
-                    }`}
+                <ContentInput
+                  content={content}
+                  isDark={isDark}
+                  isPreview={isPreview}
+                  lightModeBg={lightModeBg}
+                  setIsSaved={setIsSaved}
+                  textAlignment={textAlignment}
+                  handleContentChange={handleContentChange}
                 />
               </div>
 
