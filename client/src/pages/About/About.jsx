@@ -2,7 +2,7 @@ import { Palette } from "lucide-react";
 import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Header/Header";
 import PropTypes from "prop-types";
-import AboutMeta from "./AboutMeta";
+import AboutMeta from "./Meta";
 
 const AboutPage = ({ bgClr = "bg-cream-light" }) => {
   const featureData = [
