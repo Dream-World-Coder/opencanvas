@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
+import { useDarkModeContext } from "@/contexts/ThemeContext";
 
 export function useEditorAppearance() {
   const [sepia, setSepia] = useState(false);
   const [lightModeBg, setLightModeBg] = useState("bg-white");
-  const [isDark, setIsDark] = useState(
-    localStorage.getItem("darkThemeChoice") === "true" ? true : false,
-  );
+  const { darkMode: isDark, toggleDarkMode: setIsDark } = useDarkModeContext();
   const [helpOpen, setHelpOpen] = useState(false);
   const [optionsDropdownOpen, setOptionsDropdownOpen] = useState(false);
 

@@ -6,8 +6,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-import ProfileHeader from "../../components/Header/ProfileHeader";
-import ProfileFooter from "../../components/Footer/ProfileFooter";
+import ProfileHeader from "@/components/Header/ProfileHeader";
+import ProfileFooter from "@/components/Footer/ProfileFooter";
 import {
   ProfileHelmet,
   QuickStatsProfile,
@@ -17,8 +17,8 @@ import {
   NameDesignation,
   ProfileImage,
 } from "./components";
-import { useAuth } from "../../contexts/AuthContext";
-import { useDarkMode } from "../../components/Hooks/darkMode";
+import { useAuth } from "@/contexts/AuthContext";
+import { useDarkMode } from "@/components/Hooks/darkMode";
 
 const Profile = () => {
   const navigate = useNavigate();

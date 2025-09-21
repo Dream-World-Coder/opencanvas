@@ -9,8 +9,8 @@ import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import { CalendarDays } from "lucide-react";
 
-import ProfileHeader from "../../components/Header/ProfileHeader";
-// import { useDataService } from "../../services/dataService";
+import ProfileHeader from "@/components/Header/ProfileHeader";
+// import { useDataService } from "@/services/dataService";
 
 const FollowingPage = () => {
   const [following, setFollowing] = useState([]);

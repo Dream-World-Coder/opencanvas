@@ -1639,7 +1639,7 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
   lightModeBg = "bg-white",
   darkBg = "bg-[#222222]",
   artType = "written",
-  darkTheme = null,
+  darkTheme = null, // need a valid object, null will throw error
 }) {
   if (!isVisible) return <></>;
 

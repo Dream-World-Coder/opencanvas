@@ -27,6 +27,7 @@ import {
   Home,
 } from "lucide-react";
 import PropTypes from "prop-types";
+import { postDarkThemes } from "@/services/themes";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
@@ -45,7 +46,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  MarkdownPreview,
+  // MarkdownPreview,
   LinkInsertButton,
   ImageUploadButton,
   ScrollToBottomButton,
@@ -53,6 +54,7 @@ import {
   rawText,
   findAndReplace,
 } from "./components";
+import { ThemedMarkdownPreview } from "@/pages/PostView/components";
 
 // hooks
 import { useWritingPad } from "./hooks/useWritingPad";
@@ -98,11 +100,11 @@ const WritingPadFrontendOnly = ({ artType = "markdown2pdf" }) => {
     setIsSerif,
     documentScroll,
     setDocumentScroll,
+    isDark,
+    setIsDark,
     sepia,
     setSepia,
     lightModeBg,
-    isDark,
-    setIsDark,
     helpOpen,
     setHelpOpen,
     optionsDropdownOpen,
@@ -119,6 +121,9 @@ const WritingPadFrontendOnly = ({ artType = "markdown2pdf" }) => {
     handleTxtExport,
     handleCopy,
   } = useExport(title, content);
+
+  const darkTheme = isDark ? postDarkThemes.dark : postDarkThemes.light;
+
   return (
     <>
       <Helmet>
@@ -243,9 +248,7 @@ const WritingPadFrontendOnly = ({ artType = "markdown2pdf" }) => {
 
                 {/* dark mode button */}
                 <button
-                  onClick={() => {
-                    setIsDark(!isDark);
-                  }}
+                  onClick={setIsDark}
                   className="hover:opacity-70 transition-opacity"
                 >
                   {isDark ? (
@@ -596,13 +599,16 @@ const WritingPadFrontendOnly = ({ artType = "markdown2pdf" }) => {
                   ${!twoColumn ? "w-[100%] h-auto mx-auto absolute top-0 left-0" : "w-1/2 h-full"}
                   ${isPreview || twoColumn ? "" : "hidden"}`}
               >
-                <MarkdownPreview
+                <ThemedMarkdownPreview
                   title={title}
                   content={content}
                   isVisible={twoColumn ? true : isPreview}
                   isDark={isDark}
                   textAlignment={textAlignment}
                   lightModeBg={lightModeBg}
+                  artType={"markdown to pdf"}
+                  darkBg={darkTheme.colors.bg}
+                  darkTheme={darkTheme.colors}
                 />
               </div>
             </div>

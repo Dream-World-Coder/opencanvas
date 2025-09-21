@@ -6,10 +6,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-import ProfileHeader from "../../components/Header/ProfileHeader";
-import ProfileFooter from "../../components/Footer/ProfileFooter";
-import Header from "../../components/Header/Header";
-import Footer from "../../components/Footer/Footer";
+import ProfileHeader from "@/components/Header/ProfileHeader";
+import ProfileFooter from "@/components/Footer/ProfileFooter";
+import Header from "@/components/Header/Header";
+import Footer from "@/components/Footer/Footer";
 import {
   ProfileHelmet,
   QuickStatsProfile,
@@ -20,9 +20,9 @@ import {
   NameDesignation,
   ProfileImage,
 } from "./components";
-import { useDataService } from "../../services/dataService";
-import { useAuth } from "../../contexts/AuthContext";
-import { useDarkMode } from "../../components/Hooks/darkMode";
+import { useDataService } from "@/services/dataService";
+import { useAuth } from "@/contexts/AuthContext";
+import { useDarkMode } from "@/components/Hooks/darkMode";
 
 const PublicProfile = () => {
   const isDark = useDarkMode();

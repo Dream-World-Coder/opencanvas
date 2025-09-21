@@ -24,11 +24,11 @@ import "./services/fingerprintService";
 const LoginPage = lazy(() => import("./pages/Auth/Login"));
 const AuthSuccess = lazy(() => import("./pages/Auth/AuthSuccess"));
 
-const Profile = lazy(() => import("./pages/Profile/Profile"));
-const ProfileSettings = lazy(() => import("./pages/Profile/ProfileSettings"));
-const PublicProfile = lazy(() => import("./pages/Profile/PublicProfile"));
-const FollowersPage = lazy(() => import("./pages/Profile/FollowersPage"));
-const FollowingPage = lazy(() => import("./pages/Profile/FollowingPage"));
+const Profile = lazy(() => import("./pages/Profile/Personal"));
+const ProfileSettings = lazy(() => import("./pages/Profile/Settings"));
+const PublicProfile = lazy(() => import("./pages/Profile/Public"));
+const FollowersPage = lazy(() => import("./pages/Profile/Followers"));
+const FollowingPage = lazy(() => import("./pages/Profile/Following"));
 const SavedPosts = lazy(() => import("./pages/Profile/SavedPosts"));
 
 const ViewPost = lazy(() => import("./pages/PostView/PostPage"));

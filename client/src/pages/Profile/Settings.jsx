@@ -50,12 +50,12 @@ import {
 } from "@/components/ui/select";
 import { UAParser } from "ua-parser-js";
 
-import Header from "../../components/Header/Header";
-import AppLogo from "../../components/AppLogo";
-import { useAuth } from "../../contexts/AuthContext";
-import { useDataService } from "../../services/dataService";
-import { formatDateDetails } from "../../services/formatDate";
-import { useDarkModeContext } from "../../contexts/ThemeContext";
+import Header from "@/components/Header/Header";
+import AppLogo from "@/components/AppLogo";
+import { useAuth } from "@/contexts/AuthContext";
+import { useDataService } from "@/services/dataService";
+import { formatDateDetails } from "@/services/formatDate";
+import { useDarkModeContext } from "@/contexts/ThemeContext";
 
 const ProfileSettings = () => {
   const { currentUser, setCurrentUser, logout } = useAuth();
