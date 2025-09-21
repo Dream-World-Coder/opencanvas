@@ -241,33 +241,55 @@ export const useDataService = () => {
   // ---------------------------------
   const createCollection = async (collectionData) => {
     try {
-      const response = await authAxios.post("/collections", collectionData);
+      const response = await authAxios.post(
+        "/create/collection",
+        collectionData,
+      );
       return response.data;
     } catch (error) {
       console.error("Error creating collection:", error);
-      toast.error("Error creating collection:", error);
+      const message =
+        error.response?.data?.message || "Error creating collection";
+      toast.error(message);
       throw error;
     }
   };
 
   const getUserCollections = async (userId) => {
     try {
-      const response = await authAxios.get(`/collections/user/${userId}`);
+      const response = await authAxios.get(`/u/${userId}/collections`);
       return response.data.collections;
     } catch (error) {
       console.error("Error fetching user collections:", error);
-      toast.error("Error fetching user collections:", error);
+      const message =
+        error.response?.data?.message || "Error fetching user collections";
+      toast.error(message);
       throw error;
     }
   };
 
   const getCollectionById = async (collectionId) => {
     try {
-      const response = await authAxios.get(`/collections/${collectionId}`);
+      const response = await authAxios.get(`/c/${collectionId}`);
       return response.data.collection;
     } catch (error) {
       console.error("Error fetching collection:", error);
-      toast.error("Error fetching collection:", error);
+      const message =
+        error.response?.data?.message || "Error fetching collection";
+      toast.error(message);
+      throw error;
+    }
+  };
+
+  const getPrivateCollectionById = async (collectionId) => {
+    try {
+      const response = await authAxios.get(`/c/private/${collectionId}`);
+      return response.data.collection;
+    } catch (error) {
+      console.error("Error fetching collection:", error);
+      const message =
+        error.response?.data?.message || "Error fetching collection";
+      toast.error(message);
       throw error;
     }
   };
@@ -275,24 +297,30 @@ export const useDataService = () => {
   const updateCollection = async (collectionId, collectionData) => {
     try {
       const response = await authAxios.put(
-        `/collections/${collectionId}`,
+        `/update-collection/${collectionId}`,
         collectionData,
       );
       return response.data;
     } catch (error) {
       console.error("Error updating collection:", error);
-      toast.error("Error updating collection:", error);
+      const message =
+        error.response?.data?.message || "Error updating collection";
+      toast.error(message);
       throw error;
     }
   };
 
   const deleteCollection = async (collectionId) => {
     try {
-      const response = await authAxios.delete(`/collections/${collectionId}`);
+      const response = await authAxios.delete(
+        `/delete-collection/${collectionId}`,
+      );
       return response.data;
     } catch (error) {
       console.error("Error deleting collection:", error);
-      toast.error("Error deleting collection:", error);
+      const message =
+        error.response?.data?.message || "Error deleting collection";
+      toast.error(message);
       throw error;
     }
   };
@@ -300,12 +328,14 @@ export const useDataService = () => {
   const addPostToCollection = async (collectionId, postId) => {
     try {
       const response = await authAxios.post(
-        `/collections/${collectionId}/posts/${postId}`,
+        `/add-post/${postId}/collection/${collectionId}`,
       );
       return response.data;
     } catch (error) {
       console.error("Error adding post to collection:", error);
-      toast.error("Error adding post to collection:", error);
+      const message =
+        error.response?.data?.message || "Error adding post to collection";
+      toast.error(message);
       throw error;
     }
   };
@@ -313,12 +343,54 @@ export const useDataService = () => {
   const removePostFromCollection = async (collectionId, postId) => {
     try {
       const response = await authAxios.delete(
-        `/collections/${collectionId}/posts/${postId}`,
+        `/remove-post/${postId}/collection/${collectionId}`,
       );
       return response.data;
     } catch (error) {
       console.error("Error removing post from collection:", error);
-      toast.error("Error removing post from collection:", error);
+      const message =
+        error.response?.data?.message || "Error removing post from collection";
+      toast.error(message);
+      throw error;
+    }
+  };
+
+  const getAllCollections = async (params = {}) => {
+    try {
+      const queryParams = new URLSearchParams();
+
+      if (params.page) queryParams.append("page", params.page);
+      if (params.limit) queryParams.append("limit", params.limit);
+      if (params.search) queryParams.append("search", params.search);
+      if (params.tags) queryParams.append("tags", params.tags);
+
+      const response = await authAxios.get(
+        `/collections?${queryParams.toString()}`,
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching all collections:", error);
+      const message =
+        error.response?.data?.message || "Error fetching collections";
+      toast.error(message);
+      throw error;
+    }
+  };
+
+  const voteOnCollection = async (collectionId, voteType) => {
+    try {
+      const response = await authAxios.post(
+        `/collections/${collectionId}/vote`,
+        {
+          voteType, // 'upvote' or 'downvote'
+        },
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error voting on collection:", error);
+      const message =
+        error.response?.data?.message || "Error voting on collection";
+      toast.error(message);
       throw error;
     }
   };
@@ -352,9 +424,12 @@ export const useDataService = () => {
     createCollection,
     getUserCollections,
     getCollectionById,
+    getPrivateCollectionById,
     updateCollection,
     deleteCollection,
     addPostToCollection,
     removePostFromCollection,
+    getAllCollections,
+    voteOnCollection,
   };
 };

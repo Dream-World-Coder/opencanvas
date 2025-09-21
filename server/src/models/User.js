@@ -186,6 +186,8 @@ const userSchema = new Schema(
     featuredItems: [featureItemSchema],
     followers: [followerSchema],
     following: [followerSchema],
+
+    // recent activity -> can be calculated
   },
   { timestamps: true },
 );

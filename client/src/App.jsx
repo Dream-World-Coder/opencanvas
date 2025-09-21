@@ -15,9 +15,10 @@ import LoadingPage from "./pages/Others/LoadingPage";
 
 // loaded with main bundle
 import LandingPage from "./pages/LandingPage/LandingPage";
-import ArticleFeed from "./pages/Feeds/Articles";
-import SocialFeed from "./pages/Feeds/Social";
+import ArticleFeed from "./pages/Feed/ArticlesPage";
+import SocialFeed from "./pages/Feed/SocialPage";
 import "./services/fingerprintService";
+// import Editor from "./pages/Editor/Editor";
 
 // lazy
 const LoginPage = lazy(() => import("./pages/Auth/Login"));
@@ -30,16 +31,18 @@ const FollowersPage = lazy(() => import("./pages/Profile/FollowersPage"));
 const FollowingPage = lazy(() => import("./pages/Profile/FollowingPage"));
 const SavedPosts = lazy(() => import("./pages/Profile/SavedPosts"));
 
-const ViewPost = lazy(() => import("./pages/Post/ViewPost"));
-const PrivatePostView = lazy(() => import("./pages/Post/PrivatePostView"));
+const ViewPost = lazy(() => import("./pages/PostView/PostPage"));
+const PrivatePostView = lazy(() => import("./pages/PostView/PrivatePostPage"));
 
 const AboutPage = lazy(() => import("./pages/About/About"));
 const ContactPage = lazy(() => import("./pages/Contact/Contact"));
 
-const WritingPad = lazy(() => import("./pages/CreatePosts/Writing/WritingPad"));
-const Md2Pdf = lazy(() => import("./pages/CreatePosts/Writing/Md2pdf"));
+const WritingPad = lazy(() => import("./pages/Create/Editor/WritingPad"));
+const WritingPadFrontendOnly = lazy(
+  () => import("./pages/Create/Editor/WritingPadFrontend"),
+);
 
-const ImageUploadPage = lazy(() => import("./pages/CreatePosts/UploadImage"));
+const ImageUploadPage = lazy(() => import("./pages/Create/UploadImage"));
 
 const Thanks = lazy(() => import("./pages/Others/Thanks"));
 const NotFoundPage = lazy(() => import("./pages/Others/404"));
@@ -57,15 +60,16 @@ export default function App() {
                 <Suspense fallback={<LoadingPage />}>
                   <Routes>
                     {/* public
-                   ----------- */}
+                    ----------- */}
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/home" element={<ArticleFeed />} />
                     <Route path="/articles" element={<ArticleFeed />} />
                     <Route path="/social" element={<SocialFeed />} />
+                    {/* <Route path="/editor" element={<Editor />} />*/}
                     {/* --------------- */}
 
                     {/* Auth
-                   --------- */}
+                    --------- */}
                     <Route
                       path="/login"
                       element={<LoginPage bgClr="bg-cream-light" />}
@@ -104,6 +108,7 @@ export default function App() {
 
                     {/* --------------- */}
                     <Route path="/p/:postId" element={<ViewPost />} />
+                    {/* <Route path="/c/:collectionId" element={<ViewPost />} />*/}
                     <Route
                       path="/u/:username"
                       element={<PublicProfile bgClr="bg-white" />}
@@ -113,11 +118,25 @@ export default function App() {
                       path="/u/:username/followers"
                       element={<FollowersPage />} //followers public but following login needed
                     />
+
+                    <Route
+                      path="/markdown2pdf"
+                      element={<WritingPadFrontendOnly />}
+                    />
+                    <Route
+                      path="/md2pdf"
+                      element={<WritingPadFrontendOnly />}
+                    />
+                    <Route path="/m/2/p" element={<WritingPadFrontendOnly />} />
+                    <Route path="/m2p" element={<WritingPadFrontendOnly />} />
                     {/* --------------- */}
 
                     {/* protected
                     ------------ */}
                     <Route element={<ProtectedRoute />}>
+                      {/* test routes */}
+                      {/* end test */}
+
                       <Route
                         path="/profile"
                         element={<Profile bgClr="bg-white" />}
@@ -151,12 +170,6 @@ export default function App() {
                         path="/edit-post"
                         element={<WritingPad artType={"edit"} />}
                       />
-
-                      {/* md2pdf ~~> make them public */}
-                      <Route path="/markdown2pdf" element={<Md2Pdf />} />
-                      <Route path="/md2pdf" element={<Md2Pdf />} />
-                      <Route path="/m/2/p" element={<Md2Pdf />} />
-                      <Route path="/m2p" element={<Md2Pdf />} />
                     </Route>
 
                     <Route
@@ -177,18 +190,20 @@ export default function App() {
   );
 }
 
-// useEffect(() => {
-//   const lenis = new Lenis({
-//     duration: 0.1,
-//     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-//     smooth: true,
-//   });
-//   function raf(time) {
-//     lenis.raf(time);
-//     requestAnimationFrame(raf);
-//   }
-//   requestAnimationFrame(raf);
-//   return () => {
-//     lenis.destroy();
-//   };
-// }, []);
+/*
+useEffect(() => {
+  const lenis = new Lenis({
+    duration: 0.1,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    smooth: true,
+  });
+  function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+  }
+  requestAnimationFrame(raf);
+  return () => {
+    lenis.destroy();
+  };
+}, []);
+*/

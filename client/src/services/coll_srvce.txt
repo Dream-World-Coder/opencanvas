@@ -1,0 +1,90 @@
+const createCollection = async (collectionData) => {
+    try {
+      const response = await authAxios.post(
+        "/create-collection",
+        collectionData,
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error creating collection:", error);
+      toast.error("Error creating collection:", error);
+      throw error;
+    }
+  };
+
+  const getUserCollections = async (userId) => {
+    try {
+      const response = await authAxios.get(`/u/${userId}/collections`);
+      // in backend, check requesting, user, only show private collections after proper verification
+      return response.data.collections;
+    } catch (error) {
+      console.error("Error fetching user collections:", error);
+      toast.error("Error fetching user collections:", error);
+      throw error;
+    }
+  };
+
+  // in backend, check requesting, user, only show private collections after proper verification
+  const getCollectionById = async (collectionId) => {
+    try {
+      const response = await authAxios.get(`/collections/${collectionId}`);
+      return response.data.collection;
+    } catch (error) {
+      console.error("Error fetching collection:", error);
+      toast.error("Error fetching collection:", error);
+      throw error;
+    }
+  };
+
+  const updateCollection = async (collectionId, collectionData) => {
+    try {
+      const response = await authAxios.put(
+        `/update-collection/${collectionId}`,
+        collectionData,
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error updating collection:", error);
+      toast.error("Error updating collection:", error);
+      throw error;
+    }
+  };
+
+  const deleteCollection = async (collectionId) => {
+    try {
+      const response = await authAxios.delete(
+        `/delete-collection/${collectionId}`,
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting collection:", error);
+      toast.error("Error deleting collection:", error);
+      throw error;
+    }
+  };
+
+  const addPostToCollection = async (collectionId, postId) => {
+    try {
+      const response = await authAxios.post(
+        `/add-post/${postId}/collection/${collectionId}`,
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error adding post to collection:", error);
+      toast.error("Error adding post to collection:", error);
+      throw error;
+    }
+  };
+
+  const removePostFromCollection = async (collectionId, postId) => {
+    try {
+      const response = await authAxios.delete(
+        `/remove-post/${postId}/collection/${collectionId}`,
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error removing post from collection:", error);
+      toast.error("Error removing post from collection:", error);
+      throw error;
+    }
+  };

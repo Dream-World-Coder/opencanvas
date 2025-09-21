@@ -6,9 +6,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-import ProfileHeader from "../../components/Header/ProfileHeader";
-import ProfileFooter from "../../components/Footer/ProfileFooter";
-import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
+import ProfileHeader from "@/components/Header/ProfileHeader";
+import ProfileFooter from "@/components/Footer/ProfileFooter";
+import { MarkdownPreview } from "@/pages/Create/Editor/components";
 import {
   PostFilterTabs,
   PostActions,

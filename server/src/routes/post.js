@@ -8,7 +8,8 @@ const {
   checkUserExists,
   fingerprintMiddleware,
 } = require("../middlewares/authorisation");
-const { generateRandomThumbnail } = require("../utils/helper");
+// const { errorHandler } = require("../middlewares/errorHandler");
+// const { generateRandomThumbnail } = require("../utils/helper");
 
 // in js {} & [] are true value
 
@@ -54,10 +55,10 @@ router.post(
       let user = req.user;
 
       let postData = req.body;
-      if (!postData) {
+      if (!postData || !postData.title || !postData.content) {
         return res.status(404).json({
           success: false,
-          message: "post not found",
+          message: "title, content are required",
         });
       }
 

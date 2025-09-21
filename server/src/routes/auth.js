@@ -31,6 +31,7 @@ const config = {
   userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
   passReqToCallback: true,
 };
+
 const verifyCallback = async (
   req,
   accessToken,
@@ -84,6 +85,7 @@ const verifyCallback = async (
 // google strategy for passport
 passport.use(new GoogleStrategy(config, verifyCallback));
 
+/* using jwt so no need
 // serialize and deserialize user
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -97,8 +99,9 @@ passport.deserializeUser(async (id, done) => {
     done(error, null);
   }
 });
+*/
 
-// Google authentication routes
+// Google auth routes
 router.get(
   "/google",
   passport.authenticate("google", {

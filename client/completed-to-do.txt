@@ -148,6 +148,43 @@ as in feed page only name & pic is sufficient, not username, also has to be upda
 -- [*] handle loading etc in createoptions
 -- [*] role relationship designation fixed
 
+-- [*] selection color lime based
+-- [*] optimisations, clearer structure in view post
+-- [*] all table of contents open from start
+-- [*] turn on dark mode if not dark mode in viewpost, toggle theme
+-- [*] image hover: cursor -> magnifier icon, fixed zoom out if image covers whole screen
+-- [*] sidebar tested
+-- [*] loading improvement
+-- [*] back button functional for articles also, it will be good to preserve the scroll height also
+-- [*] modified the post routes -> no content / title or large payload handled
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+-- [*]
+
 /*****************
 data
 _________________/

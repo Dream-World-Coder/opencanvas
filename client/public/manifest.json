@@ -1,0 +1,23 @@
+{
+  "name": "OpenCanvas",
+  "short_name": "OpenCanvas",
+  "description": "An Open Canvas, just for you!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#84cc16",
+  "theme_color": "#84cc16",
+  "scope": "/",
+  "lang": "en-US",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

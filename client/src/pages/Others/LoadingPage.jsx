@@ -1,18 +1,15 @@
 const LoadingPage = ({ bgClr = "bg-white" }) => {
   return (
     <div
-      className={`relative size-full min-h-dvh ${bgClr} dark:bg-[#111] dark:text-white flex flex-col items-center justify-center text-lg gap-6 pointer-events-none`}
+      className={`relative size-full min-h-dvh ${bgClr} dark:bg-[#111] dark:text-white flex flex-col items-center justify-center gap-6 pointer-events-none`}
       style={{ minHeight: "100dvh" }}
     >
       <div
-        className="relative text-center font-normal font-sans text-2xl sm:text-4xl text-stone-800/80 dark:text-white"
+        className="relative text-center"
         style={{ transform: "translateY(-6rem)" }}
       >
-        <span style={{ position: "relative", zIndex: 10 }}>
-          Loading...
-          <br />
-          please wait
-        </span>
+        {/* Spinner */}
+        <div className="h-12 w-12 border-4 border-stone-300 border-t-stone-800 dark:border-stone-700 dark:border-t-white rounded-full animate-spin mx-auto" />
       </div>
     </div>
   );

@@ -1,38 +1,37 @@
 import { useEffect, useState } from "react";
 
-// class based
+// don't use this
 export function useDarkMode() {
-    const getDarkMode = () =>
-        document.documentElement.classList.contains("dark");
+  const getDarkMode = () => document.documentElement.classList.contains("dark");
 
-    const [isDark, setIsDark] = useState(getDarkMode());
+  const [isDark, setIsDark] = useState(getDarkMode());
 
-    useEffect(() => {
-        const targetNode = document.documentElement;
+  useEffect(() => {
+    const targetNode = document.documentElement;
 
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.attributeName === "class") {
-                    const dark = getDarkMode();
-                    setIsDark(dark);
-                    // console.log("Class attribute changed!");
-                }
-            });
-        });
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === "class") {
+          const dark = getDarkMode();
+          setIsDark(dark);
+          // console.log("Class attribute changed!");
+        }
+      });
+    });
 
-        // Add observer
-        observer.observe(targetNode, {
-            attributes: true,
-            attributeFilter: ["class"],
-        });
+    // Add observer
+    observer.observe(targetNode, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
 
-        // Cleanup
-        return () => {
-            observer.disconnect();
-        };
-    }, []);
+    // Cleanup
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
-    return isDark;
+  return isDark;
 }
 
 // theme based

@@ -15,10 +15,10 @@ const NotFoundPage = ({ bgClr = "bg-cream-light" }) => {
         <div className="text-center font-semibold text-3xl text-stone-600/80 dark:text-white">
           Page not found.
           <br />
-          Error 404
+          ERROR 404
         </div>
         <button
-          className="rounded-md bg-cream hover:bg-cream-dark box-content px-4 py-2 text-stone-600/80 flex items-center justify-center gap-2"
+          className="rounded-md bg-lime-200 hover:bg-lime-400 box-content px-4 py-2 text-stone-600/80 flex items-center justify-center gap-2"
           onClick={() => {
             navigate(-1);
           }}

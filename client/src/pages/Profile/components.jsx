@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import PropTypes from "prop-types";
-import { MarkdownPreview } from "../CreatePosts/Writing/WritingComponents";
+import { MarkdownPreview } from "@/pages/Create/Editor/components";
 import {
   Eye,
   EyeOff,
@@ -19,7 +19,10 @@ import {
   Users,
   UserCheck,
   Contact,
+  BookMarked,
 } from "lucide-react";
+
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,7 +47,7 @@ import { toast } from "sonner";
 import { useDataService } from "../../services/dataService";
 import { useAuth } from "../../contexts/AuthContext";
 import { formatDistanceToNow } from "date-fns";
-import { BookMarked } from "lucide-react";
+import { useCollectionContext } from "../../contexts/CollectionContext";
 
 const formatDates = (date) => {
   try {
@@ -123,6 +126,25 @@ export const ProfileHelmet = ({ currentProfile }) => {
 };
 ProfileHelmet.propTypes = {
   currentProfile: PropTypes.object,
+};
+
+export const ProfileImage = ({ user }) => {
+  return (
+    <div className="size-16 md:size-24 rounded-full overflow-hidden bg-gray-100 dark:bg-[#171717]">
+      <Avatar className="size-full">
+        <AvatarImage
+          src={user.profilePicture}
+          alt={`${user.username}'s profile picture`}
+        />
+        <AvatarFallback className="bg-gradient-to-r from-lime-500 to-green-500 text-white text-4xl font-light font-stardom">
+          {user.fullName.slice(0, 2).toUpperCase()}
+        </AvatarFallback>
+      </Avatar>
+    </div>
+  );
+};
+ProfileImage.propTypes = {
+  user: PropTypes.object,
 };
 
 export const QuickStatsProfile = ({ currentUser }) => {
@@ -336,6 +358,7 @@ export const PostActions = ({ post, setPosts, loading }) => {
   const { currentUser, setCurrentUser } = useAuth();
   const { deletePost, changePostVisibility, changeFeaturedSettings } =
     useDataService();
+  const { setPostIdToSave } = useCollectionContext();
 
   return (
     <div className="bg-gray-100 dark:bg-neutral-900 rounded-lg backdrop-blur-sm flex items-center cursor-pointer">
@@ -509,6 +532,9 @@ export const PostActions = ({ post, setPosts, loading }) => {
           <DropdownMenuItem>
             <button
               className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
+              onClick={() => {
+                setPostIdToSave(post._id);
+              }}
             >
               Save in Collection
             </button>
@@ -537,6 +563,7 @@ PostActions.propTypes = {
 
 export const PostActionsPublic = ({ post }) => {
   const navigate = useNavigate();
+  const { setPostIdToSave } = useCollectionContext();
 
   return (
     <div className="bg-gray-100 dark:bg-neutral-900 rounded-lg backdrop-blur-sm flex items-center cursor-pointer">
@@ -561,6 +588,7 @@ export const PostActionsPublic = ({ post }) => {
         title="Save in Collection"
         onClick={(e) => {
           e.stopPropagation();
+          setPostIdToSave(post._id);
         }}
       >
         <BookMarked
@@ -925,10 +953,10 @@ export const PostDetails = ({ post }) => {
           last edited {formatDates(post.modifiedAt)}
         </span>
       </div>
-      {post.tags && (
+      {post.tags && post.tags.length > 0 && (
         <div className="flex flex-wrap gap-2 text-xs text-black dark:text-neutral-300 mt-2">
           Tags:
-          {post.tags?.map((tag) => (
+          {post.tags.map((tag) => (
             <span
               className="bg-lime-200 dark:bg-neutral-700 rounded-full px-2"
               key={tag}

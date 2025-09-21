@@ -1,3 +1,5 @@
+// src/models/Collection.js
+
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
@@ -11,16 +13,23 @@ const collectionSchema = new Schema(
     description: {
       type: String,
       default: "",
+      trim: true,
     },
     thumbnailUrl: {
       type: String,
       trim: true,
     },
     tags: [
-      // add max 5 limit, default "regular", so 4 more possible
+      // max 5
       {
         type: String,
         trim: true,
+        validate: {
+          validator: function (tags) {
+            return tags.length <= 5;
+          },
+          message: "Maximum 5 tags are allowed.",
+        },
       },
     ],
     isPrivate: {
@@ -39,10 +48,15 @@ const collectionSchema = new Schema(
         ref: "Post",
       },
     ],
+
     // collections will be promoted through tags similarities of insider posts, their own tags
-    // & totalLikes
+    // & upvote / downvote
     // ai based content scanning can be implemented also
-    totalLikes: {
+    totalUpvotes: {
+      type: Number,
+      default: 0,
+    },
+    totalDownvotes: {
       type: Number,
       default: 0,
     },

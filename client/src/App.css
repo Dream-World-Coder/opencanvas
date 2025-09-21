@@ -1,6 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Handlee&family=Six+Caps&family=Montserrat:wght@400;600&display=swap");
 
+/* monsterrat can also be removed may be */
 @font-face {
+  /* only in about section */
   font-family: scribe;
   src: url("/fonts/military-scribe.woff2") format("woff2");
   font-style: normal;
@@ -12,6 +14,7 @@
   font-style: normal;
   font-weight: 400;
 }
+/* all of them not needed maybe */
 @font-face {
   font-family: Boska-Bold;
   src: url("/fonts/Boska-Bold.woff2") format("woff2");
@@ -24,6 +27,7 @@
   font-family: Boska-Regular;
   src: url("/fonts/Boska-Regular.woff2") format("woff2");
 }
+
 @font-face {
   font-family: "Sentient-Italic";
   src: url("/fonts/Sentient-Italic.woff2") format("woff2");
@@ -46,6 +50,7 @@
   font-style: normal;
 }
 
+/* article nested styles */
 blockquote {
   padding-top: 8px !important;
   padding-bottom: 8px !important;
@@ -175,4 +180,82 @@ article p {
 .highlighted__heading {
   background-color: yellow !important;
   color: black !important;
+}
+
+.no-resize {
+  resize: none;
+}
+
+.no-scrollbar {
+  overflow: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+
+/* Base: variables so we can reuse for both Firefox & WebKit */
+.thin-scrollbar {
+  /* Firefox */
+  scrollbar-width: thin; /* makes it thinner in Firefox */
+  scrollbar-color: var(--sb-thumb) var(--sb-track);
+
+  /* Defaults (light) */
+  --sb-thumb: #9aa0a6; /* thumb color */
+  --sb-track: #eeeeee; /* track/path color */
+}
+
+/* Dark mode override when <html class="dark"> ... */
+html.dark .thin-scrollbar {
+  --sb-thumb: #666; /* thumb in dark */
+  --sb-track: #333; /* track/path in dark (your requirement) */
+}
+
+/* Chrome/Edge/Safari (WebKit) */
+.thin-scrollbar::-webkit-scrollbar {
+  width: 5px; /* vertical scrollbar width */
+  height: 5px; /* horizontal scrollbar height */
+}
+
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: var(--sb-track);
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb);
+  border-radius: 8px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #aaa; /* light hover */
+}
+html.dark .thin-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #777; /* dark hover */
+}
+
+/* Optional: hide the scrollbar corner on both axes */
+.thin-scrollbar::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* selection color */
+/* default */
+::selection {
+  background: #bef264; /* lime-300 */
+  color: black;
+}
+::-moz-selection {
+  background: #bef264; /* Firefox */
+  color: black;
+}
+
+/* dark mode */
+html.dark ::selection {
+  background: #65a30d; /* lime-600 */
+  color: white;
+}
+html.dark ::-moz-selection {
+  background: #65a30d;
+  color: white;
 }

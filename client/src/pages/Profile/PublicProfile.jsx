@@ -4,7 +4,6 @@ import { CircleCheck } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 
 import ProfileHeader from "../../components/Header/ProfileHeader";
@@ -19,6 +18,7 @@ import {
   PostFilterTabs,
   PostList,
   NameDesignation,
+  ProfileImage,
 } from "./components";
 import { useDataService } from "../../services/dataService";
 import { useAuth } from "../../contexts/AuthContext";
@@ -214,17 +214,8 @@ const PublicProfile = () => {
                     <Skeleton className="size-16 md:size-24 rounded-full" />
                   ) : (
                     <div className="relative group">
-                      <div className="size-16 md:size-24 rounded-full overflow-hidden bg-gray-100 dark:bg-[#171717]">
-                        <Avatar className="size-full text-xl font-thin">
-                          <AvatarImage
-                            src={currentProfile.profilePicture}
-                            alt={`${currentProfile.username}'s profile image`}
-                          />
-                          <AvatarFallback className="dark:bg-[#171717]">
-                            {currentProfile.fullName.slice(0, 2).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                      </div>
+                      <ProfileImage user={currentProfile} />
+
                       {currentUser?._id?.toString() !==
                         currentProfile._id?.toString() && (
                         <button

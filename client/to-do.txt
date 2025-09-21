@@ -1,6 +1,37 @@
 -- [] interested topics add in profile settings
 -- [easy back option to articlepage]
 
+-- will use SSR, 1000chars will be in there -> SEO, rest will be fetched, so if not logged in, no read
+
+-- remove this: const isDark = useDarkMode(); use the DarkModeContext instead
+-- no session use
+
+-- remove prose classes, not needed
+-- view posts markdown preview is modified
+-- good back btn in posts/articles
+
+-- why problem without session, the recent login is getting shown everywhere
+
+-- remove totalSavedPosts, totalFollowers, totalFollowing from user
+-- totalLikes, totalViews -> fill it,
+
+-- [+] id genreation problem when `` in title, in Table of Contents
+
+fix it in posts: author: {
+  name: 'Subhajit Gorai',
+  username: 'subhajit',
+  profilePicture: 'https://lh3.googleusercontent.com/a/ACg8ocIc5NPQxm8E_It4t-lAOdbGtG1AQPnzQGmIm3ja7wNvXynyww=s96-c',
+  role: 'Sophomore B.Tech Student @IIEST'
+},
+
+
+
+-- allow spaces in tags, add one by one
+-- fix error msg, more than 5 tags, claude's code
+
+-- react docs read, writing page perf optimisation
+-- loading in comments
+-- /save-written-post -> /save/post/written
 
 -- need to store recent activity of user
 -- contact info not synced on userame update, also rate limit it
@@ -82,3 +113,90 @@ sed -i '' 's/127\.0\.0\.1/localhost/g' $(rg -l '127\.0\.0\.1')
 
 https://console.cloud.google.com/apis/credentials
 ------------------------------
+
+
+sqlite> select id, email, username, email_verified, created_at from users;
+|                id                |           email            | username | email_verified |         created_at         |
+|----------------------------------|----------------------------|----------|----------------|----------------------------|
+| 897d17c8f5dd40efb033f16b36c91253 | a@s                        | asd      | 0              | 2025-03-21 17:07:05.448285 |
+| b0e3e4d2cb104d459778e8020bd00562 | explorehub147@gmail.com    | 333      | 0              | 2025-03-21 17:21:44.966893 |
+| fb0741655b6a40a3b419d11111bfec1f | goraisubhajit133@gmail.com | subha    | 0              | 2025-03-21 17:24:40.969929 |
+| c6c8b2ea028447c8b1e73a616bd3c5b4 | goraisubhajit53@gmail.com  | subhajit | 0              | 2025-08-21 16:31:37.694999 |
+| 0afa4d8ac8c05fa8078c5749988a4ea9 | user1@example.com          | user1    | 0              | 2025-08-21 16:50:29        |
+| 8ff6ad1e9f50c36ef13ec8cfda1b067a | user2@example.com          | user2    | 0              | 2025-08-21 16:50:29        |
+| 2170669a268689dc13d4a1a311e6c4e1 | user3@example.com          | user3    | 0              | 2025-08-21 16:50:29        |
+| 454ac75b6030dbeee8b27511a7e44a43 | user4@example.com          | user4    | 0              | 2025-08-21 16:50:29        |
+| 762dc6ce311db200929be1aad15f2914 | user5@example.com          | user5    | 0              | 2025-08-21 16:50:29        |
+| bd00fa402a62a9818c2314709999d2a8 | user6@example.com          | user6    | 0              | 2025-08-21 16:50:29        |
+| 2d682fa85a8322c7f9196f900cbf7ca2 | user7@example.com          | user7    | 0              | 2025-08-21 16:50:29        |
+| 6aa2917874b0c30310d4ffab3f6085ea | user8@example.com          | user8    | 0              | 2025-08-21 16:50:29        |
+| 75ce814c835808d35511b0a57ff68358 | user9@example.com          | user9    | 0              | 2025-08-21 16:50:29        |
+| 95ae692a71abd4c5a3c27501a66b9569 | user10@example.com         | user10   | 0              | 2025-08-21 16:50:29        |
+| 1bec7327aa19416877b0953f8a6729ad | user11@example.com         | user11   | 0              | 2025-08-21 16:50:29        |
+| dc2526adc9839782c158249b57362778 | user12@example.com         | user12   | 0              | 2025-08-21 16:50:29        |
+| aefa2c9bef8878fb0e8597446e555d62 | user13@example.com         | user13   | 0              | 2025-08-21 16:50:29        |
+| 473e3b21e4dcffc41e881e4b104ba42c | user14@example.com         | user14   | 0              | 2025-08-21 16:50:29        |
+| e69f1560fda44cb6518b17a02b83af93 | user15@example.com         | user15   | 0              | 2025-08-21 16:50:29        |
+| 8e10fa3ab3ab2222e9f12d052e204b1d | user16@example.com         | user16   | 0              | 2025-08-21 16:50:29        |
+| 8d299c0564363701a69990ac47bcb1b4 | user17@example.com         | user17   | 0              | 2025-08-21 16:50:29        |
+| 1457222f6b0cddc18e86bcd69dd5b963 | user18@example.com         | user18   | 0              | 2025-08-21 16:50:29        |
+| fbecfb4849ce454ac00e02d04e45a708 | user19@example.com         | user19   | 0              | 2025-08-21 16:50:29        |
+| dbe64fff08c65708fb20cda4098e6154 | user20@example.com         | user20   | 0              | 2025-08-21 16:50:29        |
+| b7c8874d647fe4236d14b897f818af8e | user21@example.com         | user21   | 0              | 2025-08-21 16:50:29        |
+| 54be2ac9b250bba06addeaea24d2d167 | user22@example.com         | user22   | 0              | 2025-08-21 16:50:29        |
+| b6c9bbf04d17885add5ff9d6270d8615 | user23@example.com         | user23   | 0              | 2025-08-21 16:50:29        |
+| b6291e6bfbe761b832b415a4175838ec | user24@example.com         | user24   | 0              | 2025-08-21 16:50:29        |
+| 5f3bf293564f10925174f9cd5f170b7f | user25@example.com         | user25   | 0              | 2025-08-21 16:50:29        |
+| 5e4be2fbf4ba1f71d0487560eb4be9de | user26@example.com         | user26   | 0              | 2025-08-21 16:50:29        |
+| 4126d1623d7513d41ae5bb829bf6af0f | user27@example.com         | user27   | 0              | 2025-08-21 16:50:29        |
+| 000518b1a0c05b6ee7907ae0dc594d9b | user28@example.com         | user28   | 0              | 2025-08-21 16:50:29        |
+| 5c9ba0d6885c6ab941d078ffadc2a5a7 | user29@example.com         | user29   | 0              | 2025-08-21 16:50:29        |
+| b51c481cc223c179aa50aa17bc11bd10 | user30@example.com         | user30   | 0              | 2025-08-21 16:50:29        |
+| 8999a8758b64cac6b3e142c40d79271e | user31@example.com         | user31   | 0              | 2025-08-21 16:50:29        |
+| b6b4d1c8a73ced65e50148dcea1a6b79 | user32@example.com         | user32   | 0              | 2025-08-21 16:50:29        |
+| aa41af29bf23f9c9c015e937f60b6fa5 | user33@example.com         | user33   | 0              | 2025-08-21 16:50:29        |
+| 8cad926e9b35e84d78fa34bf575d0a62 | user34@example.com         | user34   | 0              | 2025-08-21 16:50:29        |
+| 2ccb2aef0d5ac987de4a152a135a5ead | user35@example.com         | user35   | 0              | 2025-08-21 16:50:29        |
+| b57689e66f95903d7b21f828f159947d | user36@example.com         | user36   | 0              | 2025-08-21 16:50:29        |
+| f95e9c09a1b1fcb6c24b2aa486b007dc | user37@example.com         | user37   | 0              | 2025-08-21 16:50:29        |
+| 9ef75972defff8d766f2277bb65c815e | user38@example.com         | user38   | 0              | 2025-08-21 16:50:29        |
+| e1dd9301d11ebd7ee6026e2ccbafcaba | user39@example.com         | user39   | 0              | 2025-08-21 16:50:29        |
+| dbcb5e3f77c4c1544b0e7bdd07490257 | user40@example.com         | user40   | 0              | 2025-08-21 16:50:29        |
+| 12b82837a79d2c86e295e2ab060c8e17 | user41@example.com         | user41   | 0              | 2025-08-21 16:50:29        |
+| e1dcb6de45053f769eabfca452328099 | user42@example.com         | user42   | 0              | 2025-08-21 16:50:29        |
+| f5dc61e939d987e27273d8110bb9ea9e | user43@example.com         | user43   | 0              | 2025-08-21 16:50:29        |
+| e3be05e0ee231574a712b940d2459e24 | user44@example.com         | user44   | 0              | 2025-08-21 16:50:29        |
+| 2705e0c60216cd7d4060820f7367c686 | user45@example.com         | user45   | 0              | 2025-08-21 16:50:29        |
+| a0d256b764238e64917e7d2f1c0b23dd | user46@example.com         | user46   | 0              | 2025-08-21 16:50:29        |
+| ae455f3d4258e7e3d93568fa7c77c1f8 | user47@example.com         | user47   | 0              | 2025-08-21 16:50:29        |
+| 2c16fb75e3af3dba0f3bc87a593eb5fd | user48@example.com         | user48   | 0              | 2025-08-21 16:50:29        |
+| 82a503a4d82d78443490935e1ae38f20 | user49@example.com         | user49   | 0              | 2025-08-21 16:50:29        |
+| 3271ac00e685484b217ec11fcf3bc2db | user50@example.com         | user50   | 0              | 2025-08-21 16:50:29        |
+sqlite>
+
+
+sqlite> select id, title, date, split_method, total_amount from expenses;
+|                  id                  |       title       |    date    | split_method | total_amount |
+|--------------------------------------|-------------------|------------|--------------|--------------|
+| cd1eb248c3a34ed9b29260a94d7c0a93     | 123               | 2025-03-21 | EQUAL        | 1212         |
+| 9e6cff7194e8433eb1686a3666bcf746     | Dinner            | 2025-07-16 | EQUAL        | 2580         |
+| a1b2c3d4-e5f6-7890-abcd-ef1234567890 | Grocery Shopping  | 2025-01-15 | EQUAL        | 15000        |
+| b2c3d4e5-f6a7-8901-bcde-f2345678901  | Movie Night       | 2025-02-10 | UNEQUAL      | 6000         |
+| c3d4e5f6-a7b8-9012-cdef-3456789012   | Road Trip Fuel    | 2025-03-05 | EQUAL        | 12000        |
+| d4e5f6a7-b8c9-0123-def0-4567890123   | Restaurant Dinner | 2025-04-20 | UNEQUAL      | 18000        |
+| e5f6a7b8-c9d0-1234-ef01-5678901234   | Concert Tickets   | 2025-05-12 | EQUAL        | 30000        |
+| f6a7b8c9-d0e1-2345-f012-6789012345   | Utility Bill      | 2025-06-01 | EQUAL        | 8000         |
+| a7b8c9d0-e1f2-3456-0123-7890123456   | Group Vacation    | 2025-06-15 | UNEQUAL      | 50000        |
+| b8c9d0e1-f2a3-4567-1234-8901234567   | Pizza Party       | 2025-07-10 | EQUAL        | 10000        |
+| c9d0e1f2-a3b4-5678-2345-9012345678   | Camping Gear      | 2025-07-25 | UNEQUAL      | 25000        |
+| d0e1f2a3-b4c5-6789-3456-0123456789   | Team Lunch        | 2025-08-01 | EQUAL        | 14000        |
+| e1f2a3b4-c5d6-7890-4567-1234567890   | BBQ Supplies      | 2025-08-05 | UNEQUAL      | 9000         |
+| f2a3b4c5-d6e7-8901-5678-2345678901   | Coffee Run        | 2025-08-10 | EQUAL        | 5000         |
+| a3b4c5d6-e7f8-9012-6789-3456789012   | Game Night Snacks | 2025-08-12 | EQUAL        | 6000         |
+| b4c5d6e7-f8a9-0123-7890-4567890123   | Hotel Booking     | 2025-08-15 | UNEQUAL      | 40000        |
+| c5d6e7f8-a9b0-1234-8901-5678901234   | Taxi Fare         | 2025-08-18 | EQUAL        | 4000         |
+| d6e7f8a9-b0c1-2345-9012-6789012345   | Group Gift        | 2025-08-20 | UNEQUAL      | 12000        |
+| e7f8a9b0-c1d2-3456-0123-7890123456   | Party Supplies    | 2025-08-21 | EQUAL        | 11000        |
+| f8a9b0c1-d2e3-4567-1234-8901234567   | Museum Tickets    | 2025-08-21 | EQUAL        | 8000         |
+| a9b0c1d2-e3f4-5678-2345-9012345678   | Bar Tab           | 2025-08-21 | UNEQUAL      | 15000        |
+| b0c1d2e3-f4a5-6789-3456-0123456789   | Picnic Supplies   | 2025-08-21 | EQUAL        | 7000         |

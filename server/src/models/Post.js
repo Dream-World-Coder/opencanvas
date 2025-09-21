@@ -26,6 +26,8 @@ const postSchema = new Schema(
       ref: "User",
       required: true,
     },
+
+    // might not be required after populate
     author: {
       name: { type: String, required: true },
       profilePicture: { type: String },
@@ -37,12 +39,12 @@ const postSchema = new Schema(
     modifiedAt: { type: Date, default: Date.now },
 
     tags: {
-      // max 5, default: "regular",
+      // max 5, default: none,
       // in images -> pre added tags,
       // in blog/articles custom tags can be added
       type: [String],
       trim: true,
-      default: ["regular"],
+      default: [],
       required: true,
       validate: {
         validator: function (tags) {
@@ -93,6 +95,9 @@ const postSchema = new Schema(
 
     anonymousEngageMentScore: { type: Number },
     engageMentScore: { type: Number },
+
+    // isRepost:,
+    // reposter: _id
   },
   { timestamps: true },
 );

@@ -23,14 +23,22 @@ export function DarkModeProvider({ children }) {
     applyDarkMode(initialDarkMode);
   }, []);
 
-  const toggleDarkMode = (value) => {
+  const setDarkTheme = (value) => {
     setDarkMode(value);
     localStorage.setItem("darkThemeChoice", JSON.stringify(value));
     applyDarkMode(value);
   };
 
+  const toggleDarkMode = () => {
+    setDarkMode((p) => !p);
+    localStorage.setItem("darkThemeChoice", JSON.stringify(!darkMode));
+    applyDarkMode(!darkMode);
+  };
+
   return (
-    <DarkModeContext.Provider value={{ darkMode, toggleDarkMode }}>
+    <DarkModeContext.Provider
+      value={{ darkMode, setDarkTheme, toggleDarkMode }}
+    >
       {children}
     </DarkModeContext.Provider>
   );

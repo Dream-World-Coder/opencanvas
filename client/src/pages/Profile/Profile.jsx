@@ -4,7 +4,6 @@ import { Camera } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 
 import ProfileHeader from "../../components/Header/ProfileHeader";
@@ -16,6 +15,7 @@ import {
   PostFilterTabs,
   PostList,
   NameDesignation,
+  ProfileImage,
 } from "./components";
 import { useAuth } from "../../contexts/AuthContext";
 import { useDarkMode } from "../../components/Hooks/darkMode";
@@ -113,17 +113,7 @@ const Profile = () => {
                     <Skeleton className="size-16 md:size-24 rounded-full" />
                   ) : (
                     <div className="relative group">
-                      <div className="size-16 md:size-24 rounded-full overflow-hidden bg-gray-100 dark:bg-[#171717]">
-                        <Avatar className="size-full text-xl font-thin">
-                          <AvatarImage
-                            src={currentUser.profilePicture}
-                            alt={`${currentUser.username}'s profile picture`}
-                          />
-                          <AvatarFallback className="dark:bg-[#171717]">
-                            {currentUser.fullName.slice(0, 2).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                      </div>
+                      <ProfileImage user={currentUser} />
                       <button
                         className="absolute bottom-0 right-0 bg-black dark:bg-[#333] text-white p-1.5 md:p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                         onClick={() => {

@@ -2,34 +2,12 @@ import {
   Book,
   FilePenLine,
   NotebookPen,
-  // Library,
   Pen,
+  Microscope,
   // Camera,
 } from "lucide-react";
 
 export const createOptions = [
-  //social, type:social
-  {
-    id: "article",
-    href: "/createpost/article",
-    icon: NotebookPen,
-    label: "New Article",
-    color: "bg-amber-500",
-  },
-  {
-    id: "poem",
-    href: "/createpost/poem",
-    icon: Pen,
-    label: "New Poem",
-    color: "bg-purple-500",
-  },
-  {
-    id: "story",
-    href: "/createpost/story",
-    icon: FilePenLine,
-    label: "New Story",
-    color: "bg-blue-500",
-  },
   // {
   //     id: "picture",
   //     href: "/createpost/image",
@@ -37,18 +15,39 @@ export const createOptions = [
   //     label: "Upload Picture",
   //     color: "bg-emerald-500",
   // },
-  // {
-  //   id: "collection",
-  //   href: "/createpost/collection",
-  //   icon: Library,
-  //   label: "Create Collection",
-  //   color: "bg-rose-500",
-  // },
+  {
+    id: "story",
+    href: "/createpost/story",
+    icon: FilePenLine,
+    label: "New Story",
+    color: "bg-lime-500",
+  },
+  {
+    id: "poem",
+    href: "/createpost/poem",
+    icon: Pen,
+    label: "New Poem",
+    color: "bg-green-500",
+  },
+  {
+    id: "article",
+    href: "/createpost/article",
+    icon: NotebookPen,
+    label: "New Article",
+    color: "bg-emerald-500",
+  },
+  {
+    id: "research-paper",
+    href: "/createpost/research-paper",
+    icon: Microscope,
+    label: "Research Paper",
+    color: "bg-teal-500",
+  },
   {
     id: "mybook",
-    href: "/createpost/book",
+    href: "/createpost/book", // article + rp -> most complex
     icon: Book,
     label: "New Book",
-    color: "bg-rose-500",
+    color: "bg-cyan-500",
   },
 ];

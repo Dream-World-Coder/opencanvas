@@ -69,6 +69,7 @@ export default {
       },
       fontFamily: {
         stardom: ["stardom", "sans-serif"],
+        sentient: ["Sentient-Regular", "sans-serif"],
         scribe: ["scribe", "serif"],
         boska: ["Boska-Regular", "serif"],
         boskaBold: ["Boska-Bold", "serif"],
