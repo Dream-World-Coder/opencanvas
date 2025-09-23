@@ -1337,9 +1337,14 @@ export const CommentsBox = memo(function CommentsBox({
         </button>
       </div>
 
+      {loading && (
+        <div className="absolute left-0 w-full h-screen flex items-center justify-center">
+          <div className="loader z-40"></div>
+        </div>
+      )}
+
       <div className="flex-1 overflow-y-auto p-4 space-y-4 divide-y-[1px]">
-        {loading && <p>Loading...</p>}
-        {!loading && comments?.length > 0
+        {comments?.length > 0
           ? comments.map((comment) => (
               <div key={comment._id}>
                 <Comment
@@ -1710,10 +1715,11 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
             h1: ({ children }) => (
               <h1
                 id={generateId(children)}
-                className={`mt-12 mb-6 leading-tight tracking-tight text-3xl md:text-4xl font-bold font-serif flex items-center gap-2 justify-start`}
+                className={`mt-12 mb-6 leading-tight tracking-tight text-3xl md:text-4xl font-bold font-serif flex items-center gap-2 justify-start group`}
               >
                 {children}{" "}
                 <Link
+                  className="opacity-0 group-hover:opacity-100"
                   onClick={() => {
                     copyHeaderLink(children);
                   }}
@@ -1723,10 +1729,11 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
             h2: ({ children }) => (
               <h2
                 id={generateId(children)}
-                className={`font-serif mt-10 mb-5 leading-tight tracking-tight text-2xl md:text-3xl font-bold flex items-center gap-2 justify-start`}
+                className={`font-serif mt-10 mb-5 leading-tight tracking-tight text-2xl md:text-3xl font-bold flex items-center gap-2 justify-start group`}
               >
                 {children}{" "}
                 <Link
+                  className="opacity-0 group-hover:opacity-100"
                   onClick={() => {
                     copyHeaderLink(children);
                   }}
@@ -1736,10 +1743,11 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
             h3: ({ children }) => (
               <h3
                 id={generateId(children)}
-                className={`font-serif mt-8 mb-4 leading-snug text-xl md:text-2xl font-bold flex items-center gap-2 justify-start`}
+                className={`font-serif mt-8 mb-4 leading-snug text-xl md:text-2xl font-bold flex items-center gap-2 justify-start group`}
               >
                 {children}{" "}
                 <Link
+                  className="opacity-0 group-hover:opacity-100"
                   onClick={() => {
                     copyHeaderLink(children);
                   }}
@@ -1749,10 +1757,11 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
             h4: ({ children }) => (
               <h4
                 id={generateId(children)}
-                className={`sentient-regular font-semibold mt-6 mb-3 leading-snug text-lg md:text-xl flex items-center gap-2 justify-start`}
+                className={`sentient-regular font-semibold mt-6 mb-3 leading-snug text-lg md:text-xl flex items-center gap-2 justify-start group`}
               >
                 {children}{" "}
                 <Link
+                  className="opacity-0 group-hover:opacity-100"
                   onClick={() => {
                     copyHeaderLink(children);
                   }}
@@ -1806,7 +1815,7 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                 className={`underline font-medium sentient-regular transition-colors duration-200 ${
                   isDark
                     ? "text-lime-300 hover:text-lime-400"
-                    : "text-lime-600 hover:text-lime-800"
+                    : "text-lime-600 hover:text-lime-700"
                 }`}
                 target={href.startsWith("http") ? "_blank" : "_self"}
                 rel={href.startsWith("http") ? "noopener noreferrer" : ""}
@@ -1817,14 +1826,14 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
 
             ul: ({ children }) => (
               <ul
-                className={`sentient-regular ${darkTheme.secondaryText} list-disc pl-6 md:pl-8 my-3 md:my-4 space-y-4`}
+                className={`sentient-regular ${darkTheme.secondaryText} list-disc pl-6 md:pl-8 my-3 md:my-4 space-y-1`}
               >
                 {children}
               </ul>
             ),
             ol: ({ children }) => (
               <ol
-                className={`sentient-regular ${darkTheme.secondaryText} list-decimal pl-6 md:pl-8 my-3 md:my-4 space-y-4`}
+                className={`sentient-regular ${darkTheme.secondaryText} list-decimal pl-6 md:pl-8 my-3 md:my-4 space-y-1`}
               >
                 {children}
               </ol>

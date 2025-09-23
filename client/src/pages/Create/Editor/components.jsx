@@ -729,12 +729,12 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                 ),
 
                 ul: ({ children }) => (
-                  <ul className="sentient-regular list-disc pl-6 md:pl-8 my-3 md:my-4 space-y-4">
+                  <ul className="sentient-regular list-disc pl-6 md:pl-8 my-3 md:my-4 space-y-1">
                     {children}
                   </ul>
                 ),
                 ol: ({ children }) => (
-                  <ol className="sentient-regular list-decimal pl-6 md:pl-8 my-3 md:my-4 space-y-4">
+                  <ol className="sentient-regular list-decimal pl-6 md:pl-8 my-3 md:my-4 space-y-1">
                     {children}
                   </ol>
                 ),
