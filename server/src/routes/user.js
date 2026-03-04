@@ -133,7 +133,7 @@ router.put(
 );
 
 // GET /u/top/writers
-// Returns the top 4 writers ranked by likes-per-post ratio (likesReceivedCount / postsCount).
+// Returns the top 5 writers ranked by likes-per-post ratio (likesReceivedCount / postsCount).
 // Only users with at least 1 post are considered to avoid division by zero.
 router.get("/u/top/writers", async (req, res) => {
   try {
@@ -153,7 +153,7 @@ router.get("/u/top/writers", async (req, res) => {
       // Best ratio first
       { $sort: { likesPerPost: -1 } },
 
-      { $limit: 4 },
+      { $limit: 5 },
 
       // Return only the fields the client needs
       {
