@@ -132,4 +132,51 @@ router.put(
   },
 );
 
+// GET /u/top/writers
+// Returns the top 4 writers ranked by likes-per-post ratio (likesReceivedCount / postsCount).
+// Only users with at least 1 post are considered to avoid division by zero.
+router.get("/u/top/writers", async (req, res) => {
+  try {
+    const topWriters = await User.aggregate([
+      // Only include users who have published at least one post
+      { $match: { "stats.postsCount": { $gt: 0 } } },
+
+      // Compute the likes-per-post ratio as a virtual field
+      {
+        $addFields: {
+          likesPerPost: {
+            $divide: ["$stats.likesReceivedCount", "$stats.postsCount"],
+          },
+        },
+      },
+
+      // Best ratio first
+      { $sort: { likesPerPost: -1 } },
+
+      { $limit: 4 },
+
+      // Return only the fields the client needs
+      {
+        $project: {
+          _id: 1,
+          username: 1,
+          fullName: 1,
+          profilePicture: 1,
+          designation: 1,
+          stats: 1,
+          likesPerPost: 1,
+        },
+      },
+    ]);
+
+    res.status(200).json({ success: true, data: topWriters });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch top writers",
+      error: process.env.NODE_ENV === "development" ? err.message : undefined,
+    });
+  }
+});
+
 module.exports = { router };

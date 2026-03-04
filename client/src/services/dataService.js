@@ -28,6 +28,17 @@ export const useDataService = () => {
     }
   };
 
+  // Top 4 writers ranked by likes-per-post ratio
+  const getTopWriters = async () => {
+    try {
+      const res = await authAxios.get("/u/top/writers");
+      return res.data.data; // [{ username, fullName, profilePicture, designation, stats, likesPerPost }]
+    } catch (err) {
+      toast.error("Error fetching top writers");
+      throw err;
+    }
+  };
+
   // Update the logged-in user's own profile
   const updateUserProfile = async (formValues) => {
     try {
@@ -427,6 +438,7 @@ export const useDataService = () => {
     // User
     getUserProfile,
     getUsersByIds,
+    getTopWriters,
     updateUserProfile,
     followUnfollowUser,
     getUserFollowers,

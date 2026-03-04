@@ -14,6 +14,9 @@ import { useState } from "react";
 import { PanelLeftClose } from "lucide-react";
 import { PanelRightClose } from "lucide-react";
 import { X } from "lucide-react";
+import { useDataService } from "../../services/dataService";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 export const LeftSideBar = ({ selectedTopics, setSelectedTopics }) => {
   const [sidebarClosed, setSidebarClosed] = useState(
@@ -131,46 +134,100 @@ LeftSideBar.propTypes = {
 
 export const RightSideBar = () => {
   const { currentUser } = useAuth();
+  const { getTopWriters, getUserProfile, followUnfollowUser } =
+    useDataService();
   const navigate = useNavigate();
 
+  const [writers, setWriters] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Per-writer follow state: { [userId]: bool }
+  const [followMap, setFollowMap] = useState({});
+
   const [suggestedWritersVisible, setSuggestedWritersVisible] = useState(true);
+
+  useEffect(() => {
+    fetchWriters();
+  }, []);
+
+  async function fetchWriters() {
+    setLoading(true);
+    try {
+      const res = await getTopWriters();
+      setWriters(res);
+
+      // Fetch follow status for each writer in parallel (only if logged in)
+      if (currentUser && res.length > 0) {
+        const profiles = await Promise.all(
+          res.map((w) => getUserProfile(w.username).catch(() => null)),
+        );
+        const map = {};
+        res.forEach((w, i) => {
+          // getUserProfile returns { user, isFollowing }
+          map[w._id] = profiles[i]?.isFollowing ?? false;
+        });
+        setFollowMap(map);
+      }
+    } catch (e) {
+      console.log(e);
+      setWriters([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleFollow(writerId) {
+    if (!currentUser) {
+      toast.error("You need to log in first");
+      return;
+    }
+    try {
+      const res = await followUnfollowUser(writerId);
+      if (!res.success) return;
+      const followed = res.message === "Followed";
+      // Update only this writer's entry in the map
+      setFollowMap((prev) => ({ ...prev, [writerId]: followed }));
+      toast.success(res.message);
+    } catch {
+      // useDataService already shows a toast
+    }
+  }
 
   return (
     <div className="p-4 bg-white dark:bg-[#222] rounded-none shadow-none h-[88dvh] flex flex-col justify-between">
       {currentUser ? (
         <div
-          className={`p-4 border border-gray-100 dark:border-[#333] rounded-lg ${suggestedWritersVisible ? "opacity-100" : "opacity-0"}`}
+          className={`p-4 border border-gray-100 dark:border-[#333] rounded-lg transition-opacity ${suggestedWritersVisible ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         >
+          {/* Card header */}
           <div className="flex justify-between items-center mb-3">
-            <h3 className="font-bold size-full">Suggested Writers</h3>
+            <h3 className="font-bold">Suggested Writers</h3>
             <X
               size={16}
-              onClick={() => {
-                setSuggestedWritersVisible(false);
-              }}
+              className="cursor-pointer text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 transition-colors"
+              onClick={() => setSuggestedWritersVisible(false)}
             />
           </div>
+
+          {/* Writer list — skeleton while loading, real rows after */}
           <div className="space-y-3">
-            {Array(3)
-              .fill(0)
-              .map((_, i) => (
-                <div key={i} className="flex items-center">
-                  <Avatar className="h-8 w-8 mr-2">
-                    <AvatarFallback>U</AvatarFallback>
-                  </Avatar>
-                  <div className="text-sm">Writer Name</div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="ml-auto text-xs px-2 py-0 h-6"
-                  >
-                    Follow
-                  </Button>
-                </div>
-              ))}
+            {loading ? (
+              <WritersSkeleton />
+            ) : (
+              writers.map((writer) => (
+                <WriterRow
+                  key={writer._id}
+                  writer={writer}
+                  isFollowing={followMap[writer._id] ?? false}
+                  onNavigate={() => navigate(`/u/${writer.username}`)}
+                  onFollow={() => handleFollow(writer._id)}
+                />
+              ))
+            )}
           </div>
         </div>
       ) : (
+        // Logged-out CTA
         <div className="p-4 border border-gray-200 dark:border-[#333] rounded-lg">
           <h3 className="font-bold mb-3">Join OpenCanvas</h3>
           <p className="text-sm mb-4">
@@ -191,10 +248,60 @@ export const RightSideBar = () => {
           </Button>
         </div>
       )}
+
       <div className="text-xs">© OPENCANVAS 2025 All rights reserved</div>
     </div>
   );
 };
+
+// ── Single writer row ─────────────────────────────────────────────────────────
+
+function WriterRow({ writer, isFollowing, onNavigate, onFollow }) {
+  return (
+    <div
+      onClick={onNavigate}
+      className="flex items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-[#2a2a2a] rounded-md px-1 py-0.5 transition-colors"
+    >
+      <Avatar className="h-8 w-8 mr-2 shrink-0">
+        <AvatarImage src={writer.profilePicture} alt={writer.username} />
+        <AvatarFallback>
+          {writer.fullName?.slice(0, 1).toUpperCase() || "U"}
+        </AvatarFallback>
+      </Avatar>
+
+      <div className="text-sm truncate flex-1">
+        {writer.fullName || "Unknown"}
+      </div>
+
+      <Button
+        size="sm"
+        variant="outline"
+        className="ml-auto text-xs px-2 py-0 h-6 shrink-0"
+        onClick={(e) => {
+          e.stopPropagation(); // don't navigate when clicking Follow
+          onFollow();
+        }}
+      >
+        {isFollowing ? "Unfollow" : "Follow"}
+      </Button>
+    </div>
+  );
+}
+
+// ── Loading skeleton ──────────────────────────────────────────────────────────
+
+function WritersSkeleton() {
+  return Array.from({ length: 4 }).map((_, i) => (
+    <div key={i} className="flex items-center gap-2 animate-pulse">
+      {/* Avatar placeholder */}
+      <div className="h-8 w-8 rounded-full bg-gray-100 dark:bg-[#333] shrink-0" />
+      {/* Name placeholder */}
+      <div className="h-3 flex-1 rounded bg-gray-100 dark:bg-[#333]" />
+      {/* Button placeholder */}
+      <div className="h-6 w-14 rounded bg-gray-100 dark:bg-[#333] shrink-0" />
+    </div>
+  ));
+}
 
 export const ErrorDisplay = ({ error, fetchPosts }) => {
   return (
