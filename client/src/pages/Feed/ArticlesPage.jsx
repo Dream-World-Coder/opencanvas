@@ -31,7 +31,7 @@ const ArticleFeed = () => {
   const { getArticlesFeed } = useDataService();
 
   const handlePostClick = (post) => {
-    navigate(`/p/${slugify(post.title)}-${post._id}`, { state: { post } });
+    navigate(`/p/${slugify(post?.title)}-${post?._id}`, { state: { post } });
   };
 
   // React Query infinite query - page-number based to match the backend
@@ -58,7 +58,7 @@ const ArticleFeed = () => {
 
   // Flatten all pages into a single deduplicated list
   const allPosts = data?.pages.flatMap((page) => page.data) ?? [];
-  const uniquePosts = [...new Map(allPosts.map((p) => [p._id, p])).values()];
+  const uniquePosts = [...new Map(allPosts.map((p) => [p?._id, p])).values()];
 
   // Intersection observer - triggers next page fetch when last post scrolls into view
   const observer = useRef();
@@ -146,7 +146,7 @@ const ArticleFeed = () => {
                   return (
                     <div
                       ref={isLast ? lastPostRef : null}
-                      key={post._id}
+                      key={post?._id}
                       className="bg-white dark:bg-[#222] rounded-none shadow-none overflow-hidden cursor-pointer"
                       onClick={() => handlePostClick(post)}
                     >
