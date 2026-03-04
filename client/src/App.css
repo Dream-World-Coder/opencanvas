@@ -159,8 +159,20 @@ article {
 
 article p {
   margin-bottom: 1.75rem;
+  overflow-wrap: break-word; /* Safer than break-all for normal text */
+  word-break: normal;
+  overflow-x: auto; /* Uses scroll only when content actually overflows */
+  overflow-y: hidden;
 }
 
+/* Ensure LaTeX and Code blocks scroll horizontally instead of breaking layout */
+article pre,
+article .katex-display,
+article .math-display {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
 @media screen and (min-width: 1400px) {
   .desktop-xl {
     padding-top: 24%;

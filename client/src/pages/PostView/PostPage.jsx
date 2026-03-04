@@ -232,7 +232,7 @@ const ViewPost = () => {
       <PostHelmet post={post} author={author} />
 
       <div
-        className={`w-full h-full grid place-items-center bg-white ${darkTheme.colors.bg} overflow-x-hidden pt-16`}
+        className={`w-full min-h-screen flex flex-col items-center bg-white ${darkTheme.colors.bg} overflow-x-hidden pt-16`}
       >
         <Header
           noBlur={true}
@@ -241,14 +241,13 @@ const ViewPost = () => {
           abs={true}
         />
 
-        {/* left + main + right */}
         <div
-          className={`flex flex-col md:flex-row min-h-screen max-w-screen-xl 2xl:max-w-[1536px] 2xl:w-[1536px] mx-auto bg-white
-          ${darkTheme.colors.bg} text-neutral-900 ${darkTheme.colors.primaryText}`}
+          className={`flex flex-col md:flex-row w-full min-h-screen max-w-screen-xl 2xl:max-w-[1536px] 2xl:w-[1536px] mx-auto bg-white
+            ${darkTheme.colors.bg} text-neutral-900 ${darkTheme.colors.primaryText}`}
         >
           <LeftSidebar />
 
-          <main className="w-full flex-1 py-4 lg:py-8 px-6 lg:px-0 2xl:px-16 min-h-screen">
+          <main className="w-full max-w-full min-w-0 flex-1 py-4 lg:py-8 px-8 lg:px-0 2xl:px-16 min-h-screen">
             <ArticleHeader
               post={post}
               currentUser={currentUser}
@@ -262,7 +261,7 @@ const ViewPost = () => {
             />
 
             {/* Article content */}
-            <article className="w-full min-w-full p-0 mb-16">
+            <article className="w-full max-w-full min-w-0 p-0 mb-16">
               <ThemedMarkdownPreview
                 title={post.title}
                 content={post.content}

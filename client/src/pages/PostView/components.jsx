@@ -277,7 +277,7 @@ export const TableOfContents = memo(function Toc({
   tableOfContents,
   isArticle,
 }) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(!true);
 
   return (
     <aside className="w-full h-full lg:w-72 relative">
