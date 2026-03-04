@@ -27,7 +27,10 @@ const FRONTEND_URL = process.env.FRONTEND_URL;
 const config = {
   clientID: GOOGLE_CLIENT_ID,
   clientSecret: GOOGLE_CLIENT_SECRET,
-  callbackURL: `${process.env.CURRENT_URL}/auth/google/callback`,
+  callbackURL:
+    process.env.NODE_ENV === "development"
+      ? `${process.env.CURRENT_URL_LOCAL}/auth/google/callback`
+      : `${process.env.CURRENT_URL}/auth/google/callback`,
   userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
   passReqToCallback: true,
 };
