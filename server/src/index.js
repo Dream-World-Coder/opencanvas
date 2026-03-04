@@ -24,7 +24,9 @@ const PORT = process.env.PORT || 3000;
 const FRONTEND_URL = process.env.FRONTEND_URL;
 
 mongoose
-  .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/opencanvas")
+  .connect(
+    process.env.MONGODB_URI || "mongodb://localhost:27017/opencanvas-new",
+  )
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 

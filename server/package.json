@@ -1,41 +1,41 @@
 {
-    "name": "server",
-    "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "dev": "NODE_ENV=development nodemon src/index.js",
-        "start": "NODE_ENV=production node src/index.js"
-    },
-    "keywords": [],
-    "author": "Subhajit Gorai",
-    "license": "ISC",
-    "dependencies": {
-        "apicache": "^1.6.3",
-        "axios": "^1.8.4",
-        "bcrypt": "^5.1.1",
-        "bcryptjs": "^2.4.3",
-        "connect-mongo": "^5.1.0",
-        "cookie-parser": "^1.4.7",
-        "cookie-session": "^2.1.0",
-        "cors": "^2.8.5",
-        "dotenv": "^16.4.7",
-        "express": "^4.21.2",
-        "express-session": "^1.18.1",
-        "form-data": "^4.0.2",
-        "helmet": "^8.0.0",
-        "jsonwebtoken": "^9.0.2",
-        "mongoose": "^8.11.0",
-        "morgan": "^1.10.0",
-        "multer": "1.4.5-lts.2",
-        "node-cron": "^3.0.3",
-        "passport": "^0.7.0",
-        "passport-google-oauth20": "^2.0.0",
-        "sitemap": "^8.0.0",
-        "uuid": "^11.1.0"
-    },
-    "devDependencies": {
-        "nodemon": "^3.1.9"
-    }
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "NODE_ENV=development nodemon src/index.js",
+    "start": "NODE_ENV=production node src/index.js"
+  },
+  "keywords": [],
+  "author": "Subhajit Gorai",
+  "license": "ISC",
+  "dependencies": {
+    "apicache": "^1.6.3",
+    "axios": "^1.13.6",
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
+    "connect-mongo": "^5.1.0",
+    "cookie-parser": "^1.4.7",
+    "cookie-session": "^2.1.1",
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.1",
+    "express-session": "^1.19.0",
+    "form-data": "^4.0.5",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.23.0",
+    "morgan": "^1.10.1",
+    "multer": "1.4.5-lts.2",
+    "node-cron": "^3.0.3",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "sitemap": "^8.0.3",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
 }
