@@ -150,11 +150,11 @@ const ArticleFeed = () => {
                       className="bg-white dark:bg-[#222] rounded-none shadow-none overflow-hidden cursor-pointer"
                       onClick={() => handlePostClick(post)}
                     >
-                      {post.thumbnailUrl && (
+                      {post?.thumbnailUrl && (
                         <div className="overflow-hidden flex items-center justify-center bg-gray-200 dark:bg-[#333] max-h-80">
                           <img
-                            src={post.thumbnailUrl}
-                            alt={post.title}
+                            src={post?.thumbnailUrl}
+                            alt={post?.title}
                             className="object-contain aspect-video w-full"
                           />
                         </div>
@@ -164,7 +164,7 @@ const ArticleFeed = () => {
                         <PostAuthorInfo post={post} />
 
                         <h2 className="text-xl sm:text-2xl font-bold mb-3 text-gray-900 dark:text-white capitalize">
-                          {post.title}
+                          {post?.title}
                         </h2>
 
                         <div className="relative mb-5 max-h-[220px] overflow-hidden">
@@ -184,7 +184,7 @@ const ArticleFeed = () => {
                           <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white dark:from-[#222] to-transparent" />
                         </div>
 
-                        {post.tags?.length > 0 && <PostTags post={post} />}
+                        {post?.tags?.length > 0 && <PostTags post={post} />}
                         <PostStats post={post} />
                       </div>
                     </div>
