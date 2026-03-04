@@ -14,27 +14,39 @@ function generateRandomAlphanumeric(length) {
   return result.join("");
 }
 
-function generateRandomUsername() {
+function generateRandomUsername(name) {
   const letters = "abcdefghijklmnopqrstuvwxyz";
   const chars = letters + "0123456789_";
-  let username = "";
+
+  // Sanitize input to allow only valid characters, default to empty string
+  const cleanName = name ? name.toLowerCase().replace(/[^a-z0-9_]/g, "") : "";
+  const prefix = cleanName.slice(0, 4);
 
   while (true) {
-    const length = Math.floor(Math.random() * 5) + 6; // 6–10
-    username = "";
+    const totalLength = Math.floor(Math.random() * 5) + 6; // 6–10
+    const remainingLength = Math.max(0, totalLength - prefix.length);
+
+    let randomPart = "";
     let hasLetter = false;
 
-    for (let i = 0; i < length; i++) {
-      const char = chars[Math.floor(Math.random() * chars.length)];
-      username += char;
+    // Check if the prefix already contains a letter
+    for (let char of prefix) {
       if (letters.includes(char)) hasLetter = true;
     }
 
-    // Ensure it's not only numbers and has at least one letter
-    if (hasLetter) break;
-  }
+    for (let i = 0; i < remainingLength; i++) {
+      const char = chars[Math.floor(Math.random() * chars.length)];
+      randomPart += char;
+      if (letters.includes(char)) hasLetter = true;
+    }
 
-  return username;
+    const finalUsername = prefix + randomPart;
+
+    // Ensure it has at least one letter
+    if (hasLetter && finalUsername.length >= 6) {
+      return finalUsername;
+    }
+  }
 }
 
 async function generateUniqueUsername() {

@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-const mediaSchema = new mongoose.Schema(
+const mediaItemSchema = new Schema(
   {
     deleteHash: { type: String, required: true },
     addedAt: { type: Date, required: true, default: Date.now },
@@ -8,9 +9,9 @@ const mediaSchema = new mongoose.Schema(
   { _id: false },
 );
 
-const mediaDeletionQueueSchema = new mongoose.Schema(
+const mediaDeletionQueueSchema = new Schema(
   {
-    deletehashes: [mediaSchema],
+    deletehashes: [mediaItemSchema],
   },
   { timestamps: false },
 );

@@ -7,27 +7,23 @@ import axios from "axios";
 
 const AuthContext = createContext();
 
+const authAxios = axios.create({
+  baseURL: import.meta.env.VITE_BACKEND_URL,
+});
+
+// auth token added to requests
+authAxios.interceptors.request.use((config) => {
+  const token = localStorage.getItem("authToken");
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-
-  const API_URL = import.meta.env.VITE_BACKEND_URL;
-
-  const authAxios = axios.create({
-    baseURL: API_URL,
-  });
-
-  // auth token added to requests
-  authAxios.interceptors.request.use((config) => {
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  });
 
   const isTokenExpired = (token) => {
     try {
@@ -37,10 +33,6 @@ export const AuthProvider = ({ children }) => {
       return true;
     }
   };
-
-  async function fetchCurrentUser() {
-    return await authAxios.get("/auth/user");
-  }
 
   // Load user on initial load
   useEffect(() => {
@@ -55,7 +47,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       try {
-        const response = await fetchCurrentUser();
+        const response = await authAxios.get("/auth/user");
         setCurrentUser(response.data.user);
       } catch (error) {
         console.error("Failed to load user:", error);
@@ -70,6 +62,17 @@ export const AuthProvider = ({ children }) => {
     loadUser();
   }, []);
 
+  // load user from /auth/user of backend
+  const loadUserData = async () => {
+    try {
+      const response = await authAxios.get("/auth/user");
+      setCurrentUser(response.data.user);
+    } catch (error) {
+      console.error("Failed to load user data:", error);
+      logout();
+    }
+  };
+
   // hangle google-auth success
   const handleGoogleAuthSuccess = async () => {
     const token = searchParams.get("token");
@@ -78,10 +81,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("authToken", token);
       navigate(location.pathname, { replace: true }); // remove token from browser history, not needed though
       try {
-        const redirectUrl = localStorage.getItem(
-          "urlToRedirectAfterLogin",
-          null,
-        );
+        const redirectUrl = localStorage.getItem("urlToRedirectAfterLogin");
 
         await loadUserData();
         // navigate("/profile");
@@ -104,25 +104,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // load user from /auth/user of backend
-  const loadUserData = async () => {
-    try {
-      const response = await fetchCurrentUser();
-      setCurrentUser(response.data.user);
-    } catch (error) {
-      console.error("Failed to load user data:", error);
-      logout();
-    }
-  };
-
   const logout = () => {
     localStorage.removeItem("authToken");
     setCurrentUser(null);
-    // set active false,
-    // when logging in, store the id of the lastLoginsSchema of current session in a user attribute,
-    // i.e. activeSessionIds = []. hide it from sending to others
-    // remove when logout
-    // match the ids & set active in profile settings
     navigate("/login");
   };
 
@@ -132,6 +116,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     error,
     logout,
+    loadUserData,
     handleGoogleAuthSuccess,
     authAxios,
   };

@@ -1,3 +1,5 @@
+// src/pages/Create/Editor/components.jsx
+
 import { useRef, useState, memo } from "react";
 import {
   X,

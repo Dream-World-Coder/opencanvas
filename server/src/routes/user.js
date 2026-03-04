@@ -1,335 +1,135 @@
 const express = require("express");
 const router = express.Router();
-const mongoose = require("mongoose");
 const User = require("../models/User");
-const Post = require("../models/Post");
-const Collection = require("../models/Collection");
-
+const Follow = require("../models/Follow");
 const {
-  handleAuthErrors,
   authenticateToken,
   checkUserExists,
 } = require("../middlewares/authorisation");
 
-/**
- *******************************************************
- * update user data
- */
-router.put(
-  "/update-user",
-  authenticateToken,
-  checkUserExists,
-  async (req, res) => {
-    try {
-      const user = req.user;
-      let {
-        username,
-        fullName,
-        designation,
-        aboutMe,
-        notifications,
-        contactInformation,
-      } = req.body;
+// ─── Public Routes ────────────────────────────────────────────────────────────
 
-      username = username.trim();
-      fullName = fullName.trim();
-      designation = designation.trim();
-      aboutMe = aboutMe.trim();
-
-      // Check if username is being changed
-      if (username && username !== user.username) {
-        // Check for username uniqueness
-        const existingUser = await User.findOne({ username });
-        if (existingUser) {
-          return res.status(400).json({
-            success: false,
-            message: "Username already taken",
-          });
-        }
-
-        // Validate username length
-        if (username.length < 4) {
-          return res.status(400).json({
-            success: false,
-            message: "Username must be at least 4 characters long",
-          });
-        }
-
-        if (username.length > 16) {
-          return res.status(400).json({
-            success: false,
-            message: "Username can be 16 characters long at max",
-          });
-        }
-
-        // should contain only A-z, 0-9, and _
-        if (!/^(?!\d+$)[a-z0-9_]+$/.test(username)) {
-          return res.status(400).json({
-            success: false,
-            message:
-              "Username can only contain letters, numbers, and underscores",
-          });
-        }
-
-        user.username = username.toLowerCase();
-      }
-
-      // Validate and update fullName if provided
-      if (fullName) {
-        if (fullName && (fullName.length < 4 || fullName.length > 32)) {
-          return res.status(400).json({
-            success: false,
-            message:
-              fullName.length < 4
-                ? "Fullname must be at least 4 characters long"
-                : "Fullname can be 32 characters long at max",
-          });
-        }
-        user.fullName = fullName;
-      }
-
-      if (designation) {
-        if (designation.length > 40) {
-          return res.status(400).json({
-            success: false,
-            message: "Designation can be 40 characters or less",
-          });
-        }
-        user.designation = designation;
-      }
-
-      // Update aboutMe if provided
-      if (aboutMe) {
-        if (aboutMe && aboutMe.length > 300) {
-          return res.status(400).json({
-            success: false,
-            message: "About must be 300 characters or less",
-          });
-        }
-        user.aboutMe = aboutMe;
-      }
-
-      // Update notifications choices if provided
-      if (notifications) {
-        if (notifications && typeof notifications !== "object") {
-          return res.status(400).json({
-            success: false,
-            message: "error setting notification settings",
-          });
-        }
-        // console.log(notifications);
-        user.notifications.emailNotification = notifications.email;
-        user.notifications.pushNotification = notifications.push;
-
-        user.notifications.mentionNotification = notifications.mentions;
-        user.notifications.followNotification = notifications.follows;
-        user.notifications.commentNotification = notifications.comments;
-        user.notifications.messageNotification = notifications.messages;
-      }
-
-      if (contactInformation !== undefined) {
-        user.contactInformation = contactInformation;
-      }
-
-      const savedUser = await user.save();
-
-      return res.status(200).json({
-        success: true,
-        message: "Profile updated successfully",
-        user: savedUser,
-      });
-    } catch (error) {
-      console.error("Update user error:", error);
-      return res.status(500).json({
-        success: false,
-        message: "Failed to update user data",
-        error:
-          process.env.NODE_ENV === "development"
-            ? error.message
-            : "Server error",
-      });
-    }
-  },
-);
-
-/**
- *******************************************************
- * public profile view
- * need to set it as id
- */
+// GET /u/:username
+// Public profile page - returns limited, safe-to-expose fields only.
+// Also returns whether the requesting user (if logged in) follows this profile.
 router.get("/u/:username", async (req, res) => {
   try {
-    const user = await User.findOne({
-      username: req.params.username,
-    }).select({
-      email: 0,
-      provider: 0,
-      ipAddress: 0,
-      lastFiveLogin: 0,
-      savedPosts: 0,
-      likedPosts: 0,
-    });
+    const user = await User.findOne({ username: req.params.username }).select(
+      "username fullName profilePicture designation aboutMe interestedIn contactInformation featuredItems stats createdAt",
+    );
 
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
-    user.posts = [...user.posts].reverse();
+    // Optionally resolve whether the caller follows this user.
+    // We read the token manually here since this is a public route - no hard auth required.
+    let isFollowing = false;
+    const authHeader = req.headers["authorization"];
+    const token = authHeader?.split(" ")[1];
+    if (token) {
+      try {
+        const jwt = require("jsonwebtoken");
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const follow = await Follow.findOne({
+          followerId: decoded.userId,
+          followingId: user._id,
+        });
+        isFollowing = !!follow;
+      } catch {
+        // Invalid/expired token - just skip the follow check, don't block the request
+      }
+    }
 
-    return res.status(200).json({
-      success: true,
-      user,
-    });
-  } catch (error) {
-    console.error("Get user error:", error);
-    return res.status(500).json({
+    res.status(200).json({ success: true, data: { user, isFollowing } });
+  } catch (err) {
+    res.status(500).json({
       success: false,
-      message: "Failed to retrieve user data",
-      error:
-        process.env.NODE_ENV === "development" ? error.message : "Server error",
+      message: "Failed to fetch user profile",
+      error: process.env.NODE_ENV === "development" ? err.message : undefined,
     });
   }
 });
 
-/**
- *******************************************************
- * get author by id -- limited data like public profile, but getting by id instead username
- */
-async function getUserPublicProfileById(req, res) {
+// GET /u/users/byids?ids=id1,id2,...
+// Batch-fetch minimal user data by IDs.
+// Used on profile pages to show follower/following lists without over-fetching.
+router.get("/u/users/byids", async (req, res) => {
   try {
-    const author = await User.findOne({
-      _id: req.params.id,
-    }).select({
-      email: 0,
-      provider: 0,
-      ipAddress: 0,
-      lastFiveLogin: 0,
-      savedPosts: 0,
-      likedPosts: 0,
-    });
-
-    if (!author) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+    const ids = req.query.ids?.split(",").filter(Boolean);
+    if (!ids || ids.length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No IDs provided" });
     }
 
-    author.posts = [...author.posts].reverse();
+    const users = await User.find({ _id: { $in: ids } }).select(
+      "username fullName profilePicture designation stats",
+    );
 
-    return res.status(200).json({
-      success: true,
-      author,
-    });
-  } catch (error) {
-    console.error("Get author error:", error);
-    return res.status(500).json({
+    res.status(200).json({ success: true, results: users.length, data: users });
+  } catch (err) {
+    res.status(500).json({
       success: false,
-      message: "Failed to retrieve author data",
-      error:
-        process.env.NODE_ENV === "development" ? error.message : "Server error",
+      message: "Failed to fetch users",
+      error: process.env.NODE_ENV === "development" ? err.message : undefined,
     });
   }
-}
-router.get("/author/:id", getUserPublicProfileById);
-router.get("/follower/:id", getUserPublicProfileById);
-router.get("/following/:id", getUserPublicProfileById);
+});
 
-/**
- *******************************************************
- * change post featured or not
- */
+// ─── Private Routes ───────────────────────────────────────────────────────────
+
+// PUT /update/user
+// Update the logged-in user's own profile. Only whitelisted fields are accepted.
+// Username and email changes are intentionally not allowed here.
 router.put(
-  "/change-post-featured",
+  "/update/user",
   authenticateToken,
   checkUserExists,
   async (req, res) => {
     try {
+      const {
+        fullName,
+        profilePicture,
+        designation,
+        aboutMe,
+        interestedIn,
+        contactInformation,
+        notifications,
+      } = req.body;
+
       const user = req.user;
-      const data = req.body;
-      const itemId = data.itemId;
-      const itemType = data.itemType;
 
-      if (!itemId || !itemType) {
-        return res.status(404).json({
-          success: false,
-          message: "itemid / itemtype not found",
-        });
+      if (fullName !== undefined) user.fullName = fullName;
+      if (profilePicture !== undefined) user.profilePicture = profilePicture;
+      if (designation !== undefined) user.designation = designation;
+      if (aboutMe !== undefined) user.aboutMe = aboutMe;
+      if (interestedIn !== undefined) user.interestedIn = interestedIn;
+      if (contactInformation !== undefined)
+        user.contactInformation = contactInformation;
+
+      // Merge notification preferences instead of replacing the whole object
+      if (notifications !== undefined) {
+        Object.assign(user.notifications, notifications);
       }
 
-      if (!mongoose.Types.ObjectId.isValid(itemId)) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Invalid itemId" });
-      }
-
-      let Model = null;
-      if (itemType === "Post") {
-        Model = Post;
-      } else if (itemType === "Collection") {
-        Model = Collection;
-      } else {
-        return res
-          .status(400)
-          .json({ success: false, message: "Invalid itemType" });
-      }
-
-      const item = await Model.findById(itemId);
-      if (!item) {
-        return res
-          .status(400)
-          .json({ success: false, message: `${itemType} not found` });
-      }
-      if (!item.isPublic) {
-        return res.status(400).json({
-          success: false,
-          message: `${itemType} is private, make public first`,
-        });
-      }
-
-      if (
-        user.featuredItems
-          .map((item) => item.itemId.toString())
-          .includes(itemId.toString())
-      ) {
-        user.featuredItems = user.featuredItems.filter(
-          (item) => item.itemId.toString() !== itemId.toString(),
-        );
-        await user.save();
-
-        return res.status(200).json({
-          success: true,
-          message: `${itemType} removed from features`,
-          added: false,
-        });
-      }
-
-      user.featuredItems.push({
-        itemId,
-        itemType,
-        itemTitle: item.title,
-        itemThumbnail: item.thumbnailUrl || null,
-      });
       await user.save();
 
-      return res.status(200).json({
-        success: true,
-        message: `${itemType} featured`,
-        added: true,
-      });
+      res.status(200).json({ success: true, data: user });
     } catch (err) {
-      console.log("Error liking post", err);
-      return res.status(500).json({
+      // Mongoose validation errors (e.g. maxlength, custom validators) come back as 400
+      if (err.name === "ValidationError") {
+        return res.status(400).json({ success: false, message: err.message });
+      }
+      res.status(500).json({
         success: false,
-        message: "Internal server error",
+        message: "Failed to update user",
+        error: process.env.NODE_ENV === "development" ? err.message : undefined,
       });
     }
   },
 );
-
-router.use(handleAuthErrors);
 
 module.exports = { router };

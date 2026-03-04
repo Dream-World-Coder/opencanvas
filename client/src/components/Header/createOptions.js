@@ -1,51 +1,40 @@
-import {
-  Book,
-  FilePenLine,
-  NotebookPen,
-  Pen,
-  Microscope,
-  // Camera,
-} from "lucide-react";
+import { Book, FilePenLine, NotebookPen, Pen, Microscope } from "lucide-react";
 
+// Each option maps to a post type the user can create.
+// The `type` query param is passed to the editor so it can tailor the UI.
+// Note: post-type behaviour in the editor is not implemented yet — leave `type` in the URL for now.
 export const createOptions = [
-  // {
-  //     id: "picture",
-  //     href: "/createpost/image",
-  //     icon: Camera,
-  //     label: "Upload Picture",
-  //     color: "bg-emerald-500",
-  // },
   {
     id: "story",
-    href: "/createpost/story",
+    type: "story",
     icon: FilePenLine,
     label: "New Story",
     color: "bg-lime-500",
   },
   {
     id: "poem",
-    href: "/createpost/poem",
+    type: "poem",
     icon: Pen,
     label: "New Poem",
     color: "bg-green-500",
   },
   {
     id: "article",
-    href: "/createpost/article",
+    type: "article",
     icon: NotebookPen,
     label: "New Article",
     color: "bg-emerald-500",
   },
   {
     id: "research-paper",
-    href: "/createpost/research-paper",
+    type: "research-paper",
     icon: Microscope,
     label: "Research Paper",
     color: "bg-teal-500",
   },
   {
     id: "mybook",
-    href: "/createpost/book", // article + rp -> most complex
+    type: "book",
     icon: Book,
     label: "New Book",
     color: "bg-cyan-500",

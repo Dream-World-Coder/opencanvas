@@ -4,195 +4,161 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-
 import { formatDistanceToNow } from "date-fns";
-import { toast } from "sonner";
 import { CalendarDays } from "lucide-react";
+import { toast } from "sonner";
 
 import ProfileHeader from "@/components/Header/ProfileHeader";
-// import { useDataService } from "@/services/dataService";
+import { useDataService } from "@/services/dataService";
+
+const LIMIT = 10;
 
 const FollowersPage = () => {
-  const [followers, setFollowers] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [orderReversed, setOrderReversed] = useState(false);
-  const [followersToFetch, setFollowersToFetch] = useState(0);
-  const navigate = useNavigate();
   const { username } = useParams();
-  const [currentProfile, setCurrentProfile] = useState(null);
+  const navigate = useNavigate();
+  const { getUserProfile, getUserFollowers } = useDataService();
 
-  async function fetchCurrentProfile(username) {
-    if (!username) {
-      navigate("/404");
-      return;
-    }
+  const [profile, setProfile] = useState(null);
+  const [followers, setFollowers] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [followersLoading, setFollowersLoading] = useState(false);
+  const [reversed, setReversed] = useState(false);
 
-    setIsLoading(true);
-    const apiUrl = `${import.meta.env.VITE_BACKEND_URL}/u/${username}`;
-
-    try {
-      const res = await fetch(apiUrl);
-
-      if (!res.ok) {
+  // Step 1 - load the public profile (we need the userId for the followers call)
+  useEffect(() => {
+    const load = async () => {
+      setProfileLoading(true);
+      try {
+        const { user } = await getUserProfile(username);
+        setProfile(user);
+      } catch {
         navigate("/404");
-        return;
+      } finally {
+        setProfileLoading(false);
       }
+    };
+    load();
+  }, [username]);
 
-      const data = await res.json();
-      setCurrentProfile(data.user);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  // Step 2 - load first page of followers once we have the profile
+  useEffect(() => {
+    if (!profile) return;
+    loadFollowers(1);
+  }, [profile]);
 
-  const fetchUserFollowers = async () => {
+  const loadFollowers = async (pageNum) => {
+    setFollowersLoading(true);
     try {
-      setIsLoading(true);
-      const token = localStorage.getItem("authToken");
-      if (
-        !currentProfile ||
-        !currentProfile.followers ||
-        currentProfile.followers.length === 0
-      ) {
-        setFollowers([]);
-        setIsLoading(false);
-        return;
-      }
-
-      if (currentProfile.followers.length < followersToFetch) return;
-
-      const followerIdsQS = currentProfile.followers
-        .map((item) => item.userId)
-        .slice(0 + followersToFetch, 10 + followersToFetch)
-        .join(",");
-
-      setFollowersToFetch(followersToFetch + 10);
-
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/u/followers/byids`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            followerIds: followerIdsQS,
-          }),
-        },
+      const res = await getUserFollowers(profile._id, pageNum);
+      setTotal(res.total);
+      // Append on load-more, replace on first load
+      setFollowers((prev) =>
+        pageNum === 1 ? res.data : [...prev, ...res.data],
       );
-
-      const data = await response.json();
-
-      if (data.success) {
-        setFollowers((prevFollowers) => [...prevFollowers, ...data.followers]);
-      } else {
-        console.error("Failed to fetch followers: ", data.message);
-        toast("Failed to fetch followers: ", data.message);
-      }
-    } catch (error) {
-      console.error("Error fetching followers: ", error);
-      toast("Error fetching followers: ", error);
+      setPage(pageNum);
+    } catch {
+      toast.error("Failed to load followers");
     } finally {
-      setIsLoading(false);
+      setFollowersLoading(false);
     }
   };
 
-  // fetch user profile when username changes
-  useEffect(() => {
-    fetchCurrentProfile(username);
-  }, [username]);
-
-  // fetch followers only _after_ currentProfile is set
-  useEffect(() => {
-    if (currentProfile) {
-      fetchUserFollowers();
-    }
-  }, [currentProfile]); // run only when _currentProfile_ updates
-
-  const formatFollowedDate = (sinceDate) => {
+  const formatSince = (date) => {
     try {
-      return formatDistanceToNow(new Date(sinceDate), {
-        addSuffix: true,
-      });
-    } catch (error) {
-      console.log(error);
+      return formatDistanceToNow(new Date(date), { addSuffix: true });
+    } catch {
       return "some time ago";
     }
   };
 
-  if (isLoading)
+  const displayedFollowers = reversed ? [...followers].reverse() : followers;
+  const hasMore = followers.length < total;
+
+  // ── Loading state ────────────────────────────────────────────────────────
+  if (profileLoading) {
     return (
-      <div className="flex justify-center items-center h-screen pt-24">
-        {Array(4)
-          .fill(0)
-          .map((_, index) => (
-            <Card
-              key={`skeleton-${index}`}
-              className="bg-gray-50 dark:bg-[#222] border-gray-200 dark:border-[#333]"
-            >
-              <CardContent className="p-4 flex items-start gap-4">
-                <Skeleton className="w-16 h-16 rounded-full bg-gray-200 dark:bg-[#333]" />
-                <div className="flex-grow">
-                  <Skeleton className="h-5 w-32 bg-gray-200 dark:bg-[#333] mb-2" />
-                  <Skeleton className="h-4 w-24 bg-gray-200 dark:bg-[#333] mb-2" />
-                  <Skeleton className="h-4 w-full bg-gray-200 dark:bg-[#333] mb-1" />
-                  <Skeleton className="h-4 w-2/3 bg-gray-200 dark:bg-[#333] mb-2" />
-                  <Skeleton className="h-3 w-32 bg-gray-200 dark:bg-[#333]" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        Loading...
+      <div className="min-h-screen bg-white dark:bg-[#111]">
+        <ProfileHeader />
+        <div className="max-w-3xl mx-auto pt-24 pb-80 space-y-3 px-4">
+          {Array(4)
+            .fill(0)
+            .map((_, i) => (
+              <Card
+                key={i}
+                className="bg-gray-50 dark:bg-[#222] border-gray-200 dark:border-[#333]"
+              >
+                <CardContent className="p-4 flex items-center gap-4">
+                  <Skeleton className="w-14 h-14 rounded-full bg-gray-200 dark:bg-[#333]" />
+                  <div className="flex-grow space-y-2">
+                    <Skeleton className="h-5 w-32 bg-gray-200 dark:bg-[#333]" />
+                    <Skeleton className="h-4 w-24 bg-gray-200 dark:bg-[#333]" />
+                    <Skeleton className="h-4 w-full bg-gray-200 dark:bg-[#333]" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+        </div>
       </div>
     );
+  }
+
+  // ── Null guard — profile failed to load ──────────────────────────────────
+  if (!profile) return null;
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#111] text-gray-800 dark:text-gray-100 p-4 md:p-0">
       <ProfileHeader />
-      <div className="max-w-3xl mx-auto pt-24 pb-80">
+
+      <div className="max-w-3xl mx-auto pt-24 pb-80 px-4">
+        {/* Header row */}
         <div className="flex flex-col md:flex-row items-center justify-between mb-6 pb-4">
           <h1 className="text-xl md:text-3xl font-bold font-serif capitalize">
-            {currentProfile.fullName}&apos;s Followers
+            {profile.fullName}&apos;s Followers
+            <span className="ml-2 text-base font-normal text-gray-500 dark:text-gray-400">
+              ({total})
+            </span>
           </h1>
           <button
-            className="px-3 py-1.5 text-sm border border-gray-200 dark:border-[#333] hover:border-gray-300 dark:hover:border-gray-600 rounded-md flex items-center space-x-1.5 transition-all duration-200"
-            onClick={() => {
-              setFollowers([...followers].reverse());
-              setOrderReversed(!orderReversed);
-            }}
+            className="px-3 py-1.5 text-sm border border-gray-200 dark:border-[#333] hover:border-gray-300 dark:hover:border-gray-600 rounded-md transition-all duration-200"
+            onClick={() => setReversed((r) => !r)}
           >
-            <span>{orderReversed ? "Newest" : "Oldest"} first</span>
+            {reversed ? "Newest" : "Oldest"} first
           </button>
         </div>
 
+        {/* Empty state */}
+        {!followersLoading && followers.length === 0 && (
+          <div className="text-center py-12 border border-gray-100 dark:border-[#333] rounded-lg mt-6">
+            <p className="text-xl text-gray-600 dark:text-gray-400">
+              No followers yet
+            </p>
+            <p className="text-gray-500 dark:text-gray-500 mt-2">
+              When people follow {profile.fullName}, they&apos;ll appear here.
+            </p>
+          </div>
+        )}
+
+        {/* Follower cards */}
         <div className="space-y-3">
-          {followers.map((follower, index) => (
+          {displayedFollowers.map((follower) => (
             <Card
               key={follower._id}
               className="border border-gray-300 md:border-gray-100 dark:border-[#333] bg-transparent hover:bg-gray-50 dark:hover:bg-[#222] transition-all duration-300 cursor-pointer rounded-lg overflow-hidden shadow-none"
               onClick={() => navigate(`/u/${follower.username}`)}
             >
               <CardContent className="p-4 flex items-center gap-4">
-                <div className="flex-shrink-0">
-                  {follower.profilePicture ? (
-                    <Avatar className="text-xl font-thin size-12 md:size-14 border border-gray-200 dark:border-[#333]">
-                      <AvatarImage
-                        src={follower.profilePicture}
-                        alt={follower.fullName}
-                      />
-                      <AvatarFallback>
-                        {follower.fullName.slice(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                  ) : (
-                    <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gray-100 dark:bg-[#333] flex items-center justify-center text-lg font-medium">
-                      {follower.fullName.charAt(0)}
-                    </div>
-                  )}
-                </div>
+                <Avatar className="size-12 md:size-14 border border-gray-200 dark:border-[#333] flex-shrink-0">
+                  <AvatarImage
+                    src={follower.profilePicture}
+                    alt={follower.fullName}
+                  />
+                  <AvatarFallback>
+                    {follower.fullName?.slice(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+
                 <div className="flex-grow">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <div>
@@ -205,52 +171,30 @@ const FollowersPage = () => {
                     </div>
                     <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mt-2 md:mt-0">
                       <CalendarDays size={14} className="mr-1" />
-                      <span>
-                        Followed{" "}
-                        {orderReversed
-                          ? formatFollowedDate(
-                              [...currentProfile.followers].reverse()[index]
-                                .since,
-                            )
-                          : formatFollowedDate(
-                              currentProfile.followers[index].since,
-                            )}
-                      </span>
+                      <span>Followed {formatSince(follower.since)}</span>
                     </div>
                   </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2 mt-2">
-                    {follower.designation}
-                  </p>
+                  {follower.designation && (
+                    <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2 mt-2">
+                      {follower.designation}
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        {currentProfile.followers.length > followersToFetch && (
+        {/* Load more */}
+        {hasMore && (
           <div className="w-full flex items-center justify-center mt-8 border-t border-gray-100 dark:border-[#222] pt-6">
             <Button
               className="px-6 py-2 border border-gray-200 dark:border-[#333] hover:border-gray-300 dark:hover:border-gray-600 bg-transparent hover:bg-gray-50 dark:hover:bg-[#222] text-gray-800 dark:text-gray-200 rounded-md transition-all duration-200"
-              onClick={async () => {
-                if (currentProfile && currentProfile.followers) {
-                  await fetchUserFollowers();
-                }
-              }}
+              disabled={followersLoading}
+              onClick={() => loadFollowers(page + 1)}
             >
-              Load More
+              {followersLoading ? "Loading..." : "Load More"}
             </Button>
-          </div>
-        )}
-
-        {!isLoading && currentProfile.followers.length === 0 && (
-          <div className="text-center py-12 border border-gray-100 dark:border-[#333] rounded-lg mt-6">
-            <p className="text-xl text-gray-600 dark:text-gray-400">
-              No followers yet
-            </p>
-            <p className="text-gray-500 dark:text-gray-500 mt-2">
-              When people follow {currentProfile.fullName}, they&apos;ll appear
-              here.
-            </p>
           </div>
         )}
       </div>

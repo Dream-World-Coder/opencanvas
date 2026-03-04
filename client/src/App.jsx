@@ -13,14 +13,13 @@ import { CollectionContextProvider } from "./contexts/CollectionContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LoadingPage from "./pages/Others/LoadingPage";
 
-// loaded with main bundle
+// Loaded with the main bundle - pages users hit immediately on arrival
 import LandingPage from "./pages/LandingPage/LandingPage";
 import ArticleFeed from "./pages/Feed/ArticlesPage";
-import SocialFeed from "./pages/Feed/SocialPage";
-import "./services/fingerprintService";
-// import Editor from "./pages/Editor/Editor";
 
-// lazy
+import "./services/fingerprintService";
+
+// Everything else is lazy - loaded only when the route is first visited
 const LoginPage = lazy(() => import("./pages/Auth/Login"));
 const AuthSuccess = lazy(() => import("./pages/Auth/AuthSuccess"));
 
@@ -34,22 +33,25 @@ const SavedPosts = lazy(() => import("./pages/Profile/SavedPosts"));
 const ViewPost = lazy(() => import("./pages/PostView/PostPage"));
 const PrivatePostView = lazy(() => import("./pages/PostView/PrivatePostPage"));
 
+// const CollectionView = lazy(() => import("./pages/Collection/CollectionPage"));
+
 const AboutPage = lazy(() => import("./pages/About/About"));
 const ContactPage = lazy(() => import("./pages/Contact/Contact"));
 
+// WritingPad     → requires auth, saves to backend
+// WritingPadMd   → public, frontend-only markdown editor / md2pdf tool
 const WritingPad = lazy(() => import("./pages/Create/Editor/WritingPad"));
-const WritingPadFrontendOnly = lazy(
+const WritingPadMd = lazy(
   () => import("./pages/Create/Editor/WritingPadFrontend"),
 );
-
-const ImageUploadPage = lazy(() => import("./pages/Create/UploadImage"));
 
 const Thanks = lazy(() => import("./pages/Others/Thanks"));
 const NotFoundPage = lazy(() => import("./pages/Others/404"));
 
-export default function App() {
-  const queryClient = new QueryClient();
+// Must live outside the component so the cache survives re-renders
+const queryClient = new QueryClient();
 
+export default function App() {
   return (
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
@@ -59,17 +61,26 @@ export default function App() {
               <CollectionContextProvider>
                 <Suspense fallback={<LoadingPage />}>
                   <Routes>
-                    {/* public
-                    ----------- */}
+                    {/* ── Static ──────────────────────────────────────── */}
                     <Route path="/" element={<LandingPage />} />
-                    <Route path="/home" element={<ArticleFeed />} />
-                    <Route path="/articles" element={<ArticleFeed />} />
-                    <Route path="/social" element={<SocialFeed />} />
-                    {/* <Route path="/editor" element={<Editor />} />*/}
-                    {/* --------------- */}
+                    <Route
+                      path="/about"
+                      element={<AboutPage bgClr="bg-white" />}
+                    />
+                    <Route
+                      path="/contact"
+                      element={<ContactPage bgClr="bg-white" />}
+                    />
+                    <Route
+                      path="/thanks"
+                      element={<Thanks bgClr="bg-white" />}
+                    />
+                    <Route
+                      path="/loading"
+                      element={<LoadingPage bgClr="bg-white" />}
+                    />
 
-                    {/* Auth
-                    --------- */}
+                    {/* ── Auth ────────────────────────────────────────── */}
                     <Route
                       path="/login"
                       element={<LoginPage bgClr="bg-cream-light" />}
@@ -80,63 +91,36 @@ export default function App() {
                       path="/login-needed"
                       element={<LoginPage backBtn={true} />}
                     />
-
                     <Route path="/auth/success" element={<AuthSuccess />} />
-                    {/* --------------- */}
 
-                    {/* About & contact
-                    ------------------- */}
-                    <Route
-                      path="/about"
-                      element={<AboutPage bgClr="bg-white" />}
-                    />
-                    <Route
-                      path="/contact"
-                      element={<ContactPage bgClr="bg-white" />}
-                    />
-                    {/* --------------- */}
+                    {/* ── Feed ────────────────────────────────────────── */}
+                    <Route path="/articles" element={<ArticleFeed />} />
+                    <Route path="/home" element={<ArticleFeed />} />
+                    {/* alias */}
 
-                    <Route path="/upload-image" element={<ImageUploadPage />} />
-                    <Route
-                      path="/thanks"
-                      element={<Thanks bgClr="bg-white" />}
-                    />
-                    <Route
-                      path="/loading"
-                      element={<LoadingPage bgClr="bg-white" />}
-                    />
-
-                    {/* --------------- */}
-                    <Route path="/p/:postId" element={<ViewPost />} />
-                    {/* <Route path="/c/:collectionId" element={<ViewPost />} />*/}
+                    {/* ── Public profiles ─────────────────────────────── */}
                     <Route
                       path="/u/:username"
                       element={<PublicProfile bgClr="bg-white" />}
                     />
-
                     <Route
                       path="/u/:username/followers"
-                      element={<FollowersPage />} //followers public but following login needed
+                      element={<FollowersPage />}
                     />
 
-                    <Route
-                      path="/markdown2pdf"
-                      element={<WritingPadFrontendOnly />}
-                    />
-                    <Route
-                      path="/md2pdf"
-                      element={<WritingPadFrontendOnly />}
-                    />
-                    <Route path="/m/2/p" element={<WritingPadFrontendOnly />} />
-                    <Route path="/m2p" element={<WritingPadFrontendOnly />} />
-                    {/* --------------- */}
+                    {/* ── Public posts & collections ───────────────────── */}
+                    <Route path="/p/:slug" element={<ViewPost />} />
+                    {/* <Route path="/c/:id" element={<CollectionView />} />*/}
 
-                    {/* protected
-                    ------------ */}
+                    {/* ── Public editor (markdown preview / md→pdf tool) ── */}
+                    <Route path="/editor/markdown" element={<WritingPadMd />} />
+                    {/* Short aliases for the md→pdf tool */}
+                    <Route path="/markdown2pdf" element={<WritingPadMd />} />
+                    <Route path="/md2pdf" element={<WritingPadMd />} />
+                    <Route path="/m2p" element={<WritingPadMd />} />
+
+                    {/* ── Protected ───────────────────────────────────── */}
                     <Route element={<ProtectedRoute />}>
-                      {/* test routes */}
-                      {/* end test */}
-
                       <Route
                         path="/profile"
                         element={<Profile bgClr="bg-white" />}
@@ -145,33 +129,31 @@ export default function App() {
                         path="/profile/settings"
                         element={<ProfileSettings />}
                       />
-                      <Route path="/saved-posts" element={<SavedPosts />} />
+                      <Route path="/saved" element={<SavedPosts />} />
+
                       <Route
                         path="/u/:username/following"
                         element={<FollowingPage />}
                       />
+
                       <Route
-                        path="/private/p/:postId"
+                        path="/private/p/:slug"
                         element={<PrivatePostView />}
                       />
+
+                      {/*
+                        Editor - create or edit a post.
+                        artType is not passed as a prop, post ID comes from
+                        ?id= query param (pre-fetched via /get-new-post-id).
+                        /editor/markdown/create?type=article&id=...
+                      */}
                       <Route
-                        path="/createpost/poem"
-                        element={<WritingPad artType={"poem"} />}
-                      />
-                      <Route
-                        path="/createpost/story"
-                        element={<WritingPad artType={"story"} />}
-                      />
-                      <Route
-                        path="/createpost/article"
-                        element={<WritingPad artType={"article"} />}
-                      />
-                      <Route
-                        path="/edit-post"
-                        element={<WritingPad artType={"edit"} />}
+                        path="/editor/markdown/create"
+                        element={<WritingPad />}
                       />
                     </Route>
 
+                    {/* ── Catch-all ────────────────────────────────────── */}
                     <Route
                       path="*"
                       element={<NotFoundPage bgClr="bg-white" />}
@@ -189,21 +171,3 @@ export default function App() {
     </HelmetProvider>
   );
 }
-
-/*
-useEffect(() => {
-  const lenis = new Lenis({
-    duration: 0.1,
-    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    smooth: true,
-  });
-  function raf(time) {
-    lenis.raf(time);
-    requestAnimationFrame(raf);
-  }
-  requestAnimationFrame(raf);
-  return () => {
-    lenis.destroy();
-  };
-}, []);
-*/

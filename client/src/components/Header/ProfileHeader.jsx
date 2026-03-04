@@ -14,8 +14,9 @@ export default function ProfileHeader() {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [createMenuOpen, setCreateMenuOpen] = useState(false);
-  const { getNewPostId } = useDataService();
   const [loading, setLoading] = useState(false);
+
+  const { getNewPostId } = useDataService();
 
   const navLinks = [
     { href: "/articles", label: "Articles" },
@@ -24,37 +25,28 @@ export default function ProfileHeader() {
     { href: "/profile", label: "Profile" },
   ];
 
+  // Fetches a fresh post ID from the server, then opens the editor
+  // with the ID and type in the URL — no localStorage needed.
   async function handlePostCreate(option) {
-    setLoading(true);
-
     if (!currentUser) {
-      toast.error("you need to Log In first");
-      localStorage.setItem("urlToRedirectAfterLogin", window.location.pathname);
-      setLoading(false);
-
-      setTimeout(() => {
-        navigate("/login-needed");
-      }, 500);
-
+      toast.error("You need to log in first");
+      navigate("/login");
       return;
     }
 
-    localStorage.removeItem("blogPost");
-    localStorage.removeItem("newPostId");
+    setLoading(true);
     setCreateMenuOpen(false);
+    localStorage.setItem("blogPost", "");
 
     try {
-      let newPostId = await getNewPostId();
-      localStorage.setItem("newPostId", newPostId);
+      const postId = await getNewPostId();
+      navigate(`/editor/markdown/create?type=${option.type}&id=${postId}`);
     } catch (e) {
-      console.log(e);
+      // getNewPostId already shows a toast; nothing more to do here
+      console.error("Failed to get new post ID", e);
     } finally {
       setLoading(false);
     }
-
-    navigate(option.href);
-
-    setLoading(false);
   }
 
   return (
@@ -62,20 +54,18 @@ export default function ProfileHeader() {
       <div className="max-w-7xl mx-auto flex justify-between items-center px-4 sm:px-0 py-3">
         <AppLogo />
 
-        {/* Desktop Navigation */}
+        {/* Desktop nav links + Settings + Create button */}
         <div className="hidden md:flex items-center space-x-2 text-sm">
           {navLinks.map((link, index) => (
             <React.Fragment key={index}>
               <button
-                onClick={() => {
-                  navigate(link.href);
-                }}
-                className={`px-3 py-1 box-content rounded-md hover:bg-lime-200 dark:hover:bg-[#333] transition-all duration-200`}
+                onClick={() => navigate(link.href)}
+                className="px-3 py-1 box-content rounded-md hover:bg-lime-200 dark:hover:bg-[#333] transition-all duration-200"
               >
                 {link.label}
               </button>
               {index !== navLinks.length - 1 && (
-                <span className={`text-lime-300 flex items-center`}>•</span>
+                <span className="text-lime-300 flex items-center">•</span>
               )}
             </React.Fragment>
           ))}
@@ -87,18 +77,20 @@ export default function ProfileHeader() {
             <Settings className="w-5 h-5" />
           </button>
 
-          {/* Create Button with Dropdown */}
+          {/* Create dropdown — desktop */}
           <div className="relative">
             <button
               onClick={() => setCreateMenuOpen(!createMenuOpen)}
               className="flex items-center space-x-2 bg-black dark:bg-[#333] text-white px-4 py-2 rounded-full hover:bg-stone-800/90 dark:hover:bg-[#333] transition-colors"
             >
               <span>Create</span>
-              {!createMenuOpen && <ChevronDown className="w-4 h-4" />}
-              {createMenuOpen && <ChevronUp className="w-4 h-4" />}
+              {createMenuOpen ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
             </button>
 
-            {/* Create Menu Dropdown -- desktop */}
             {createMenuOpen && (
               <CreateMenuDesktop
                 loading={loading}
@@ -118,7 +110,7 @@ export default function ProfileHeader() {
         />
       </div>
 
-      {/* mobile menu */}
+      {/* Mobile slide-down nav menu */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-white dark:bg-[#111] border-t border-gray-100 dark:border-[#333]">
           <div className="px-4 py-2 space-y-1">

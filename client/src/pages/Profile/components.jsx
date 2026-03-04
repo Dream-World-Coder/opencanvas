@@ -48,21 +48,21 @@ import { useDataService } from "../../services/dataService";
 import { useAuth } from "../../contexts/AuthContext";
 import { formatDistanceToNow } from "date-fns";
 import { useCollectionContext } from "../../contexts/CollectionContext";
+import { slugify } from "@/pages/Create/Editor/hooks/useWritingPad";
+import { Heart } from "lucide-react";
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const formatDates = (date) => {
   try {
-    return formatDistanceToNow(new Date(date), {
-      addSuffix: true,
-    });
-  } catch (error) {
-    console.log(error);
+    return formatDistanceToNow(new Date(date), { addSuffix: true });
+  } catch {
     return "some time ago";
   }
 };
 
 function getSchemaData(currentProfile) {
   const origin = window.location.origin;
-
   return {
     "@context": "https://schema.org",
     "@type": "Person",
@@ -70,7 +70,7 @@ function getSchemaData(currentProfile) {
     image: `${origin}${currentProfile.profilePicture}`,
     description: currentProfile.aboutMe,
     url: `${origin}/u/${currentProfile.username}`,
-    sameAs: currentProfile.contactInformation.map((contact) => contact.url),
+    sameAs: currentProfile.contactInformation.map((c) => c.url),
     jobTitle: currentProfile.designation,
     mainEntityOfPage: {
       "@type": "WebPage",
@@ -79,8 +79,32 @@ function getSchemaData(currentProfile) {
   };
 }
 
+// Copy post/collection URL to clipboard, or use native share if available
+function sharePost(post) {
+  const slug = `${slugify(post.title)}-${post._id}`;
+  const postUrl = `${window.location.origin}/p/${slug}`;
+  if (navigator.share) {
+    navigator.share({ title: post.title, url: postUrl });
+  } else {
+    navigator.clipboard
+      .writeText(postUrl)
+      .then(() => toast.success("Link copied to clipboard"))
+      .catch(() => toast.error("Failed to copy link"));
+  }
+}
+
+// Hide a post card by DOM id after deletion (avoids a full re-fetch)
+function hidePostCard(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = "none";
+}
+
+// ─── SEO ──────────────────────────────────────────────────────────────────────
+
 export const ProfileHelmet = ({ currentProfile }) => {
-  const stopWords = [
+  if (!currentProfile) return null;
+
+  const stopWords = new Set([
     "a",
     "an",
     "the",
@@ -97,10 +121,7 @@ export const ProfileHelmet = ({ currentProfile }) => {
     "for",
     "from",
     "by",
-  ];
-  if (!currentProfile) return null;
-
-  const schemaData = getSchemaData(currentProfile);
+  ]);
 
   const keywords = [
     currentProfile.fullName,
@@ -108,7 +129,7 @@ export const ProfileHelmet = ({ currentProfile }) => {
     ...currentProfile.designation
       .toLowerCase()
       .split(/\s+/)
-      .filter((word) => !stopWords.includes(word)),
+      .filter((w) => !stopWords.has(w)),
     "opencanvas",
   ];
 
@@ -120,103 +141,99 @@ export const ProfileHelmet = ({ currentProfile }) => {
         content={`OpenCanvas profile page of ${currentProfile.fullName}`}
       />
       <meta name="keywords" content={[...new Set(keywords)].join(", ")} />
-      <script type="application/ld+json">{JSON.stringify(schemaData)}</script>
+      <script type="application/ld+json">
+        {JSON.stringify(getSchemaData(currentProfile))}
+      </script>
     </Helmet>
   );
 };
-ProfileHelmet.propTypes = {
-  currentProfile: PropTypes.object,
-};
+ProfileHelmet.propTypes = { currentProfile: PropTypes.object };
 
-export const ProfileImage = ({ user }) => {
-  return (
-    <div className="size-16 md:size-24 rounded-full overflow-hidden bg-gray-100 dark:bg-[#171717]">
-      <Avatar className="size-full">
-        <AvatarImage
-          src={user.profilePicture}
-          alt={`${user.username}'s profile picture`}
-        />
-        <AvatarFallback className="bg-gradient-to-r from-lime-500 to-green-500 text-white text-4xl font-light font-stardom">
-          {user.fullName.slice(0, 2).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
-    </div>
-  );
-};
-ProfileImage.propTypes = {
-  user: PropTypes.object,
-};
+// ─── Profile Image ─────────────────────────────────────────────────────────────
+
+export const ProfileImage = ({ user }) => (
+  <div className="size-16 md:size-24 rounded-full overflow-hidden bg-gray-100 dark:bg-[#171717]">
+    <Avatar className="size-full">
+      <AvatarImage
+        src={user.profilePicture}
+        alt={`${user.username}'s profile picture`}
+      />
+      <AvatarFallback className="bg-gradient-to-r from-lime-500 to-green-500 text-white text-4xl font-light font-stardom">
+        {user.fullName.slice(0, 2).toUpperCase()}
+      </AvatarFallback>
+    </Avatar>
+  </div>
+);
+ProfileImage.propTypes = { user: PropTypes.object };
+
+// ─── Quick Stats ───────────────────────────────────────────────────────────────
 
 export const QuickStatsProfile = ({ currentUser }) => {
   const [hoveredItem, setHoveredItem] = useState(null);
 
-  const userStats = [
+  const stats = [
     {
       name: "WORKS",
       href: "#post-view",
-      amount: currentUser.posts.length,
+      amount: currentUser.stats?.postsCount ?? 0,
       icon: SquareChartGantt,
+    },
+    {
+      name: "LIKES RECEIVED",
+      href: `#`,
+      amount: currentUser.stats?.likesReceivedCount ?? 0,
+      icon: Heart,
     },
     {
       name: "FOLLOWERS",
       href: `/u/${currentUser.username}/followers`,
-      amount: currentUser.followers.length,
+      amount: currentUser.stats?.followersCount ?? 0,
       icon: Users,
     },
     {
       name: "FOLLOWING",
       href: `/u/${currentUser.username}/following`,
-      amount: currentUser.following.length,
+      amount: currentUser.stats?.followingCount ?? 0,
       icon: UserCheck,
     },
   ];
 
   return (
     <div className="w-full md:w-[300px] lg:w-[400px] font-sans border border-gray-300 md:border-gray-200 dark:border-[#222] mt-6 md:mt-0 rounded-lg bg-white dark:bg-[#171717] overflow-hidden">
-      {userStats.map((item, index) => (
+      {stats.map((item, index) => (
         <a
           key={index}
-          className={`flex items-center justify-between px-4 py-3 border-b last:border-b-0 border-gray-300 md:border-gray-200 dark:border-[#222]
-            hover:bg-gray-50 dark:hover:bg-[#111] transition-all duration-300 ease-in-out ${
-              hoveredItem === index ? "bg-gray-50 dark:bg-[#222]" : ""
-            }`}
           href={item.href}
+          className={`flex items-center justify-between px-4 py-3 border-b last:border-b-0 border-gray-300 md:border-gray-200 dark:border-[#222]
+            hover:bg-gray-50 dark:hover:bg-[#111] transition-all duration-300 ease-in-out
+            ${hoveredItem === index ? "bg-gray-50 dark:bg-[#222]" : ""}`}
           onMouseEnter={() => setHoveredItem(index)}
           onMouseLeave={() => setHoveredItem(null)}
         >
           <div className="flex items-center space-x-3">
             <span
-              className={`text-gray-400 dark:text-gray-500 transition-all duration-300 ${
-                hoveredItem === index ? "text-gray-600 dark:text-gray-300" : ""
-              }`}
+              className={`text-gray-400 dark:text-gray-500 transition-all duration-300
+                ${hoveredItem === index ? "text-gray-600 dark:text-gray-300" : ""}`}
             >
               <item.icon size={16} strokeWidth={1.5} />
             </span>
             <span
-              className={`font-medium text-xs tracking-wider text-gray-500 dark:text-gray-400 transition-all duration-300 ${
-                hoveredItem === index
-                  ? "text-gray-700 dark:text-gray-200 translate-x-1"
-                  : ""
-              }`}
+              className={`font-medium text-xs tracking-wider text-gray-500 dark:text-gray-400 transition-all duration-300
+                ${hoveredItem === index ? "text-gray-700 dark:text-gray-200 translate-x-1" : ""}`}
             >
               {item.name}
             </span>
           </div>
           <div
-            className={`flex items-center transition-all duration-300 ${
-              hoveredItem === index ? "scale-110" : ""
-            }`}
+            className={`flex items-center transition-all duration-300 ${hoveredItem === index ? "scale-110" : ""}`}
           >
             <span className="font-semibold text-base text-gray-800 dark:text-gray-200">
               {item.amount}
             </span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className={`h-4 w-4 ml-1 text-gray-400 dark:text-gray-500 transition-transform duration-300 ${
-                hoveredItem === index
-                  ? "transform translate-x-1 opacity-100 text-gray-600 dark:text-gray-300"
-                  : "opacity-0"
-              }`}
+              className={`h-4 w-4 ml-1 text-gray-400 dark:text-gray-500 transition-transform duration-300
+                ${hoveredItem === index ? "transform translate-x-1 opacity-100 text-gray-600 dark:text-gray-300" : "opacity-0"}`}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -234,9 +251,9 @@ export const QuickStatsProfile = ({ currentUser }) => {
     </div>
   );
 };
-QuickStatsProfile.propTypes = {
-  currentUser: PropTypes.object.isRequired,
-};
+QuickStatsProfile.propTypes = { currentUser: PropTypes.object.isRequired };
+
+// ─── Post Filter Tabs ──────────────────────────────────────────────────────────
 
 export const PostFilterTabs = ({ activeTab, setActiveTab }) => {
   const tabs = [
@@ -250,34 +267,23 @@ export const PostFilterTabs = ({ activeTab, setActiveTab }) => {
   const [isMobile, setIsMobile] = useState(false);
   const scrollRef = useRef(null);
 
-  // Check screen size for responsive behavior
   useEffect(() => {
-    const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 640);
-    };
-
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-
-    return () => {
-      window.removeEventListener("resize", checkScreenSize);
-    };
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
   }, []);
 
-  // Scroll active tab into view
+  // Scroll the active tab into view on mobile
   useEffect(() => {
-    if (scrollRef.current && isMobile) {
-      const activeElement = document.getElementById(`tab-${activeTab}`);
-      if (activeElement) {
-        const scrollLeft =
-          activeElement.offsetLeft -
-          scrollRef.current.offsetWidth / 2 +
-          activeElement.offsetWidth / 2;
-        scrollRef.current.scrollTo({
-          left: scrollLeft,
-          behavior: "smooth",
-        });
-      }
+    if (!scrollRef.current || !isMobile) return;
+    const activeEl = document.getElementById(`tab-${activeTab}`);
+    if (activeEl) {
+      const scrollLeft =
+        activeEl.offsetLeft -
+        scrollRef.current.offsetWidth / 2 +
+        activeEl.offsetWidth / 2;
+      scrollRef.current.scrollTo({ left: scrollLeft, behavior: "smooth" });
     }
   }, [activeTab, isMobile]);
 
@@ -308,7 +314,7 @@ export const PostFilterTabs = ({ activeTab, setActiveTab }) => {
             <ScrollBar orientation="horizontal" className="opacity-0" />
           </ScrollArea>
 
-          {/* Visual indicators for scrolling on mobile */}
+          {/* Fade edges to hint at horizontal scroll on mobile */}
           <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-background to-transparent pointer-events-none sm:hidden" />
           <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-background to-transparent pointer-events-none sm:hidden" />
         </div>
@@ -317,42 +323,12 @@ export const PostFilterTabs = ({ activeTab, setActiveTab }) => {
   );
 };
 PostFilterTabs.propTypes = {
-  setActiveTab: PropTypes.func,
   activeTab: PropTypes.string,
+  setActiveTab: PropTypes.func,
 };
 
-function sharePost(post) {
-  const baseUrl = window.location.origin;
-  const postUrl = `${baseUrl}/p/${post._id}`;
+// ─── Post Actions (owner) ──────────────────────────────────────────────────────
 
-  navigator.share
-    ? navigator.share({
-        title: post.title,
-        url: window.location.origin + `/p/${post._id}`,
-      })
-    : navigator.clipboard
-        .writeText(postUrl)
-        .then(() => {
-          toast.success("Link copied to clipboard", {
-            action: {
-              label: "Close",
-              onClick: () => console.log("Close"),
-            },
-          });
-        })
-        .catch((err) => {
-          console.error("Failed to copy link:", err);
-          toast.error("Faild to copy link");
-        });
-}
-
-// better than setting currentuser, else have to remap all posts again
-function hideDiv(id) {
-  const elementToHide = document.getElementById(id);
-  if (elementToHide) {
-    elementToHide.style.display = "none";
-  }
-}
 export const PostActions = ({ post, setPosts, loading }) => {
   const navigate = useNavigate();
   const { currentUser, setCurrentUser } = useAuth();
@@ -362,48 +338,40 @@ export const PostActions = ({ post, setPosts, loading }) => {
 
   return (
     <div className="bg-gray-100 dark:bg-neutral-900 rounded-lg backdrop-blur-sm flex items-center cursor-pointer">
-      {/* view */}
+      {/* View */}
       <div
         className="p-2 hover:bg-gray-200 dark:hover:bg-[#444] rounded-full"
         title="View"
         onClick={(e) => {
           e.stopPropagation();
+          const slug = `${slugify(post.title)}-${post._id}`;
           post.isPublic
-            ? navigate(`/p/${post._id}`, { state: { post } })
-            : navigate(`/private/p/${post._id}`, {
-                state: { post },
-              });
+            ? navigate(`/p/${slug}`, { state: { post } })
+            : navigate(`/private/p/${slug}`, { state: { post } });
         }}
       >
-        <Eye
-          title="View"
-          className="w-4 h-4 text-gray-600 dark:text-gray-300 rounded-full"
-        />
+        <Eye className="w-4 h-4 text-gray-600 dark:text-gray-300 rounded-full" />
       </div>
 
-      {/* edit */}
+      {/* Edit — post ID goes in the URL, no localStorage */}
       <div
         className="p-2 hover:bg-gray-200 dark:hover:bg-[#444] rounded-full"
         title="Edit"
         onClick={(e) => {
+          localStorage.setItem("blogPost", "");
           e.stopPropagation();
-          localStorage.setItem("newPostId", post._id.toString());
-          window.location.href = "/edit-post";
+          navigate(
+            `/editor/markdown/create?type=${post.type}&id=${post._id}&editing=${true}`,
+          );
         }}
       >
-        <Edit
-          title="Edit"
-          className="w-4 h-4 text-gray-600 dark:text-gray-300"
-        />
+        <Edit className="w-4 h-4 text-gray-600 dark:text-gray-300" />
       </div>
 
-      {/* delete */}
-      <AlertDialog title="Delete">
+      {/* Delete */}
+      <AlertDialog>
         <AlertDialogTrigger className="p-2 hover:bg-gray-200 dark:hover:bg-[#444] rounded-full">
-          <Trash2
-            title="Delete"
-            className="w-4 h-4 text-gray-600 dark:text-gray-300"
-          />
+          <Trash2 className="w-4 h-4 text-gray-600 dark:text-gray-300" />
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -416,16 +384,14 @@ export const PostActions = ({ post, setPosts, loading }) => {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              title="Delete"
               onClick={async (e) => {
                 e.stopPropagation();
                 try {
-                  let res = await deletePost(post._id);
+                  const res = await deletePost(post._id);
                   toast(res.message);
-                  hideDiv(post._id);
-                } catch (error) {
-                  console.error(error);
-                  toast("Failed to delete post.");
+                  hidePostCard(post._id);
+                } catch {
+                  toast.error("Failed to delete post.");
                 }
               }}
             >
@@ -435,90 +401,68 @@ export const PostActions = ({ post, setPosts, loading }) => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* dropdown menu */}
-      <DropdownMenu
-        className="size-6 grid place-items-center overflow-hidden"
-        title="More"
-        onClick={(e) => e.stopPropagation()}
-      >
+      {/* More options dropdown */}
+      <DropdownMenu onClick={(e) => e.stopPropagation()}>
         <DropdownMenuTrigger className="p-2 box-content hover:bg-gray-200 dark:hover:bg-[#444] rounded-full">
           <MoreHorizontal className="w-4 h-4 text-gray-600 dark:text-gray-300" />
         </DropdownMenuTrigger>
 
         <DropdownMenuContent>
+          {/* Toggle public/private */}
           <DropdownMenuItem>
             <button
+              disabled={loading}
+              className={`hover:opacity-70 transition-opacity flex items-center gap-2 size-full ${loading ? "opacity-20" : ""}`}
               onClick={async () => {
-                let tmp = await changePostVisibility(post._id, !post.isPublic);
-                if (tmp.success) {
-                  toast.success(tmp.message, {
-                    action: {
-                      label: "Close",
-                      onClick: () => console.log("Close"),
-                    },
-                  });
-                  setPosts((prevPosts) =>
-                    prevPosts.map((p) =>
+                const res = await changePostVisibility(
+                  post._id,
+                  !post.isPublic,
+                );
+                if (res.success) {
+                  toast.success(res.message);
+                  setPosts((prev) =>
+                    prev.map((p) =>
                       p._id === post._id
-                        ? {
-                            ...p,
-                            isPublic: !post.isPublic,
-                          }
+                        ? { ...p, isPublic: !post.isPublic }
                         : p,
                     ),
                   );
                 }
               }}
-              className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
             >
               Make {post.isPublic ? "Private" : "Public"}
             </button>
           </DropdownMenuItem>
 
-          {/* feature post / remove feature */}
+          {/* Toggle featured */}
           <DropdownMenuItem>
             <button
+              disabled={loading}
+              className={`hover:opacity-70 transition-opacity flex items-center gap-2 size-full ${loading ? "opacity-20" : ""}`}
               onClick={async () => {
-                let res = await changeFeaturedSettings(post._id, "Post");
-                if (res.success && res.added == true) {
-                  toast.success(res.message, {
-                    action: {
-                      label: "Close",
-                      onClick: () => console.log("Close"),
-                    },
-                  });
-                  setCurrentUser((currentUser) => ({
-                    ...currentUser,
-                    featuredItems: [
-                      ...currentUser.featuredItems,
-                      {
-                        itemId: post._id,
-                        itemType: "Post",
-                        itemTitle: post.title,
-                        itemThumbnail: post.thumbnailUrl,
-                      },
-                    ],
-                  }));
-                } else if (res.success && res.added == false) {
-                  toast.success(res.message, {
-                    action: {
-                      label: "Close",
-                      onClick: () => console.log("Close"),
-                    },
-                  });
-                  setCurrentUser((currentUser) => ({
-                    ...currentUser,
-                    featuredItems: [
-                      ...currentUser.featuredItems.filter(
-                        (item) => item.itemId != post._id,
-                      ),
-                    ],
-                  }));
-                } else {
-                  toast.error(res.response.data.message);
+                const res = await changeFeaturedSettings(post._id);
+                if (!res.success) {
+                  toast.error(res.response?.data?.message);
+                  return;
                 }
+                toast.success(res.message);
+                setCurrentUser((prev) => ({
+                  ...prev,
+                  featuredItems: res.added
+                    ? [
+                        ...prev.featuredItems,
+                        {
+                          itemId: post._id,
+                          itemType: "Post",
+                          itemTitle: post.title,
+                          itemThumbnail: post.thumbnailUrl,
+                        },
+                      ]
+                    : prev.featuredItems.filter(
+                        (item) => item.itemId !== post._id,
+                      ),
+                }));
               }}
-              className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
             >
               {currentUser.featuredItems
                 .map((item) => item.itemId.toString())
@@ -528,13 +472,12 @@ export const PostActions = ({ post, setPosts, loading }) => {
             </button>
           </DropdownMenuItem>
 
-          {/* add post in collection */}
+          {/* Save in collection */}
           <DropdownMenuItem>
             <button
-              className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
-              onClick={() => {
-                setPostIdToSave(post._id);
-              }}
+              disabled={loading}
+              className={`hover:opacity-70 transition-opacity flex items-center gap-2 size-full ${loading ? "opacity-20" : ""}`}
+              onClick={() => setPostIdToSave(post._id)}
             >
               Save in Collection
             </button>
@@ -542,13 +485,13 @@ export const PostActions = ({ post, setPosts, loading }) => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* share */}
+      {/* Share */}
       <div
+        className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-[#444] transition-colors duration-200"
         onClick={(e) => {
           e.stopPropagation();
           sharePost(post);
         }}
-        className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-[#444] transition-colors duration-200"
       >
         <Share2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
       </div>
@@ -561,28 +504,26 @@ PostActions.propTypes = {
   loading: PropTypes.bool,
 };
 
+// ─── Post Actions (public visitor) ────────────────────────────────────────────
+
 export const PostActionsPublic = ({ post }) => {
   const navigate = useNavigate();
   const { setPostIdToSave } = useCollectionContext();
 
   return (
     <div className="bg-gray-100 dark:bg-neutral-900 rounded-lg backdrop-blur-sm flex items-center cursor-pointer">
-      {/* view */}
       <div
         className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full"
         title="View"
         onClick={(e) => {
           e.stopPropagation();
-          navigate(`/p/${post._id}`, { state: { post } });
+          const slug = `${slugify(post.title)}-${post._id}`;
+          navigate(`/p/${slug}`, { state: { post } });
         }}
       >
-        <Eye
-          title="View"
-          className="w-4 h-4 text-gray-600 dark:text-gray-300 rounded-full"
-        />
+        <Eye className="w-4 h-4 text-gray-600 dark:text-gray-300 rounded-full" />
       </div>
 
-      {/* save in collection */}
       <div
         className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full"
         title="Save in Collection"
@@ -591,74 +532,70 @@ export const PostActionsPublic = ({ post }) => {
           setPostIdToSave(post._id);
         }}
       >
-        <BookMarked
-          title="Save in Collection"
-          className="w-4 h-4 text-gray-600 dark:text-gray-300 rounded-full"
-        />
+        <BookMarked className="w-4 h-4 text-gray-600 dark:text-gray-300 rounded-full" />
       </div>
 
-      {/* share */}
       <div
+        className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
         onClick={(e) => {
           e.stopPropagation();
           sharePost(post);
         }}
-        className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
       >
         <Share2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
       </div>
     </div>
   );
 };
-PostActionsPublic.propTypes = {
-  post: PropTypes.object,
-};
+PostActionsPublic.propTypes = { post: PropTypes.object };
 
-export const ContactInformationDropdown = ({ currentProfile }) => {
-  return (
-    <AlertDialog>
-      <AlertDialogTrigger className="flex items-center justify-center gap-2">
-        <Contact className="size-5" /> Contact
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Contact Information</AlertDialogTitle>
-          <AlertDialogDescription>
-            {currentProfile.contactInformation.map((item, index) => (
-              <div key={index} className="mb-3">
-                <h3 className="flex items-center justify-between font-semibold text-[#222] dark:text-white">
-                  {item.title}
+// ─── Contact Information ───────────────────────────────────────────────────────
 
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(item.url);
-                      toast.success("url copied to clipboard", {
-                        action: {
-                          label: "Close",
-                          onClick: () => console.log("Close"),
-                        },
-                      });
-                    }}
-                  >
-                    <Copy />
-                  </button>
-                </h3>
-                <div className="text-xs">{item.url}</div>
-              </div>
-            ))}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Close</AlertDialogCancel>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
-};
+export const ContactInformationDropdown = ({ currentProfile }) => (
+  <AlertDialog>
+    <AlertDialogTrigger className="flex items-center justify-center gap-2">
+      <Contact className="size-5" /> Contact
+    </AlertDialogTrigger>
+    <AlertDialogContent>
+      <AlertDialogHeader>
+        <AlertDialogTitle>Contact Information</AlertDialogTitle>
+        <AlertDialogDescription>
+          {currentProfile.contactInformation.map((item, index) => (
+            <div key={index} className="mb-3">
+              <h3 className="flex items-center justify-between font-semibold text-[#222] dark:text-white">
+                {item.title}
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(item.url);
+                    toast.success("URL copied to clipboard");
+                  }}
+                >
+                  <Copy />
+                </button>
+              </h3>
+              <div className="text-xs">{item.url}</div>
+            </div>
+          ))}
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter>
+        <AlertDialogCancel>Close</AlertDialogCancel>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
+);
+ContactInformationDropdown.propTypes = { currentProfile: PropTypes.object };
 
-ContactInformationDropdown.propTypes = {
-  currentProfile: PropTypes.object,
-};
+// ─── Featured Works ────────────────────────────────────────────────────────────
+
+const FEATURED_COLORS = [
+  "bg-gradient-to-br from-[#E8F5E8] to-[#D4F1D4] dark:bg-zinc-900 border-[#E8F5E8] dark:border-neutral-800 dark:text-neutral-200",
+  "bg-gradient-to-br from-[#F0F8D0] to-[#E8F5CD] dark:bg-zinc-900 border-[#F0F8D0] dark:border-neutral-800 dark:text-neutral-200",
+  "bg-gradient-to-br from-[#C8E6C9] to-[#B8D4B8] dark:bg-zinc-900 border-[#C8E6C9] dark:border-neutral-800 dark:text-neutral-200",
+  "bg-gradient-to-br from-[#E1F5FE] to-[#B3E5FC] dark:bg-zinc-900 border-[#E1F5FE] dark:border-neutral-800 dark:text-neutral-200",
+  "bg-gradient-to-br from-[#FFF3E0] to-[#FFE0B2] dark:bg-zinc-900 border-[#FFF3E0] dark:border-neutral-800 dark:text-neutral-200",
+  "bg-gradient-to-br from-[#F3E5F5] to-[#E1BEE7] dark:bg-zinc-900 border-[#F3E5F5] dark:border-neutral-800 dark:text-neutral-200",
+];
 
 export const FeaturedWorks = memo(function FeaturedWorks({ currentUser }) {
   const scrollContainerRef = useRef(null);
@@ -666,312 +603,177 @@ export const FeaturedWorks = memo(function FeaturedWorks({ currentUser }) {
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
 
-  // const colors1 = [
-  //   // Soft lime greens
-  //   "bg-[#E8F5E8]/100 dark:bg-zinc-900 border-[#E8F5E8] dark:border-neutral-800 dark:text-neutral-200",
-  //   "bg-[#D4F1D4]/100 dark:bg-zinc-900 border-[#D4F1D4] dark:border-neutral-800 dark:text-neutral-200",
-  //   "bg-[#C8E6C9]/100 dark:bg-zinc-900 border-[#C8E6C9] dark:border-neutral-800 dark:text-neutral-200",
-
-  //   // Pastel lime-yellows
-  //   "bg-[#F0F8D0]/100 dark:bg-zinc-900 border-[#F0F8D0] dark:border-neutral-800 dark:text-neutral-200",
-  //   "bg-[#E8F5CD]/100 dark:bg-zinc-900 border-[#E8F5CD] dark:border-neutral-800 dark:text-neutral-200",
-  //   "bg-[#F5F8E1]/100 dark:bg-zinc-900 border-[#F5F8E1] dark:border-neutral-800 dark:text-neutral-200",
-
-  //   // Complementary pastels
-  //   "bg-[#E1F5FE]/100 dark:bg-zinc-900 border-[#E1F5FE] dark:border-neutral-800 dark:text-neutral-200", // Soft blue
-  //   "bg-[#FCE4EC]/100 dark:bg-zinc-900 border-[#FCE4EC] dark:border-neutral-800 dark:text-neutral-200", // Soft pink
-  //   "bg-[#F3E5F5]/100 dark:bg-zinc-900 border-[#F3E5F5] dark:border-neutral-800 dark:text-neutral-200", // Soft lavender
-  //   "bg-[#FFF3E0]/100 dark:bg-zinc-900 border-[#FFF3E0] dark:border-neutral-800 dark:text-neutral-200", // Soft peach
-  // ];
-
-  const colors = [
-    // Soft lime green
-    "bg-gradient-to-br from-[#E8F5E8] to-[#D4F1D4] dark:bg-zinc-900 border-[#E8F5E8] dark:border-neutral-800 dark:text-neutral-200",
-
-    // Pastel lime-yellow
-    "bg-gradient-to-br from-[#F0F8D0] to-[#E8F5CD] dark:bg-zinc-900 border-[#F0F8D0] dark:border-neutral-800 dark:text-neutral-200",
-
-    // Mint to sage
-    "bg-gradient-to-br from-[#C8E6C9] to-[#B8D4B8] dark:bg-zinc-900 border-[#C8E6C9] dark:border-neutral-800 dark:text-neutral-200",
-
-    // Soft blue complement
-    "bg-gradient-to-br from-[#E1F5FE] to-[#B3E5FC] dark:bg-zinc-900 border-[#E1F5FE] dark:border-neutral-800 dark:text-neutral-200",
-
-    // Peachy pink
-    "bg-gradient-to-br from-[#FFF3E0] to-[#FFE0B2] dark:bg-zinc-900 border-[#FFF3E0] dark:border-neutral-800 dark:text-neutral-200",
-
-    // Soft lavender
-    "bg-gradient-to-br from-[#F3E5F5] to-[#E1BEE7] dark:bg-zinc-900 border-[#F3E5F5] dark:border-neutral-800 dark:text-neutral-200",
-  ];
-
-  // checkk if scrolling is available
   const checkScroll = () => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const hasScrollableContent = container.scrollWidth > container.clientWidth;
-    const atLeftEdge = container.scrollLeft <= 10;
-    const atRightEdge =
-      container.scrollLeft + container.clientWidth >=
-      container.scrollWidth - 10;
-
-    setShowLeftArrow(hasScrollableContent && !atLeftEdge);
-    setShowRightArrow(hasScrollableContent && !atRightEdge);
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const scrollable = el.scrollWidth > el.clientWidth;
+    setShowLeftArrow(scrollable && el.scrollLeft > 10);
+    setShowRightArrow(
+      scrollable && el.scrollLeft + el.clientWidth < el.scrollWidth - 10,
+    );
   };
 
-  // Scroll functions
-  const scrollLeft = () => {
-    scrollContainerRef.current.scrollBy({ left: -300, behavior: "smooth" });
-  };
-
-  const scrollRight = () => {
-    scrollContainerRef.current.scrollBy({ left: 300, behavior: "smooth" });
-  };
-
-  // Check on mount and resize
   useEffect(() => {
     checkScroll();
     window.addEventListener("resize", checkScroll);
     return () => window.removeEventListener("resize", checkScroll);
   }, []);
 
-  const featuredItems = currentUser.featuredItems; //.reverse();
+  if (!currentUser.featuredItems.length) return null;
 
   return (
-    <>
-      {currentUser.featuredItems.length > 0 && (
-        <div className="mb-24 relative px-4 md:px-0">
-          <h2 className="text-2xl font-semibold tracking-tight mb-8 dark:text-[#f0f0f0]">
-            <span className="border-none border-gray-100 dark:border-[#222] rounded-md box-content px-2 py-1">
-              Featured Works
-            </span>
-          </h2>
+    <div className="mb-24 relative px-4 md:px-0">
+      <h2 className="text-2xl font-semibold tracking-tight mb-8 dark:text-[#f0f0f0]">
+        <span className="border-none border-gray-100 dark:border-[#222] rounded-md box-content px-2 py-1">
+          Featured Works
+        </span>
+      </h2>
 
-          {/* Left Scroll Indicator */}
-          {showLeftArrow && (
-            <button
-              onClick={scrollLeft}
-              className="absolute left-0 top-1/2 mt-0 transform -translate-y-1/2 bg-white dark:bg-[#1a1a1a] p-2 rounded-full shadow-md z-10 flex items-center"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-          )}
-
-          {/* Right Scroll Indicator */}
-          {showRightArrow && (
-            <button
-              onClick={scrollRight}
-              className="absolute right-0 top-1/2 mt-0 transform -translate-y-1/2 bg-white dark:bg-[#1a1a1a] p-2 rounded-full shadow-md z-10 flex items-center"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          )}
-
-          <div
-            ref={scrollContainerRef}
-            className="flex gap-6 overflow-x-auto scrollbar-hide flex-nowrap pb-4"
-            onScroll={checkScroll}
-          >
-            {featuredItems.map((item, index) => (
-              <div
-                key={item.itemId}
-                className="group cursor-pointer min-w-[200px] md:min-w-[300px] max-w-[200px] md:max-w-[300px]"
-                onClick={() => {
-                  item.itemType.toLowerCase() === "post"
-                    ? navigate(`/p/${item.itemId}`)
-                    : navigate(`/c/${item.itemId}`);
-                }}
-              >
-                <div className="relative aspect-square overflow-hidden mb-4 border border-gray-100 dark:border-[#333]">
-                  {item.itemThumbnail ? (
-                    <img
-                      src={item.itemThumbnail}
-                      alt={item.itemTitle}
-                      className="object-cover size-full transition-transform duration-500 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div
-                      className={`size-full transition-transform duration-500 group-hover:scale-105 border ${colors[index % colors.length]} p-5 text-xl font-serif overflow-hidden`}
-                    >
-                      {item.itemTitle}
-                    </div>
-                  )}
-                  {/* dark inset on hover */}
-                  <div className="absolute inset-0 bg-black/10 dark:bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"></div>
-                </div>
-                <h3 className="text-base font-medium mb-1 flex justify-between dark:text-[#e8e8e8]">
-                  {item.itemTitle}
-                  <Share2
-                    className="w-6 h-6 min-h-[24px] min-w-[24px] text-black dark:text-white rounded-lg p-1 hover:bg-yellow-200 dark:hover:bg-[#2c2c2c]"
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      let baseUrl = window.location.origin;
-                      let typ =
-                        item.itemType.toLowerCase() === "collection"
-                          ? "c"
-                          : "p";
-                      await navigator.clipboard.writeText(
-                        `${baseUrl}/${typ}/${item.itemId}`,
-                      );
-                      toast.success("link copied to clipboard", {
-                        action: {
-                          label: "Close",
-                          onClick: () => console.log("Close"),
-                        },
-                      });
-                    }}
-                  />
-                </h3>
-                <p className="text-sm text-gray-400 dark:text-[#888]">
-                  {item.itemType.toLowerCase() === "collection"
-                    ? "Collection"
-                    : ""}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
+      {showLeftArrow && (
+        <button
+          onClick={() =>
+            scrollContainerRef.current.scrollBy({
+              left: -300,
+              behavior: "smooth",
+            })
+          }
+          className="absolute left-0 top-1/2 mt-0 transform -translate-y-1/2 bg-white dark:bg-[#1a1a1a] p-2 rounded-full shadow-md z-10 flex items-center"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
       )}
-    </>
+
+      {showRightArrow && (
+        <button
+          onClick={() =>
+            scrollContainerRef.current.scrollBy({
+              left: 300,
+              behavior: "smooth",
+            })
+          }
+          className="absolute right-0 top-1/2 mt-0 transform -translate-y-1/2 bg-white dark:bg-[#1a1a1a] p-2 rounded-full shadow-md z-10 flex items-center"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      )}
+
+      <div
+        ref={scrollContainerRef}
+        className="flex gap-6 overflow-x-auto scrollbar-hide flex-nowrap pb-4"
+        onScroll={checkScroll}
+      >
+        {currentUser.featuredItems.map((item, index) => (
+          <div
+            key={item.itemId}
+            className="group cursor-pointer min-w-[200px] md:min-w-[300px] max-w-[200px] md:max-w-[300px]"
+            onClick={() =>
+              navigate(
+                item.itemType.toLowerCase() === "post"
+                  ? `/p/${item.itemId}`
+                  : `/c/${item.itemId}`,
+              )
+            }
+          >
+            <div className="relative aspect-square overflow-hidden mb-4 border border-gray-100 dark:border-[#333]">
+              {item.itemThumbnail ? (
+                <img
+                  src={item.itemThumbnail}
+                  alt={item.itemTitle}
+                  className="object-cover size-full transition-transform duration-500 group-hover:scale-105"
+                />
+              ) : (
+                <div
+                  className={`size-full transition-transform duration-500 group-hover:scale-105 border ${FEATURED_COLORS[index % FEATURED_COLORS.length]} p-5 text-xl font-serif overflow-hidden`}
+                >
+                  {item.itemTitle}
+                </div>
+              )}
+              <div className="absolute inset-0 bg-black/10 dark:bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </div>
+
+            <h3 className="text-base font-medium mb-1 flex justify-between dark:text-[#e8e8e8]">
+              {item.itemTitle}
+              <Share2
+                className="w-6 h-6 min-h-[24px] min-w-[24px] text-black dark:text-white rounded-lg p-1 hover:bg-yellow-200 dark:hover:bg-[#2c2c2c]"
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  const type =
+                    item.itemType.toLowerCase() === "collection" ? "c" : "p";
+                  await navigator.clipboard.writeText(
+                    `${window.location.origin}/${type}/${item.itemId}`,
+                  );
+                  toast.success("Link copied to clipboard");
+                }}
+              />
+            </h3>
+            <p className="text-sm text-gray-400 dark:text-[#888]">
+              {item.itemType.toLowerCase() === "collection" ? "Collection" : ""}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 });
-FeaturedWorks.propTypes = {
-  currentUser: PropTypes.object,
-};
+FeaturedWorks.propTypes = { currentUser: PropTypes.object };
 
-const MockFeatureItem = ({ post = null, collection = null }) => {
-  const navigate = useNavigate();
-  let item = {};
-  if (post) {
-    item = {
-      itemType: "Post",
-      itemThumbnail: post.thumbnailUrl,
-      itemTitle: post.title,
-    };
-  } else if (collection) {
-    item = {
-      itemType: "Collection",
-      itemThumbnail: collection.thumbnailUrl,
-      itemTitle: collection.title,
-    };
-  } else {
-    return;
-  }
-  return (
-    <div
-      className="group cursor-pointer min-w-[200px] md:min-w-[300px] max-w-[200px] md:max-w-[300px]"
-      onClick={() => {
-        item.itemType.toLowerCase() === "post"
-          ? navigate(`/p/${item.itemId}`)
-          : navigate(`/c/${item.itemId}`);
-      }}
-    >
-      <div className="relative aspect-square overflow-hidden mb-4">
-        <img
-          src={item.itemThumbnail}
-          alt={item.itemTitle}
-          className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
-        />
-        {/* dark inset on hover */}
-        <div className="absolute inset-0 bg-black/20 dark:bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"></div>
-      </div>
-      <h3 className="text-lg font-medium mb-1 flex justify-between dark:text-[#e8e8e8]">
-        {item.itemTitle}
-        <Share2
-          className="w-6 h-6 text-black dark:text-white rounded-lg p-1 hover:bg-yellow-200 dark:hover:bg-[#2c2c2c]"
-          onClick={async (e) => {
-            e.stopPropagation();
-            let baseUrl = window.location.origin;
-            let typ = item.itemType.toLowerCase() === "collection" ? "c" : "p";
-            await navigator.clipboard.writeText(
-              `${baseUrl}/${typ}/${item.itemId}`,
-            );
-            toast.success("link copied to clipboard", {
-              action: {
-                label: "Close",
-                onClick: () => console.log("Close"),
-              },
-            });
-          }}
-        />
-      </h3>
-      <p className="text-sm text-gray-400 dark:text-[#888]">
-        {item.itemType.toLowerCase() === "collection" ? "Collection" : ""}
-      </p>
+// ─── Post Stats ────────────────────────────────────────────────────────────────
+
+export const PostStats = ({ post }) => (
+  <div className="flex flex-wrap gap-4 items-center text-xs">
+    <div className="flex items-center gap-1">
+      <Eye className="w-4 h-4 block sm:hidden" />
+      <b>{post?.stats?.viewsCount || 0}&nbsp;</b>
+      <span className="hidden sm:inline">Views</span>
     </div>
-  );
-};
-MockFeatureItem.propTypes = {
-  post: PropTypes.object,
-  collection: PropTypes.object,
-};
-
-export const PostStats = ({ post }) => {
-  return (
-    <div className="flex flex-wrap gap-4 items-center text-xs">
-      {/* views */}
-      <div className="flex items-center gap-1">
-        <Eye className="w-4 h-4 block sm:hidden" />
-        <b>{post.totalViews || 0}&nbsp;</b>
-        <span className="hidden sm:inline">Views</span>
-      </div>
-
-      {/* likes */}
-      <div className="flex items-center gap-1">
-        <ThumbsUp className="w-4 h-4 block sm:hidden" />
-        <b>{post.totalLikes || 0}&nbsp;</b>
-        <span className="hidden sm:inline">Likes</span>
-      </div>
-
-      {/* comments */}
-      <div className="flex items-center gap-1">
-        <MessageCircle className="w-4 h-4 block sm:hidden" />
-        <b>{post.totalComments || 0}&nbsp;</b>
-        <span className="hidden sm:inline">Comments</span>
-      </div>
-
-      {/* read time */}
-      <span className="text-gray-500 dark:text-gray-400">{post.readTime}</span>
+    <div className="flex items-center gap-1">
+      <ThumbsUp className="w-4 h-4 block sm:hidden" />
+      <b>{post?.stats?.likesCount || 0}&nbsp;</b>
+      <span className="hidden sm:inline">Likes</span>
     </div>
-  );
-};
-PostStats.propTypes = {
-  post: PropTypes.object,
-};
-
-export const PostDetails = ({ post }) => {
-  return (
-    <div className="">
-      <div className="flex flex-col lg:flex-row items-start lg:items-center lg:space-x-2">
-        <span className="text-xs text-gray-600 dark:text-gray-400">
-          created {formatDates(post.createdAt)}
-        </span>
-        <span className="text-gray-400 dark:text-gray-500 hidden lg:block">
-          ·
-        </span>
-        <span className="text-xs text-gray-600 dark:text-gray-400">
-          last edited {formatDates(post.modifiedAt)}
-        </span>
-      </div>
-      {post.tags && post.tags.length > 0 && (
-        <div className="flex flex-wrap gap-2 text-xs text-black dark:text-neutral-300 mt-2">
-          Tags:
-          {post.tags.map((tag) => (
-            <span
-              className="bg-lime-200 dark:bg-neutral-700 rounded-full px-2"
-              key={tag}
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-      )}
+    <div className="flex items-center gap-1">
+      <MessageCircle className="w-4 h-4 block sm:hidden" />
+      <b>{post?.stats?.commentsCount || 0}&nbsp;</b>
+      <span className="hidden sm:inline">Comments</span>
     </div>
-  );
-};
-PostDetails.propTypes = {
-  post: PropTypes.object,
-};
+    <span className="text-gray-500 dark:text-gray-400">{post.readTime}</span>
+  </div>
+);
+PostStats.propTypes = { post: PropTypes.object };
+
+// ─── Post Details ──────────────────────────────────────────────────────────────
+
+export const PostDetails = ({ post }) => (
+  <div>
+    <div className="flex flex-col lg:flex-row items-start lg:items-center lg:space-x-2">
+      <span className="text-xs text-gray-600 dark:text-gray-400">
+        created {formatDates(post.createdAt)}
+      </span>
+      <span className="text-gray-400 dark:text-gray-500 hidden lg:block">
+        ·
+      </span>
+      <span className="text-xs text-gray-600 dark:text-gray-400">
+        last edited {formatDates(post.updatedAt)}
+      </span>
+    </div>
+    {post.tags?.length > 0 && (
+      <div className="flex flex-wrap gap-2 text-xs text-black dark:text-neutral-300 mt-2">
+        Tags:
+        {post.tags.map((tag) => (
+          <span
+            key={tag}
+            className="bg-lime-200 dark:bg-neutral-700 rounded-full px-2"
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+    )}
+  </div>
+);
+PostDetails.propTypes = { post: PropTypes.object };
+
+// ─── Post List ─────────────────────────────────────────────────────────────────
 
 export const PostList = memo(function PostList({
   posts,
@@ -982,37 +784,29 @@ export const PostList = memo(function PostList({
   forPrivate,
 }) {
   const navigate = useNavigate();
-  const handlePostClick = (post, forPrivate) => {
-    if (forPrivate) return;
-    navigate(`/p/${post._id}`, { state: { post } });
-  };
 
   return (
     <div className="space-y-8 mb-16 px-4 md:px-0">
       {posts.map(
         (post) =>
-          (activeTab !== "all" ? post.type === activeTab : true) && (
+          (activeTab === "all" || post.type === activeTab) && (
             <div
               key={post._id}
               id={`${post._id}`}
-              onClick={() => handlePostClick(post, forPrivate)}
+              onClick={() => {
+                if (!forPrivate) {
+                  const slug = `${slugify(post.title)}-${post._id}`;
+                  navigate(`/p/${slug}`, { state: { post } });
+                }
+              }}
               className={`group ${forPrivate ? "" : "cursor-pointer"}`}
             >
               <div className="flex flex-col gap-4">
-                {/* Post metadata and title section */}
                 <div className="w-full">
-                  {/* tag based on post type */}
-                  {/* <div className="mb-2">
-                      <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-full px-2 py-1 box-content font-medium">
-                          {post.type}
-                      </span>
-                  </div> */}
-
-                  {/* Content area with thumbnail (if available) */}
                   <div className="flex flex-col sm:flex-row gap-4">
-                    {/* Thumbnail - made responsive, full width on mobile */}
+                    {/* Thumbnail */}
                     {post.thumbnailUrl && (
-                      <div className="w-full max-w-[17rem] aspect-video overflow-hidden rounded-lg _mx-auto _sm:_mx-0">
+                      <div className="w-full max-w-[17rem] aspect-video overflow-hidden rounded-lg">
                         <img
                           src={post.thumbnailUrl}
                           alt={post.title}
@@ -1024,12 +818,14 @@ export const PostList = memo(function PostList({
 
                     {/* Content preview */}
                     <div className="w-full flex flex-col justify-start items-start">
-                      {/* preview snippet */}
                       <div className="relative mb-4 max-h-[150px] max-w-[300px] md:max-w-none overflow-hidden">
                         <div className="prose prose-sm dark:prose-invert">
                           <MarkdownPreview
                             title={post.title}
-                            content={post.content.slice(0, 700) + "..." || ""}
+                            content={
+                              (post.content ?? "").slice(0, 700) +
+                              (post.content ? "..." : "")
+                            }
                             thumbnailUrl={post.thumbnailUrl}
                             isDark={isDark}
                             darkBg="bg-[#222]"
@@ -1038,18 +834,15 @@ export const PostList = memo(function PostList({
                             contentOnly={true}
                           />
                         </div>
-                        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white dark:from-[#222] to-transparent"></div>
+                        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white dark:from-[#222] to-transparent" />
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Post details and actions */}
+                {/* Details + actions row */}
                 <div className="flex flex-col space-y-4">
-                  {/* details */}
                   <PostDetails post={post} />
-
-                  {/* Stats and actions */}
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
                       {post.isPublic ? (
@@ -1061,8 +854,6 @@ export const PostList = memo(function PostList({
                         </div>
                       )}
                     </div>
-
-                    {/* post actions */}
                     {forPrivate ? (
                       <PostActions
                         post={post}
@@ -1076,8 +867,7 @@ export const PostList = memo(function PostList({
                 </div>
               </div>
 
-              {/* divider */}
-              <div className="mt-8 border-b border-gray-100 dark:border-[#333]"></div>
+              <div className="mt-8 border-b border-gray-100 dark:border-[#333]" />
             </div>
           ),
       )}
@@ -1093,23 +883,22 @@ PostList.propTypes = {
   forPrivate: PropTypes.bool,
 };
 
-export const NameDesignation = ({ name, designation }) => {
-  return (
-    <h1
-      className="text-xl md:text-3xl lg:text-4xl font-sans md:font-stardom text-black  dark:text-[#fff]
-        leading-tight md:leading-[0.95] tracking-tight pointer-events-none md:pointer-events-auto capitalize truncate"
-    >
-      {name}
+// ─── Name + Designation ────────────────────────────────────────────────────────
 
-      <span
-        className="block mt-1 md:mt-2 text-sm md:text-xl font-sans md:font-['Sentient-Regular'] font-normal
-          tracking-normal capitalize text-neutral-900 dark:text-neutral-50"
-      >
-        {designation}
-      </span>
-    </h1>
-  );
-};
+export const NameDesignation = ({ name, designation }) => (
+  <h1
+    className="text-xl md:text-3xl lg:text-4xl font-sans md:font-stardom text-black dark:text-[#fff]
+      leading-tight md:leading-[0.95] tracking-tight pointer-events-none md:pointer-events-auto capitalize truncate"
+  >
+    {name}
+    <span
+      className="block mt-1 md:mt-2 text-sm md:text-xl font-sans md:font-['Sentient-Regular'] font-normal
+        tracking-normal capitalize text-neutral-900 dark:text-neutral-50"
+    >
+      {designation}
+    </span>
+  </h1>
+);
 NameDesignation.propTypes = {
   name: PropTypes.string,
   designation: PropTypes.string,

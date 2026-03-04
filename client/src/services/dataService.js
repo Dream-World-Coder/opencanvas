@@ -4,432 +4,470 @@ import { toast } from "sonner";
 export const useDataService = () => {
   const { authAxios } = useAuth();
 
-  // user related
-  // ---------------------------------
-  const getAuthorProfile = async (authorId) => {
+  // ─── User ──────────────────────────────────────────────────────────────────
+
+  // Returns public profile + isFollowing boolean for the logged-in user
+  const getUserProfile = async (username) => {
     try {
-      const response = await authAxios.get(`/author/${authorId}`);
-      return response.data.author;
-    } catch (error) {
-      console.error("Error fetching author profile:", error);
-      toast.error("Error fetching author profile:", error);
-      throw error;
+      const res = await authAxios.get(`/u/${username}`);
+      return res.data.data; // { user, isFollowing }
+    } catch (err) {
+      toast.error("Error fetching user profile");
+      throw err;
     }
   };
 
-  const followUser = async (followId) => {
+  // Batch-fetch minimal user data (used for follower/following lists)
+  const getUsersByIds = async (ids = []) => {
     try {
-      const response = await authAxios.put(`/follow-user?followId=${followId}`);
-      return response.data;
-    } catch (error) {
-      console.error("Error following user:", error);
-      toast.error("Error following user:", error);
-      throw error;
+      const res = await authAxios.get(`/u/users/byids?ids=${ids.join(",")}`);
+      return res.data.data;
+    } catch (err) {
+      toast.error("Error fetching users");
+      throw err;
     }
   };
 
+  // Update the logged-in user's own profile
   const updateUserProfile = async (formValues) => {
     try {
-      const response = await authAxios.put(`/update-user`, {
-        username: formValues.username.toLowerCase(),
+      const res = await authAxios.put("/update/user", {
         fullName: formValues.fullName,
+        profilePicture: formValues.profilePicture,
         designation: formValues.designation,
         aboutMe: formValues.aboutMe,
-        notifications: formValues.notifications,
+        interestedIn: formValues.interestedIn,
         contactInformation: formValues.contactInformation,
+        notifications: formValues.notifications,
       });
-      return response.data;
-    } catch (error) {
-      console.error("Error updating user profile:", error);
-      toast.error("Error updating user profile:", error);
-      throw error;
+      return res.data;
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error updating profile");
+      throw err;
     }
   };
 
-  const changeFeaturedSettings = async (itemId, itemType) => {
+  // Toggle follow/unfollow on a user by their ID
+  const followUnfollowUser = async (targetUserId) => {
     try {
-      const response = await authAxios.put(`/change-post-featured`, {
-        itemId,
-        itemType,
+      const res = await authAxios.post("/follow-unfollow/user", {
+        targetUserId,
       });
-      return response.data;
-    } catch (error) {
-      console.error("Error changing featured settings:", error);
-      return error;
+      return res.data; // { success, message: "Followed" | "Unfollowed" }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error following user");
+      throw err;
     }
   };
 
-  // Post related
-  // ---------------------------------
+  const getUserFollowers = async (userId, page = 1) => {
+    const res = await authAxios.get(
+      `/u/${userId}/followers?page=${page}&limit=10`,
+    );
+    return res.data; // { data, total }
+  };
+  const getUserFollowing = async (userId, page = 1) => {
+    const res = await authAxios.get(
+      `/u/${userId}/following?page=${page}&limit=10`,
+    );
+    return res.data; // { data, total }
+  };
+
+  // ─── Feed ──────────────────────────────────────────────────────────────────
+
+  // Paginated public articles feed
+  const getArticlesFeed = async ({ page = 1, limit = 10 } = {}) => {
+    try {
+      const res = await authAxios.get(`/articles?page=${page}&limit=${limit}`);
+      return res.data; // { success, page, results, data }
+    } catch (err) {
+      toast.error("Error fetching feed");
+      throw err;
+    }
+  };
+
+  // ─── Posts ─────────────────────────────────────────────────────────────────
+
+  // Get a public post by its full slug (e.g. "my-post-title-64abc123")
+  const getPost = async (slug) => {
+    try {
+      const res = await authAxios.get(`/p/${slug}`);
+      return res.data.data;
+    } catch (err) {
+      toast.error("Error fetching post");
+      throw err;
+    }
+  };
+
+  // Get a private post - only works if logged-in user is the author or mod
+  // adding postId also for edit post
+  const getPrivatePost = async (slug, postId) => {
+    try {
+      const res = await authAxios.get(`/private/p/${slug}?postId=${postId}`);
+      return res.data.data;
+    } catch (err) {
+      toast.error("Error fetching post");
+      throw err;
+    }
+  };
+
+  // Batch-fetch post cards by IDs (used on profile page)
+  const getPostsByIds = async (ids = []) => {
+    try {
+      const res = await authAxios.get(`/u/posts/byids?ids=${ids.join(",")}`);
+      return res.data.data;
+    } catch (err) {
+      toast.error("Error fetching posts");
+      throw err;
+    }
+  };
+
+  const getMyPosts = async (page = 1) => {
+    const res = await authAxios.get(`/u/posts/mine?page=${page}&limit=20`);
+    return res.data; // { data, total }
+  };
+
+  const getUserPosts = async (userId, page = 1) => {
+    const res = await authAxios.get(`/u/${userId}/posts?page=${page}&limit=20`);
+    return res.data; // { data, total }
+  };
+
+  const getSavedPosts = async (page = 1) => {
+    const res = await authAxios.get(`/saved/posts?page=${page}&limit=20`);
+    return res.data; // { data, total }
+  };
+
+  const getMyPostInteractions = async (postId) => {
+    const res = await authAxios.get(`/post/${postId}/my-interactions`);
+    return res.data.data; // { isLiked, isDisliked, isSaved }
+  };
+
+  // Get a fresh post ID from the server before opening the editor
   const getNewPostId = async () => {
     try {
-      const response = await authAxios.post("/get-new-postId");
-      return response.data.newPostId;
-    } catch (error) {
-      console.error("Error creating post:", error);
-      toast.error("Error getting post id");
-      throw error;
+      const res = await authAxios.get("/get-new-post-id");
+      return res.data.data.postId;
+    } catch (err) {
+      toast.error("Error getting post ID");
+      throw err;
     }
   };
 
-  const getPostById = async (postId) => {
+  // Create or update a written post (upsert - same endpoint for both)
+  const saveWrittenPost = async (postData) => {
     try {
-      const response = await authAxios.get(`/p/${postId}`);
-      return response.data.post;
-    } catch (error) {
-      console.error("Error fetching post:", error);
-      toast.error("Error getting post");
-      throw error;
-    }
-  };
-  // here post media also has to be reveled,
-  // so auth needed, else anyone can delete the
-  // images inside the post using imgur api
-  const getPostByIdSecured = async (postId) => {
-    try {
-      const response = await authAxios.get(`/secure/p/${postId}`);
-      return response.data.post;
-    } catch (error) {
-      console.error("Error fetching post:", error);
-      toast.error("Error getting post");
-      throw error;
+      const res = await authAxios.post("/save/post/written", postData);
+      return res.data.data;
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error saving post");
+      throw err;
     }
   };
 
-  // would have been betten if could do these in bulk
+  // Like or dislike a post. vote: "like" | "dislike"
+  // Sending the same vote again removes it; opposite vote switches it.
+  const voteOnPost = async (postId, vote) => {
+    try {
+      const res = await authAxios.post("/post/like-dislike", { postId, vote });
+      return res.data;
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error voting on post");
+      throw err;
+    }
+  };
+
+  // Toggle save/unsave a post
+  const saveUnsavePost = async (postId) => {
+    try {
+      const res = await authAxios.post("/post/save-unsave", { postId });
+      return res.data;
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error saving post");
+      throw err;
+    }
+  };
+
+  // Toggle a post between public and private
+  const changePostVisibility = async (postId) => {
+    try {
+      const res = await authAxios.put("/change-post-visibility-status", {
+        postId,
+      });
+      return res.data;
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message || "Error changing post visibility",
+      );
+      throw err;
+    }
+  };
+
+  // Toggle a post in/out of the author's featured items on their profile
+  const changeFeaturedSettings = async (postId) => {
+    try {
+      const res = await authAxios.put("/change-post-featured-status", {
+        postId,
+      });
+      return res.data;
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message || "Error changing featured status",
+      );
+      throw err;
+    }
+  };
+
+  // Permanently delete a post
   const deletePost = async (postId) => {
     try {
-      const response = await authAxios.delete(`/delete-post?postId=${postId}`);
-      return response.data;
-    } catch (error) {
-      console.error("Error deleting post:", error);
-      toast.error("Error deleting post:", error);
-      throw error;
+      // axios.delete doesn't accept a body directly - must pass it under `data`
+      const res = await authAxios.delete("/post/delete", { data: { postId } });
+      return res.data;
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error deleting post");
+      throw err;
     }
   };
 
-  const changePostVisibility = async (postId, isPublic) => {
+  // ─── Comments ──────────────────────────────────────────────────────────────
+
+  // Fetch paginated top-level comments for a post (replies loaded separately on demand)
+  const getPostComments = async (postId, page = 1, limit = 10) => {
     try {
-      const response = await authAxios.put(
-        `/post-visibility-change?postId=${postId}`,
-        { isPublic },
+      const res = await authAxios.get(
+        `/p/${postId}/comments?page=${page}&limit=${limit}`,
       );
-      return response.data;
-    } catch (error) {
-      console.error("Error changing visibility of the post:", error);
-      toast.error("Error changing visibility of the post:", error);
-      throw error;
+      return res.data.data; // Comment[]
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error fetching comments");
+      throw err;
     }
   };
 
-  const likePost = async (postId) => {
+  // Fetch a single comment and all its direct replies
+  const getComment = async (commentId) => {
     try {
-      const response = await authAxios.put(`/like-post?postId=${postId}`);
-      return response.data;
-    } catch (error) {
-      console.error("Error liking post:", error);
-      toast.error("Error liking post:", error);
-      throw error;
+      const res = await authAxios.get(`/p/comments/${commentId}`);
+      return res.data.data; // { comment, replies }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error fetching comment");
+      throw err;
     }
   };
 
-  const dislikePost = async (postId) => {
+  // Post a new top-level comment on a post
+  const addComment = async (postId, content) => {
     try {
-      const response = await authAxios.put(`/dislike-post?postId=${postId}`);
-      return response.data;
-    } catch (error) {
-      console.error("Error disliking post:", error);
-      toast.error("Error disliking post:", error);
-      throw error;
+      const res = await authAxios.post("/new-comment", { postId, content });
+      return res.data.data; // the new Comment document
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error adding comment");
+      throw err;
     }
   };
 
-  const savePost = async (postId) => {
+  // Reply to an existing comment
+  const replyToComment = async (postId, parentId, content) => {
     try {
-      const response = await authAxios.put(
-        `/save-post-for-user?postId=${postId}`,
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error saving post:", error);
-      toast.error("Error saving post:", error);
-      throw error;
+      const res = await authAxios.post("/reply-to-comment", {
+        postId,
+        parentId,
+        content,
+      });
+      return res.data.data; // the new reply Comment document
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error posting reply");
+      throw err;
     }
   };
 
-  // Comments related
-  // ---------------------------------
-  const addNewComment = async (content, postId) => {
+  // Edit a comment's content (author only)
+  const editComment = async (commentId, content) => {
     try {
-      const data = { content, postId };
-      const response = await authAxios.post(`/new-comment`, data);
-      return response.data;
-    } catch (error) {
-      toast.error(error.response.data.message);
-      console.error("Error adding comment:", error);
-      throw error;
+      const res = await authAxios.put("/edit-comment", { commentId, content });
+      return res.data.data; // the updated Comment document
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error editing comment");
+      throw err;
     }
   };
 
-  const editComment = async (content, commentId) => {
-    try {
-      const data = { content, commentId };
-      const response = await authAxios.put(`/edit-comment`, data);
-      return response.data;
-    } catch (error) {
-      toast.error(error.response.data.message);
-      console.error("Error editing comment:", error);
-      throw error;
-    }
-  };
-
+  // Delete a comment (author or mod/admin)
   const deleteComment = async (commentId) => {
     try {
-      // for axios.delete has to be get, cuz it does not send any data
-      const response = await authAxios.delete(
-        `/delete-comment?commentId=${commentId}`,
-      );
-      return response.data;
-    } catch (error) {
-      toast.error(error.response.data.message);
-      console.error("Error deleting comment:", error);
-      throw error;
+      const res = await authAxios.delete("/delete-comment", {
+        data: { commentId },
+      });
+      return res.data; // { success, message }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error deleting comment");
+      throw err;
     }
   };
 
-  const newReply = async (content, postId, parentId) => {
+  // ─── Collections ───────────────────────────────────────────────────────────
+
+  // Browse all public collections
+  const getAllCollections = async ({
+    page = 1,
+    limit = 10,
+    search,
+    tags,
+  } = {}) => {
     try {
-      const data = { content, postId, parentId };
-      const response = await authAxios.post(`/reply-to-a-comment`, data);
-      return response.data;
-    } catch (error) {
-      toast.error(error.response.data.message);
-      console.error("Error adding comment:", error);
-      throw error;
+      const params = new URLSearchParams({ page, limit });
+      if (search) params.append("search", search);
+      if (tags) params.append("tags", tags);
+      const res = await authAxios.get(`/collections?${params.toString()}`);
+      return res.data; // { success, page, results, data }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error fetching collections");
+      throw err;
     }
   };
 
-  const getComment = async (commentId) => {
-    // loads a comment family
+  // Get a public collection + its posts
+  const getCollection = async (collectionId) => {
     try {
-      const response = await authAxios.get(`/p/comments/${commentId}`);
-      return response.data;
-    } catch (error) {
-      toast.error(error.response.data.message);
-      console.error("Error fetching comment:", error);
-      throw error;
+      const res = await authAxios.get(`/c/${collectionId}`);
+      return res.data.data; // { collection, posts }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error fetching collection");
+      throw err;
     }
   };
 
-  const getCommentsByIds = async (post, currentIndex) => {
-    if (post.comments.length === 0) return [];
-    const commentIds = post.comments
-      // .slice(currentIndex + 0, currentIndex + 10)
-      .join(",");
-    const data = { commentIds };
+  // Get a private collection + its posts (author/mod only)
+  const getPrivateCollection = async (collectionId) => {
     try {
-      const response = await authAxios.post(`/get-comments-byids`, data);
-      return response.data.comments;
-    } catch (error) {
-      toast.error(error.response.data.message);
-      console.error("Error fetching comments:", error);
-      throw error;
+      const res = await authAxios.get(`/c/private/${collectionId}`);
+      return res.data.data; // { collection, posts }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error fetching collection");
+      throw err;
     }
   };
 
-  // Collection related
-  // ---------------------------------
-  const createCollection = async (collectionData) => {
-    try {
-      const response = await authAxios.post(
-        "/create/collection",
-        collectionData,
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error creating collection:", error);
-      const message =
-        error.response?.data?.message || "Error creating collection";
-      toast.error(message);
-      throw error;
-    }
-  };
-
+  // Get all collections belonging to a user (metadata only, no posts inside)
   const getUserCollections = async (userId) => {
     try {
-      const response = await authAxios.get(`/u/${userId}/collections`);
-      return response.data.collections;
-    } catch (error) {
-      console.error("Error fetching user collections:", error);
-      const message =
-        error.response?.data?.message || "Error fetching user collections";
-      toast.error(message);
-      throw error;
+      const res = await authAxios.get(`/u/${userId}/collections`);
+      return res.data.data;
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message || "Error fetching user collections",
+      );
+      throw err;
     }
   };
 
-  const getCollectionById = async (collectionId) => {
+  // Create a new collection
+  const createCollection = async (collectionData) => {
     try {
-      const response = await authAxios.get(`/c/${collectionId}`);
-      return response.data.collection;
-    } catch (error) {
-      console.error("Error fetching collection:", error);
-      const message =
-        error.response?.data?.message || "Error fetching collection";
-      toast.error(message);
-      throw error;
+      const res = await authAxios.post("/create/collection", collectionData);
+      return res.data.data;
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error creating collection");
+      throw err;
     }
   };
 
-  const getPrivateCollectionById = async (collectionId) => {
-    try {
-      const response = await authAxios.get(`/c/private/${collectionId}`);
-      return response.data.collection;
-    } catch (error) {
-      console.error("Error fetching collection:", error);
-      const message =
-        error.response?.data?.message || "Error fetching collection";
-      toast.error(message);
-      throw error;
-    }
-  };
-
+  // Update collection metadata (author only)
   const updateCollection = async (collectionId, collectionData) => {
     try {
-      const response = await authAxios.put(
+      const res = await authAxios.put(
         `/update-collection/${collectionId}`,
         collectionData,
       );
-      return response.data;
-    } catch (error) {
-      console.error("Error updating collection:", error);
-      const message =
-        error.response?.data?.message || "Error updating collection";
-      toast.error(message);
-      throw error;
+      return res.data.data;
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error updating collection");
+      throw err;
     }
   };
 
+  // Toggle a post into/out of a collection (single endpoint handles both add and remove)
+  const togglePostInCollection = async (postId, collectionId) => {
+    try {
+      const res = await authAxios.put(
+        `/add-remove-post/${postId}/collection/${collectionId}`,
+      );
+      return res.data; // { success, message: "Post added..." | "Post removed..." }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error updating collection");
+      throw err;
+    }
+  };
+
+  // Like or dislike a collection. vote: "like" | "dislike"
+  const voteOnCollection = async (collectionId, vote) => {
+    try {
+      const res = await authAxios.post(`/collection/${collectionId}/vote`, {
+        vote,
+      });
+      return res.data;
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error voting on collection");
+      throw err;
+    }
+  };
+
+  // Delete a collection (author or mod/admin)
   const deleteCollection = async (collectionId) => {
     try {
-      const response = await authAxios.delete(
-        `/delete-collection/${collectionId}`,
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error deleting collection:", error);
-      const message =
-        error.response?.data?.message || "Error deleting collection";
-      toast.error(message);
-      throw error;
-    }
-  };
-
-  const addPostToCollection = async (collectionId, postId) => {
-    try {
-      const response = await authAxios.post(
-        `/add-post/${postId}/collection/${collectionId}`,
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error adding post to collection:", error);
-      const message =
-        error.response?.data?.message || "Error adding post to collection";
-      toast.error(message);
-      throw error;
-    }
-  };
-
-  const removePostFromCollection = async (collectionId, postId) => {
-    try {
-      const response = await authAxios.delete(
-        `/remove-post/${postId}/collection/${collectionId}`,
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error removing post from collection:", error);
-      const message =
-        error.response?.data?.message || "Error removing post from collection";
-      toast.error(message);
-      throw error;
-    }
-  };
-
-  const getAllCollections = async (params = {}) => {
-    try {
-      const queryParams = new URLSearchParams();
-
-      if (params.page) queryParams.append("page", params.page);
-      if (params.limit) queryParams.append("limit", params.limit);
-      if (params.search) queryParams.append("search", params.search);
-      if (params.tags) queryParams.append("tags", params.tags);
-
-      const response = await authAxios.get(
-        `/collections?${queryParams.toString()}`,
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching all collections:", error);
-      const message =
-        error.response?.data?.message || "Error fetching collections";
-      toast.error(message);
-      throw error;
-    }
-  };
-
-  const voteOnCollection = async (collectionId, voteType) => {
-    try {
-      const response = await authAxios.post(
-        `/collections/${collectionId}/vote`,
-        {
-          voteType, // 'upvote' or 'downvote'
-        },
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error voting on collection:", error);
-      const message =
-        error.response?.data?.message || "Error voting on collection";
-      toast.error(message);
-      throw error;
+      const res = await authAxios.delete(`/delete-collection/${collectionId}`);
+      return res.data;
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error deleting collection");
+      throw err;
     }
   };
 
   return {
     // User
-    getAuthorProfile,
+    getUserProfile,
+    getUsersByIds,
     updateUserProfile,
-    followUser,
-    changeFeaturedSettings,
+    followUnfollowUser,
+    getUserFollowers,
+    getUserFollowing,
+
+    // Feed
+    getArticlesFeed,
 
     // Posts
+    getPost,
+    getPrivatePost,
+    getPostsByIds,
+    getMyPosts,
+    getUserPosts,
+    getSavedPosts,
+    getMyPostInteractions,
     getNewPostId,
-    getPostById,
-    getPostByIdSecured,
-    deletePost,
-    likePost,
-    dislikePost,
-    savePost,
+    saveWrittenPost,
+    voteOnPost,
+    saveUnsavePost,
     changePostVisibility,
+    changeFeaturedSettings,
+    deletePost,
 
     // Comments
-    addNewComment,
+    getPostComments,
+    getComment,
+    addComment,
+    replyToComment,
     editComment,
     deleteComment,
-    newReply,
-    getComment,
-    getCommentsByIds,
 
     // Collections
-    createCollection,
-    getUserCollections,
-    getCollectionById,
-    getPrivateCollectionById,
-    updateCollection,
-    deleteCollection,
-    addPostToCollection,
-    removePostFromCollection,
     getAllCollections,
+    getCollection,
+    getPrivateCollection,
+    getUserCollections,
+    createCollection,
+    updateCollection,
+    togglePostInCollection,
     voteOnCollection,
+    deleteCollection,
   };
 };

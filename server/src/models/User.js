@@ -4,51 +4,28 @@ const Schema = mongoose.Schema;
 const ContactInfoSchema = new Schema(
   {
     title: { type: String, required: true, default: "OpenCanvas" },
-    url: {
-      type: String,
-      required: true,
-    },
-  },
-  { _id: false },
-);
-
-const followerSchema = new Schema(
-  {
-    userId: { type: Schema.Types.ObjectId, ref: "User" },
-    since: { type: Date, default: Date.now },
-  },
-  { _id: false },
-);
-const featureItemSchema = new Schema(
-  {
-    itemId: {
-      type: Schema.Types.ObjectId,
-      refPath: "featuredItems.itemType",
-    },
-    itemType: {
-      type: String,
-      enum: ["Post", "Collection"],
-    },
-    itemTitle: { type: String },
-    itemThumbnail: { type: String },
+    url: { type: String, required: true },
   },
   { _id: false },
 );
 
 const lastLoginsSchema = new Schema(
   {
-    loginTime: {
-      type: Date,
-      default: Date.now,
-    },
-    deviceInfo: {
-      type: String,
-    },
-    ipAddress: {
-      type: String,
-    },
+    loginTime: { type: Date, default: Date.now },
+    deviceInfo: { type: String },
+    ipAddress: { type: String },
   },
-  { _id: true },
+  { _id: false },
+);
+
+const featureItemSchema = new Schema(
+  {
+    itemId: { type: Schema.Types.ObjectId, refPath: "featuredItems.itemType" },
+    itemType: { type: String, enum: ["Post", "Collection"] },
+    itemTitle: { type: String },
+    itemThumbnail: { type: String },
+  },
+  { _id: false },
 );
 
 const userSchema = new Schema(
@@ -62,15 +39,9 @@ const userSchema = new Schema(
       maxlength: [16, "Username can be 16 characters long at max"],
       match: [
         /^(?!\d+$)[a-z0-9_]+$/,
-        "Username must contain only lowercase letters, numbers, or underscores, and cannot be only numbers",
+        "Username must contain only lowercase letters, numbers, or underscores.",
       ],
-    },
-    fullName: {
-      type: String,
-      required: false,
-      trim: true,
-      minlength: [4, "Fullname must be at least 4 characters long"],
-      maxlength: [32, "Fullname can be 32 characters long at max"],
+      index: true,
     },
     email: {
       type: String,
@@ -79,32 +50,36 @@ const userSchema = new Schema(
       trim: true,
       lowercase: true,
     },
-    provider: {
+    fullName: {
       type: String,
-      enum: ["google", "opencanvas"],
-      required: true,
+      trim: true,
+      minlength: [4, "Fullname must be at least 4 characters long"],
+      maxlength: [32, "Fullname can be 32 characters long at max"],
     },
-    profilePicture: {
-      type: String,
-      default: "https://opencanvas.blog/defaults/profile.jpeg",
-    },
-    designation: {
-      type: String,
-      default: "Learner",
-      maxlength: [40, "Designation can be 40 characters or less"],
-    },
+
+    // Auth & Role
+    provider: { type: String, enum: ["google", "opencanvas"], required: true },
     role: {
       type: String,
       enum: ["user", "moderator", "admin"],
-      // moderator -> bot
-      // admin -> for user admin
       default: "user",
     },
-    aboutMe: {
+
+    // Profile Details
+    profilePicture: {
       type: String,
-      default: "",
-      maxlength: [300, "Bio must be 300 characters or less"],
+      default: "https://opencanvas.in/defaults/profile.jpeg",
     },
+    designation: { type: String, default: "Learner", maxlength: 40 },
+    aboutMe: { type: String, default: "", maxlength: 300 },
+    interestedIn: {
+      type: [String],
+      validate: [(val) => val.length <= 8, "Maximum 8 topics are allowed."],
+      default: ["any"],
+    },
+    contactInformation: [ContactInfoSchema],
+
+    // Premium
     premiumUser: {
       isPremium: { type: Boolean, default: false },
       subscriptionType: {
@@ -112,101 +87,59 @@ const userSchema = new Schema(
         enum: ["none", "basic", "pro", "premium"],
         default: "none",
       },
-      subscriptionStartDate: { type: Date },
-      subscriptionEndDate: { type: Date },
+      subscriptionStartDate: Date,
+      subscriptionEndDate: Date,
     },
-    interestedIn: {
-      // max 8, default: "any",
-      type: [String],
-      trim: true,
-      default: ["any"],
-      required: true,
-      validate: {
-        validator: function (interestedIn) {
-          return interestedIn.length <= 8;
-        },
-        message: "Maximum 8 topics are allowed.",
-      },
+
+    // storing counts here, actual data is in 'Follow' and 'Interaction' collections.
+    stats: {
+      followersCount: { type: Number, default: 0 },
+      followingCount: { type: Number, default: 0 },
+      postsCount: { type: Number, default: 0 }, // Total posts created
+      likesReceivedCount: { type: Number, default: 0 }, // likes on all posts
     },
-    // <<<<>>>>
+
+    // limit to max 50
+    collections: {
+      type: [{ type: Schema.Types.ObjectId, ref: "Collection" }],
+      validate: [(val) => val.length <= 50, "Maximum 50 collections allowed"],
+      default: [],
+    },
+
     lastFiveLogin: [lastLoginsSchema],
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-    contactInformation: [ContactInfoSchema],
+
+    // Settings
     notifications: {
-      // type
       emailNotification: { type: Boolean, default: true },
       pushNotification: { type: Boolean, default: true },
-
-      // category
       mentionNotification: { type: Boolean, default: true },
       followNotification: { type: Boolean, default: true },
       commentNotification: { type: Boolean, default: false },
       messageNotification: { type: Boolean, default: true },
-      // its good but why no _id is created here? it is a document itself
     },
-    // <<<<>>>>
-    posts: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Post",
-      },
-    ],
-    // only an linear array will suffice because, user can create collections if needed to store similar type of rticles,
-    // so no need to make this an array of object, like savedPosts.readLater etc
-    savedPosts: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Post",
-      },
-    ],
-    likedPosts: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Post",
-      },
-    ],
-    dislikedPosts: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Post",
-      },
-    ],
-    // no need to store posts, totalSavedPosts & totalLikedPosts just use .length,
-    // cuz the array has to be loaded anyway, when we load currentUser
-    collections: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Collection",
-      },
-    ],
-    // featured post or collection, max 8 featured items
-    featuredItems: [featureItemSchema],
-    followers: [followerSchema],
-    following: [followerSchema],
 
-    // recent activity -> can be calculated
+    // small
+    featuredItems: [featureItemSchema],
   },
   { timestamps: true },
 );
+
 userSchema.index({ username: 1, email: 1 });
 
-// Limit featured items to 8
 userSchema.path("featuredItems").validate(function (value) {
   return value.length <= 8;
 }, "Featured items cannot exceed 8");
 
-// Pre-save hook to set the default URL dynamically
-userSchema.pre("save", function (next) {
-  if (this.contactInformation.length === 0) {
-    this.contactInformation.push({
-      url: `https://www.opencanvas.blog/u/${this.username}`,
-    });
-  }
-  next();
-});
+// will do it with frontend only
+// userSchema.pre("save", function (next) {
+//   if (this.contactInformation && this.contactInformation.length === 0) {
+//     this.contactInformation.push({
+//       title: "OpenCanvas",
+//       url: `https://www.opencanvas.in/u/${this.username}`,
+//     });
+//   }
+//   next();
+// });
 
 const User = mongoose.model("User", userSchema);
 module.exports = User;

@@ -23,11 +23,15 @@ const Header = ({
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [createMenuOpen, setCreateMenuOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const { currentUser } = useAuth();
   const { getNewPostId } = useDataService();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
 
+  // Called when the user picks a post type from the Create menu.
+  // Fetches a fresh post ID from the server, then opens the editor
+  // with the ID and type embedded in the URL — no localStorage needed.
   async function handlePostCreate(option) {
     if (!currentUser) {
       toast.error("You need to login first");
@@ -35,23 +39,18 @@ const Header = ({
     }
 
     setLoading(true);
-    localStorage.removeItem("blogPost");
-    localStorage.removeItem("newPostId");
     setCreateMenuOpen(false);
+    localStorage.setItem("blogPost", "");
 
     try {
-      let newPostId = await getNewPostId();
-      localStorage.setItem("newPostId", newPostId);
+      const postId = await getNewPostId();
+      navigate(`/editor/markdown/create?type=${option.type}&id=${postId}`);
     } catch (e) {
-      console.log(e);
+      // getNewPostId already shows a toast; nothing more to do here
+      console.error("Failed to get new post ID", e);
     } finally {
       setLoading(false);
     }
-
-    setTimeout(() => {
-      // window.location.href = option.href;
-      navigate(option.href);
-    }, 300);
   }
 
   let navLinks = [
@@ -63,8 +62,7 @@ const Header = ({
 
   if (!currentUser) {
     navLinks.push({ name: "Login", href: "/login" });
-  }
-  if (currentUser) {
+  } else {
     navLinks.push({ name: "Profile", href: "/profile" });
   }
 
@@ -85,7 +83,7 @@ const Header = ({
             <SearchBar round={true} hideSubmitBtn={true} />
           </div>
 
-          {/* Desktop Navigation */}
+          {/* Desktop nav links + Create button */}
           <div className="hidden md:flex items-center space-x-2">
             {navLinks.map((link, index) => (
               <React.Fragment key={index}>
@@ -103,7 +101,7 @@ const Header = ({
                         <Avatar className="size-6 md:size-8 dark:bg-[#333]">
                           <AvatarImage
                             src={currentUser.profilePicture}
-                            alt={`${currentUser.username}`}
+                            alt={currentUser.username}
                           />
                           <AvatarFallback className="dark:bg-[#333]">
                             {currentUser.fullName.slice(0, 2).toUpperCase()}
@@ -118,27 +116,30 @@ const Header = ({
                 )}
               </React.Fragment>
             ))}
-            {/* Create Button with Dropdown */}
-            <div className="relative">
-              {currentUser && (
+
+            {/* Create dropdown — desktop */}
+            {currentUser && (
+              <div className="relative">
                 <button
                   onClick={() => setCreateMenuOpen(!createMenuOpen)}
                   className="flex items-center space-x-2 bg-black dark:bg-[#333] text-white px-4 py-2 rounded-full hover:bg-stone-800/90 transition-colors"
                 >
                   <span className="text-sm">Create</span>
-                  {!createMenuOpen && <ChevronDown className="w-4 h-4" />}
-                  {createMenuOpen && <ChevronUp className="w-4 h-4" />}
+                  {createMenuOpen ? (
+                    <ChevronUp className="w-4 h-4" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4" />
+                  )}
                 </button>
-              )}
 
-              {/* Create Menu Dropdown -- desktop */}
-              {createMenuOpen && (
-                <CreateMenuDesktop
-                  loading={loading}
-                  handlePostCreate={handlePostCreate}
-                />
-              )}
-            </div>
+                {createMenuOpen && (
+                  <CreateMenuDesktop
+                    loading={loading}
+                    handlePostCreate={handlePostCreate}
+                  />
+                )}
+              </div>
+            )}
           </div>
 
           <MobileNav
@@ -151,7 +152,7 @@ const Header = ({
           />
         </nav>
 
-        {/* mobile menu */}
+        {/* Mobile slide-down nav menu */}
         <div
           className={`md:hidden absolute left-0 right-0 bg-white dark:bg-[#111] backdrop-blur-md shadow-lg
             border-b border-stone-200/50 dark:border-stone-700/50 transition-all duration-300 ease-in-out ${
@@ -161,7 +162,6 @@ const Header = ({
             }`}
         >
           <div className="px-4 py-6 space-y-6">
-            {/* mobile nav links */}
             <div className="flex flex-col">
               {navLinks.map(
                 (link, index) =>
@@ -169,7 +169,7 @@ const Header = ({
                     <button
                       key={index}
                       className="py-2 pl-4 rounded-lg text-stone-600 dark:text-gray-300 hover:text-stone-800
-                  dark:hover:text-gray-200 hover:bg-lime-300/50 transition-colors flex items-center justify-start"
+                        dark:hover:text-gray-200 hover:bg-lime-300/50 transition-colors flex items-center justify-start"
                       onClick={() => {
                         setIsMenuOpen(false);
                         navigate(link.href);
@@ -186,8 +186,8 @@ const Header = ({
     </header>
   );
 };
+
 Header.propTypes = {
-  currentUser: PropTypes.object,
   noBlur: PropTypes.bool,
   abs: PropTypes.bool,
   noShadow: PropTypes.bool,

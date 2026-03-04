@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-// import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Card,
@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-// import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import {
@@ -57,45 +56,553 @@ import { useDataService } from "@/services/dataService";
 import { formatDateDetails } from "@/services/formatDate";
 import { useDarkModeContext } from "@/contexts/ThemeContext";
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function getDeviceInfo(deviceInfo) {
+  const parser = new UAParser(deviceInfo);
+  const result = parser.getResult();
+  return {
+    browser: `${result.browser.name} ${result.browser.version}`,
+    os: `${result.os.name} ${result.os.version}`,
+    device: result.device.type
+      ? `${result.device.vendor || ""} ${result.device.model}`.trim()
+      : "Desktop",
+  };
+}
+
+// Single login session card — shared between the "active" and "past" renders
+function LoginSessionCard({ item, isActive = false }) {
+  if (!item) return null;
+  const { ipAddress: ip, deviceInfo, loginTime } = item;
+  const info = getDeviceInfo(deviceInfo);
+  return (
+    <div className="rounded-lg border p-4 dark:border-[#333] dark:bg-[#222]">
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <p className="text-sm font-medium">
+            <strong>Device</strong>: {info.device}
+          </p>
+          <p className="text-sm font-medium">
+            <strong>Operating System</strong>: {info.os}
+          </p>
+          <p className="text-sm font-medium">
+            <strong>Browser</strong>: {info.browser}
+          </p>
+          <p className="text-sm font-medium">
+            <strong>IP Address</strong>: {ip || "N/A"}
+          </p>
+          <p className="text-sm font-medium">
+            <strong>Date</strong>: {formatDateDetails(loginTime)}
+          </p>
+        </div>
+        {isActive && <Badge className="bg-green-600 text-white">Active</Badge>}
+      </div>
+    </div>
+  );
+}
+LoginSessionCard.propTypes = {
+  item: PropTypes.object,
+  isActive: PropTypes.bool,
+};
+
+// ─── Main Component ────────────────────────────────────────────────────────────
+
 const ProfileSettings = () => {
   const { currentUser, setCurrentUser, logout } = useAuth();
   const { darkMode, toggleDarkMode } = useDarkModeContext();
+  const { updateUserProfile } = useDataService();
+
+  const baseUrl = window.location.origin;
 
   const [activeTab, setActiveTab] = useState("general");
+  const [loading, setLoading] = useState(false);
   const [formValues, setFormValues] = useState({
-    username: currentUser.username.toLowerCase() ?? "null",
+    username: currentUser.username?.toLowerCase() ?? "",
     fullName: currentUser.fullName ?? "",
     designation: currentUser.designation ?? "Learner",
     aboutMe: currentUser.aboutMe ?? "",
     notifications: {
-      email: currentUser.notifications.emailNotification,
-      push: currentUser.notifications.pushNotification,
-      mentions: currentUser.notifications.mentionNotification,
-      follows: currentUser.notifications.followNotification,
-      comments: currentUser.notifications.commentNotification,
-      messages: currentUser.notifications.messageNotification,
+      emailNotification: currentUser.notifications?.emailNotification,
+      pushNotification: currentUser.notifications?.pushNotification,
+      mentionNotification: currentUser.notifications?.mentionNotification,
+      followNotification: currentUser.notifications?.followNotification,
+      commentNotification: currentUser.notifications?.commentNotification,
+      messageNotification: currentUser.notifications?.messageNotification,
     },
     contactInformation: currentUser.contactInformation ?? [
       {
         title: "Opencanvas",
-        url: `${baseUrl}/u/${currentUser.username.toLowerCase()}`,
+        url: `${baseUrl}/u/${currentUser.username?.toLowerCase()}`,
       },
     ],
   });
-  const baseUrl = window.location.origin;
 
-  function getDeviceInfo() {
-    const parser = new UAParser();
-    const result = parser.getResult();
+  // Open the Pro tab when URL hash is #pro
+  useEffect(() => {
+    const hash = window.location.href.split("#")[1];
+    if (hash?.toLowerCase() === "pro") setActiveTab("pro");
+  }, []);
 
-    return {
-      browser: `${result.browser.name} ${result.browser.version}`,
-      os: `${result.os.name} ${result.os.version}`,
-      device: result.device.type
-        ? `${result.device.vendor || ""} ${result.device.model}`.trim()
-        : "Desktop",
-    };
+  // ─── Form handlers ──────────────────────────────────────────────────────────
+
+  const handleContactInfoChange = (index, field, value) => {
+    const updated = [...formValues.contactInformation];
+    updated[index] = { ...updated[index], [field]: value };
+    setFormValues({ ...formValues, contactInformation: updated });
+  };
+
+  const addContactInfoField = () => {
+    setFormValues({
+      ...formValues,
+      contactInformation: [
+        ...formValues.contactInformation,
+        { title: "", url: "" },
+      ],
+    });
+  };
+
+  const removeContactInfoField = (index) => {
+    const updated = [...formValues.contactInformation];
+    updated.splice(index, 1);
+    setFormValues({ ...formValues, contactInformation: updated });
+  };
+
+  async function updateUser() {
+    setLoading(true);
+    try {
+      if (formValues.designation?.length > 40) {
+        toast.error("Designation can be max 40 characters");
+        return;
+      }
+      if (formValues.fullName?.length > 32 || formValues.fullName?.length < 4) {
+        toast.error("Full name should be 4–32 characters");
+        return;
+      }
+      if (formValues.aboutMe?.length > 300) {
+        toast.error("About me can be max 300 characters");
+        return;
+      }
+
+      await updateUserProfile(formValues);
+
+      // Keep the Opencanvas contact link in sync with the username (read-only, but kept for consistency)
+      setFormValues((prev) => ({
+        ...prev,
+        contactInformation: prev.contactInformation.map((item) =>
+          item.title.toLowerCase() === "opencanvas"
+            ? { ...item, url: `${baseUrl}/u/${currentUser.username}` }
+            : item,
+        ),
+      }));
+
+      setCurrentUser((prev) => ({
+        ...prev,
+        fullName: formValues.fullName.trim().toLowerCase(),
+        designation: formValues.designation.trim().toLowerCase(),
+        aboutMe: formValues.aboutMe.trim().toLowerCase(),
+      }));
+
+      toast.success("Profile updated successfully.");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong while updating your profile.",
+      );
+    } finally {
+      setLoading(false);
+    }
   }
+
+  // ─── Tab: General ───────────────────────────────────────────────────────────
+
+  const general = {
+    id: "general",
+    label: "General",
+    icon: <UserIcon className="h-4 w-4" />,
+    content: (
+      <>
+        {/* Mobile-only profile link header */}
+        <CardHeader className="pb-2 p-0 md:p-6 sm:hidden mb-4">
+          <CardTitle className="dark:text-white flex items-center justify-between mb-1">
+            Public Profile Link
+            <Copy
+              className="size-4 cursor-pointer"
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  `${baseUrl}/u/${formValues.username}`,
+                );
+                toast.success("Copied!");
+              }}
+            />
+          </CardTitle>
+          <CardDescription className="dark:text-gray-400">
+            {baseUrl.replace(/^https?:\/\//, "")}/u/
+            {formValues.username.toLowerCase()}
+          </CardDescription>
+        </CardHeader>
+
+        <div className="space-y-6 dark:text-white">
+          <div className="flex flex-col sm:flex-row gap-6 items-start">
+            {/* Avatar */}
+            <div className="flex flex-col items-center gap-2">
+              <Avatar className="h-24 w-24">
+                <AvatarImage
+                  src={currentUser.profilePicture}
+                  alt="Profile picture"
+                />
+                <AvatarFallback>
+                  {currentUser.fullName?.slice(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-2 dark:text-white cursor-not-allowed"
+              >
+                Change Photo
+              </Button>
+            </div>
+
+            <div className="flex-1 space-y-4 w-full">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="username">Username</Label>
+                  <Input
+                    id="username"
+                    value={formValues.username.toLowerCase()}
+                    readOnly
+                    disabled
+                    title="Username cannot be changed"
+                    className="dark:bg-[#171717] dark:text-white dark:border-[#333] opacity-60 cursor-not-allowed"
+                  />
+                  <p className="text-xs text-gray-400">
+                    Username cannot be changed.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <Input
+                    id="fullName"
+                    value={formValues.fullName}
+                    onChange={(e) =>
+                      setFormValues({ ...formValues, fullName: e.target.value })
+                    }
+                    className="dark:bg-[#171717] dark:text-white dark:border-[#333]"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="designation">Designation</Label>
+                <Input
+                  id="designation"
+                  value={formValues.designation}
+                  onChange={(e) =>
+                    setFormValues({
+                      ...formValues,
+                      designation: e.target.value,
+                    })
+                  }
+                  className="dark:bg-[#171717] dark:text-white dark:border-[#333]"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="aboutMe">About</Label>
+                <Input
+                  id="aboutMe"
+                  value={formValues.aboutMe}
+                  onChange={(e) =>
+                    setFormValues({ ...formValues, aboutMe: e.target.value })
+                  }
+                  className="dark:bg-[#171717] dark:text-white dark:border-[#333]"
+                />
+              </div>
+
+              {/* Contact Information */}
+              <div className="space-y-2">
+                <Label>Contact Information</Label>
+                {formValues.contactInformation.map((contact, index) => (
+                  <div
+                    key={index}
+                    className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+                  >
+                    <Input
+                      placeholder="Title, e.g. GitHub"
+                      className="dark:border-[#333]"
+                      value={contact.title}
+                      onChange={(e) =>
+                        handleContactInfoChange(index, "title", e.target.value)
+                      }
+                    />
+                    <div className="flex items-end gap-2">
+                      <Input
+                        placeholder="e.g. https://github.com/username"
+                        className="dark:border-[#333]"
+                        value={contact.url}
+                        onChange={(e) =>
+                          handleContactInfoChange(index, "url", e.target.value)
+                        }
+                      />
+                      {formValues.contactInformation.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => removeContactInfoField(index)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="mt-2 dark:bg-white dark:text-black"
+                  onClick={addContactInfoField}
+                >
+                  <PlusCircle className="h-4 w-4 mr-2" />
+                  Add More
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Dark mode toggle */}
+          <div className="flex items-center space-x-2 dark:text-white">
+            <Switch
+              id="darkMode"
+              checked={darkMode}
+              onCheckedChange={toggleDarkMode}
+            />
+            <Label htmlFor="darkMode">Dark Mode</Label>
+            {darkMode ? (
+              <MoonIcon className="h-4 w-4 ml-2" />
+            ) : (
+              <SunIcon className="h-4 w-4 ml-2" />
+            )}
+          </div>
+
+          <div className="flex justify-end">
+            <Button
+              onClick={updateUser}
+              disabled={loading}
+              className="bg-lime-600 hover:bg-lime-700 dark:bg-lime-700 dark:hover:bg-lime-800 text-white"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Save Changes"
+              )}
+            </Button>
+          </div>
+        </div>
+      </>
+    ),
+  };
+
+  // ─── Tab: Account ───────────────────────────────────────────────────────────
+
+  // lastFiveLogin may be undefined if the server hasn't sent it yet — guard everywhere
+  const recentLogin = currentUser?.lastFiveLogin?.slice(0, 1);
+  const pastLogins = currentUser?.lastFiveLogin?.slice(1) ?? [];
+
+  const account = {
+    id: "account",
+    label: "Account",
+    icon: <LockIcon className="h-4 w-4" />,
+    content: (
+      <div className="space-y-6 dark:text-white">
+        <div className="space-y-4 mb-6">
+          <div className="text-sm font-thin">
+            Joined:{" "}
+            {new Date(currentUser.createdAt).toLocaleDateString("en-GB")}
+          </div>
+
+          <h3 className="text-lg font-medium">Last Five Logins</h3>
+
+          {/* Most recent session shown as "Active" */}
+          <LoginSessionCard item={recentLogin} isActive={true} />
+
+          {/* Remaining past sessions in a 2-col grid */}
+          {pastLogins.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {pastLogins.map((item, index) => (
+                <LoginSessionCard key={index} item={item} />
+              ))}
+            </div>
+          )}
+        </div>
+        Log out from account:{" "}
+        <AlertDialog>
+          <AlertDialogTrigger className="hover:bg-red-300/80 dark:hover:bg-red-800/80 border border-red-300/80 dark:border-red-600/80 rounded-md px-3 py-1 box-content">
+            Logout
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                Are you sure you want to logout?
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                This will remove your current session. You can log in again
+                anytime.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-red-600 hover:bg-red-500"
+                onClick={logout}
+              >
+                Continue
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+        {/* Danger zone */}
+        <Card className="border-none shadow-none dark:bg-[#171717] dark:text-white pt-6">
+          <CardHeader className="p-0 pb-4">
+            <CardTitle className="text-red-600 dark:text-red-400">
+              Danger Zone
+            </CardTitle>
+            <CardDescription className="dark:text-gray-400">
+              Irreversible account actions
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-0 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="text-base font-medium dark:text-white">
+                  Deactivate Account
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Temporarily disable your account. You can reactivate anytime.
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950"
+              >
+                Deactivate
+              </Button>
+            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="text-base font-medium dark:text-white">
+                  Delete Account
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Permanently delete your account and all your data. This cannot
+                  be undone.
+                </p>
+              </div>
+              <Button variant="destructive">Delete</Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    ),
+  };
+
+  // ─── Tab: Notifications ─────────────────────────────────────────────────────
+
+  const notifications = {
+    id: "notifications",
+    label: "Notifications",
+    icon: <BellIcon className="h-4 w-4" />,
+    content: (
+      <div className="space-y-6 dark:text-white">
+        <div className="space-y-4">
+          {["emailNotification", "pushNotification"].map((type) => (
+            <div key={type} className="flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-medium">
+                  {type.charAt(0).toUpperCase() + type.slice(1)} Notifications
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {type === "emailNotification"
+                    ? "Receive updates via email"
+                    : "Get notifications on your device"}
+                </p>
+              </div>
+              <Switch
+                id={`${type}Notifications`}
+                checked={formValues.notifications[type]}
+                onCheckedChange={(checked) =>
+                  setFormValues({
+                    ...formValues,
+                    notifications: {
+                      ...formValues.notifications,
+                      [type]: checked,
+                    },
+                  })
+                }
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Notification Categories</h3>
+          {[
+            "mentionNotification",
+            "followNotification",
+            "messageNotification",
+            "commentNotification",
+          ].map((category) => (
+            <div
+              key={category}
+              className="flex items-center justify-between rounded-lg border p-4 dark:border-[#333] dark:bg-[#222]"
+            >
+              <div>
+                <h3 className="text-sm font-medium">
+                  {category.charAt(0).toUpperCase() + category.slice(1)}
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Notifications when someone{" "}
+                  {category === "followNotification"
+                    ? "follows you"
+                    : category === "messageNotification"
+                      ? "sends you a message"
+                      : `${category} you in a post`}
+                </p>
+              </div>
+              <Switch
+                id={`${category}Notifications`}
+                checked={formValues.notifications[category]}
+                onCheckedChange={(checked) =>
+                  setFormValues({
+                    ...formValues,
+                    notifications: {
+                      ...formValues.notifications,
+                      [category]: checked,
+                    },
+                  })
+                }
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="flex justify-end">
+          <Button
+            onClick={updateUser}
+            className="bg-lime-600 hover:bg-lime-700 dark:bg-lime-700 dark:hover:bg-lime-800 text-white"
+          >
+            Save Changes
+          </Button>
+        </div>
+      </div>
+    ),
+  };
+
+  // ─── Tab: Pro ───────────────────────────────────────────────────────────────
 
   const plans = [
     {
@@ -122,665 +629,28 @@ const ProfileSettings = () => {
     },
   ];
 
-  // if #pro in url, open pro tab
-  useEffect(() => {
-    const hash = window.location.href.split("#")[1];
-    if (hash && hash.toLowerCase() === "pro") {
-      setActiveTab("pro");
-    }
-  }, []);
-
-  const { updateUserProfile } = useDataService();
-  const [loading, setLoading] = useState(false);
-
-  async function updateUser() {
-    setLoading(true);
-    try {
-      if (!/^(?!\d+$)[a-z0-9_]+$/.test(formValues.username)) {
-        toast.error(
-          "Username can only contain letters, numbers, underscores and at least one letter is mandatory.",
-        );
-        return;
-      }
-
-      if (formValues.username?.length > 16 || formValues.username?.length < 4) {
-        toast.error("Username should be 4-16 characters");
-        return;
-      }
-
-      if (formValues.designation?.length > 40) {
-        toast.error("Designation can be max 40 characters");
-        return;
-      }
-
-      if (formValues.fullName?.length > 32 || formValues.fullName?.length < 4) {
-        toast.error("Full name should be 4-32 characters");
-        return;
-      }
-
-      if (formValues.aboutMe?.length > 300) {
-        toast.error("About should be max 300 characters");
-        return;
-      }
-
-      await updateUserProfile(formValues);
-
-      setFormValues((prevValues) => ({
-        ...prevValues,
-        contactInformation: [
-          ...formValues.contactInformation.map((item) =>
-            item.title.toLowerCase() === "opencanvas"
-              ? {
-                  ...item,
-                  url: `${baseUrl}/u/${formValues.username.trim().toLowerCase()}`,
-                }
-              : item,
-          ),
-        ],
-      }));
-      setCurrentUser((oldCurrentUser) => ({
-        ...oldCurrentUser,
-        username: formValues.username.trim().toLowerCase(),
-        fullName: formValues.fullName.trim().toLowerCase(),
-        designation: formValues.designation.trim().toLowerCase(),
-        aboutMe: formValues.aboutMe.trim().toLowerCase(),
-      }));
-      toast.success("Your profile information has been updated successfully.", {
-        action: {
-          label: "Close",
-          onClick: () => console.log("Close"),
-        },
-      });
-    } catch (error) {
-      toast.error(
-        error.response?.data?.message ||
-          "Something went wrong while updating your profile.",
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const handleContactInfoChange = (index, field, value) => {
-    // not only url can be ph no also
-    const updatedContactInfo = [...formValues.contactInformation];
-    updatedContactInfo[index] = {
-      ...updatedContactInfo[index],
-      [field]: value,
-    };
-
-    setFormValues({
-      ...formValues,
-      contactInformation: updatedContactInfo,
-    });
-  };
-
-  // Add new contact information field
-  const addContactInfoField = () => {
-    setFormValues({
-      ...formValues,
-      contactInformation: [
-        ...formValues.contactInformation,
-        { title: "", url: "" },
-      ],
-    });
-  };
-
-  // Remove contact information field
-  const removeContactInfoField = (index) => {
-    const updatedContactInfo = [...formValues.contactInformation];
-    updatedContactInfo.splice(index, 1);
-
-    setFormValues({
-      ...formValues,
-      contactInformation: updatedContactInfo,
-    });
-  };
-
-  const general = {
-    id: "general",
-    label: "General",
-    icon: <UserIcon className="h-4 w-4" />,
-    content: (
-      <>
-        <CardHeader className="pb-2 p-0 md:p-6 sm:hidden mb-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="">
-              <CardTitle className="dark:text-white flex items-center justify-between mb-1">
-                Public Profile Link
-                <Copy
-                  className="size-4 cursor-pointer"
-                  onClick={() => {
-                    navigator.clipboard.writeText(
-                      `${baseUrl}/u/${formValues.username}`,
-                    );
-                    toast.success("copied!", {
-                      action: {
-                        label: "Close",
-                        onClick: () => console.log("Close"),
-                      },
-                    });
-                  }}
-                />
-              </CardTitle>
-              <CardDescription className="dark:text-gray-400">
-                {baseUrl.replace(/^https?:\/\//, "")}
-                /u/
-                {formValues.username.toLowerCase()}
-              </CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <div className="space-y-6 dark:text-white">
-          <div className="flex flex-col sm:flex-row gap-6 items-start">
-            <div className="flex flex-col items-center gap-2">
-              <Avatar className="h-24 w-24 _dark:text-black">
-                <AvatarImage
-                  src={currentUser.profilePicture}
-                  alt="Profile picture"
-                />
-                <AvatarFallback>
-                  {currentUser.fullName.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-2 dark:text-white cursor-not-allowed"
-              >
-                Change Photo
-              </Button>
-            </div>
-
-            <div className="flex-1 space-y-4 w-full">
-              <div className="grid gap-4 sm:grid-cols-2">
-                {/* username */}
-                <div className="space-y-2">
-                  <Label htmlFor="username">Username</Label>
-                  <Input
-                    id="username"
-                    value={formValues.username.toLowerCase()}
-                    onChange={(e) =>
-                      setFormValues({
-                        ...formValues,
-                        username: e.target.value?.toLowerCase(),
-                      })
-                    }
-                    className="dark:bg-[#171717] dark:text-white dark:border-[#333]"
-                  />
-                </div>
-
-                {/* full name */}
-                <div className="space-y-2">
-                  <Label htmlFor="fullName">Full Name</Label>
-                  <Input
-                    id="fullName"
-                    value={formValues.fullName}
-                    onChange={(e) =>
-                      setFormValues({
-                        ...formValues,
-                        fullName: e.target.value,
-                      })
-                    }
-                    className="dark:bg-[#171717] dark:text-white dark:border-[#333]"
-                  />
-                </div>
-              </div>
-
-              {/* Designation */}
-              <div className="space-y-2">
-                <Label htmlFor="designation">Designation</Label>
-                <Input
-                  id="designation"
-                  value={formValues.designation}
-                  onChange={(e) =>
-                    setFormValues({
-                      ...formValues,
-                      designation: e.target.value,
-                    })
-                  }
-                  className="dark:bg-[#171717] dark:text-white dark:border-[#333]"
-                />
-              </div>
-
-              {/* About */}
-              <div className="space-y-2">
-                <Label htmlFor="aboutMe">About</Label>
-                <Input
-                  id="aboutMe"
-                  type="aboutMe"
-                  value={formValues.aboutMe}
-                  onChange={(e) =>
-                    setFormValues({
-                      ...formValues,
-                      aboutMe: e.target.value,
-                    })
-                  }
-                  className="dark:bg-[#171717] dark:text-white dark:border-[#333]"
-                />
-              </div>
-
-              {/* Contact Information */}
-              <div className="space-y-2">
-                <Label htmlFor="contactInfo">Contact Information</Label>
-
-                {formValues.contactInformation.map((contact, index) => (
-                  <div
-                    key={index}
-                    className="grid grid-cols-1 gap-4 sm:grid-cols-2"
-                  >
-                    <Input
-                      // id={`contact-title-${index}`}
-                      placeholder="Title, eg: GitHub"
-                      className="dark:border-[#333]"
-                      value={contact.title}
-                      onChange={(e) =>
-                        handleContactInfoChange(index, "title", e.target.value)
-                      }
-                    />
-
-                    <div className="space-y-0 flex items-end gap-2">
-                      {/* const isValidURL = (url) => {
-                        try {
-                            new URL(url);
-                            return true;
-                        } catch (e) {
-                            return false;
-                        }
-                    }; */}
-                      <Input
-                        // id={`contact-url-${index}`}
-                        placeholder="eg: https://github.com/username"
-                        className="dark:border-[#333]"
-                        value={contact.url}
-                        onChange={(e) =>
-                          handleContactInfoChange(index, "url", e.target.value)
-                        }
-                      />
-
-                      {formValues.contactInformation.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => removeContactInfoField(index)}
-                          className="mb-2"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="mt-2 dark:bg-white dark:text-black"
-                  onClick={addContactInfoField}
-                >
-                  <PlusCircle className="h-4 w-4 mr-2" />
-                  Add More
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Interested fields & topics -- for articles */}
-
-          <div className="flex items-center justify-between dark:text-white">
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="darkMode"
-                checked={darkMode}
-                onCheckedChange={toggleDarkMode}
-              />
-              <Label htmlFor="darkMode">Dark Mode</Label>
-              {darkMode ? (
-                <MoonIcon className="h-4 w-4 ml-2" />
-              ) : (
-                <SunIcon className="h-4 w-4 ml-2" />
-              )}
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-2">
-            <Button
-              onClick={updateUser}
-              disabled={loading}
-              className="bg-lime-600 hover:bg-lime-700 dark:bg-lime-700 dark:hover:bg-lime-800 text-white"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                "Save Changes"
-              )}
-            </Button>
-          </div>
-        </div>
-      </>
-    ),
-  };
-
-  const account = {
-    id: "account",
-    label: "Account",
-    icon: <LockIcon className="h-4 w-4" />,
-    content: (
-      <div className="space-y-6 dark:text-white">
-        {/* password */}
-        {/* ------------ */}
-        {/* <div className="space-y-4 dark:text-white">
-            <h3 className="text-lg font-medium dark:text-white">
-                Password &amp; Security
-            </h3>
-            <div className="grid gap-4 dark:text-white">
-                <div className="space-y-2">
-                    <Label htmlFor="currentPassword">
-                        Current Password
-                    </Label>
-                    <Input
-                        id="currentPassword"
-                        type="password"
-                        value="************"
-                        className="dark:bg-[#171717] dark:text-white dark:border-[#333]"
-                    />
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="space-y-2">
-                        <Label htmlFor="newPassword">
-                            New Password
-                        </Label>
-                        <Input
-                            id="newPassword"
-                            type="password"
-                            className="dark:bg-[#171717] dark:text-white dark:border-[#333]"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="confirmPassword">
-                            Confirm Password
-                        </Label>
-                        <Input
-                            id="confirmPassword"
-                            type="password"
-                            className="dark:bg-[#171717] dark:text-white dark:border-[#333]"
-                        />
-                    </div>
-                </div>
-            </div>
-        </div> */}
-        {/* sessions / lastFiveLogin */}
-        {/* ------------- */}
-        <div className="space-y-4 mb-6">
-          <div className="text-sm font-thin">
-            Joined:{" "}
-            {new Date(currentUser.createdAt).toLocaleDateString("en-GB")}
-          </div>
-          <h3 className="text-lg font-medium">
-            Last Five Logins
-            {/* Sessions */}
-          </h3>
-
-          {[currentUser?.lastFiveLogin[0]]?.map((item) => (
-            <div
-              key={"index--0"}
-              className="rounded-lg border p-4 dark:border-[#333] dark:bg-[#222]"
-            >
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">
-                    <strong>Device</strong>:{" "}
-                    {getDeviceInfo(item.deviceInfo).device}
-                  </p>
-                  <p className="text-sm font-medium">
-                    <strong>Operating System</strong>:{" "}
-                    {getDeviceInfo(item.deviceInfo).os}
-                  </p>
-                  <p className="text-sm font-medium">
-                    <strong>Browser</strong>:{" "}
-                    {getDeviceInfo(item.deviceInfo).browser}
-                  </p>
-                  <p className="text-sm font-medium">
-                    <strong>ip Address</strong>: {item.ipAddress || "N/A"}
-                  </p>
-                  <p className="text-sm font-medium">
-                    <strong>Date</strong>: {formatDateDetails(item.loginTime)}
-                  </p>
-                </div>
-
-                <Badge className="bg-green-600 text-white">Active</Badge>
-              </div>
-            </div>
-          ))}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {currentUser.lastFiveLogin?.slice(1)?.map((item, index) => (
-              <div
-                key={index}
-                className="rounded-lg border p-4 dark:border-[#333] dark:bg-[#222]"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium">
-                      <strong>Device</strong>:{" "}
-                      {getDeviceInfo(item.deviceInfo).device}
-                    </p>
-                    <p className="text-sm font-medium">
-                      <strong>Operating System</strong>:{" "}
-                      {getDeviceInfo(item.deviceInfo).os}
-                    </p>
-                    <p className="text-sm font-medium">
-                      <strong>Browser</strong>:{" "}
-                      {getDeviceInfo(item.deviceInfo).browser}
-                    </p>
-                    <p className="text-sm font-medium">
-                      <strong>ip Address</strong>: {item.ipAddress || "N/A"}
-                    </p>
-                    <p className="text-sm font-medium">
-                      <strong>Date</strong>: {formatDateDetails(item.loginTime)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        Log out from account:{" "}
-        <AlertDialog>
-          <AlertDialogTrigger className="hover:bg-red-300/80 dark:hover:bg-red-800/80 border border-red-300/80 dark:border-red-600/80 rounded-md px-3 py-1 box-content">
-            Logout
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure to logout?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action will remove your current session. You can login
-                later.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                className="bg-red-600 hover:bg-red-500"
-                onClick={() => {
-                  logout();
-                }}
-              >
-                Continue
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-        {/* save-cancel buttons */}
-        {/* <div className="flex justify-end gap-2">
-          <Button
-            variant="outline"
-            className="dark:bg-[#222] dark:hover:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white"
-          >
-            Cancel
-          </Button>
-          <Button className="bg-lime-600 hover:bg-lime-700 dark:bg-lime-700 dark:hover:bg-lime-800 text-white">
-            Save Changes
-          </Button>
-        </div>*/}
-        <Card className="border-none shadow-none dark:bg-[#171717] dark:text-white pt-6">
-          <CardHeader className="p-0 pb-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-red-600 dark:text-red-400">
-                  Danger Zone
-                </CardTitle>
-                <CardDescription className="dark:text-gray-400">
-                  Irreversible account actions
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="space-y-6">
-              <div className="rounded-lg border-none border-red-200 dark:border-red-900 Xp-4 dark:bg-[#222]">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <h3 className="text-base font-medium dark:text-white">
-                      Deactivate Account
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Temporarily disable your account. You can reactivate
-                      anytime.
-                    </p>
-                  </div>
-                  <Button
-                    variant="outline"
-                    className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950"
-                  >
-                    Deactivate
-                  </Button>
-                </div>
-              </div>
-
-              <div className="rounded-lg border-none border-red-200 dark:border-red-900 Xp-4 dark:bg-[#222]">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <h3 className="text-base font-medium dark:text-white">
-                      Delete Account
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Permanently delete your account and all your data. This
-                      action cannot be undone.
-                    </p>
-                  </div>
-                  <Button variant="destructive">Delete</Button>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    ),
-  };
-
-  const notifications = {
-    id: "notifications",
-    label: "Notifications",
-    icon: <BellIcon className="h-4 w-4" />,
-    content: (
-      <div className="space-y-6 dark:text-white">
-        <div className="space-y-4">
-          {["email", "push"].map((type) => {
-            const label = type.charAt(0).toUpperCase() + type.slice(1);
-            return (
-              <div key={type} className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-base font-medium">
-                    {label} Notifications
-                  </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {type === "email" && "Receive updates via email"}
-                    {type === "push" && "Get notifications on your device"}
-                  </p>
-                </div>
-                <Switch
-                  id={`${type}Notifications`}
-                  checked={formValues.notifications[type]}
-                  onCheckedChange={(checked) =>
-                    setFormValues({
-                      ...formValues,
-                      notifications: {
-                        ...formValues.notifications,
-                        [type]: checked,
-                      },
-                    })
-                  }
-                />
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Notification Categories</h3>
-
-          {["mentions", "follows", "messages", "comments"].map((category) => {
-            const label = category.charAt(0).toUpperCase() + category.slice(1);
-            return (
-              <div
-                key={category}
-                className="flex items-center justify-between rounded-lg border p-4 dark:border-[#333] dark:bg-[#222]"
-              >
-                <div>
-                  <h3 className="text-sm font-medium">{label}</h3>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Notifications when someone{" "}
-                    {category === "follows"
-                      ? "follows you"
-                      : category === "messages"
-                        ? "sends you a message"
-                        : `${category} you in a post`}
-                  </p>
-                </div>
-                <Switch
-                  id={`${category}Notifications`}
-                  // defaultChecked={true}
-                  checked={formValues.notifications[category]}
-                  onCheckedChange={(checked) =>
-                    setFormValues({
-                      ...formValues,
-                      notifications: {
-                        ...formValues.notifications,
-                        [category]: checked,
-                      },
-                    })
-                  }
-                />
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="flex justify-end">
-          <Button
-            onClick={updateUser}
-            className="bg-lime-600 hover:bg-lime-700 dark:bg-lime-700 dark:hover:bg-lime-800 text-white"
-          >
-            Save Changes
-          </Button>
-        </div>
-      </div>
-    ),
-  };
-
-  /*
-    const privacy = {
-      id: "privacy",
-      label: "Privacy",
+  const proFeatures = [
+    {
+      feature: "Ad-free experience",
+      description: "bla bla bla",
       icon: <ShieldIcon className="h-4 w-4" />,
-      "Allow us to collect usage data to improve your experience",
-    }
-  */
+    },
+    {
+      feature: "Personal Subdomain",
+      description: "{your username}.opencanvas.blog",
+      icon: <GlobeIcon className="h-4 w-4" />,
+    },
+    {
+      feature: "Analytics dashboard",
+      description: "bla bla bla",
+      icon: <CreditCardIcon className="h-4 w-4" />,
+    },
+    {
+      feature: "Bla Bla",
+      description: "bla bla bla",
+      icon: <UserIcon className="h-4 w-4" />,
+    },
+  ];
 
   const pro = {
     id: "pro",
@@ -792,41 +662,18 @@ const ProfileSettings = () => {
           <div className="mx-auto flex size-24 items-center justify-center rounded-full bg-lime-100 dark:bg-lime-900">
             <AppLogo size={64} fontSize="text-3xl md:text-4xl" />
           </div>
-          <div>
-            {/* <h3 className="text-xl font-medium">Upgrade to Pro</h3> */}
-            <p className="text-sm text-black dark:text-gray-100 mt-1">
-              Opencanvas is an open source project, you can use it for absolute
-              free from the code in github. <br /> However please support the
-              maintaince and deployment cost if you can.
-            </p>
-          </div>
+          <p className="text-sm text-black dark:text-gray-100 mt-1">
+            Opencanvas is an open source project, free to use from GitHub.
+            <br />
+            However, please support the maintenance and deployment cost if you
+            can.
+          </p>
 
           <div className="grid gap-4 md:grid-cols-1">
-            {[
-              {
-                feature: "Ad-free experience",
-                description: "bla bla bla",
-                icon: <ShieldIcon className="h-4 w-4" />,
-              },
-              {
-                feature: "Personal Subdomain",
-                description: "{your username}.opencanvas.blog",
-                icon: <GlobeIcon className="h-4 w-4" />,
-              },
-              {
-                feature: "Analytics dashboard",
-                description: "bla bla bla",
-                icon: <CreditCardIcon className="h-4 w-4" />,
-              },
-              {
-                feature: "Bla Bla",
-                description: "bla bla bla",
-                icon: <UserIcon className="h-4 w-4" />,
-              },
-            ].map((item, i) => (
+            {proFeatures.map((item, i) => (
               <div
                 key={i}
-                className="flex flex-col _justify-between items-start space-x-2 rounded-lg border p-3 dark:border-[#333] dark:bg-[#222]"
+                className="flex flex-col items-start space-x-2 rounded-lg border p-3 dark:border-[#333] dark:bg-[#222]"
               >
                 <div className="flex justify-center items-center gap-2">
                   <div className="text-lime-600 dark:text-lime-400">
@@ -838,24 +685,6 @@ const ProfileSettings = () => {
               </div>
             ))}
           </div>
-
-          {/*
-            4.99 / month -> for a month
-            2.99 / month -> for yearly
-            137.00 -> Permanent ~~> Be an early supporter, special perks on later stages
-          */}
-          {/* <div className="space-y-3 pt-4">
-            <div className="text-center">
-              <span className="text-3xl font-bold">$2.99</span>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                {" "}
-                / month
-              </span>
-            </div>
-            <Button className="w-full bg-lime-600 hover:bg-lime-700 dark:bg-lime-700 dark:hover:bg-lime-800 text-white">
-              Upgrade Now
-            </Button>
-          </div> */}
 
           <div className="grid gap-6 md:grid-cols-3 pt-4">
             {plans.map((plan, idx) => (
@@ -895,7 +724,7 @@ const ProfileSettings = () => {
             </div>
             <Badge
               variant="outline"
-              className="dark:border-gray-700 dark:text-white dark:hover:text-white"
+              className="dark:border-gray-700 dark:text-white"
             >
               Free
             </Badge>
@@ -905,6 +734,8 @@ const ProfileSettings = () => {
     ),
   };
 
+  // ─── Render ─────────────────────────────────────────────────────────────────
+
   const settingsSections = [general, account, notifications, pro];
 
   return (
@@ -913,22 +744,19 @@ const ProfileSettings = () => {
         noBlur={true}
         exclude={["/about", "/contact", "/photo-gallery"]}
       />
-      <div className="w-full h-full bg-white dark:bg-[#171717] dark:text-white">
+      <div className="w-full h-full min-h-screen bg-white dark:bg-[#171717] dark:text-white">
         <div className="mx-auto max-w-4xl pt-24 px-6 md:px-4 pb-4 dark:bg-[#171717]">
           <h1 className="text-3xl font-bold mb-6 dark:text-white">
             Profile Settings
             <div className="text-sm font-thin">{currentUser.email}</div>
           </h1>
 
+          {/* Mobile tab selector */}
           <div className="mb-6 block sm:hidden">
-            <Select
-              value={activeTab}
-              onValueChange={(value) => setActiveTab(value)}
-            >
-              <SelectTrigger className="w-full p-2 rounded-md border border-gray-300 dark:border-gray-700 dark:bg-[#171717] dark:text-white focus:ring-lime-500 focus:border-lime-500">
+            <Select value={activeTab} onValueChange={setActiveTab}>
+              <SelectTrigger className="w-full p-2 rounded-md border border-gray-300 dark:border-gray-700 dark:bg-[#171717] dark:text-white">
                 <SelectValue placeholder="Select section" />
               </SelectTrigger>
-
               <SelectContent>
                 {settingsSections.map((section) => (
                   <SelectItem key={section.id} value={section.id}>
@@ -947,7 +775,7 @@ const ProfileSettings = () => {
             <Card className="dark:bg-[#171717] dark:border-[#333] shadow-none md:shadow-sm border-0 md:border">
               <CardHeader className="pb-2 p-0 sm:p-6 hidden sm:block">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  <div className="">
+                  <div>
                     <CardTitle className="dark:text-white flex items-center justify-between mb-1">
                       Public Profile Link
                       <Copy
@@ -956,21 +784,16 @@ const ProfileSettings = () => {
                           navigator.clipboard.writeText(
                             `${baseUrl}/u/${formValues.username}`,
                           );
-                          toast.success("copied!", {
-                            action: {
-                              label: "Close",
-                              onClick: () => console.log("Close"),
-                            },
-                          });
+                          toast.success("Copied!");
                         }}
                       />
                     </CardTitle>
                     <CardDescription className="dark:text-gray-400">
-                      {baseUrl.replace(/^https?:\/\//, "")}
-                      /u/
+                      {baseUrl.replace(/^https?:\/\//, "")}/u/
                       {formValues.username.toLowerCase()}
                     </CardDescription>
                   </div>
+
                   <TabsList
                     className={`hidden sm:grid grid-cols-${settingsSections.length} gap-1 dark:bg-[#222]`}
                   >
@@ -1001,7 +824,8 @@ const ProfileSettings = () => {
               </CardContent>
             </Card>
           </Tabs>
-          <div className="h-[3dvh] w-full"></div>
+
+          <div className="h-[3dvh] w-full" />
         </div>
       </div>
     </>

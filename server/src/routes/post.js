@@ -2,754 +2,643 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const Post = require("../models/Post");
-const MediaDeletionQueue = require("../models/MediaDeletionQueue");
+const Interaction = require("../models/Interaction");
 const {
   authenticateToken,
   checkUserExists,
   fingerprintMiddleware,
 } = require("../middlewares/authorisation");
-// const { errorHandler } = require("../middlewares/errorHandler");
-// const { generateRandomThumbnail } = require("../utils/helper");
 
-// in js {} & [] are true value
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-/**
- *******************************************************
- * send generated _id for new post
- * no db Query
- */
-router.post(
-  "/get-new-postId",
-  authenticateToken,
-  // checkUserExists, // no need, user will be authenticated
-  async (req, res) => {
-    try {
-      const newPostId = new mongoose.Types.ObjectId().toString();
-      return res.status(200).json({
-        success: true,
-        newPostId: newPostId,
-      });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({
-        success: false,
-        error:
-          process.env.NODE_ENV === "development"
-            ? error.message
-            : "Server error",
-      });
-    }
-  },
-);
+// URLs look like /p/my-post-title-64abc123def456789012abcd
+// The last 24-char hex segment is always the MongoDB ObjectId
+const extractPostId = (slug) => {
+  const parts = slug.split("-");
+  const last = parts[parts.length - 1];
+  // A valid ObjectId is exactly 24 hex characters
+  return /^[a-f0-9]{24}$/i.test(last) ? last : null;
+};
 
-/**
- *******************************************************
- * save / update written post
- */
-router.post(
-  "/save-written-post",
-  authenticateToken,
-  checkUserExists,
-  async (req, res) => {
-    try {
-      let user = req.user;
+// ─── Public Routes ────────────────────────────────────────────────────────────
 
-      let postData = req.body;
-      if (!postData || !postData.title || !postData.content) {
-        return res.status(404).json({
-          success: false,
-          message: "title, content are required",
-        });
-      }
-
-      const currentPost = await Post.findById(postData.id);
-      let savedPost = {};
-
-      if (currentPost) {
-        if (currentPost.authorId.toString() !== user._id.toString()) {
-          return res.status(403).json({
-            success: false,
-            message: "Unauthorized to update this post",
-          });
-        }
-
-        currentPost.title = postData.title;
-        currentPost.content = postData.content;
-        currentPost.tags = postData.tags;
-        currentPost.readTime = postData.readTime;
-        currentPost.modifiedAt = Date.now();
-        currentPost.isEdited = true;
-        currentPost.isPublic = postData.isPublic ?? true;
-        currentPost.thumbnailUrl =
-          postData.thumbnailUrl || currentPost.thumbnailUrl;
-        currentPost.media = postData.media || [];
-
-        // update associated author details, or else need to cron this
-        currentPost.author.name = user.fullName;
-        currentPost.author.profilePicture = user.profilePicture;
-
-        savedPost = await currentPost.save();
-      } else {
-        const post = new Post({
-          _id: postData.id,
-          title: postData.title,
-          content: postData.content,
-          authorId: user._id,
-          author: {
-            name: user.fullName,
-            profilePicture: user.profilePicture,
-          },
-          tags: postData.tags,
-          isEdited: false,
-          isPublic: postData.isPublic ?? true,
-          type: postData.artType ?? "written", // artType cannot be changed, its fixed, for now atleast
-          thumbnailUrl: postData.thumbnailUrl, //||generateRandomThumbnail(postData.artType),
-          readTime: postData.readTime,
-          media: postData.media || [],
-        });
-
-        savedPost = await post.save(); // returns the post
-      }
-
-      // append _id of post to user
-      if (!user.posts.includes(savedPost._id)) {
-        user.posts.push(savedPost._id);
-      }
-      await user.save();
-
-      return res.status(200).json({
-        success: true,
-        message: "posted successfully",
-        postId: savedPost._id,
-      });
-    } catch (error) {
-      console.error("Save/update post[written] upload error:", error);
-      return res.status(500).json({
-        success: false,
-        message: "Failed to upload post",
-        error:
-          process.env.NODE_ENV === "development"
-            ? error.message
-            : "Server error",
-      });
-    }
-  },
-);
-
-/**
- *******************************************************
- * Get post by ID,
- * @for public post page
- */
-router.get("/p/:postId", async (req, res) => {
+// GET /p/:slug
+// Public post page - resolves the post by extracting the ID from the slug
+router.get("/p/:slug", async (req, res) => {
   try {
-    const { postId } = req.params;
-
-    if (!mongoose.Types.ObjectId.isValid(postId)) {
-      return res.status(400).json({ error: "Invalid post ID" });
+    const postId = extractPostId(req.params.slug);
+    if (!postId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid post URL" });
     }
 
-    const post = await Post.findById(postId).select(
-      "-totalDislikes -viewedBy -media",
+    const post = await Post.findOne({ _id: postId, isPublic: true });
+    if (!post) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Post not found" });
+    }
+
+    res.status(200).json({ success: true, data: post });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch post",
+      error: process.env.NODE_ENV === "development" ? err.message : undefined,
+    });
+  }
+});
+
+// GET /u/posts/byids?ids=id1,id2,...
+// Batch-fetch posts by IDs (used on profile page to load post cards efficiently)
+router.get("/u/posts/byids", async (req, res) => {
+  try {
+    const ids = req.query.ids?.split(",").filter(Boolean);
+    if (!ids || ids.length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No IDs provided" });
+    }
+
+    const posts = await Post.find({ _id: { $in: ids }, isPublic: true }).select(
+      "title slug type tags readTime thumbnailUrl isPremium authorSnapshot stats createdAt",
     );
 
-    if (!post) {
-      return res.status(404).json({
-        success: false,
-        message: "Post not found",
-      });
-    }
-
-    if (!post.isPublic) {
-      return res.status(403).json({
-        success: false,
-        message: "Post is Private",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      post,
-    });
-  } catch (error) {
-    console.error("Get post[written] error:", error);
-    return res.status(500).json({
+    res.status(200).json({ success: true, results: posts.length, data: posts });
+  } catch (err) {
+    res.status(500).json({
       success: false,
-      message: "Failed to get post[written]",
-      error:
-        process.env.NODE_ENV === "development" ? error.message : "Server error",
+      message: "Failed to fetch posts",
+      error: process.env.NODE_ENV === "development" ? err.message : undefined,
     });
   }
 });
 
-/**
- *******************************************************
- * Get post by ID,
- * @for private/secured post page
- */
-router.get("/secure/p/:postId", authenticateToken, async (req, res) => {
-  try {
-    const { postId } = req.params;
+// ─── Protected Routes ─────────────────────────────────────────────────────────
 
-    if (!mongoose.Types.ObjectId.isValid(postId)) {
-      return res.status(400).json({ error: "Invalid post ID" });
-    }
-
-    const post = await Post.findById(postId).select("-viewedBy");
-
-    if (!post) {
-      return res.status(404).json({
-        success: false,
-        message: "Post not found",
-      });
-    }
-
-    if (post.authorId.toString() !== req.userId.toString()) {
-      return res.status(403).json({
-        success: false,
-        message:
-          "Forbidden: You do not have permission to perform this action.",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      post,
-    });
-  } catch (error) {
-    console.error("Get post[written] error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to get post[written]",
-      error:
-        process.env.NODE_ENV === "development" ? error.message : "Server error",
-    });
-  }
+// GET /get-new-post-id
+// Returns a fresh ObjectId for the editor to use as the post ID before the post is saved.
+// Just logged in - no full user check needed.
+router.get("/get-new-post-id", authenticateToken, (req, res) => {
+  const newId = new mongoose.Types.ObjectId();
+  res.status(200).json({ success: true, data: { postId: newId } });
 });
 
-/**
- *******************************************************
- * change visibility to public or private
- */
-router.put(
-  "/post-visibility-change",
+// GET /private/p/:slug
+// View a private post - only the author (or mod/admin) can access
+router.get(
+  "/private/p/:slug",
   authenticateToken,
   checkUserExists,
   async (req, res) => {
     try {
-      const user = req.user;
-      const { postId } = req.query;
-
+      const slug = req.params.slug;
+      const postId = req.query.postId ?? extractPostId(slug);
       if (!postId) {
-        return res.status(404).json({
-          success: false,
-          message: "post id not found",
-        });
-      }
-
-      if (!mongoose.Types.ObjectId.isValid(postId)) {
         return res
           .status(400)
-          .json({ success: false, message: "Invalid post ID" });
+          .json({ success: false, message: "Invalid post URL" });
       }
 
       const post = await Post.findById(postId);
       if (!post) {
         return res
-          .status(400)
-          .json({ success: false, message: "post not found" });
+          .status(404)
+          .json({ success: false, message: "Post not found" });
       }
-      if (post.authorId.toString() !== user._id.toString()) {
-        return res.status(401).json({
+
+      const isOwner = post.authorId.toString() === req.userId;
+      const isMod = ["moderator", "admin"].includes(req.user.role);
+      if (!isOwner && !isMod) {
+        return res.status(403).json({
           success: false,
-          message: "Not authorised to change post visibility",
+          message: "Not authorised to view this post",
         });
       }
-      post.isPublic = req.body.isPublic;
-      await post.save();
 
-      return res.status(200).json({
-        success: true,
-        message: "changed post visibility",
-      });
+      res.status(200).json({ success: true, data: post });
     } catch (err) {
-      console.log("Error changing visibility of post", err);
-      return res.status(500).json({
+      res.status(500).json({
         success: false,
-        message: "Internal server error",
+        message: "Failed to fetch private post",
+        error: process.env.NODE_ENV === "development" ? err.message : undefined,
       });
     }
   },
 );
 
-/**
- *******************************************************
- * update post views
- */
-router.put(
-  "/update-post-views/:postId",
-  fingerprintMiddleware,
-  async (req, res) => {
-    const MAX_VIEWS = 16;
-    const RELAXATION_PERIOD = 150; //minutes
-    try {
-      const { postId } = req.params;
+// POST /post/like-dislike
+// Like or dislike a post. Same vote twice removes it. Opposite vote switches it.
+// Also updates stats.likesReceivedCount on the post's author.
+router.post("/post/like-dislike", authenticateToken, async (req, res) => {
+  try {
+    const { postId, vote } = req.body; // vote: "like" | "dislike"
 
-      if (!mongoose.Types.ObjectId.isValid(postId)) {
+    if (!postId || !["like", "dislike"].includes(vote)) {
+      return res.status(400).json({
+        success: false,
+        message: "postId and vote ('like'|'dislike') are required",
+      });
+    }
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Post not found" });
+    }
+
+    const statField =
+      vote === "like" ? "stats.likesCount" : "stats.dislikesCount";
+    const oppositeField =
+      vote === "like" ? "stats.dislikesCount" : "stats.likesCount";
+
+    const existing = await Interaction.findOne({
+      userId: req.userId,
+      targetId: postId,
+      targetModel: "Post",
+    });
+
+    if (existing) {
+      if (existing.type === vote) {
+        // Same vote → remove
+        await existing.deleteOne();
+        await Post.findByIdAndUpdate(postId, { $inc: { [statField]: -1 } });
+        // Decrement author's received likes if it was a like being removed
+        if (vote === "like") {
+          await mongoose.model("User").findByIdAndUpdate(post.authorId, {
+            $inc: { "stats.likesReceivedCount": -1 },
+          });
+        }
+        return res.status(200).json({ success: true, message: "Vote removed" });
+      } else {
+        // Opposite vote → switch
+        existing.type = vote;
+        await existing.save();
+        await Post.findByIdAndUpdate(postId, {
+          $inc: { [statField]: 1, [oppositeField]: -1 },
+        });
+        // If switching to like, add +1; if switching away from like, add -1
+        const likesDelta = vote === "like" ? 1 : -1;
+        await mongoose.model("User").findByIdAndUpdate(post.authorId, {
+          $inc: { "stats.likesReceivedCount": likesDelta },
+        });
         return res
-          .status(400)
-          .json({ success: false, error: "Invalid post ID" });
+          .status(200)
+          .json({ success: true, message: "Vote switched" });
       }
+    }
 
-      // Get visitor identifier
-      const visitorIdentifier = req.visitorIdentifier;
-      if (!visitorIdentifier) {
+    // No prior vote → add it
+    await Interaction.create({
+      userId: req.userId,
+      targetId: postId,
+      targetModel: "Post",
+      type: vote,
+    });
+    await Post.findByIdAndUpdate(postId, { $inc: { [statField]: 1 } });
+    if (vote === "like") {
+      await mongoose.model("User").findByIdAndUpdate(post.authorId, {
+        $inc: { "stats.likesReceivedCount": 1 },
+      });
+    }
+
+    res.status(201).json({ success: true, message: "Vote recorded" });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to vote on post",
+      error: process.env.NODE_ENV === "development" ? err.message : undefined,
+    });
+  }
+});
+
+// POST /post/save-unsave
+// Save or unsave a post (toggle). Saved posts are stored as Interactions with type "save".
+router.post("/post/save-unsave", authenticateToken, async (req, res) => {
+  try {
+    const { postId } = req.body;
+    if (!postId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "postId is required" });
+    }
+
+    const existing = await Interaction.findOne({
+      userId: req.userId,
+      targetId: postId,
+      targetModel: "Post",
+      type: "save",
+    });
+
+    if (existing) {
+      await existing.deleteOne();
+      return res.status(200).json({ success: true, message: "Post unsaved" });
+    }
+
+    await Interaction.create({
+      userId: req.userId,
+      targetId: postId,
+      targetModel: "Post",
+      type: "save",
+    });
+    res.status(201).json({ success: true, message: "Post saved" });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to save/unsave post",
+      error: process.env.NODE_ENV === "development" ? err.message : undefined,
+    });
+  }
+});
+
+// POST /save/post/written
+// Create or update a written post (upsert by _id).
+// The post ID was pre-generated by /get-new-post-id.
+router.post(
+  "/save/post/written",
+  authenticateToken,
+  checkUserExists,
+  async (req, res) => {
+    try {
+      const {
+        postId,
+        title,
+        content,
+        slug,
+        tags,
+        type,
+        readTime,
+        thumbnailUrl,
+        isPremium,
+        isPublic,
+      } = req.body;
+
+      if (!postId || !title || !content) {
         return res.status(400).json({
           success: false,
-          error: "Could not identify visitor",
+          message: "postId, title and content are required",
         });
+      }
+
+      const isNew = !(await Post.exists({ _id: postId }));
+
+      const postData = {
+        title,
+        content,
+        slug,
+        tags,
+        type,
+        readTime,
+        thumbnailUrl,
+        isPremium,
+        isPublic,
+        authorId: req.userId,
+        // Always keep the snapshot current with the latest author profile
+        authorSnapshot: {
+          username: req.user.username,
+          profilePicture: req.user.profilePicture,
+          fullName: req.user.fullName,
+        },
+        isEdited: !isNew, // Mark as edited on any update after creation
+      };
+
+      const post = await Post.findByIdAndUpdate(
+        postId,
+        { $set: postData },
+        { upsert: true, new: true, runValidators: true },
+      );
+
+      // Increment user's post count only on creation
+      if (isNew) {
+        await mongoose.model("User").findByIdAndUpdate(req.userId, {
+          $inc: { "stats.postsCount": 1 },
+        });
+      }
+
+      res.status(isNew ? 201 : 200).json({ success: true, data: post });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({
+        success: false,
+        message: "Failed to save post",
+        error: process.env.NODE_ENV === "development" ? err.message : undefined,
+      });
+    }
+  },
+);
+
+// PUT /change-post-visibility-status
+// Toggle a post between public and private. Author only.
+router.put(
+  "/change-post-visibility-status",
+  authenticateToken,
+  checkUserExists,
+  async (req, res) => {
+    try {
+      const { postId } = req.body;
+      if (!postId) {
+        return res
+          .status(400)
+          .json({ success: false, message: "postId is required" });
       }
 
       const post = await Post.findById(postId);
       if (!post) {
-        return res.status(404).json({
-          success: false,
-          message: "Post not found",
-        });
+        return res
+          .status(404)
+          .json({ success: false, message: "Post not found" });
       }
 
-      // stop if private post
-      if (!post.isPublic) {
-        return res.status(200).json({
-          success: false,
-          message: "Post is private",
-        });
+      if (post.authorId.toString() !== req.userId) {
+        return res
+          .status(403)
+          .json({ success: false, message: "Not authorised" });
       }
 
-      // Check if visitor exists in viewedBy array
-      const existingViewer = post.viewedBy.find(
-        (viewer) => viewer.identifier === visitorIdentifier,
+      post.isPublic = !post.isPublic;
+      await post.save();
+
+      res.status(200).json({
+        success: true,
+        message: `Post is now ${post.isPublic ? "public" : "private"}`,
+        data: post,
+      });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to change post visibility",
+        error: process.env.NODE_ENV === "development" ? err.message : undefined,
+      });
+    }
+  },
+);
+
+// PUT /change-post-featured-status
+// Add or remove a post from the author's featuredItems on their profile. Author only.
+router.put(
+  "/change-post-featured-status",
+  authenticateToken,
+  checkUserExists,
+  async (req, res) => {
+    try {
+      const { postId } = req.body;
+      if (!postId) {
+        return res
+          .status(400)
+          .json({ success: false, message: "postId is required" });
+      }
+
+      const post = await Post.findById(postId);
+      if (!post) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Post not found" });
+      }
+
+      if (post.authorId.toString() !== req.userId) {
+        return res
+          .status(403)
+          .json({ success: false, message: "Not authorised" });
+      }
+
+      const alreadyFeatured = req.user.featuredItems.some(
+        (item) =>
+          item.itemId?.toString() === postId && item.itemType === "Post",
       );
 
-      const now = new Date();
-
-      if (existingViewer) {
-        // Check if RELAXATION_PERIOD minutes have passed since last view
-        const timeSinceLastView = now - new Date(existingViewer.lastViewed);
-        const minutesSinceLastView = timeSinceLastView / (1000 * 60);
-
-        // If less than RELAXATION_PERIOD minutes have passed, don't increment
-        if (minutesSinceLastView < RELAXATION_PERIOD) {
-          return res.status(200).json({
-            success: true,
-            message: "View already counted recently",
-            counted: false,
-          });
-        }
-
-        // If already reached max views (MAX_VIEWS), don't increment
-        if (existingViewer.viewCount >= MAX_VIEWS) {
-          return res.status(200).json({
-            success: true,
-            message: "Max views reached for this visitor",
-            counted: false,
-          });
-        }
-
-        // Update existing viewer
-        existingViewer.viewCount += 1;
-        existingViewer.lastViewed = now;
+      if (alreadyFeatured) {
+        req.user.featuredItems = req.user.featuredItems.filter(
+          (item) =>
+            !(item.itemId?.toString() === postId && item.itemType === "Post"),
+        );
       } else {
-        // Add new viewer
-        post.viewedBy.push({
-          identifier: visitorIdentifier,
-          viewCount: 1,
-          lastViewed: now,
+        if (req.user.featuredItems.length >= 8) {
+          return res.status(400).json({
+            success: false,
+            message: "Maximum 8 featured items allowed",
+          });
+        }
+        req.user.featuredItems.push({
+          itemId: post._id,
+          itemType: "Post",
+          itemTitle: post.title,
+          itemThumbnail: post.thumbnailUrl,
         });
       }
 
-      post.totalViews += 1;
+      await req.user.save();
 
-      await post.save();
-
-      return res.status(200).json({
+      res.status(200).json({
         success: true,
-        message: "View counted successfully",
-        counted: true,
-        totalViews: post.totalViews,
+        message: alreadyFeatured
+          ? "Post removed from featured"
+          : "Post added to featured",
       });
     } catch (err) {
-      console.error("Error updating post views:", err);
-      return res.status(500).json({
+      res.status(500).json({
         success: false,
-        message: "Server error while updating views",
-        error: err.message,
+        message: "Failed to change featured status",
+        error: process.env.NODE_ENV === "development" ? err.message : undefined,
       });
     }
   },
 );
 
-/**
- *******************************************************
- * like / remove-like a post
- */
-router.put(
-  "/like-post",
-  authenticateToken,
-  checkUserExists,
-  async (req, res) => {
-    try {
-      const user = req.user;
-      const { postId } = req.query;
-
-      if (!postId) {
-        return res.status(404).json({
-          success: false,
-          message: "post id not found",
-        });
-      }
-
-      if (!mongoose.Types.ObjectId.isValid(postId)) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Invalid post ID" });
-      }
-
-      const post = await Post.findById(postId);
-      if (!post) {
-        return res
-          .status(400)
-          .json({ success: false, message: "post not found" });
-      }
-
-      if (user.likedPosts.includes(postId)) {
-        user.likedPosts = user.likedPosts.filter(
-          (id) => id.toString() !== postId.toString(),
-        );
-        await user.save();
-
-        post.totalLikes -= 1;
-        await post.save();
-
-        return res.status(200).json({
-          success: true,
-          message: "removed like",
-          increase: "decrease",
-        });
-      }
-
-      post.totalLikes += 1;
-      await post.save();
-
-      user.likedPosts.push(postId);
-      await user.save();
-
-      return res.status(200).json({
-        success: true,
-        message: "liked",
-        increase: "increase",
-      });
-    } catch (err) {
-      console.log("Error liking post", err);
-      return res.status(500).json({
-        success: false,
-        message: "Internal server error",
-      });
-    }
-  },
-);
-
-/**
- *******************************************************
- * dislike / remove-dislike a post
- */
-router.put(
-  "/dislike-post",
-  authenticateToken,
-  checkUserExists,
-  async (req, res) => {
-    try {
-      const user = req.user;
-      const { postId } = req.query;
-
-      if (!postId) {
-        return res.status(404).json({
-          success: false,
-          message: "post id not found",
-        });
-      }
-
-      if (!mongoose.Types.ObjectId.isValid(postId)) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Invalid post ID" });
-      }
-
-      const post = await Post.findById(postId);
-      if (!post) {
-        return res
-          .status(400)
-          .json({ success: false, message: "post not found" });
-      }
-
-      if (user.dislikedPosts.includes(postId)) {
-        user.dislikedPosts = user.dislikedPosts.filter(
-          (id) => id.toString() !== postId.toString(),
-        );
-        await user.save();
-
-        post.totalDislikes -= 1;
-        await post.save();
-
-        return res.status(200).json({
-          success: true,
-          message: "removed dislike",
-        });
-      }
-
-      post.totalDislikes += 1;
-      await post.save();
-
-      user.dislikedPosts.push(postId);
-      await user.save();
-
-      return res.status(200).json({
-        success: true,
-        message: "disliked",
-      });
-    } catch (err) {
-      console.log("Error disliking post", err);
-      return res.status(500).json({
-        success: false,
-        message: "Internal server error",
-      });
-    }
-  },
-);
-
-/**
- *******************************************************
- * save post in user's savedPosts array
- * @for saving post in a collection
- * only User query
- */
-router.put(
-  "/save-post-for-user",
-  authenticateToken,
-  checkUserExists,
-  async (req, res) => {
-    try {
-      const user = req.user;
-      const { postId } = req.query;
-
-      if (!postId) {
-        return res.status(404).json({
-          success: false,
-          message: "post id not found",
-        });
-      }
-
-      if (!mongoose.Types.ObjectId.isValid(postId)) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Invalid post ID" });
-      }
-
-      // no need to query the post
-
-      if (
-        user.savedPosts.map((i) => i.toString()).includes(postId.toString())
-      ) {
-        user.savedPosts = user.savedPosts.filter(
-          (id) => id.toString() !== postId.toString(),
-        );
-        await user.save();
-
-        return res.status(200).json({
-          success: true,
-          message: "unsaved post",
-          saved: false,
-        });
-      }
-
-      user.savedPosts.push(postId);
-      await user.save();
-
-      return res.status(200).json({
-        success: true,
-        message: "saved post",
-        saved: true,
-      });
-    } catch (err) {
-      console.log("Error saving post", err);
-      return res.status(500).json({
-        success: false,
-        message: "Internal server error",
-      });
-    }
-  },
-);
-
-/**
- *******************************************************
- * delete-post
- */
+// DELETE /post/delete
+// Permanently delete a post. Author or mod/admin only.
 router.delete(
-  "/delete-post",
+  "/post/delete",
   authenticateToken,
   checkUserExists,
   async (req, res) => {
     try {
-      const user = req.user;
-      const { postId } = req.query;
-
+      const { postId } = req.body;
       if (!postId) {
-        return res.status(404).json({
-          success: false,
-          message: "post id not found",
-        });
+        return res
+          .status(400)
+          .json({ success: false, message: "postId is required" });
       }
 
-      if (!mongoose.Types.ObjectId.isValid(postId)) {
-        return res.status(400).json({ error: "Invalid post ID" });
-      }
-
-      const post = await Post.findOneAndDelete({
-        _id: postId, // its in string format
-        authorId: user._id, // ownership check in the same query
-      });
-
+      const post = await Post.findById(postId);
       if (!post) {
-        return res.status(404).json({
+        return res
+          .status(404)
+          .json({ success: false, message: "Post not found" });
+      }
+
+      const isOwner = post.authorId.toString() === req.userId;
+      const isMod = ["moderator", "admin"].includes(req.user.role);
+      if (!isOwner && !isMod) {
+        return res.status(403).json({
           success: false,
-          message: "Post not found or unauthorized to delete",
+          message: "Not authorised to delete this post",
         });
       }
 
-      await MediaDeletionQueue.insertOne({
-        deletehashes: post.media.map((item) => ({
-          deleteHash: item,
-          addedAt: Date.now(),
-        })),
+      await post.deleteOne();
+
+      // Decrement the author's post count
+      await mongoose.model("User").findByIdAndUpdate(post.authorId, {
+        $inc: { "stats.postsCount": -1 },
       });
 
-      // removing post from user's list
-      user.posts = user.posts.filter(
-        (id) => id.toString() !== postId.toString(),
-      );
-      await user.save();
-
-      return res.status(200).json({
-        success: true,
-        message: "post deleted",
-      });
+      res.status(200).json({ success: true, message: "Post deleted" });
     } catch (err) {
-      console.log("Error deleting post", err);
-      return res.status(500).json({
+      res.status(500).json({
         success: false,
-        message: "Internal server error",
+        message: "Failed to delete post",
+        error: process.env.NODE_ENV === "development" ? err.message : undefined,
       });
     }
   },
 );
 
-/**
- *******************************************************
- * Route to get posts by IDs query string
- * gives every detail of post
- * @for the private /profile route
- */
-router.post("/u/posts/byids", authenticateToken, async (req, res) => {
+// PATCH /update-post-views/:slug
+// Increments view count. Called by a cron job, uses fingerprinting to avoid double-counting.
+router.patch(
+  "/update-post-views/:slug",
+  fingerprintMiddleware,
+  async (req, res) => {
+    try {
+      const postId = extractPostId(req.params.slug || "none");
+      await Post.findByIdAndUpdate(postId, {
+        $inc: { "stats.viewsCount": 1 },
+      });
+
+      res.status(200).json({ success: true, message: "View counted" });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to update views",
+        error: process.env.NODE_ENV === "development" ? err.message : undefined,
+      });
+    }
+  },
+);
+
+// GET /u/posts/mine?page=1&limit=20
+// Returns the logged-in user's own posts including private ones
+router.get("/u/posts/mine", authenticateToken, async (req, res) => {
   try {
-    // query string, need to split
-    const data = req.body;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
 
-    if (!data) {
-      return res.status(400).json({
-        success: false,
-        message: "No post IDs provided",
-      });
-    }
+    const [posts, total] = await Promise.all([
+      Post.find({ authorId: req.userId })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Post.countDocuments({ authorId: req.userId }),
+    ]);
 
-    // splitting query str _ids & valid Object ids check
-    const postIds = data.postIds
-      .split(",")
-      .filter((id) => mongoose.Types.ObjectId.isValid(id));
-
-    if (postIds.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "No valid post IDs provided",
-      });
-    }
-
-    const posts = await Post.find({
-      _id: { $in: postIds },
-    }).sort({ createdAt: -1 }); // newest first
-
-    return res.status(200).json({
-      success: true,
-      posts: posts,
-    });
-  } catch (error) {
-    console.error("Error fetching posts by IDs:", error);
-    return res.status(500).json({
+    res.status(200).json({ success: true, data: posts, total });
+  } catch (err) {
+    res.status(500).json({
       success: false,
       message: "Failed to fetch posts",
-      error:
-        process.env.NODE_ENV === "development" ? error.message : "Server error",
+      error: process.env.NODE_ENV === "development" ? err.message : undefined,
     });
   }
 });
 
-/**
- *******************************************************
- * Route to get posts by IDs query string
- * gives limited detail of post
- * @for the public /profile route
- */
-router.post("/author/posts/byids", async (req, res) => {
+// GET /u/:userId/posts?page=1&limit=20
+// Public posts by a specific author
+router.get("/u/:userId/posts", async (req, res) => {
   try {
-    const data = req.body; // query string
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
 
-    if (!data) {
-      return res.status(400).json({
-        success: false,
-        message: "No post IDs provided",
-      });
-    }
+    const [posts, total] = await Promise.all([
+      Post.find({ authorId: req.params.userId, isPublic: true })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .select(
+          "title content slug type tags readTime thumbnailUrl isPremium isPublic authorSnapshot stats createdAt updatedAt",
+        ),
+      Post.countDocuments({ authorId: req.params.userId, isPublic: true }),
+    ]);
 
-    const postIds = data.postIds
-      .split(",")
-      .filter((id) => mongoose.Types.ObjectId.isValid(id));
-
-    if (postIds.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "No valid post IDs provided",
-      });
-    }
-
-    const posts = await Post.find({
-      _id: { $in: postIds },
-      isPublic: true,
-    })
-      .select("-totalDislikes -viewedBy -media")
-      .sort({ createdAt: -1 }); // new first
-
-    return res.status(200).json({
-      success: true,
-      posts: posts,
-    });
-  } catch (error) {
-    console.error("Error fetching posts by IDs:", error);
-    return res.status(500).json({
+    res.status(200).json({ success: true, data: posts, total });
+  } catch (err) {
+    res.status(500).json({
       success: false,
       message: "Failed to fetch posts",
-      error:
-        process.env.NODE_ENV === "development" ? error.message : "Server error",
+      error: process.env.NODE_ENV === "development" ? err.message : undefined,
     });
   }
 });
+
+// GET /saved/posts?page=1&limit=20
+// Returns the logged-in user's saved posts via the Interaction collection
+router.get("/saved/posts", authenticateToken, async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    const [saves, total] = await Promise.all([
+      Interaction.find({
+        userId: req.userId,
+        targetModel: "Post",
+        type: "save",
+      })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate(
+          "targetId",
+          "title slug type tags readTime thumbnailUrl isPremium authorSnapshot stats createdAt",
+        ),
+      Interaction.countDocuments({
+        userId: req.userId,
+        targetModel: "Post",
+        type: "save",
+      }),
+    ]);
+
+    const posts = saves.map((s) => s.targetId).filter(Boolean); // filter nulls from deleted posts
+
+    res.status(200).json({ success: true, data: posts, total });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch saved posts",
+      error: process.env.NODE_ENV === "development" ? err.message : undefined,
+    });
+  }
+});
+
+// GET /post/:postId/my-interactions
+// Returns the logged-in user's like/dislike/save state for a post
+router.get(
+  "/post/:postId/my-interactions",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const interactions = await Interaction.find({
+        userId: req.userId,
+        targetId: req.params.postId,
+        targetModel: "Post",
+      });
+      res.status(200).json({
+        success: true,
+        data: {
+          isLiked: interactions.some((i) => i.type === "like"),
+          isDisliked: interactions.some((i) => i.type === "dislike"),
+          isSaved: interactions.some((i) => i.type === "save"),
+        },
+      });
+    } catch (err) {
+      res
+        .status(500)
+        .json({ success: false, message: "Failed to fetch interactions" });
+    }
+  },
+);
 
 module.exports = { router };

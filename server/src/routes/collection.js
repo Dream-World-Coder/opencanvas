@@ -1,94 +1,84 @@
-// server/src/routes/collection.js
-// needs review
-
 const express = require("express");
 const router = express.Router();
 const Collection = require("../models/Collection");
 const Post = require("../models/Post");
+const Interaction = require("../models/Interaction");
 const {
   authenticateToken,
   checkUserExists,
 } = require("../middlewares/authorisation");
 
-/**
- *
- * create
- *
- */
-// create a new collection
-router.post(
-  "/create/collection",
-  authenticateToken,
-  checkUserExists,
-  async (req, res) => {
-    try {
-      let { title, description, thumbnailUrl, tags, isPrivate } = req.body;
+// ─── Public Routes ────────────────────────────────────────────────────────────
 
-      title = title.trim();
+// GET /collections
+// Browse/discovery - returns all public collections, paginated
+router.get("/collections", async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
-      if (!title) {
-        return res.status(400).json({
-          success: false,
-          message: "Title is required",
-        });
-      }
+    const collections = await Collection.find({ isPrivate: false })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .select("title description thumbnailUrl tags stats authorId createdAt");
 
-      // only alphanumeric, spaces allowed
-      const titleRegex = /^[a-zA-Z0-9 ]+$/;
-
-      if (!titleRegex.test(title)) {
-        return res.status(400).json({
-          success: false,
-          message: "Title can only contain letters, numbers, and spaces",
-        });
-      }
-
-      if (tags && tags.length > 5) {
-        return res.status(400).json({
-          success: false,
-          message: "Maximum 5 tags are allowed",
-        });
-      }
-
-      const collection = new Collection({
-        title: title.trim(),
-        description: description?.trim() || "",
-        thumbnailUrl: thumbnailUrl?.trim() || "",
-        tags: tags
-          ? tags.map((tag) => tag.trim()).filter((tag) => tag !== "")
-          : [],
-        isPrivate: isPrivate || false,
-        authorId: req.userId,
-      });
-
-      const savedCollection = await collection.save();
-      await savedCollection.populate("authorId", "username profilePicture");
-
-      res.status(201).json({
+    res
+      .status(200)
+      .json({
         success: true,
-        message: "Collection created successfully",
-        collection: savedCollection,
+        page,
+        results: collections.length,
+        data: collections,
       });
-    } catch (error) {
-      console.error("Error creating collection:", error);
-      res.status(500).json({
-        success: false,
-        message: "Failed to create collection",
-        error:
-          process.env.NODE_ENV === "development"
-            ? error.message
-            : "Server error",
-      });
-    }
-  },
-);
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch collections",
+      error: process.env.NODE_ENV === "development" ? err.message : undefined,
+    });
+  }
+});
 
-/**
- *
- * read
- *
- */
-// get user's collections, only collections data, not articles inside it
+// GET /c/:collectionId
+// Public collection page - returns the collection + its posts (card data only)
+router.get("/c/:collectionId", async (req, res) => {
+  try {
+    const collection = await Collection.findOne({
+      _id: req.params.collectionId,
+      isPrivate: false,
+    });
+
+    if (!collection) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Collection not found" });
+    }
+
+    // Only select what post cards need - authorSnapshot avoids a populate() call
+    const posts = await Post.find({
+      _id: { $in: collection.posts },
+      isPublic: true,
+    }).select(
+      "title slug type tags readTime thumbnailUrl isPremium authorSnapshot stats createdAt",
+    );
+
+    res.status(200).json({ success: true, data: { collection, posts } });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch collection",
+      error: process.env.NODE_ENV === "development" ? err.message : undefined,
+    });
+  }
+});
+
+// ─── Protected Routes ─────────────────────────────────────────────────────────
+
+// GET /u/:userId/collections
+// Returns a user's collections (no posts inside, just collection metadata).
+// Owner/mod sees all; everyone else sees only public collections.
 router.get(
   "/u/:userId/collections",
   authenticateToken,
@@ -96,477 +86,347 @@ router.get(
   async (req, res) => {
     try {
       const { userId } = req.params;
-      const requestingUserId = req.userId;
 
-      // Build query - if requesting own collections, show all; if requesting others', show only public
-      let query = { authorId: userId };
-      if (userId !== requestingUserId) {
-        query.isPrivate = false;
-      }
+      const isOwner = req.userId === userId;
+      const isMod = ["moderator", "admin"].includes(req.user.role);
+      const filter =
+        isOwner || isMod
+          ? { authorId: userId }
+          : { authorId: userId, isPrivate: false };
 
-      const collections = await Collection.find(query)
-        .populate("authorId", "username profilePicture")
-        .populate("posts", "title thumbnailUrl createdAt")
-        .sort({ createdAt: -1 });
+      const collections = await Collection.find(filter)
+        .sort({ createdAt: -1 })
+        .select(
+          "title description thumbnailUrl tags isPrivate stats createdAt",
+        );
 
-      res.json({
-        success: true,
-        collections,
-      });
-    } catch (error) {
-      console.error("Error fetching collections:", error);
+      res
+        .status(200)
+        .json({
+          success: true,
+          results: collections.length,
+          data: collections,
+        });
+    } catch (err) {
       res.status(500).json({
         success: false,
-        message: "Failed to fetch collections",
-        error:
-          process.env.NODE_ENV === "development"
-            ? error.message
-            : "Server error",
+        message: "Failed to fetch user collections",
+        error: process.env.NODE_ENV === "development" ? err.message : undefined,
       });
     }
   },
 );
 
-// collection by ID, public route, collection + articles inside it, smaller url cuz its shareable
-router.get("/c/:collectionId", async (req, res) => {
-  try {
-    const { collectionId } = req.params;
-
-    const collection = await Collection.findById(collectionId)
-      .populate("authorId", "username profilePicture")
-      .populate("posts", "title content thumbnailUrl createdAt authorId tags");
-
-    if (!collection) {
-      return res.status(404).json({
-        success: false,
-        message: "Collection not found",
-      });
-    }
-
-    if (collection.isPrivate) {
-      return res.status(403).json({
-        success: false,
-        message: "Access denied to private collection",
-      });
-    }
-
-    res.json({
-      success: true,
-      collection,
-    });
-  } catch (error) {
-    console.error("Error fetching collection:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch collection",
-      error:
-        process.env.NODE_ENV === "development" ? error.message : "Server error",
-    });
-  }
-});
-
-// collection by ID, private route, collection + articles inside it, smaller url cuz its shareable
+// GET /c/private/:collectionId
+// Private collection viewer - only the author (or mod/admin) can access
 router.get(
   "/c/private/:collectionId",
   authenticateToken,
   checkUserExists,
   async (req, res) => {
     try {
-      const { collectionId } = req.params;
-      const requestingUserId = req.userId;
-
-      const collection = await Collection.findById(collectionId)
-        .populate("authorId", "username profilePicture")
-        .populate(
-          "posts",
-          "title content thumbnailUrl createdAt authorId tags",
-        );
-
+      const collection = await Collection.findById(req.params.collectionId);
       if (!collection) {
-        return res.status(404).json({
-          success: false,
-          message: "Collection not found",
-        });
+        return res
+          .status(404)
+          .json({ success: false, message: "Collection not found" });
       }
 
-      if (collection.authorId.toString() !== requestingUserId.toString()) {
-        return res.status(403).json({
-          success: false,
-          message: "Access denied to private collection",
-        });
+      const isOwner = collection.authorId.toString() === req.userId;
+      const isMod = ["moderator", "admin"].includes(req.user.role);
+      if (!isOwner && !isMod) {
+        return res
+          .status(403)
+          .json({
+            success: false,
+            message: "Not authorised to view this collection",
+          });
       }
 
-      res.json({
-        success: true,
-        collection,
-      });
-    } catch (error) {
-      console.error("Error fetching collection:", error);
+      // Private collections can contain private posts too, so no isPublic filter here
+      const posts = await Post.find({ _id: { $in: collection.posts } }).select(
+        "title slug type tags readTime thumbnailUrl isPremium authorSnapshot stats createdAt",
+      );
+
+      res.status(200).json({ success: true, data: { collection, posts } });
+    } catch (err) {
       res.status(500).json({
         success: false,
-        message: "Failed to fetch collection",
-        error:
-          process.env.NODE_ENV === "development"
-            ? error.message
-            : "Server error",
+        message: "Failed to fetch private collection",
+        error: process.env.NODE_ENV === "development" ? err.message : undefined,
       });
     }
   },
 );
 
-// get all public collections (for discovery/browse)
-router.get("/collections", async (req, res) => {
-  try {
-    const { page = 1, limit = 20, tags, search } = req.query;
+// POST /create/collection
+// Create a new collection. Also registers it in the user's collections array.
+router.post(
+  "/create/collection",
+  authenticateToken,
+  checkUserExists,
+  async (req, res) => {
+    try {
+      if (req.user.collections.length >= 50) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Maximum 50 collections allowed" });
+      }
 
-    let query = { isPrivate: false };
+      const { title, description, thumbnailUrl, isPrivate, tags } = req.body;
+      if (!title) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Title is required" });
+      }
 
-    // Add search functionality
-    if (search) {
-      query.$or = [
-        { title: { $regex: search, $options: "i" } },
-        { description: { $regex: search, $options: "i" } },
-        { tags: { $in: [new RegExp(search, "i")] } },
-      ];
+      const collection = await Collection.create({
+        title,
+        description,
+        thumbnailUrl,
+        isPrivate: isPrivate ?? false,
+        tags: tags ?? [],
+        authorId: req.userId,
+      });
+
+      // Keep user.collections in sync with the Collection documents
+      req.user.collections.push(collection._id);
+      await req.user.save();
+
+      res.status(201).json({ success: true, data: collection });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to create collection",
+        error: process.env.NODE_ENV === "development" ? err.message : undefined,
+      });
     }
+  },
+);
 
-    // Filter by tags
-    if (tags) {
-      const tagArray = tags.split(",").map((tag) => tag.trim());
-      query.tags = { $in: tagArray };
+// POST /collection/:collectionId/vote
+// Like or dislike a collection. Sending the same vote again removes it (toggle).
+// Sending the opposite vote switches it and corrects both counters.
+router.post(
+  "/collection/:collectionId/vote",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { collectionId } = req.params;
+      const { vote } = req.body; // "like" | "dislike"
+
+      if (!["like", "dislike"].includes(vote)) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "vote must be 'like' or 'dislike'",
+          });
+      }
+
+      const statField =
+        vote === "like" ? "stats.likesCount" : "stats.dislikesCount";
+      const oppositeField =
+        vote === "like" ? "stats.dislikesCount" : "stats.likesCount";
+
+      const existing = await Interaction.findOne({
+        userId: req.userId,
+        targetId: collectionId,
+        targetModel: "Collection",
+      });
+
+      if (existing) {
+        if (existing.type === vote) {
+          // Same vote → remove (un-vote)
+          await existing.deleteOne();
+          await Collection.findByIdAndUpdate(collectionId, {
+            $inc: { [statField]: -1 },
+          });
+          return res
+            .status(200)
+            .json({ success: true, message: "Vote removed" });
+        } else {
+          // Opposite vote → switch
+          existing.type = vote;
+          await existing.save();
+          await Collection.findByIdAndUpdate(collectionId, {
+            $inc: { [statField]: 1, [oppositeField]: -1 },
+          });
+          return res
+            .status(200)
+            .json({ success: true, message: "Vote switched" });
+        }
+      }
+
+      // No prior vote → add it
+      await Interaction.create({
+        userId: req.userId,
+        targetId: collectionId,
+        targetModel: "Collection",
+        type: vote,
+      });
+      await Collection.findByIdAndUpdate(collectionId, {
+        $inc: { [statField]: 1 },
+      });
+
+      res.status(201).json({ success: true, message: "Vote recorded" });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to vote",
+        error: process.env.NODE_ENV === "development" ? err.message : undefined,
+      });
     }
+  },
+);
 
-    const collections = await Collection.find(query)
-      .populate("authorId", "username profilePicture")
-      .populate("posts", "title thumbnailUrl")
-      .sort({ totalUpvotes: -1, createdAt: -1 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
-
-    const total = await Collection.countDocuments(query);
-
-    res.json({
-      success: true,
-      collections,
-      totalPages: Math.ceil(total / limit),
-      currentPage: page,
-      total,
-    });
-  } catch (error) {
-    console.error("Error fetching collections:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch collections",
-      error:
-        process.env.NODE_ENV === "development" ? error.message : "Server error",
-    });
-  }
-});
-
-/**
- *
- * update
- *
- */
-// edit/update colln
+// PUT /update-collection/:collectionId
+// Update collection metadata. Author only.
 router.put(
   "/update-collection/:collectionId",
   authenticateToken,
   checkUserExists,
   async (req, res) => {
     try {
-      const { collectionId } = req.params;
-      const { title, description, thumbnailUrl, tags, isPrivate } = req.body;
-      const userId = req.userId;
-
-      const collection = await Collection.findById(collectionId);
-
+      const collection = await Collection.findById(req.params.collectionId);
       if (!collection) {
-        return res.status(404).json({
-          success: false,
-          message: "Collection not found",
-        });
+        return res
+          .status(404)
+          .json({ success: false, message: "Collection not found" });
       }
 
-      // Check if user owns the collection
-      if (collection.authorId.toString() !== userId) {
-        return res.status(403).json({
-          success: false,
-          message: "Not authorized to update this collection",
-        });
+      if (collection.authorId.toString() !== req.userId) {
+        return res
+          .status(403)
+          .json({
+            success: false,
+            message: "Not authorised to update this collection",
+          });
       }
 
-      // Validation
-      if (title && title.trim() === "") {
-        return res.status(400).json({
-          success: false,
-          message: "Title cannot be empty",
-        });
-      }
-
-      if (tags && tags.length > 5) {
-        return res.status(400).json({
-          success: false,
-          message: "Maximum 5 tags are allowed",
-        });
-      }
-
-      // Update fields
-      if (title !== undefined) collection.title = title.trim();
-      if (description !== undefined)
-        collection.description = description.trim();
-      if (thumbnailUrl !== undefined)
-        collection.thumbnailUrl = thumbnailUrl.trim();
-      if (tags !== undefined)
-        collection.tags = tags
-          .map((tag) => tag.trim())
-          .filter((tag) => tag !== "");
+      const { title, description, thumbnailUrl, isPrivate, tags } = req.body;
+      if (title !== undefined) collection.title = title;
+      if (description !== undefined) collection.description = description;
+      if (thumbnailUrl !== undefined) collection.thumbnailUrl = thumbnailUrl;
       if (isPrivate !== undefined) collection.isPrivate = isPrivate;
+      if (tags !== undefined) collection.tags = tags;
 
-      const updatedCollection = await collection.save();
-      await updatedCollection.populate("authorId", "username profilePicture");
+      await collection.save();
 
-      res.json({
-        success: true,
-        message: "Collection updated successfully",
-        collection: updatedCollection,
-      });
-    } catch (error) {
-      console.error("Error updating collection:", error);
+      res.status(200).json({ success: true, data: collection });
+    } catch (err) {
       res.status(500).json({
         success: false,
         message: "Failed to update collection",
-        error:
-          process.env.NODE_ENV === "development"
-            ? error.message
-            : "Server error",
+        error: process.env.NODE_ENV === "development" ? err.message : undefined,
       });
     }
   },
 );
 
-// add a post to colln
-router.post(
-  "/add-post/:postId/collection/:collectionId",
+// PUT /add-remove-post/:postId/collection/:collectionId
+// Toggle a post into/out of a collection. Enforces the 50 post limit.
+router.put(
+  "/add-remove-post/:postId/collection/:collectionId",
   authenticateToken,
   checkUserExists,
   async (req, res) => {
     try {
       const { postId, collectionId } = req.params;
-      const userId = req.userId;
 
       const collection = await Collection.findById(collectionId);
-      const post = await Post.findById(postId);
-
       if (!collection) {
-        return res.status(404).json({
-          success: false,
-          message: "Collection not found",
-        });
+        return res
+          .status(404)
+          .json({ success: false, message: "Collection not found" });
       }
 
-      if (!post) {
-        return res.status(404).json({
-          success: false,
-          message: "Post not found",
-        });
+      if (collection.authorId.toString() !== req.userId) {
+        return res
+          .status(403)
+          .json({
+            success: false,
+            message: "Not authorised to modify this collection",
+          });
       }
 
-      // Check if user owns the collection
-      if (collection.authorId.toString() !== userId) {
-        return res.status(403).json({
-          success: false,
-          message: "Not authorized to modify this collection",
-        });
-      }
+      const alreadyIn = collection.posts.some((id) => id.toString() === postId);
 
-      // Check if post is already in collection
-      if (collection.posts.includes(postId)) {
-        return res.status(400).json({
-          success: false,
-          message: "Post already exists in this collection",
-        });
-      }
-
-      collection.posts.push(postId);
-      await collection.save();
-
-      res.json({
-        success: true,
-        message: "Post added to collection successfully",
-      });
-    } catch (error) {
-      console.error("Error adding post to collection:", error);
-      res.status(500).json({
-        success: false,
-        message: "Failed to add post to collection",
-        error:
-          process.env.NODE_ENV === "development"
-            ? error.message
-            : "Server error",
-      });
-    }
-  },
-);
-
-// remove post from colln
-router.delete(
-  "/remove-post/:postId/collection/:collectionId",
-  authenticateToken,
-  checkUserExists,
-  async (req, res) => {
-    try {
-      const { postId, collectionId } = req.params;
-      const userId = req.userId;
-
-      const collection = await Collection.findById(collectionId);
-
-      if (!collection) {
-        return res.status(404).json({
-          success: false,
-          message: "Collection not found",
-        });
-      }
-
-      // Check if user owns the collection
-      if (collection.authorId.toString() !== userId) {
-        return res.status(403).json({
-          success: false,
-          message: "Not authorized to modify this collection",
-        });
-      }
-
-      // Check if post exists in collection
-      if (!collection.posts.includes(postId)) {
-        return res.status(400).json({
-          success: false,
-          message: "Post not found in this collection",
-        });
-      }
-
-      collection.posts = collection.posts.filter(
-        (id) => id.toString() !== postId,
-      );
-      await collection.save();
-
-      res.json({
-        success: true,
-        message: "Post removed from collection successfully",
-      });
-    } catch (error) {
-      console.error("Error removing post from collection:", error);
-      res.status(500).json({
-        success: false,
-        message: "Failed to remove post from collection",
-        error:
-          process.env.NODE_ENV === "development"
-            ? error.message
-            : "Server error",
-      });
-    }
-  },
-);
-
-// upvote/downvote colln
-router.post(
-  "/collection/:collectionId/vote",
-  authenticateToken,
-  checkUserExists,
-  async (req, res) => {
-    try {
-      const { collectionId } = req.params;
-      const { voteType } = req.body; // 'upvote' or 'downvote'
-
-      if (!["upvote", "downvote"].includes(voteType)) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid vote type. Use 'upvote' or 'downvote'",
-        });
-      }
-
-      const collection = await Collection.findById(collectionId);
-
-      if (!collection) {
-        return res.status(404).json({
-          success: false,
-          message: "Collection not found",
-        });
-      }
-
-      if (voteType === "upvote") {
-        collection.totalUpvotes += 1;
+      if (alreadyIn) {
+        collection.posts = collection.posts.filter(
+          (id) => id.toString() !== postId,
+        );
       } else {
-        collection.totalDownvotes += 1;
+        if (collection.posts.length >= 50) {
+          return res
+            .status(400)
+            .json({
+              success: false,
+              message: "Collection is full (50 post limit)",
+            });
+        }
+        collection.posts.push(postId);
       }
 
       await collection.save();
 
-      res.json({
+      res.status(200).json({
         success: true,
-        message: `Collection ${voteType}d successfully`,
-        totalUpvotes: collection.totalUpvotes,
-        totalDownvotes: collection.totalDownvotes,
+        message: alreadyIn
+          ? "Post removed from collection"
+          : "Post added to collection",
+        data: collection,
       });
-    } catch (error) {
-      console.error("Error voting on collection:", error);
+    } catch (err) {
       res.status(500).json({
         success: false,
-        message: "Failed to vote on collection",
-        error:
-          process.env.NODE_ENV === "development"
-            ? error.message
-            : "Server error",
+        message: "Failed to update collection posts",
+        error: process.env.NODE_ENV === "development" ? err.message : undefined,
       });
     }
   },
 );
 
-/**
- *
- * delete
- *
- */
+// DELETE /delete-collection/:collectionId
+// Delete a collection and remove it from the user's collections array.
 router.delete(
   "/delete-collection/:collectionId",
   authenticateToken,
   checkUserExists,
   async (req, res) => {
     try {
-      const { collectionId } = req.params;
-      const userId = req.userId;
-
-      const collection = await Collection.findById(collectionId);
-
+      const collection = await Collection.findById(req.params.collectionId);
       if (!collection) {
-        return res.status(404).json({
-          success: false,
-          message: "Collection not found",
-        });
+        return res
+          .status(404)
+          .json({ success: false, message: "Collection not found" });
       }
 
-      // Check if user owns the collection
-      if (collection.authorId.toString() !== userId) {
-        return res.status(403).json({
-          success: false,
-          message: "Not authorized to delete this collection",
-        });
+      const isOwner = collection.authorId.toString() === req.userId;
+      const isMod = ["moderator", "admin"].includes(req.user.role);
+      if (!isOwner && !isMod) {
+        return res
+          .status(403)
+          .json({
+            success: false,
+            message: "Not authorised to delete this collection",
+          });
       }
 
-      await Collection.findByIdAndDelete(collectionId);
+      await collection.deleteOne();
 
-      res.json({
-        success: true,
-        message: "Collection deleted successfully",
-      });
-    } catch (error) {
-      console.error("Error deleting collection:", error);
+      // Remove from user's collections reference array
+      req.user.collections = req.user.collections.filter(
+        (id) => id.toString() !== req.params.collectionId,
+      );
+      await req.user.save();
+
+      res.status(200).json({ success: true, message: "Collection deleted" });
+    } catch (err) {
       res.status(500).json({
         success: false,
         message: "Failed to delete collection",
-        error:
-          process.env.NODE_ENV === "development"
-            ? error.message
-            : "Server error",
+        error: process.env.NODE_ENV === "development" ? err.message : undefined,
       });
     }
   },

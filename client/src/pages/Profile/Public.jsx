@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { CircleCheck } from "lucide-react";
 
-import { Skeleton } from "@/components/ui/skeleton";
+// import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -28,265 +28,182 @@ const PublicProfile = () => {
   const isDark = useDarkMode();
   const navigate = useNavigate();
   const { username } = useParams();
-  const { currentUser, setCurrentUser } = useAuth();
-  const { followUser } = useDataService();
+  const { currentUser } = useAuth();
+  const { getUserProfile, getUserPosts, followUnfollowUser } = useDataService();
 
-  const [currentProfile, setCurrentProfile] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [isFollowing, setIsFollowing] = useState(false);
   const [posts, setPosts] = useState([]);
-  // const [collections, setCollections] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
   const [activeTab, setActiveTab] = useState("all");
-  const [postsToFetch, setPostsToFetch] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [loading, setLoading] = useState(true);
-  const [following, setFollowing] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [postsLoading, setPostsLoading] = useState(false);
 
-  // fetches user's posts
-  const fetchUserPosts = async (user) => {
-    try {
-      setLoading(true);
-      if (!user || !user.posts || user.posts.length === 0) {
-        setPosts([]);
-        setLoading(false);
-        return;
-      }
+  const hasMore = posts.length < total;
+  const isOwnProfile =
+    currentUser?._id?.toString() === profile?._id?.toString();
 
-      if (user.posts.length < postsToFetch) return;
-
-      // post IDs to query string
-      const postIdsParam = user.posts
-        .slice(0 + postsToFetch, 20 + postsToFetch)
-        .join(",");
-
-      setPostsToFetch(postsToFetch + 20);
-
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/author/posts/byids`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            postIds: postIdsParam,
-          }),
-        },
-      );
-
-      const data = await response.json();
-
-      if (data.success) {
-        setPosts((prevPosts) => [...prevPosts, ...data.posts]);
-      } else {
-        console.error("Failed to fetch posts: ", data.message);
-        toast("Failed to fetch posts: ", data.message);
-      }
-    } catch (error) {
-      console.error("Error fetching posts: ", error);
-      toast("Error fetching posts: ", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // fetch the current profile
+  // Step 1 - load profile. isFollowing comes directly from the server response
+  // (backend checks the Follow collection), so we don't need currentUser.following
   useEffect(() => {
-    async function fetchCurrentProfile(username) {
-      if (!username) {
-        return;
-      }
-      username = username.trim();
-      if (username.startsWith("@")) {
-        username = username.slice(1);
-      }
-
-      setIsLoading(true);
-      const apiUrl = `${import.meta.env.VITE_BACKEND_URL}/u/${username}`;
-
+    const load = async () => {
+      setProfileLoading(true);
+      // Reset page state when navigating between profiles
+      setPosts([]);
+      setPage(1);
       try {
-        const res = await fetch(apiUrl);
-
-        if (!res.ok) {
-          return;
-        }
-
-        const data = await res.json();
-        setCurrentProfile(data.user);
-        setFollowing(
-          !!currentUser &&
-            !!currentUser.following
-              .map((item) => item.userId)
-              .includes(data.user._id),
-        );
-
-        // fetching posts
-        await fetchUserPosts(data.user);
-      } catch (err) {
-        console.error(err);
+        const clean = username.trim().replace(/^@/, "");
+        const res = await getUserProfile(clean);
+        setProfile(res.user);
+        setIsFollowing(res.isFollowing);
+      } catch {
+        // getUserProfile already shows a toast, nothing else to do
       } finally {
-        setIsLoading(false);
+        setProfileLoading(false);
       }
-    }
+    };
+    load();
+  }, [username]);
 
-    fetchCurrentProfile(username);
-  }, [username, navigate, currentUser]);
-
-  async function handleFollow(userId) {
-    let res = await followUser(userId);
-    if (res.success && res.message === "followed") {
-      setFollowing(true);
-      toast.success(res.message, {
-        action: {
-          label: "Close",
-          onClick: () => console.log("Close"),
-        },
-      });
-      setCurrentUser((currentUser) => ({
-        ...currentUser,
-        following: [...currentUser.following, { userId, since: Date.now() }],
-      }));
-    } else if (res.success && res.message === "unfollowed") {
-      setFollowing(false);
-      toast.success(res.message, {
-        action: {
-          label: "Close",
-          onClick: () => console.log("Close"),
-        },
-      });
-      setCurrentUser((currentUser) => ({
-        ...currentUser,
-        following: [
-          ...currentUser.following.filter(
-            (i) => i.userId.toString() !== userId.toString(),
-          ),
-        ],
-      }));
-    } else {
-      toast.error(res.message);
-    }
-  }
-
+  // Step 2 - load posts once profile is ready
   useEffect(() => {
-    if (
-      currentUser &&
-      currentProfile?._id?.toString() === currentUser?._id?.toString()
-    ) {
+    if (!profile) return;
+    loadPosts(1);
+  }, [profile]);
+
+  // Notify the user if they're looking at their own public profile
+  useEffect(() => {
+    if (isOwnProfile) {
       toast.info("This is your public profile", {
         duration: 15000,
         action: { label: "Close", onClick: () => {} },
       });
     }
-  }, [currentUser?._id, currentProfile?._id]);
+  }, [isOwnProfile]);
 
-  if (isLoading)
+  const loadPosts = async (pageNum) => {
+    setPostsLoading(true);
+    try {
+      const res = await getUserPosts(profile._id, pageNum);
+      setTotal(res.total);
+      setPosts((prev) => (pageNum === 1 ? res.data : [...prev, ...res.data]));
+      setPage(pageNum);
+    } catch {
+      toast.error("Failed to fetch posts");
+    } finally {
+      setPostsLoading(false);
+    }
+  };
+
+  const handleFollow = async () => {
+    if (!currentUser) {
+      localStorage.setItem("urlToRedirectAfterLogin", window.location.pathname);
+      navigate("/login-needed");
+      return;
+    }
+
+    try {
+      const res = await followUnfollowUser(profile._id);
+      if (res.success) {
+        const followed = res.message === "Followed";
+        setIsFollowing(followed);
+        // Update the visible follower count on the profile without a refetch
+        setProfile((p) => ({
+          ...p,
+          stats: {
+            ...p.stats,
+            followersCount: p.stats.followersCount + (followed ? 1 : -1),
+          },
+        }));
+        toast.success(res.message);
+      }
+    } catch {
+      // useDataService already shows a toast on error
+    }
+  };
+
+  // ── Loading ──────────────────────────────────────────────────────────────
+  if (profileLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        Loading...
+      <div className="min-h-screen bg-white dark:bg-[#222]">
+        <ProfileHeader />
+        <div className="flex justify-center items-center h-screen">
+          Loading...
+        </div>
       </div>
     );
+  }
 
-  // navigating, but still,
-  if (!currentProfile)
+  // ── Not found ────────────────────────────────────────────────────────────
+  if (!profile) {
     return (
       <>
         <Header />
         <div className="flex justify-center items-center h-screen">
-          Profile Not found...
+          Profile not found
         </div>
         <Footer />
       </>
     );
+  }
 
   return (
     <>
-      <ProfileHelmet currentProfile={currentProfile} />
-      <div
-        className={`min-h-screen bg-white dark:bg-[#222] dark:text-white font-sans`}
-      >
+      <ProfileHelmet currentProfile={profile} />
+      <div className="min-h-screen bg-white dark:bg-[#222] dark:text-white font-sans">
         <ProfileHeader />
 
         <main className="pt-24 md:pt-28 px-2 md:px-8 min-h-[90dvh]">
           <div className="max-w-7xl mx-auto pb-[20vh]">
+            {/* User details + quick stats */}
             <div className="flex flex-col md:flex-row justify-between items-start gap-6 md:gap-16 mb-12 md:mb-24 px-4 md:px-0">
-              {/* User Details */}
               <div className="space-y-6 md:space-y-8 flex-1 w-full">
                 <div className="flex items-start md:items-center space-x-4 md:space-x-8">
-                  {loading ? (
-                    <Skeleton className="size-16 md:size-24 rounded-full" />
-                  ) : (
-                    <div className="relative group">
-                      <ProfileImage user={currentProfile} />
+                  <div className="relative group flex-shrink-0">
+                    <ProfileImage user={profile} />
 
-                      {currentUser?._id?.toString() !==
-                        currentProfile._id?.toString() && (
-                        <button
-                          onClick={async () => {
-                            if (!currentUser) {
-                              toast.error("you need to log in first to follow");
-                              localStorage.setItem(
-                                "urlToRedirectAfterLogin",
-                                window.location.pathname,
-                              );
-                              navigate("/login-needed");
-                              return;
-                            }
-                            await handleFollow(currentProfile._id);
-                          }}
-                          className={`absolute bottom-0 ${following ? "right-0 group-hover:-right-4" : "right-0"} bg-lime-300 dark:bg-lime-600
-                            text-lime-900 dark:text-lime-50 p-1 md:p-2 rounded-full transition-opacity text-xs cursor-pointer flex items-center justify-center gap-1`}
+                    {/* Follow button - hidden on own profile */}
+                    {!isOwnProfile && (
+                      <button
+                        onClick={handleFollow}
+                        className={`absolute bottom-0 ${isFollowing ? "right-0 group-hover:-right-4" : "right-0"} bg-lime-300 dark:bg-lime-600
+                          text-lime-900 dark:text-lime-50 p-1 md:p-2 rounded-full transition-all duration-200 text-xs cursor-pointer flex items-center justify-center gap-1`}
+                      >
+                        {isFollowing && <CircleCheck className="size-4" />}
+                        <span
+                          className={`${isFollowing ? "hidden group-hover:block" : "block"} transition-all duration-200`}
                         >
-                          {following ? <CircleCheck className="size-4" /> : ""}
-                          <span
-                            className={`${following ? "hidden group-hover:block" : "block"} transition-all duration-200`}
-                          >
-                            {following ? "Following" : "Follow"}
-                          </span>
-                        </button>
-                      )}
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    {loading ? (
-                      <div className="space-y-2">
-                        <Skeleton className="h-8 md:h-10 w-3/4" />
-                        <Skeleton className="h-5 md:h-6 w-1/2" />
-                      </div>
-                    ) : (
-                      <NameDesignation
-                        name={currentProfile.fullName}
-                        designation={currentProfile.designation}
-                      />
+                          {isFollowing ? "Following" : "Follow"}
+                        </span>
+                      </button>
                     )}
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <NameDesignation
+                      name={profile.fullName}
+                      designation={profile.designation}
+                    />
                   </div>
                 </div>
 
-                {loading ? (
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-5/6" />
-                    <Skeleton className="h-4 w-4/6" />
-                  </div>
-                ) : (
-                  currentProfile.aboutMe && (
-                    <p
-                      className="text-stone-700 dark:text-[#d0d0d0] sentient-italic text-sm md:text-lg overflow-hidden
-                      leading-tight tracking-normal pointer-events-none md:pointer-events-auto max-w-[65ch] text-wrap !no-underline"
-                    >
-                      {currentProfile.aboutMe}
-                    </p>
-                  )
+                {profile.aboutMe && (
+                  <p className="text-stone-700 dark:text-[#d0d0d0] sentient-italic text-sm md:text-lg overflow-hidden leading-tight tracking-normal pointer-events-none md:pointer-events-auto max-w-[65ch] text-wrap !no-underline">
+                    {profile.aboutMe}
+                  </p>
                 )}
 
-                <ContactInformationDropdown currentProfile={currentProfile} />
+                <ContactInformationDropdown currentProfile={profile} />
               </div>
 
-              {/* Quick Stats */}
-              <QuickStatsProfile currentUser={currentProfile} />
+              <QuickStatsProfile currentUser={profile} />
             </div>
 
-            {/* featured */}
-            <FeaturedWorks currentUser={currentProfile} />
+            {/* Featured works */}
+            <FeaturedWorks currentUser={profile} />
 
-            {/* filter tabs */}
+            {/* Filter tabs */}
             {posts.length > 0 && (
               <div id="post-view" className="mb-2 px-4 md:px-0">
                 <PostFilterTabs
@@ -296,28 +213,25 @@ const PublicProfile = () => {
               </div>
             )}
 
-            {/* posts */}
+            {/* Posts */}
             <PostList
               posts={posts}
               setPosts={setPosts}
               activeTab={activeTab}
-              loading={loading}
+              loading={postsLoading}
               isDark={isDark}
               forPrivate={false}
             />
 
-            {/* load more button */}
-            {currentProfile.posts.length > postsToFetch && (
-              <div className="w-[100%] flex items-center justify-center">
+            {/* Load more */}
+            {hasMore && (
+              <div className="w-full flex items-center justify-center mt-6">
                 <Button
                   className="mx-auto z-20 dark:invert"
-                  onClick={async () => {
-                    if (currentProfile && currentProfile.posts) {
-                      await fetchUserPosts(currentProfile);
-                    }
-                  }}
+                  disabled={postsLoading}
+                  onClick={() => loadPosts(page + 1)}
                 >
-                  Load More
+                  {postsLoading ? "Loading..." : "Load More"}
                 </Button>
               </div>
             )}

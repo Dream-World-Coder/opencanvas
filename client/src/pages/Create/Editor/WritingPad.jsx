@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, memo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import PropTypes from "prop-types";
 
 import {
   X,
@@ -82,15 +81,16 @@ import { useAuth } from "@/contexts/AuthContext";
 const frontendOnly = false;
 // ----------------------------
 
-const WritingPad = memo(function WritingPad({ artType = "article" }) {
+const WritingPad = memo(function WritingPad() {
   const { currentUser } = useAuth();
   const publishBtnRef = useRef(null);
   const navigate = useNavigate();
 
-  const [postId, setPostId] = useState("");
-  useEffect(() => {
-    setPostId(localStorage.getItem("newPostId", ""));
-  }, [postId]);
+  // Post ID and type come from URL: /editor/markdown/create?type=article&id=...
+  const [searchParams] = useSearchParams();
+  const postId = searchParams.get("id") ?? "";
+  const artType = searchParams.get("type") ?? "article";
+  const editing = searchParams.get("editing") === "true";
 
   const {
     title,
@@ -110,7 +110,7 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
     setIsPublic,
     setMedia,
     setThumbnailUrl,
-  } = useWritingPad({ postId, frontendOnly, artType });
+  } = useWritingPad({ postId, frontendOnly, artType, editing });
 
   // formatting
   const {
@@ -226,8 +226,7 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
                       setShowUnsavedAlert(true);
                       return;
                     }
-                    localStorage.removeItem("newPostId");
-                    window.location.href = "/profile";
+                    navigate("/profile");
                   }}
                   className="hover:opacity-70 transition-opacity p-1 border rounded-full"
                 >
@@ -592,7 +591,6 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
                     <button
                       onClick={() => {
                         setShowUnsavedAlert(false);
-                        localStorage.removeItem("newPostId");
                         navigate(-1);
                       }}
                       className="px-3 py-1.5 border border-gray-300 rounded-md text-sm hover:bg-gray-50 transition-colors"
@@ -721,7 +719,4 @@ const WritingPad = memo(function WritingPad({ artType = "article" }) {
 
 export default WritingPad;
 
-WritingPad.propTypes = {
-  artType: PropTypes.string,
-  postId: PropTypes.any,
-};
+WritingPad.propTypes = {};

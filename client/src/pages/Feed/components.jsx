@@ -1,3 +1,5 @@
+// src/pages/Feed/components.jsx
+
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { BookOpen, Clock } from "lucide-react";
@@ -216,25 +218,25 @@ export const PostStats = ({ post }) => {
       <div className="flex items-center space-x-4">
         <div className="flex items-center">
           {/* <Eye className="h-4 w-4 mr-1.5" />
-              <span>{post.totalViews || 0}</span> */}
+              <span>{post.stats.viewsCount || 0}</span> */}
           <b>
-            {post.totalViews || 0}
+            {post.stats.viewsCount || 0}
             &nbsp;
           </b>
           Views
         </div>
         <div className="flex items-center">
           {/* <Heart className="h-4 w-4 mr-1.5" />
-                    <span>{post.totalLikes || 0}</span> */}
+                    <span>{post.stats.likesCount || 0}</span> */}
           <b>
-            {post.totalLikes || 0}
+            {post.stats.likesCount || 0}
             &nbsp;
           </b>
           Likes
         </div>
         <div className="flex items-center">
           <b>
-            {post.totalComments || 0}
+            {post.stats.commentsCount || 0}
             &nbsp;
           </b>
           Comments
@@ -280,14 +282,14 @@ export const PostAuthorInfo = ({ post }) => {
   return (
     <div className="flex items-center mb-4">
       <Avatar className="size-8 md:size-10 ring-2 ring-white dark:ring-[#333] mr-3">
-        <AvatarImage src={post.author?.profilePicture} />
+        <AvatarImage src={post.authorSnapshot?.profilePicture} />
         <AvatarFallback className="bg-gradient-to-br from-lime-500 to-green-500 text-white">
-          {post.author?.name?.charAt(0) || "U"}
+          {post.authorSnapshot?.fullName?.charAt(0) || "U"}
         </AvatarFallback>
       </Avatar>
       <div>
         <span className="font-semibold text-sm text-gray-900 dark:text-gray-100">
-          {post.author?.name}
+          {post.authorSnapshot?.fullName}
         </span>
         <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
           <Clock className="h-3 w-3 mr-1" />

@@ -9,8 +9,8 @@ const cron = require("node-cron");
 const { router: authRoutes } = require("./routes/auth");
 const { router: userRoutes } = require("./routes/user");
 const { router: postRoutes } = require("./routes/post");
-const { router: commentRoutes } = require("./routes/comments");
-const { router: followerRoutes } = require("./routes/follower");
+const { router: commentRoutes } = require("./routes/comment");
+const { router: followerRoutes } = require("./routes/follow");
 const { router: feedRoutes } = require("./routes/feed");
 const { router: collectionRoutes } = require("./routes/collection");
 const { router: imageService } = require("./services/imageService");
@@ -35,7 +35,7 @@ app.use(morgan("dev")); // logger
 app.use(
   cors({
     origin:
-      FRONTEND_URL === "http://localhost:5173"
+      process.env.NODE_ENV === "production"
         ? [FRONTEND_URL]
         : ["http://localhost:5173", FRONTEND_URL],
     credentials: true,
@@ -58,13 +58,14 @@ app.use(postRoutes);
 app.use(commentRoutes);
 app.use(followerRoutes);
 app.use(collectionRoutes);
-app.use("/feed", feedRoutes);
+// app.use("/feed", feedRoutes);
+app.use(feedRoutes);
 app.use("/api", imageService);
 
 app.get("/", (req, res) => {
   res.json({
     message: "Welcome to OpenCanvas API",
-    environment: process.env.NODE_ENV.toString(),
+    environment: process.env.NODE_ENV || "development",
   });
 });
 

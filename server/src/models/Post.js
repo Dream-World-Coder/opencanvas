@@ -1,107 +1,71 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-/*
--- the additional media uploaded, like images in an article
--- no need to be unique
--- needed only if i use imgur, else delete by _id
-const mediaSchema = new Schema({
-    url: { type: String, required: true },
-    deleteHash: { type: String, required: true },
-});
-*/
-
-// postDeleteHash: _id
-
 const postSchema = new Schema(
   {
-    title: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+    title: { type: String, required: true, trim: true },
     content: { type: String, required: true },
+    slug: { type: String, index: true }, // Store "my-cool-post" here
+
     authorId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
 
-    // might not be required after populate
-    author: {
-      name: { type: String, required: true },
+    // Denormalized for Feed Performance
+    authorSnapshot: {
+      username: { type: String, required: true },
       profilePicture: { type: String },
+      fullName: String,
     },
+
     thumbnailUrl: { type: String, default: "" },
-    premiumPost: { type: Boolean, default: false }, // will be set by the user not me, if premium i will take some charge
-
-    // createdAt given at default
-    modifiedAt: { type: Date, default: Date.now },
-
-    tags: {
-      // max 5, default: none,
-      // in images -> pre added tags,
-      // in blog/articles custom tags can be added
-      type: [String],
-      trim: true,
-      default: [],
-      required: true,
-      validate: {
-        validator: function (tags) {
-          return tags.length <= 5;
-        },
-        message: "Maximum 5 tags are allowed.",
-      },
-    },
+    isPremium: { type: Boolean, default: false },
+    isPublic: { type: Boolean, default: true, index: true },
     isEdited: { type: Boolean, default: false },
-    isPublic: { type: Boolean, default: true },
-    readTime: {
-      type: String,
-      default: "",
-      maxlength: [16, "read time must be 16 characters or less"],
-    },
+
     type: {
       type: String,
       default: "written",
-      enum: ["written", "article", "poem", "story", "social"],
+      enum: ["research-paper", "article", "poem", "story", "book", "written"],
     },
 
-    // array of deleteHash
-    media: [{ type: String }],
+    readTime: {
+      type: String,
+      default: "",
+      maxlength: [16, "Read time too long"],
+    },
 
-    comments: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Comment",
-      },
-    ],
-    totalComments: { type: Number, default: 0 },
+    tags: {
+      type: [String],
+      trim: true,
+      default: [],
+      validate: [(val) => val.length <= 5, "Maximum 5 tags allowed"],
+    },
 
-    totalViews: { type: Number, default: 0 },
-    totalCompleteReads: { type: Number, default: 0 },
+    media: [{ type: String }], // Array of strings (URLs/Hashes)
 
-    viewedBy: [
-      {
-        identifier: String, // ID or fingerprint
-        viewCount: { type: Number, default: 0 },
-        lastViewed: { type: Date, default: Date.now },
-      },
-    ],
+    // SCALABLE STATS (Atomic Counters)
+    stats: {
+      viewsCount: { type: Number, default: 0 },
+      likesCount: { type: Number, default: 0 },
+      dislikesCount: { type: Number, default: 0 },
+      sharesCount: { type: Number, default: 0 },
+      commentsCount: { type: Number, default: 0 },
+      readsCount: { type: Number, default: 0 }, // Total Complete Reads
+    },
 
-    totalLikes: { type: Number, default: 0 },
-    // who liked can also be stored
-    totalDislikes: { type: Number, default: 0 },
-    totalShares: { type: Number, default: 0 },
-
-    anonymousEngageMentScore: { type: Number },
-    engageMentScore: { type: Number },
-
-    // isRepost:,
-    // reposter: _id
+    anonymousEngagementScore: { type: Number },
+    engagementScore: { type: Number },
   },
   { timestamps: true },
 );
-postSchema.index({ topics: 1, isPublic: 1, anonymousEngagementScore: -1 });
+
+// Compound Indexes for Feed Generation
+postSchema.index({ authorId: 1, isPublic: 1, createdAt: -1 });
+postSchema.index({ tags: 1, isPublic: 1 }); // For Topic search
 
 const Post = mongoose.model("Post", postSchema);
 module.exports = Post;

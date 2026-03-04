@@ -64,7 +64,9 @@ const verifyCallback = async (
     } else {
       // new user creating
       const newUser = new User({
-        username: await generateUniqueUsername(),
+        username: await generateUniqueUsername(
+          profile.displayName.slice(0, 32) || null,
+        ),
         fullName: profile.displayName.slice(0, 32) || "User",
         email: profile.emails[0].value,
         provider: "google",
@@ -84,22 +86,6 @@ const verifyCallback = async (
 
 // google strategy for passport
 passport.use(new GoogleStrategy(config, verifyCallback));
-
-/* using jwt so no need
-// serialize and deserialize user
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
-
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await User.findById(id);
-    done(null, user);
-  } catch (error) {
-    done(error, null);
-  }
-});
-*/
 
 // Google auth routes
 router.get(
@@ -138,42 +124,24 @@ router.get(
  *******************************************************
  * Get user Data for Auth, frontend's {@currentUser} gets data through this
  */
-router.get(
-  "/user",
-  authenticateToken,
-  cache("60 seconds"),
-  async (req, res) => {
-    try {
-      const user = await User.findById(req.userId).select(
-        "-provider -ipAddress",
-      );
-
-      if (!user) {
-        return res.status(404).json({
-          success: false,
-          message: "User not found",
-        });
-      }
-
-      user.posts = [...user.posts].reverse();
-
-      return res.status(200).json({
-        success: true,
-        user,
-      });
-    } catch (error) {
-      console.error("Get user error:", error);
-      return res.status(500).json({
-        success: false,
-        message: "Failed to retrieve user data",
-        error:
-          process.env.NODE_ENV === "development"
-            ? error.message
-            : "Server error",
-      });
+router.get("/user", authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select("-provider");
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
-  },
-);
+    return res.status(200).json({ success: true, user });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to retrieve user data",
+      error:
+        process.env.NODE_ENV === "development" ? error.message : "Server error",
+    });
+  }
+});
 
 router.use(handleAuthErrors);
 

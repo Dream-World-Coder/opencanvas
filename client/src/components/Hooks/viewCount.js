@@ -1,47 +1,35 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-export const useViewTracker = (postId) => {
+// Waits 10 seconds after mount, then sends a PATCH to increment the post's view count.
+// Returns true once the view has been counted so the caller can update local state.
+export const useViewTracker = (slug) => {
   const [viewCounted, setViewCounted] = useState(false);
 
   useEffect(() => {
-    if (!postId) return;
+    if (!slug) return;
 
     let timeoutId;
     let mounted = true;
 
-    const trackView = async () => {
+    // Delay the request so drive-by visits don't count
+    timeoutId = setTimeout(async () => {
+      if (!mounted) return;
       try {
-        // Wait for 10 seconds before counting view
-        timeoutId = setTimeout(async () => {
-          if (!mounted) return;
-
-          const response = await axios.put(
-            `${import.meta.env.VITE_BACKEND_URL}/update-post-views/${postId}`,
-          );
-
-          if (response.data.counted) {
-            setViewCounted(true);
-            // console.log("View counted successfully");
-          } else {
-            // console.log(response.data.message);
-            console.log(" ");
-          }
-        }, 10000);
-      } catch (error) {
-        console.error("Failed to track view:", error);
+        await axios.patch(
+          `${import.meta.env.VITE_BACKEND_URL}/update-post-views/${slug}`,
+        );
+        setViewCounted(true);
+      } catch (err) {
+        console.error("Failed to track view:", err);
       }
-    };
+    }, 10000);
 
-    // Start tracking
-    trackView();
-
-    // Cleanup function
     return () => {
       mounted = false;
-      if (timeoutId) clearTimeout(timeoutId);
+      clearTimeout(timeoutId);
     };
-  }, [postId]);
+  }, [slug]);
 
   return viewCounted;
 };

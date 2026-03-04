@@ -1,3 +1,5 @@
+// client/src/pages/Create/Editor/hooks/useEditorAppearance
+
 import { useState, useEffect } from "react";
 import { useDarkModeContext } from "@/contexts/ThemeContext";
 
