@@ -45,6 +45,8 @@ const WritingPadMd = lazy(
   () => import("./pages/Create/Editor/WritingPadFrontend"),
 );
 
+const SearchPage = lazy(() => import("./pages/Search/SearchPage"));
+
 const Thanks = lazy(() => import("./pages/Others/Thanks"));
 const NotFoundPage = lazy(() => import("./pages/Others/404"));
 
@@ -107,6 +109,8 @@ export default function App() {
                       path="/u/:username/followers"
                       element={<FollowersPage />}
                     />
+
+                    <Route path="/search" element={<SearchPage />} />
 
                     {/* ── Public posts & collections ───────────────────── */}
                     <Route path="/p/:slug" element={<ViewPost />} />

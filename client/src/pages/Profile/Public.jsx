@@ -76,7 +76,7 @@ const PublicProfile = () => {
   useEffect(() => {
     if (isOwnProfile) {
       toast.info("This is your public profile", {
-        duration: 15000,
+        duration: 500,
         action: { label: "Close", onClick: () => {} },
       });
     }

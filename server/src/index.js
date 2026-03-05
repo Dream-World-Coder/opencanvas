@@ -14,6 +14,7 @@ const { router: followerRoutes } = require("./routes/follow");
 const { router: feedRoutes } = require("./routes/feed");
 const { router: collectionRoutes } = require("./routes/collection");
 const { router: imageService } = require("./services/imageService");
+const { router: searchRoutes } = require("./routes/search");
 
 const updateDefaultEngagementScore = require("./migrations/Post/updateDefaultEngagementScore");
 
@@ -61,7 +62,9 @@ app.use(collectionRoutes);
 // app.use("/feed", feedRoutes);
 app.use(feedRoutes);
 app.use("/api", imageService);
+app.use(searchRoutes);
 
+// root test
 app.get("/", (req, res) => {
   res.json({
     message: "Welcome to OpenCanvas API",
@@ -106,7 +109,5 @@ cron.schedule("*/15 * * * *", () => {
 
 // app start
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(
-    `Opencanvas server is running on port ${PORT}, visit: http://localhost:${PORT}`,
-  );
+  console.log(`SUCCESS: Opencanvas server is running on port ${PORT}.`);
 });

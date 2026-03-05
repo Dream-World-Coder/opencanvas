@@ -20,6 +20,7 @@ const Header = ({
   darkBg = "dark:bg-[#222]",
   noShadow = false,
   borderClrLight = "border-gray-100",
+  searchBarHidden = false,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [createMenuOpen, setCreateMenuOpen] = useState(false);
@@ -80,7 +81,9 @@ const Header = ({
         <nav className="flex items-center justify-between">
           <div className="flex items-center justify-center gap-2">
             <AppLogo />
-            <SearchBar round={true} hideSubmitBtn={true} />
+            {!searchBarHidden && (
+              <SearchBar round={true} hideSubmitBtn={true} />
+            )}
           </div>
 
           {/* Desktop nav links + Create button */}
@@ -191,6 +194,7 @@ Header.propTypes = {
   noBlur: PropTypes.bool,
   abs: PropTypes.bool,
   noShadow: PropTypes.bool,
+  searchBarHidden: PropTypes.bool,
   ballClr: PropTypes.string,
   darkBg: PropTypes.string,
   borderClrLight: PropTypes.string,

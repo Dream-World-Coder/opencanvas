@@ -1,14 +1,24 @@
 import { Input } from "@/components/ui/input";
 import { Search, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 
 export default function SearchBar({ round = false, hideSubmitBtn = false }) {
   const [loading, setLoading] = useState(false);
+  const inputRef = useRef(null);
+  const navigate = useNavigate();
 
   const handleSearch = (e) => {
     e.preventDefault();
+    const query = inputRef.current?.value?.trim();
+    if (!query) return;
+
     setLoading(true);
-    setTimeout(() => setLoading(false), 2000);
+    navigate(`/search?q=${encodeURIComponent(query)}`);
+
+    // Reset loading after navigation - small delay so it feels snappy
+    setTimeout(() => setLoading(false), 500);
   };
 
   return (
@@ -19,6 +29,7 @@ export default function SearchBar({ round = false, hideSubmitBtn = false }) {
       <div className="relative w-full">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
         <Input
+          ref={inputRef}
           type="text"
           placeholder="Search"
           className={`pl-9 shadow-none border-gray-200 dark:border-[#333] ${
@@ -30,8 +41,7 @@ export default function SearchBar({ round = false, hideSubmitBtn = false }) {
           }`}
         />
       </div>
-
-      {/* have changed the component for lime ring on focus, focus-visible:ring-lime-400 */}
+      {/* focus ring overridden to lime - see component styles */}
       {!hideSubmitBtn && (
         <button
           type="submit"
@@ -44,3 +54,7 @@ export default function SearchBar({ round = false, hideSubmitBtn = false }) {
     </form>
   );
 }
+SearchBar.propTypes = {
+  round: PropTypes.bool,
+  hideSubmitBtn: PropTypes.bool,
+};
