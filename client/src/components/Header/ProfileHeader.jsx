@@ -20,7 +20,7 @@ export default function ProfileHeader() {
 
   const navLinks = [
     { href: "/articles", label: "Articles" },
-    { href: "/social", label: "Social" },
+    // { href: "/social", label: "Social" },
     { href: "/saved-posts", label: "Saved" },
     { href: "/profile", label: "Profile" },
   ];

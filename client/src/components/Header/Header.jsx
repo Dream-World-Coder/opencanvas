@@ -56,7 +56,7 @@ const Header = ({
 
   let navLinks = [
     { name: "Articles", href: "/articles" },
-    { name: "Social", href: "/social" },
+    // { name: "Social", href: "/social" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
   ];
