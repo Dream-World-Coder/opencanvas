@@ -1,11 +1,11 @@
 {
   "name": "OpenCanvas",
   "short_name": "OpenCanvas",
-  "description": "An Open Canvas, just for you!",
+  "description": "OpenCanvas: High-Quality Science Papers & Stories",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#84cc16",
-  "theme_color": "#84cc16",
+  "background_color": "#f8fafc",
+  "theme_color": "#f8fafc",
   "scope": "/",
   "lang": "en-US",
   "icons": [

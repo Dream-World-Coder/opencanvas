@@ -24,14 +24,12 @@ router.get("/collections", async (req, res) => {
       .limit(limit)
       .select("title description thumbnailUrl tags stats authorId createdAt");
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        page,
-        results: collections.length,
-        data: collections,
-      });
+    res.status(200).json({
+      success: true,
+      page,
+      results: collections.length,
+      data: collections,
+    });
   } catch (err) {
     res.status(500).json({
       success: false,
@@ -96,17 +94,17 @@ router.get(
 
       const collections = await Collection.find(filter)
         .sort({ createdAt: -1 })
+        // posts is included so the frontend can derive the count via posts.length.
+        // Collection.stats has no postsCount field - the source of truth is the posts array.
         .select(
-          "title description thumbnailUrl tags isPrivate stats createdAt",
+          "title description thumbnailUrl tags isPrivate stats posts createdAt",
         );
 
-      res
-        .status(200)
-        .json({
-          success: true,
-          results: collections.length,
-          data: collections,
-        });
+      res.status(200).json({
+        success: true,
+        results: collections.length,
+        data: collections,
+      });
     } catch (err) {
       res.status(500).json({
         success: false,
@@ -135,12 +133,10 @@ router.get(
       const isOwner = collection.authorId.toString() === req.userId;
       const isMod = ["moderator", "admin"].includes(req.user.role);
       if (!isOwner && !isMod) {
-        return res
-          .status(403)
-          .json({
-            success: false,
-            message: "Not authorised to view this collection",
-          });
+        return res.status(403).json({
+          success: false,
+          message: "Not authorised to view this collection",
+        });
       }
 
       // Private collections can contain private posts too, so no isPublic filter here
@@ -216,12 +212,10 @@ router.post(
       const { vote } = req.body; // "like" | "dislike"
 
       if (!["like", "dislike"].includes(vote)) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "vote must be 'like' or 'dislike'",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "vote must be 'like' or 'dislike'",
+        });
       }
 
       const statField =
@@ -296,12 +290,10 @@ router.put(
       }
 
       if (collection.authorId.toString() !== req.userId) {
-        return res
-          .status(403)
-          .json({
-            success: false,
-            message: "Not authorised to update this collection",
-          });
+        return res.status(403).json({
+          success: false,
+          message: "Not authorised to update this collection",
+        });
       }
 
       const { title, description, thumbnailUrl, isPrivate, tags } = req.body;
@@ -342,12 +334,10 @@ router.put(
       }
 
       if (collection.authorId.toString() !== req.userId) {
-        return res
-          .status(403)
-          .json({
-            success: false,
-            message: "Not authorised to modify this collection",
-          });
+        return res.status(403).json({
+          success: false,
+          message: "Not authorised to modify this collection",
+        });
       }
 
       const alreadyIn = collection.posts.some((id) => id.toString() === postId);
@@ -358,12 +348,10 @@ router.put(
         );
       } else {
         if (collection.posts.length >= 50) {
-          return res
-            .status(400)
-            .json({
-              success: false,
-              message: "Collection is full (50 post limit)",
-            });
+          return res.status(400).json({
+            success: false,
+            message: "Collection is full (50 post limit)",
+          });
         }
         collection.posts.push(postId);
       }
@@ -405,12 +393,10 @@ router.delete(
       const isOwner = collection.authorId.toString() === req.userId;
       const isMod = ["moderator", "admin"].includes(req.user.role);
       if (!isOwner && !isMod) {
-        return res
-          .status(403)
-          .json({
-            success: false,
-            message: "Not authorised to delete this collection",
-          });
+        return res.status(403).json({
+          success: false,
+          message: "Not authorised to delete this collection",
+        });
       }
 
       await collection.deleteOne();

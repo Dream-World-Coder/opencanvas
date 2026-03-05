@@ -14,24 +14,28 @@ import {
   FeaturedWorks,
   PostFilterTabs,
   PostList,
+  CollectionList,
   NameDesignation,
   ProfileImage,
 } from "./components";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDarkMode } from "@/components/Hooks/darkMode";
 import { useDataService } from "@/services/dataService";
+import { useCollectionContext } from "@/contexts/CollectionContext";
 
 const Profile = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const isDark = useDarkMode();
-  const { getMyPosts } = useDataService();
+  const { getMyPosts, getUserCollections } = useDataService();
+  const { setIsCreatingNewColl } = useCollectionContext();
 
   const [activeTab, setActiveTab] = useState("all");
   const [posts, setPosts] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [collections, setCollections] = useState([]);
 
   const hasMore = posts.length < total;
 
@@ -52,7 +56,12 @@ const Profile = () => {
 
   // currentUser is guaranteed to exist here (protected route)
   useEffect(() => {
-    if (currentUser) loadPosts(1);
+    if (!currentUser) return;
+    loadPosts(1);
+    // Load the user's own collections (owner sees all, including private)
+    getUserCollections(currentUser._id)
+      .then(setCollections)
+      .catch(() => {}); // dataService already shows a toast on error
   }, [currentUser]);
 
   return (
@@ -148,6 +157,25 @@ const Profile = () => {
                   {loading ? "Loading..." : "Load More"}
                 </Button>
               </div>
+            )}
+
+            {/* Collections section */}
+            {collections.length > 0 && (
+              <div className="hidden px-4 md:px-0 mb-4 _flex items-center justify-between">
+                <h2 className="text-2xl font-semibold tracking-tight dark:text-[#f0f0f0]">
+                  Collections
+                </h2>
+                <Button
+                  size="sm"
+                  className="dark:invert"
+                  onClick={() => setIsCreatingNewColl(true)}
+                >
+                  New
+                </Button>
+              </div>
+            )}
+            {activeTab == "collection" && (
+              <CollectionList collections={collections} forPrivate={true} />
             )}
           </div>
         </main>

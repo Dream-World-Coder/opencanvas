@@ -1,3 +1,5 @@
+// client/src/pages/Profile/components.jsx
+
 import { useState, useRef, useEffect, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -880,6 +882,102 @@ PostList.propTypes = {
   activeTab: PropTypes.string,
   loading: PropTypes.bool,
   isDark: PropTypes.bool,
+  forPrivate: PropTypes.bool,
+};
+
+// ─── Collection List ───────────────────────────────────────────────────────────
+// Renders a user's collections as article-style rows (no heading — caller adds one).
+// forPrivate=true shows the private badge and routes private collections to /c/private/:id.
+
+export const CollectionList = ({ collections, forPrivate }) => {
+  const navigate = useNavigate();
+
+  if (!collections || collections.length === 0) return null;
+
+  return (
+    <div className="px-4 md:px-0 mb-16">
+      {collections.map((col) => {
+        // Private collections are behind an auth-gated route
+        const href =
+          forPrivate && col.isPrivate
+            ? `/c/private/${col._id}`
+            : `/c/${col._id}`;
+
+        return (
+          <div key={col._id} className="group">
+            <div className="flex gap-4 py-6">
+              {/* Thumbnail */}
+              <div
+                onClick={() => navigate(href)}
+                className="cursor-pointer flex-shrink-0 w-24 h-16 md:w-36 md:h-24 rounded-lg overflow-hidden bg-gray-100 dark:bg-[#1a1a1a]"
+              >
+                {col.thumbnailUrl ? (
+                  <img
+                    src={col.thumbnailUrl}
+                    alt={col.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
+                ) : (
+                  // Show title as placeholder text — same pattern as FeaturedWorks
+                  <div className="w-full h-full flex items-center justify-center p-2 text-xs text-gray-400 dark:text-gray-600 font-serif text-center leading-snug">
+                    {col.title}
+                  </div>
+                )}
+              </div>
+
+              {/* Body */}
+              <div className="flex-1 min-w-0 flex flex-col justify-between">
+                <div>
+                  <div
+                    onClick={() => navigate(href)}
+                    className="cursor-pointer flex items-center gap-2 mb-1"
+                  >
+                    <h2 className="text-base font-medium dark:text-[#e8e8e8] truncate group-hover:text-lime-700 dark:group-hover:text-lime-400 transition-colors">
+                      {col.title}
+                    </h2>
+                    {/* Private badge — only visible to the owner (forPrivate=true) */}
+                    {forPrivate && col.isPrivate && (
+                      <span className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 shrink-0">
+                        <EyeOff className="size-3" />
+                        Private
+                      </span>
+                    )}
+                  </div>
+
+                  {col.description && (
+                    <p className="text-sm text-stone-600 dark:text-[#aaa] line-clamp-2 leading-snug">
+                      {col.description}
+                    </p>
+                  )}
+                </div>
+
+                {/* Meta row */}
+                <div className="flex items-center gap-3 mt-2 text-xs text-gray-400 dark:text-gray-500">
+                  <span>{col.posts?.length ?? 0} posts</span>
+                  {col.tags?.length > 0 && (
+                    <>
+                      <span>·</span>
+                      <span className="hidden sm:inline">
+                        {col.tags.slice(0, 3).join(", ")}
+                        {col.tags.length > 3 && ` +${col.tags.length - 3}`}
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="border-b border-gray-100 dark:border-[#333]" />
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+CollectionList.propTypes = {
+  collections: PropTypes.array,
   forPrivate: PropTypes.bool,
 };
 

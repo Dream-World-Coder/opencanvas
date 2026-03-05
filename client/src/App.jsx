@@ -33,7 +33,9 @@ const SavedPosts = lazy(() => import("./pages/Profile/SavedPosts"));
 const ViewPost = lazy(() => import("./pages/PostView/PostPage"));
 const PrivatePostView = lazy(() => import("./pages/PostView/PrivatePostPage"));
 
-// const CollectionView = lazy(() => import("./pages/Collection/CollectionPage"));
+const CollectionView = lazy(
+  () => import("./pages/Collection/CollectionDetailsPage"),
+);
 
 const AboutPage = lazy(() => import("./pages/About/About"));
 const ContactPage = lazy(() => import("./pages/Contact/Contact"));
@@ -114,7 +116,7 @@ export default function App() {
 
                     {/* ── Public posts & collections ───────────────────── */}
                     <Route path="/p/:slug" element={<ViewPost />} />
-                    {/* <Route path="/c/:id" element={<CollectionView />} />*/}
+                    <Route path="/c/:id" element={<CollectionView />} />
 
                     {/* ── Public editor (markdown preview / md→pdf tool) ── */}
                     <Route path="/editor/markdown" element={<WritingPadMd />} />
@@ -143,6 +145,12 @@ export default function App() {
                       <Route
                         path="/private/p/:slug"
                         element={<PrivatePostView />}
+                      />
+
+                      {/* Private collection — auth required */}
+                      <Route
+                        path="/c/private/:id"
+                        element={<CollectionView />}
                       />
 
                       {/*

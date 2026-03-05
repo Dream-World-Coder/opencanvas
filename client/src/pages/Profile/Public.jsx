@@ -17,6 +17,7 @@ import {
   FeaturedWorks,
   PostFilterTabs,
   PostList,
+  CollectionList,
   NameDesignation,
   ProfileImage,
 } from "./components";
@@ -29,7 +30,12 @@ const PublicProfile = () => {
   const navigate = useNavigate();
   const { username } = useParams();
   const { currentUser } = useAuth();
-  const { getUserProfile, getUserPosts, followUnfollowUser } = useDataService();
+  const {
+    getUserProfile,
+    getUserPosts,
+    followUnfollowUser,
+    getUserCollections,
+  } = useDataService();
 
   const [profile, setProfile] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
@@ -39,6 +45,7 @@ const PublicProfile = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [profileLoading, setProfileLoading] = useState(true);
   const [postsLoading, setPostsLoading] = useState(false);
+  const [collections, setCollections] = useState([]);
 
   const hasMore = posts.length < total;
   const isOwnProfile =
@@ -66,10 +73,14 @@ const PublicProfile = () => {
     load();
   }, [username]);
 
-  // Step 2 - load posts once profile is ready
+  // Step 2 - load posts and public collections once profile is ready
   useEffect(() => {
     if (!profile) return;
     loadPosts(1);
+    // Public profile: only public collections are returned by the server
+    getUserCollections(profile._id)
+      .then(setCollections)
+      .catch(() => {}); // dataService already shows a toast on error
   }, [profile]);
 
   // Notify the user if they're looking at their own public profile
@@ -234,6 +245,18 @@ const PublicProfile = () => {
                   {postsLoading ? "Loading..." : "Load More"}
                 </Button>
               </div>
+            )}
+
+            {/* Collections section */}
+            {collections.length > 0 && (
+              <div className="hidden px-4 md:px-0 mb-4">
+                <h2 className="text-2xl font-semibold tracking-tight dark:text-[#f0f0f0]">
+                  Collections
+                </h2>
+              </div>
+            )}
+            {activeTab == "collection" && (
+              <CollectionList collections={collections} forPrivate={false} />
             )}
           </div>
         </main>

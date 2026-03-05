@@ -11,117 +11,227 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { timeAgo } from "@/services/formatDate";
 import { useState } from "react";
-import { PanelLeftClose } from "lucide-react";
-import { PanelRightClose } from "lucide-react";
-import { X } from "lucide-react";
+import { PanelLeftClose, PanelRightClose, X } from "lucide-react";
 import { useDataService } from "../../services/dataService";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
+// ─── OpenCanvas Illustration ────────────────────────────────────────────────
+// A minimal SVG illustration representing reading, discovery, and science.
+// Uses lime, violet, and sky color palette.
+const OpenCanvasIllustration = () => (
+  <svg
+    viewBox="0 0 160 180"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className="w-full max-w-[140px] mx-auto"
+    aria-hidden="true"
+  >
+    {/* Background orb — sky */}
+    <circle cx="80" cy="80" r="60" fill="#e0f2fe" className="dark:opacity-10" />
+
+    {/* Open book base */}
+    <rect
+      x="30"
+      y="85"
+      width="100"
+      height="60"
+      rx="4"
+      fill="#f0fdf4"
+      stroke="#a3e635"
+      strokeWidth="1.5"
+    />
+
+    {/* Book spine */}
+    <line x1="80" y1="85" x2="80" y2="145" stroke="#a3e635" strokeWidth="1.5" />
+
+    {/* Left page lines */}
+    <line
+      x1="40"
+      y1="100"
+      x2="72"
+      y2="100"
+      stroke="#bef264"
+      strokeWidth="1"
+      strokeLinecap="round"
+    />
+    <line
+      x1="40"
+      y1="108"
+      x2="72"
+      y2="108"
+      stroke="#bef264"
+      strokeWidth="1"
+      strokeLinecap="round"
+    />
+    <line
+      x1="40"
+      y1="116"
+      x2="60"
+      y2="116"
+      stroke="#bef264"
+      strokeWidth="1"
+      strokeLinecap="round"
+    />
+
+    {/* Right page lines */}
+    <line
+      x1="88"
+      y1="100"
+      x2="120"
+      y2="100"
+      stroke="#bef264"
+      strokeWidth="1"
+      strokeLinecap="round"
+    />
+    <line
+      x1="88"
+      y1="108"
+      x2="120"
+      y2="108"
+      stroke="#bef264"
+      strokeWidth="1"
+      strokeLinecap="round"
+    />
+    <line
+      x1="88"
+      y1="116"
+      x2="108"
+      y2="116"
+      stroke="#bef264"
+      strokeWidth="1"
+      strokeLinecap="round"
+    />
+
+    {/* Floating atom / science icon — violet */}
+    <circle cx="80" cy="50" r="7" fill="#7c3aed" opacity="0.15" />
+    <circle cx="80" cy="50" r="3" fill="#7c3aed" opacity="0.7" />
+    <ellipse
+      cx="80"
+      cy="50"
+      rx="12"
+      ry="5"
+      stroke="#7c3aed"
+      strokeWidth="1"
+      opacity="0.5"
+    />
+    <ellipse
+      cx="80"
+      cy="50"
+      rx="12"
+      ry="5"
+      stroke="#7c3aed"
+      strokeWidth="1"
+      opacity="0.5"
+      transform="rotate(60 80 50)"
+    />
+    <ellipse
+      cx="80"
+      cy="50"
+      rx="12"
+      ry="5"
+      stroke="#7c3aed"
+      strokeWidth="1"
+      opacity="0.5"
+      transform="rotate(120 80 50)"
+    />
+
+    {/* Star sparkles — sky */}
+    <circle cx="50" cy="62" r="2" fill="#38bdf8" opacity="0.8" />
+    <circle cx="110" cy="68" r="1.5" fill="#38bdf8" opacity="0.6" />
+    <circle cx="95" cy="40" r="1.5" fill="#a3e635" opacity="0.8" />
+    <circle cx="60" cy="38" r="1" fill="#7c3aed" opacity="0.5" />
+
+    {/* Upward arrow — discovery */}
+    <path d="M80 28 L76 36 L84 36 Z" fill="#a3e635" opacity="0.9" />
+    <line
+      x1="80"
+      y1="36"
+      x2="80"
+      y2="44"
+      stroke="#a3e635"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
+// ─── Donate Button ───────────────────────────────────────────────────────────
+// Small, unobtrusive donate CTA using violet accent.
+const DonateButton = () => (
+  <a
+    href="https://ko-fi.com" // Replace with your actual donation link
+    target="_blank"
+    rel="noopener noreferrer"
+    className="block w-full text-center text-xs py-2 px-3 rounded-lg border border-lime-200 dark:border-lime-900 text-lime-600 dark:text-lime-400 hover:bg-lime-50 dark:hover:bg-lime-950 transition-colors duration-150"
+  >
+    ♥ Support OpenCanvas
+  </a>
+);
+
+// ─── LeftSideBar ─────────────────────────────────────────────────────────────
+// Collapsible left sidebar for the feed page.
+// Feed options and topic filters are hidden (not yet implemented).
+// Shows an OpenCanvas illustration and donate button when open.
 export const LeftSideBar = ({ selectedTopics, setSelectedTopics }) => {
+  // Persist sidebar open/closed state across sessions
   const [sidebarClosed, setSidebarClosed] = useState(
-    JSON.parse(localStorage.getItem("feedSidebarClosed")),
+    JSON.parse(localStorage.getItem("feedSidebarClosed")) ?? false,
   );
 
-  const feedOptions = [
-    { name: "For You" },
-    { name: "Following" },
-    { name: "Popular" },
-    { name: "Latest" },
-  ];
-  const filters = [
-    "AI",
-    "Math",
-    "Physics",
-    "Adventure",
-    "Experience",
-    "Regular",
-  ];
-
-  const toggleTopic = (topic) => {
-    setSelectedTopics((prev) => {
-      if (prev.includes(topic.toLowerCase())) {
-        return prev.filter((t) => t !== topic.toLowerCase());
-      } else {
-        return [...prev, topic.toLowerCase()];
-      }
-    });
+  // Toggle sidebar and save preference to localStorage
+  const toggleSidebar = () => {
+    const next = !sidebarClosed;
+    localStorage.setItem("feedSidebarClosed", JSON.stringify(next));
+    setSidebarClosed(next);
   };
 
   return (
     <div
-      className={`p-4 bg-white dark:bg-[#222] rounded-none shadow-none ${sidebarClosed ? "border-none" : "border-r-0 md:border-r"} border-gray-100 dark:border-[#333] h-screen`}
+      className={`relative p-4 bg-white dark:bg-[#222] h-screen
+        ${sidebarClosed ? "border-none" : "border-r border-gray-100 dark:border-[#333]"}`}
     >
-      <div
-        className={`absolute top-4 text-neutral-500 dark:text-neutral-500 cursor-pointer ${sidebarClosed ? "left-4" : "right-4"}`}
-        onClick={() => {
-          localStorage.setItem("feedSidebarClosed", !sidebarClosed);
-          setSidebarClosed(!sidebarClosed);
-        }}
+      {/* Toggle button — positioned left when closed, right when open */}
+      <button
+        className={`absolute top-4 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 cursor-pointer transition-colors
+          ${sidebarClosed ? "left-4" : "right-4"}`}
+        onClick={toggleSidebar}
+        aria-label={sidebarClosed ? "Open sidebar" : "Close sidebar"}
       >
         {sidebarClosed ? (
-          <PanelRightClose size={20} className="font-thin" />
+          <PanelRightClose size={20} />
         ) : (
-          <PanelLeftClose size={20} className="font-thin" />
+          <PanelLeftClose size={20} />
         )}
-      </div>
+      </button>
 
+      {/* Sidebar content — only shown when open */}
       {!sidebarClosed && (
-        <>
-          <div className="border-none dark:border-[#333] p-4 rounded-xl">
-            <div className="font-bold mb-4">Feed Options</div>
-            {feedOptions.map((link, index) => (
-              <div
-                key={index}
-                className="block p-1.5 rounded hover:bg-lime-50 dark:hover:bg-[#171717] transition duration-0 cursor-pointer"
-              >
-                {link.name}
-              </div>
-            ))}
+        <div className="flex flex-col items-center gap-6 mt-10 px-2">
+          {/* Illustration + tagline */}
+          <div className="text-center">
+            <OpenCanvasIllustration />
+            <p className="mt-3 text-xs font-semibold tracking-wide text-lime-600 dark:text-lime-400 uppercase">
+              OpenCanvas
+            </p>
+            <p className="mt-1 text-[11px] text-neutral-400 dark:text-neutral-500 leading-relaxed">
+              High-quality science,
+              <br />
+              papers & stories
+            </p>
           </div>
 
-          <div className="mt-8 border-none dark:border-[#333] p-4 rounded-xl">
-            <div className="font-bold mb-4 flex items-center">
-              {/* <Filter className="w-4 h-4 mr-2" /> */}
-              Trending Topics
-            </div>
-            <div className="space-y-2">
-              {filters.map((topic) => (
-                <div key={topic} className="flex items-center">
-                  <div
-                    className="w-4 h-4 mr-2 border border-gray-300 cursor-pointer flex items-center justify-center rounded-full"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      toggleTopic(topic);
-                    }}
-                    role="checkbox"
-                    aria-checked={selectedTopics.includes(topic.toLowerCase())}
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        toggleTopic(topic);
-                      }
-                    }}
-                  >
-                    {selectedTopics.includes(topic.toLowerCase()) && (
-                      <div className="w-2 h-2 bg-lime-500 rounded-sm"></div>
-                    )}
-                  </div>
-                  <div
-                    className="cursor-pointer select-none"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      toggleTopic(topic);
-                    }}
-                  >
-                    {topic}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </>
+          {/* Donate CTA */}
+          <DonateButton />
+
+          {/*
+            Feed Options and Trending Topics are hidden until implemented.
+            Uncomment and restore these sections when ready:
+
+            <FeedOptions feedOptions={feedOptions} />
+            <TopicFilters filters={filters} selectedTopics={selectedTopics} toggleTopic={toggleTopic} />
+          */}
+        </div>
       )}
     </div>
   );
