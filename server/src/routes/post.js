@@ -590,10 +590,12 @@ router.get("/saved/posts", authenticateToken, async (req, res) => {
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
-        .populate(
-          "targetId",
-          "title slug type tags readTime thumbnailUrl isPremium authorSnapshot stats createdAt",
-        ),
+        .populate({
+          path: "targetId",
+          model: "Post",
+          select:
+            "title slug type tags readTime thumbnailUrl isPremium isPublic authorSnapshot stats createdAt",
+        }),
       Interaction.countDocuments({
         userId: req.userId,
         targetModel: "Post",
