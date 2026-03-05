@@ -28,6 +28,7 @@ import {
   Copy,
   Trash2,
   PlusCircle,
+  BookOpenIcon,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -632,23 +633,23 @@ const ProfileSettings = () => {
   const proFeatures = [
     {
       feature: "Ad-free experience",
-      description: "bla bla bla",
+      description: "Read without interruptions or distractions.",
       icon: <ShieldIcon className="h-4 w-4" />,
     },
     {
       feature: "Personal Subdomain",
-      description: "{your username}.opencanvas.blog",
+      description: "Host content at {username}.opencanvas.blog.",
       icon: <GlobeIcon className="h-4 w-4" />,
     },
     {
       feature: "Analytics dashboard",
-      description: "bla bla bla",
+      description: "Track readership and engagement metrics.",
       icon: <CreditCardIcon className="h-4 w-4" />,
     },
     {
-      feature: "Bla Bla",
-      description: "bla bla bla",
-      icon: <UserIcon className="h-4 w-4" />,
+      feature: "Advanced Publishing",
+      description: "Publish digital books and web-based research papers.",
+      icon: <BookOpenIcon className="h-4 w-4" />,
     },
   ];
 
@@ -706,7 +707,12 @@ const ProfileSettings = () => {
                     {plan.description}
                   </p>
                 </div>
-                <Button className="mt-4 w-full bg-lime-600 hover:bg-lime-700 dark:bg-lime-700 dark:hover:bg-lime-800 text-white">
+                <Button
+                  onClick={() => {
+                    window.location.href = "https://ko-fi.com/myopencanvas";
+                  }}
+                  className="mt-4 w-full bg-lime-600 hover:bg-lime-700 dark:bg-lime-700 dark:hover:bg-lime-800 text-white"
+                >
                   {plan.buttonText}
                 </Button>
               </div>

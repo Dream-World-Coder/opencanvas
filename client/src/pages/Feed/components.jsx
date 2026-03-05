@@ -160,7 +160,7 @@ const OpenCanvasIllustration = () => (
 // Small, unobtrusive donate CTA using violet accent.
 const DonateButton = () => (
   <a
-    href="https://ko-fi.com" // Replace with your actual donation link
+    href="https://ko-fi.com/myopencanvas"
     target="_blank"
     rel="noopener noreferrer"
     className="block w-full text-center text-xs py-2 px-3 rounded-lg border border-lime-200 dark:border-lime-900 text-lime-600 dark:text-lime-400 hover:bg-lime-50 dark:hover:bg-lime-950 transition-colors duration-150"
