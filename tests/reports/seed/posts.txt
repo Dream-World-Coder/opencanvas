@@ -1,0 +1,13 @@
+tests  (git)-[main]- ➤ node seed-posts.js
+Connected to DB.
+Inserted 5000 / 50000
+Inserted 10000 / 50000
+Inserted 15000 / 50000
+Inserted 20000 / 50000
+Inserted 25000 / 50000
+Inserted 30000 / 50000
+Inserted 35000 / 50000
+Inserted 40000 / 50000
+Inserted 45000 / 50000
+Inserted 50000 / 50000
+Seeding complete.

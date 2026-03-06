@@ -1,0 +1,35 @@
+tests  (git)-[main]- ➤ pnpm test:bench:local
+
+> tests@1.0.0 test:bench:local /Users/subhajitgorai/Codes/current_projects/opencanvas/tests
+> node bench.js local
+
+Running benchmark on: http://localhost:3000/articles
+Running 10s test @ http://localhost:3000/articles
+500 connections with 10 pipelining factor
+
+running [==================  ] 90%(node:76419) TimeoutNegativeWarning: -2 is a negative number.
+Timeout duration was set to 1.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+┌─────────┬────────┬─────────┬─────────┬─────────┬────────────┬────────────┬─────────┐
+│ Stat    │ 2.5%   │ 50%     │ 97.5%   │ 99%     │ Avg        │ Stdev      │ Max     │
+├─────────┼────────┼─────────┼─────────┼─────────┼────────────┼────────────┼─────────┤
+│ Latency │ 521 ms │ 1043 ms │ 7383 ms │ 8932 ms │ 1401.12 ms │ 1484.27 ms │ 9989 ms │
+└─────────┴────────┴─────────┴─────────┴─────────┴────────────┴────────────┴─────────┘
+┌───────────┬─────────┬─────────┬─────────┬─────────┬─────────┬─────────┬─────────┐
+│ Stat      │ 1%      │ 2.5%    │ 50%     │ 97.5%   │ Avg     │ Stdev   │ Min     │
+├───────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
+│ Req/Sec   │ 1,929   │ 1,929   │ 2,725   │ 2,803   │ 2,635   │ 246.61  │ 1,929   │
+├───────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
+│ Bytes/Sec │ 34.3 MB │ 34.3 MB │ 48.5 MB │ 49.9 MB │ 46.9 MB │ 4.38 MB │ 34.3 MB │
+└───────────┴─────────┴─────────┴─────────┴─────────┴─────────┴─────────┴─────────┘
+
+Req/Bytes counts sampled once per second.
+# of samples: 10
+
+32k requests in 10.05s, 469 MB read
+615 errors (570 timeouts)
+
+Requests per second: 2635
+Average Latency: 1401.12ms
+tests  (git)-[main]- ➤

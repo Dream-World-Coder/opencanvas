@@ -1,0 +1,34 @@
+
+> tests@1.0.0 test:bench:local /Users/subhajitgorai/Codes/current_projects/opencanvas/tests
+> node bench.js local
+
+Running benchmark on: http://localhost:3000/articles
+
+Requests per second: 2793.8
+Average Latency: 35.26ms
+
+
+---
+
+tests  (git)-[main]- ➤ pnpm test:bench:local > reports/loc_speed_2.txt
+Running 10s test @ http://localhost:3000/articles
+100 connections
+
+
+┌─────────┬───────┬───────┬───────┬───────┬──────────┬──────────┬────────┐
+│ Stat    │ 2.5%  │ 50%   │ 97.5% │ 99%   │ Avg      │ Stdev    │ Max    │
+├─────────┼───────┼───────┼───────┼───────┼──────────┼──────────┼────────┤
+│ Latency │ 23 ms │ 34 ms │ 50 ms │ 56 ms │ 35.26 ms │ 16.21 ms │ 633 ms │
+└─────────┴───────┴───────┴───────┴───────┴──────────┴──────────┴────────┘
+┌───────────┬─────────┬─────────┬─────────┬───────┬─────────┬─────────┬─────────┐
+│ Stat      │ 1%      │ 2.5%    │ 50%     │ 97.5% │ Avg     │ Stdev   │ Min     │
+├───────────┼─────────┼─────────┼─────────┼───────┼─────────┼─────────┼─────────┤
+│ Req/Sec   │ 2,147   │ 2,147   │ 2,911   │ 2,979 │ 2,793.8 │ 249.31  │ 2,146   │
+├───────────┼─────────┼─────────┼─────────┼───────┼─────────┼─────────┼─────────┤
+│ Bytes/Sec │ 38.2 MB │ 38.2 MB │ 51.8 MB │ 53 MB │ 49.7 MB │ 4.43 MB │ 38.2 MB │
+└───────────┴─────────┴─────────┴─────────┴───────┴─────────┴─────────┴─────────┘
+
+Req/Bytes counts sampled once per second.
+# of samples: 10
+
+28k requests in 10.02s, 497 MB read

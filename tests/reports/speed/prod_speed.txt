@@ -1,0 +1,33 @@
+
+> tests@1.0.0 test:bench:prod /Users/subhajitgorai/Codes/current_projects/opencanvas/tests
+> node bench.js prod
+
+Running benchmark on: https://opencanvas.onrender.com/articles
+
+Requests per second: 20.3
+Average Latency: 3383.87ms
+
+---
+
+tests  (git)-[main]- ➤ pnpm test:bench:prod > reports/prod_speed.txt
+Running 10s test @ https://opencanvas.onrender.com/articles
+100 connections
+
+
+┌─────────┬────────┬─────────┬─────────┬─────────┬────────────┬────────────┬─────────┐
+│ Stat    │ 2.5%   │ 50%     │ 97.5%   │ 99%     │ Avg        │ Stdev      │ Max     │
+├─────────┼────────┼─────────┼─────────┼─────────┼────────────┼────────────┼─────────┤
+│ Latency │ 456 ms │ 1681 ms │ 9312 ms │ 9360 ms │ 3383.87 ms │ 3053.57 ms │ 9464 ms │
+└─────────┴────────┴─────────┴─────────┴─────────┴────────────┴────────────┴─────────┘
+┌───────────┬─────┬──────┬─────────┬─────────┬─────────┬────────┬────────┐
+│ Stat      │ 1%  │ 2.5% │ 50%     │ 97.5%   │ Avg     │ Stdev  │ Min    │
+├───────────┼─────┼──────┼─────────┼─────────┼─────────┼────────┼────────┤
+│ Req/Sec   │ 0   │ 0    │ 20      │ 30      │ 20.3    │ 7.94   │ 17     │
+├───────────┼─────┼──────┼─────────┼─────────┼─────────┼────────┼────────┤
+│ Bytes/Sec │ 0 B │ 0 B  │ 1.01 MB │ 1.51 MB │ 1.02 MB │ 400 kB │ 857 kB │
+└───────────┴─────┴──────┴─────────┴─────────┴─────────┴────────┴────────┘
+
+Req/Bytes counts sampled once per second.
+# of samples: 10
+
+303 requests in 10.07s, 10.2 MB read

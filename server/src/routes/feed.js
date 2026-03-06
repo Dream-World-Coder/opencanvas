@@ -9,6 +9,7 @@ const {
 } = require("../middlewares/authorisation");
 
 /**
+ * LEGACY
  *
  * Route to generate articles feed for non-logged in users
  */
@@ -134,7 +135,8 @@ router.get("/articles", async (req, res) => {
       .limit(limit)
       .select(
         "title content slug type tags readTime thumbnailUrl isPremium isPublic authorSnapshot stats createdAt updatedAt",
-      );
+      )
+      .lean();
     // authorSnapshot is denormalized so we avoid a populate() call per post
 
     res.status(200).json({

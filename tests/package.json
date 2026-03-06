@@ -1,0 +1,25 @@
+{
+  "name": "tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:load:local": "artillery run load-test.yml -e local",
+    "test:load:prod": "artillery run load-test.yml -e prod",
+    "test:bench:local": "node bench.js local",
+    "test:bench:prod": "node bench.js prod"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "artillery": "^2.0.30",
+    "autocannon": "^8.0.0",
+    "dotenv": "^17.3.1",
+    "mongoose": "^9.2.4"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^10.3.0"
+  }
+}

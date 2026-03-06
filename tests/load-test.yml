@@ -1,0 +1,15 @@
+config:
+  environments:
+    local:
+      target: "http://localhost:3000"
+    prod:
+      target: "https://opencanvas.onrender.com"
+  phases:
+    - duration: 30
+      arrivalRate: 10
+      name: "Sustained load"
+scenarios:
+  - name: "Fetch educational articles"
+    flow:
+      - get:
+          url: "/articles"

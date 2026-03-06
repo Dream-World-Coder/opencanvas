@@ -13,3 +13,5 @@ opencanvas_app
 Binary-Search-Tree-Example*.png
 structure.md
 to-do.txt
+node_modules
+**/node_modules
