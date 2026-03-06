@@ -1,4 +1,5 @@
 import { Menu, Plus, Search, X } from "lucide-react";
+import { NavLink } from "react-router-dom";
 import PropTypes from "prop-types";
 
 import { CreateMenuMobile } from "./CreateMenu";
@@ -17,9 +18,12 @@ export const MobileNav = ({
   return (
     <div className="md:hidden flex items-center justify-center gap-0">
       {/* mobile search btn */}
-      <button className="flex items-center justify-center p-2 rounded-md">
+      <NavLink
+        to={"/search"}
+        className="flex items-center justify-center p-2 rounded-md"
+      >
         <Search className="size-5 text-black dark:text-gray-200" />
-      </button>
+      </NavLink>
 
       {/* mobile create button */}
       {currentUser && (
