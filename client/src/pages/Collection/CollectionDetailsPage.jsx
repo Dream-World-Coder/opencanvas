@@ -350,7 +350,7 @@ const CollectionDetailsPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-white dark:bg-[#222]">
-        <Header exclude={["/about", "/contact"]} />
+        <Header noBlur={true} exclude={["/about", "/contact"]} />
         <div className="flex items-center justify-center h-screen text-sm text-gray-400">
           Loading...
         </div>
@@ -363,7 +363,7 @@ const CollectionDetailsPage = () => {
   if (!collection) {
     return (
       <div className="min-h-screen bg-white dark:bg-[#222]">
-        <Header exclude={["/about", "/contact"]} />
+        <Header noBlur={true} exclude={["/about", "/contact"]} />
         <div className="flex flex-col items-center justify-center h-screen gap-4">
           <p className="text-gray-400">Collection not found or is private.</p>
           <Button className="dark:invert" onClick={() => navigate(-1)}>
@@ -377,8 +377,8 @@ const CollectionDetailsPage = () => {
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#222] dark:text-white font-sans">
-      <Header exclude={["/about", "/contact"]} />
+    <div className="min-h-screen bg-white dark:bg-[#222] dark:text-white font-sans relative">
+      <Header noBlur={true} exclude={["/about", "/contact"]} />
 
       <main className="pt-24 md:pt-28 px-4 md:px-8 min-h-[90dvh]">
         <div className="max-w-7xl mx-auto pb-[20vh]">

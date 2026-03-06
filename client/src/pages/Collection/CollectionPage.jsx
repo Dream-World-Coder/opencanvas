@@ -224,7 +224,7 @@ const CollectionsPage = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#222] dark:text-white font-sans">
-      <Header exclude={["/about", "/contact"]} />
+      <Header noBlur={true} exclude={["/about", "/contact"]} />
 
       <main className="pt-24 md:pt-28 px-4 md:px-8 min-h-[90dvh]">
         <div className="max-w-3xl mx-auto pb-[20vh]">

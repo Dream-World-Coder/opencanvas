@@ -74,9 +74,9 @@ export const MobileNav = ({
           aria-label="Toggle menu"
         >
           {isMenuOpen ? (
-            <X className="size-5 text-black dark:text-gray-200" />
+            <X className="size-6 text-black dark:text-gray-200" />
           ) : (
-            <Menu className="size-5 text-black dark:text-gray-200" />
+            <Menu className="size-6 text-black dark:text-gray-200" />
           )}
         </button>
       )}

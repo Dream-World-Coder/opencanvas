@@ -586,7 +586,7 @@ export const ArticleHeader = ({
         <button
           className="rounded-full text-sm bg-gray-100 hover:bg-gray-200 dark:bg-[#111]
               border box-content p-1 text-stone-600/80 dark:border-[#333] cursor-pointer"
-          onClick={() => navigate("/articles")}
+          onClick={() => navigate(-1)}
         >
           <ChevronLeft className="size-6" />
         </button>

@@ -128,7 +128,7 @@ const ContactPage = ({ bgClr = "bg-cream-light" }) => {
       <div
         className={`min-h-screen ${bgClr} dark:bg-[#111] dark:text-gray-100 pt-8`}
       >
-        <Header exclude={["/contact", "/photo-gallery"]} />
+        <Header noBlur={true} exclude={["/contact", "/photo-gallery"]} />
 
         <main className="max-w-2xl mx-auto px-6 py-16">
           {/* Header Section */}

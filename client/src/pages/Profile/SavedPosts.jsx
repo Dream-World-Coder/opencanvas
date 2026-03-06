@@ -92,7 +92,7 @@ export default function SavedPosts() {
             <Button
               variant="outline"
               className="dark:border-[#444] dark:text-gray-300"
-              onClick={() => navigate("/articles")}
+              onClick={() => navigate(-1)}
             >
               Browse articles
             </Button>

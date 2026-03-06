@@ -22,8 +22,10 @@ export default function ProfileHeader() {
     { href: "/articles", label: "Articles" },
     // { href: "/social", label: "Social" },
     { href: "/saved", label: "Saved" },
-    { href: "/profile", label: "Profile" },
+    { href: "/profile", label: "Profile" }, // logged in already
   ];
+
+  const filteredNavLinks = navLinks.filter((link) => link.href !== "/profile");
 
   // Fetches a fresh post ID from the server, then opens the editor
   // with the ID and type in the URL — no localStorage needed.
@@ -107,6 +109,7 @@ export default function ProfileHeader() {
           createMenuOpen={createMenuOpen}
           setIsMenuOpen={setMobileMenuOpen}
           isMenuOpen={mobileMenuOpen}
+          filteredNavLinks={filteredNavLinks}
         />
       </div>
 
