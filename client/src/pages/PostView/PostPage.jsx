@@ -36,7 +36,7 @@ const ViewPost = () => {
     saveUnsavePost,
     followUnfollowUser,
     getMyPostInteractions,
-    getUserPosts,
+    // getUserPosts,
   } = useDataService();
 
   const [post, setPost] = useState(null);
@@ -247,7 +247,7 @@ const ViewPost = () => {
         >
           <LeftSidebar />
 
-          <main className="w-full max-w-full min-w-0 flex-1 py-4 lg:py-8 px-8 lg:px-0 2xl:px-16 min-h-screen">
+          <main className="w-full max-w-full min-w-0 flex-1 py-4 lg:py-8 px-6 lg:px-0 2xl:px-16 min-h-screen">
             <ArticleHeader
               post={post}
               currentUser={currentUser}
