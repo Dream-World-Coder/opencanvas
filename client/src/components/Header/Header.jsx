@@ -30,9 +30,6 @@ const Header = ({
   const { getNewPostId } = useDataService();
   const navigate = useNavigate();
 
-  // Called when the user picks a post type from the Create menu.
-  // Fetches a fresh post ID from the server, then opens the editor
-  // with the ID and type embedded in the URL — no localStorage needed.
   async function handlePostCreate(option) {
     if (!currentUser) {
       toast.error("You need to login first");
@@ -47,7 +44,6 @@ const Header = ({
       const postId = await getNewPostId();
       navigate(`/editor/markdown/create?type=${option.type}&id=${postId}`);
     } catch (e) {
-      // getNewPostId already shows a toast; nothing more to do here
       console.error("Failed to get new post ID", e);
     } finally {
       setLoading(false);
@@ -56,7 +52,6 @@ const Header = ({
 
   let navLinks = [
     { name: "Articles", href: "/articles" },
-    // { name: "Social", href: "/social" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
   ];
@@ -66,6 +61,13 @@ const Header = ({
   } else {
     navLinks.push({ name: "Profile", href: "/profile" });
   }
+
+  const filteredNavLinks = navLinks.filter(
+    (link) =>
+      !exclude.includes(link.href) &&
+      link.href !== "/profile" &&
+      link.href !== "/login",
+  );
 
   return (
     <header
@@ -79,6 +81,7 @@ const Header = ({
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-0 py-3">
         <nav className="flex items-center justify-between">
+          {/* Left: Logo + SearchBar */}
           <div className="flex items-center justify-center gap-2">
             <AppLogo />
             {!searchBarHidden && (
@@ -145,14 +148,17 @@ const Header = ({
             )}
           </div>
 
-          <MobileNav
-            loading={loading}
-            handlePostCreate={handlePostCreate}
-            setCreateMenuOpen={setCreateMenuOpen}
-            createMenuOpen={createMenuOpen}
-            setIsMenuOpen={setIsMenuOpen}
-            isMenuOpen={isMenuOpen}
-          />
+          <div className="flex md:hidden items-center gap-2">
+            <MobileNav
+              loading={loading}
+              handlePostCreate={handlePostCreate}
+              setCreateMenuOpen={setCreateMenuOpen}
+              createMenuOpen={createMenuOpen}
+              setIsMenuOpen={setIsMenuOpen}
+              isMenuOpen={isMenuOpen}
+              filteredNavLinks={filteredNavLinks}
+            />
+          </div>
         </nav>
 
         {/* Mobile slide-down nav menu */}
@@ -166,22 +172,19 @@ const Header = ({
         >
           <div className="px-4 py-6 space-y-6">
             <div className="flex flex-col">
-              {navLinks.map(
-                (link, index) =>
-                  !exclude.includes(link.href) && (
-                    <button
-                      key={index}
-                      className="py-2 pl-4 rounded-lg text-stone-600 dark:text-gray-300 hover:text-stone-800
-                        dark:hover:text-gray-200 hover:bg-lime-300/50 transition-colors flex items-center justify-start"
-                      onClick={() => {
-                        setIsMenuOpen(false);
-                        navigate(link.href);
-                      }}
-                    >
-                      {link.name}
-                    </button>
-                  ),
-              )}
+              {filteredNavLinks.map((link, index) => (
+                <button
+                  key={index}
+                  className="py-2 pl-4 rounded-lg text-stone-600 dark:text-gray-300 hover:text-stone-800
+                      dark:hover:text-gray-200 hover:bg-lime-300/50 transition-colors flex items-center justify-start"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    navigate(link.href);
+                  }}
+                >
+                  {link.name}
+                </button>
+              ))}
             </div>
           </div>
         </div>
