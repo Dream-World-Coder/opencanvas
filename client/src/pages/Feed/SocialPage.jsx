@@ -189,7 +189,9 @@ const SocialFeed = () => {
                       <div className="relative mb-5 max-h-[220px] overflow-hidden">
                         <div className="prose prose-sm dark:prose-invert max-w-none">
                           <MarkdownPreview
-                            content={post.content.slice(0, 700) + "..." || ""}
+                            content={
+                              post.contentPreview.slice(0, 700) + "..." || ""
+                            }
                             thumbnailUrl={post.thumbnailUrl}
                             isDark={isDark}
                             darkBg="bg-[#222]"

@@ -86,11 +86,15 @@ export const useDataService = () => {
 
   // ─── Feed ──────────────────────────────────────────────────────────────────
 
-  // Paginated public articles feed
-  const getArticlesFeed = async ({ page = 1, limit = 10 } = {}) => {
+  // Cursor-based public articles feed.
+  // First call: no cursor. Subsequent calls: pass nextCursor from the previous response.
+  // Returns { success, results, data, nextCursor, hasMore }
+  const getArticlesFeed = async ({ cursor = "", limit = 10 } = {}) => {
     try {
-      const res = await authAxios.get(`/articles?page=${page}&limit=${limit}`);
-      return res.data; // { success, page, results, data }
+      const params = new URLSearchParams({ limit });
+      if (cursor) params.set("cursor", cursor);
+      const res = await authAxios.get(`/articles?${params.toString()}`);
+      return res.data;
     } catch (err) {
       toast.error("Error fetching feed");
       throw err;

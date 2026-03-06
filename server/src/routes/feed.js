@@ -1,150 +1,177 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const User = require("../models/User");
 const Post = require("../models/Post");
-const {
-  authenticateToken,
-  checkUserExists,
-} = require("../middlewares/authorisation");
+const { cache, TTL } = require("../services/cacheService");
 
 /**
  * LEGACY
  *
- * Route to generate articles feed for non-logged in users
+ * POST /articles/anonymous-user
+ * Cursor-based feed sorted by anonymousEngagementScore.
+ * Not cached — every request carries a unique cursor value.
  */
 router.post("/articles/anonymous-user", async (req, res) => {
   try {
-    // Extract cursor and limit parameters
-    const { cursor, limit = 16 } = req.body; // { ..., topics} = ...
+    const { cursor, limit = 16 } = req.body;
 
-    // Validate limit
     if (limit < 1 || limit > 50) {
       return res.status(400).json({
         success: false,
-        message: "Invalid limit parameter. Limit must be between 1-50.",
+        message: "Invalid limit. Must be between 1 and 50.",
       });
     }
 
-    // Build query object
     const query = { isPublic: true };
 
     if (cursor) {
       try {
-        // console.log("Raw cursor:", cursor);
-        const decodedString = Buffer.from(cursor, "base64").toString("utf-8");
-        // console.log("Decoded string:", decodedString);
-        const cursorData = JSON.parse(decodedString);
-        // console.log("Parsed cursor data:", cursorData);
+        const cursorData = JSON.parse(
+          Buffer.from(cursor, "base64").toString("utf-8"),
+        );
 
-        query.anonymousEngageMentScore = { $lt: cursorData.score };
-
-        // If there are posts with the same score, use _id to break the tie
+        // Use $or so that ties on score are broken deterministically by _id
         if (cursorData.lastId) {
           query.$or = [
-            { anonymousEngageMentScore: { $lt: cursorData.score } },
+            { anonymousEngagementScore: { $lt: cursorData.score } },
             {
-              anonymousEngageMentScore: cursorData.score,
-              _id: {
-                $lt: new mongoose.Types.ObjectId(cursorData.lastId),
-              },
+              anonymousEngagementScore: cursorData.score,
+              _id: { $lt: new mongoose.Types.ObjectId(cursorData.lastId) },
             },
           ];
+        } else {
+          query.anonymousEngagementScore = { $lt: cursorData.score };
         }
-      } catch (error) {
-        console.error("Cursor parsing error:", error);
-        return res.status(400).json({
-          success: false,
-          message: "Invalid cursor format",
-        });
+      } catch {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid cursor format" });
       }
     }
 
-    // Add topic filtering if provided
-    // if (topics && Array.isArray(topics) && topics.length > 0) {
-    //     query.topics = { $in: topics };
-    // }
-
-    // Execute the query with projection to exclude sensitive fields
-    const posts = await Post.find(query, {
-      totalDislikes: 0,
-      viewedBy: 0,
-      // anonymousEngageMentScore: 0,
-      engagementScore: 0,
-      totalCompleteReads: 0,
-      media: 0,
-    })
-      .sort({ anonymousEngageMentScore: -1, _id: -1 })
-      .limit(limit + 1) // Fetch one extra to determine if there are more posts
-      .populate("author", "username displayName profilePicture")
+    const posts = await Post.find(query)
+      .select(
+        "title contentPreview slug type tags readTime thumbnailUrl isPremium authorSnapshot stats anonymousEngagementScore createdAt",
+      )
+      .sort({ anonymousEngagementScore: -1, _id: -1 })
+      .limit(limit + 1) // one extra to determine if a next page exists
       .lean();
 
-    // Check if there are more posts available
     const hasMore = posts.length > limit;
+    if (hasMore) posts.pop();
 
-    // Remove the extra post if there are more
-    if (hasMore) {
-      posts.pop();
-    }
-
-    // Create the next cursor
     let nextCursor = null;
     if (hasMore && posts.length > 0) {
-      const lastPost = posts[posts.length - 1];
-      const cursorData = {
-        score: lastPost.anonymousEngageMentScore,
-        lastId: lastPost._id.toString(),
-      };
-
-      // Add these debug logs
-      // console.log("Creating cursor with data:", cursorData);
-      const jsonString = JSON.stringify(cursorData);
-      // console.log("JSON string:", jsonString);
-      nextCursor = Buffer.from(jsonString).toString("base64");
-      // console.log("Final nextCursor:", nextCursor);
+      const last = posts[posts.length - 1];
+      nextCursor = Buffer.from(
+        JSON.stringify({
+          score: last.anonymousEngagementScore,
+          lastId: last._id.toString(),
+        }),
+      ).toString("base64");
     }
 
-    // Return the posts with cursor information
-    return res.status(200).json({
-      success: true,
-      posts,
-      hasMore,
-      nextCursor,
-    });
-  } catch (error) {
-    console.error("Error generating anonymous feed:", error);
+    return res.status(200).json({ success: true, posts, hasMore, nextCursor });
+  } catch (err) {
+    console.error("Anonymous feed error:", err);
     return res.status(500).json({
       success: false,
-      message: "Failed to generate feed. Please try again later.",
-      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+      message: "Failed to generate feed.",
+      error: process.env.NODE_ENV === "development" ? err.message : undefined,
     });
   }
 });
 
-// GET /articles
-// Public - returns paginated list of public articles for the feed
+/**
+ * GET /articles?cursor=<base64>&limit=10
+ *
+ * Cursor-based public feed, sorted newest-first.
+ * Replaces skip() — skip walks the index from the start on every request,
+ * which gets progressively slower as the collection grows.
+ * A cursor filter lets MongoDB seek directly to the right position.
+ *
+ * Cursor encodes: { createdAt: <ISO string>, lastId: <ObjectId string> }
+ *   - createdAt  → primary sort key
+ *   - lastId     → tie-breaker when two posts share the exact same createdAt
+ *
+ * The existing index { isPublic: 1, createdAt: -1 } covers this query fully.
+ *
+ * Cache key : "articles:c{cursor}:l{limit}"  (first page key is "articles:c:l{limit}")
+ * TTL       : TTL.ARTICLES_FEED (30 seconds)
+ * Busted by : post create, delete, or visibility toggle — see post.js
+ *
+ * Response shape:
+ *   { success, results, data, nextCursor, hasMore }
+ */
 router.get("/articles", async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
+    const limit = Math.min(parseInt(req.query.limit) || 10, 50);
+    const rawCursor = req.query.cursor || "";
+    const cacheKey = `articles:c${rawCursor}:l${limit}`;
 
-    const posts = await Post.find({ isPublic: true })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
+    // ── Cache hit ────────────────────────────────────────────────────────────
+    const cached = cache.get(cacheKey);
+    if (cached) {
+      return res
+        .status(200)
+        .json({ success: true, ...cached, fromCache: true });
+    }
+
+    // ── Build query from cursor ──────────────────────────────────────────────
+    const query = { isPublic: true };
+
+    if (rawCursor) {
+      let cursorData;
+      try {
+        cursorData = JSON.parse(
+          Buffer.from(rawCursor, "base64").toString("utf-8"),
+        );
+      } catch {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid cursor format" });
+      }
+
+      const cursorDate = new Date(cursorData.createdAt);
+      const cursorId = new mongoose.Types.ObjectId(cursorData.lastId);
+
+      // Fetch posts older than the cursor, breaking ties with _id
+      query.$or = [
+        { createdAt: { $lt: cursorDate } },
+        { createdAt: cursorDate, _id: { $lt: cursorId } },
+      ];
+    }
+
+    // ── Cache miss — hit the DB ──────────────────────────────────────────────
+    // Fetch one extra to know whether a next page exists
+    const posts = await Post.find(query)
+      .sort({ createdAt: -1, _id: -1 })
+      .limit(limit + 1)
       .select(
-        "title content slug type tags readTime thumbnailUrl isPremium isPublic authorSnapshot stats createdAt updatedAt",
+        "title contentPreview slug type tags readTime thumbnailUrl isPremium isPublic authorSnapshot stats createdAt updatedAt",
       )
       .lean();
-    // authorSnapshot is denormalized so we avoid a populate() call per post
 
-    res.status(200).json({
-      success: true,
-      page,
-      results: posts.length,
-      data: posts,
-    });
+    const hasMore = posts.length > limit;
+    if (hasMore) posts.pop();
+
+    // Encode the last post's position as the next cursor
+    let nextCursor = null;
+    if (hasMore && posts.length > 0) {
+      const last = posts[posts.length - 1];
+      nextCursor = Buffer.from(
+        JSON.stringify({
+          createdAt: last.createdAt.toISOString(),
+          lastId: last._id.toString(),
+        }),
+      ).toString("base64");
+    }
+
+    const payload = { results: posts.length, data: posts, nextCursor, hasMore };
+
+    cache.set(cacheKey, payload, TTL.ARTICLES_FEED);
+
+    return res.status(200).json({ success: true, ...payload });
   } catch (err) {
     res.status(500).json({
       success: false,

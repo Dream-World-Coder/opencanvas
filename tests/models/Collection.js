@@ -19,7 +19,6 @@ const collectionSchema = new Schema(
     // 50 max list of posts in this collection
     posts: [{ type: Schema.Types.ObjectId, ref: "Post" }],
 
-    // STATS
     stats: {
       likesCount: { type: Number, default: 0 },
       dislikesCount: { type: Number, default: 0 },

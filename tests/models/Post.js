@@ -5,7 +5,12 @@ const postSchema = new Schema(
   {
     title: { type: String, required: true, trim: true },
     content: { type: String, required: true },
-    slug: { type: String, index: true }, // Store "my-cool-post" here
+    contentPreview: {
+      type: String,
+      default: "",
+      maxlength: 700,
+    },
+    slug: { type: String, index: true },
 
     authorId: {
       type: Schema.Types.ObjectId,
@@ -14,7 +19,7 @@ const postSchema = new Schema(
       index: true,
     },
 
-    // Denormalized for Feed Performance
+    // denormalized for feed perf
     authorSnapshot: {
       username: { type: String, required: true },
       profilePicture: { type: String },
@@ -45,16 +50,16 @@ const postSchema = new Schema(
       validate: [(val) => val.length <= 5, "Maximum 5 tags allowed"],
     },
 
-    media: [{ type: String }], // Array of strings (URLs/Hashes)
+    media: [{ type: String }], // arr of strings (url or hashes)
 
-    // STATS (Atomic Counters)
+    // stats (atomic ctns)
     stats: {
       viewsCount: { type: Number, default: 0 },
       likesCount: { type: Number, default: 0 },
       dislikesCount: { type: Number, default: 0 },
       sharesCount: { type: Number, default: 0 },
       commentsCount: { type: Number, default: 0 },
-      readsCount: { type: Number, default: 0 }, // Total Complete Reads
+      readsCount: { type: Number, default: 0 }, // total full reads
     },
 
     anonymousEngagementScore: { type: Number },
@@ -65,8 +70,9 @@ const postSchema = new Schema(
 
 // indexes
 postSchema.index({ authorId: 1, isPublic: 1, createdAt: -1 });
-postSchema.index({ isPublic: 1, createdAt: -1 }); // for articles feed
-postSchema.index({ tags: 1, isPublic: 1 }); // For topic search
+postSchema.index({ isPublic: 1, createdAt: -1, _id: -1 }); // for articles feed
+// actually _id: -1 is needed for the tests only, else same createdAt is extremely rare unless millions of active users
+postSchema.index({ tags: 1, isPublic: 1 }); // for topic srch
 
 const Post = mongoose.model("Post", postSchema);
 module.exports = Post;

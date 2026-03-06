@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "test:load:local": "artillery run load-test.yml -e local",
     "test:load:prod": "artillery run load-test.yml -e prod",
-    "test:bench:local": "node bench.js local",
-    "test:bench:prod": "node bench.js prod"
+    "test:bench:simple": "node bench.js simple",
+    "test:bench:stressed": "node bench.js stressed"
   },
   "keywords": [],
   "author": "",

@@ -24,6 +24,7 @@ const interactionSchema = new Schema(
   { timestamps: true },
 );
 
+// indexes
 interactionSchema.index({ userId: 1, targetId: 1, type: 1 }, { unique: true });
 interactionSchema.index({ targetId: 1, type: 1 });
 

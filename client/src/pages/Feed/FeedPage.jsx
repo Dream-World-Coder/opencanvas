@@ -34,7 +34,9 @@ const ArticleFeed = () => {
     navigate(`/p/${slugify(post?.title)}-${post?._id}`, { state: { post } });
   };
 
-  // React Query infinite query - page-number based to match the backend
+  // Cursor-based infinite query — pageParam is the cursor string, not a page number.
+  // First fetch: pageParam is "" (no cursor). Each subsequent fetch passes the
+  // nextCursor returned by the previous page.
   const {
     data,
     error,
@@ -45,15 +47,12 @@ const ArticleFeed = () => {
     refetch,
   } = useInfiniteQuery({
     queryKey: ["feed", "articles"],
-    queryFn: ({ pageParam = 1 }) =>
-      getArticlesFeed({ page: pageParam, limit: LIMIT }),
-    // Backend returns { page, results, data } - use page number to derive next
-    getNextPageParam: (lastPage) => {
-      const fetchedSoFar = (lastPage.page - 1) * LIMIT + lastPage.results;
-      // If we got a full page back there's likely more
-      return lastPage.results === LIMIT ? lastPage.page + 1 : undefined;
-    },
-    staleTime: 1000 * 60 * 5, // Fresh for 5 minutes
+    queryFn: ({ pageParam = "" }) =>
+      getArticlesFeed({ cursor: pageParam, limit: LIMIT }),
+    // Backend returns { nextCursor, hasMore } — pass cursor forward, or
+    // return undefined to signal the end of the feed.
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+    staleTime: 1000 * 60 * 5,
   });
 
   // Flatten all pages into a single deduplicated list
@@ -135,7 +134,8 @@ const ArticleFeed = () => {
               {/* Error */}
               {error && !isLoading && uniquePosts.length === 0 && (
                 <ErrorDisplay
-                  message={error.message || "Failed to load posts"}
+                  error={error.message || "Failed to load posts"}
+                  fetchPosts={() => refetch()}
                 />
               )}
 
@@ -171,7 +171,9 @@ const ArticleFeed = () => {
                           <div className="prose prose-sm dark:prose-invert max-w-none">
                             <MarkdownPreview
                               content={
-                                post?.content?.slice(0, 700) + "..." || ""
+                                post?.contentPreview
+                                  ? post.contentPreview + "..."
+                                  : ""
                               }
                               thumbnailUrl={post?.thumbnailUrl}
                               isDark={isDark}

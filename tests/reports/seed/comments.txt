@@ -1,0 +1,36 @@
+tests  (git)-[main]- ➤ node seed-comments.js
+Connected to DB.
+Generating comment pool...
+Inserted 10000 / 320000
+Inserted 20000 / 320000
+Inserted 30000 / 320000
+Inserted 40000 / 320000
+Inserted 50000 / 320000
+Inserted 60000 / 320000
+Inserted 70000 / 320000
+Inserted 80000 / 320000
+Inserted 90000 / 320000
+Inserted 100000 / 320000
+Inserted 110000 / 320000
+Inserted 120000 / 320000
+Inserted 130000 / 320000
+Inserted 140000 / 320000
+Inserted 150000 / 320000
+Inserted 160000 / 320000
+Inserted 170000 / 320000
+Inserted 180000 / 320000
+Inserted 190000 / 320000
+Inserted 200000 / 320000
+Inserted 210000 / 320000
+Inserted 220000 / 320000
+Inserted 230000 / 320000
+Inserted 240000 / 320000
+Inserted 250000 / 320000
+Inserted 260000 / 320000
+Inserted 270000 / 320000
+Inserted 280000 / 320000
+Inserted 290000 / 320000
+Inserted 300000 / 320000
+Inserted 310000 / 320000
+Inserted 320000 / 320000
+Seeding complete.

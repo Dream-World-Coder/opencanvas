@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const Follow = require("../models/Follow");
+const { cache, TTL } = require("../services/cacheService");
 const {
   authenticateToken,
   checkUserExists,
@@ -10,8 +11,8 @@ const {
 // ─── Public Routes ────────────────────────────────────────────────────────────
 
 // GET /u/:username
-// Public profile page - returns limited, safe-to-expose fields only.
-// Also returns whether the requesting user (if logged in) follows this profile.
+// Public profile page. Resolves follow status for logged-in callers via
+// optional token inspection (no hard auth, just best-effort).
 router.get("/u/:username", async (req, res) => {
   try {
     const user = await User.findOne({ username: req.params.username }).select(
@@ -25,10 +26,9 @@ router.get("/u/:username", async (req, res) => {
     }
 
     // Optionally resolve whether the caller follows this user.
-    // We read the token manually here since this is a public route - no hard auth required.
+    // Public route — we inspect the token manually without hard-failing on it.
     let isFollowing = false;
-    const authHeader = req.headers["authorization"];
-    const token = authHeader?.split(" ")[1];
+    const token = req.headers["authorization"]?.split(" ")[1];
     if (token) {
       try {
         const jwt = require("jsonwebtoken");
@@ -39,7 +39,7 @@ router.get("/u/:username", async (req, res) => {
         });
         isFollowing = !!follow;
       } catch {
-        // Invalid/expired token - just skip the follow check, don't block the request
+        // Expired or invalid token — skip the follow check, don't block the request
       }
     }
 
@@ -54,8 +54,7 @@ router.get("/u/:username", async (req, res) => {
 });
 
 // GET /u/users/byids?ids=id1,id2,...
-// Batch-fetch minimal user data by IDs.
-// Used on profile pages to show follower/following lists without over-fetching.
+// Batch-fetch minimal user data by IDs (used for follower/following lists).
 router.get("/u/users/byids", async (req, res) => {
   try {
     const ids = req.query.ids?.split(",").filter(Boolean);
@@ -82,8 +81,7 @@ router.get("/u/users/byids", async (req, res) => {
 // ─── Private Routes ───────────────────────────────────────────────────────────
 
 // PUT /update/user
-// Update the logged-in user's own profile. Only whitelisted fields are accepted.
-// Username and email changes are intentionally not allowed here.
+// Update the logged-in user's own profile. Username and email are intentionally excluded.
 router.put(
   "/update/user",
   authenticateToken,
@@ -110,7 +108,7 @@ router.put(
       if (contactInformation !== undefined)
         user.contactInformation = contactInformation;
 
-      // Merge notification preferences instead of replacing the whole object
+      // Merge notification prefs instead of replacing the whole object
       if (notifications !== undefined) {
         Object.assign(user.notifications, notifications);
       }
@@ -119,7 +117,6 @@ router.put(
 
       res.status(200).json({ success: true, data: user });
     } catch (err) {
-      // Mongoose validation errors (e.g. maxlength, custom validators) come back as 400
       if (err.name === "ValidationError") {
         return res.status(400).json({ success: false, message: err.message });
       }
@@ -132,16 +129,35 @@ router.put(
   },
 );
 
-// GET /u/top/writers
-// Returns the top 5 writers ranked by likes-per-post ratio (likesReceivedCount / postsCount).
-// Only users with at least 1 post are considered to avoid division by zero.
+/**
+ * GET /u/top/writers
+ *
+ * Top 5 writers ranked by likes-per-post ratio.
+ * This changes only when someone publishes a post or receives a like —
+ * a 5-minute cache is more than acceptable.
+ *
+ * Cache key : "writers:top"
+ * TTL       : TTL.TOP_WRITERS (5 minutes)
+ * Busted by : post like/dislike and post create/delete — see post.js
+ */
 router.get("/u/top/writers", async (req, res) => {
   try {
+    const CACHE_KEY = "writers:top";
+
+    // ── Cache hit ──────────────────────────────────────────────────────────
+    const cached = cache.get(CACHE_KEY);
+    if (cached) {
+      return res
+        .status(200)
+        .json({ success: true, data: cached, fromCache: true });
+    }
+
+    // ── Cache miss — run the aggregation ──────────────────────────────────
     const topWriters = await User.aggregate([
-      // Only include users who have published at least one post
+      // Only users with at least one published post (avoids division by zero)
       { $match: { "stats.postsCount": { $gt: 0 } } },
 
-      // Compute the likes-per-post ratio as a virtual field
+      // Compute likes-per-post as a virtual field
       {
         $addFields: {
           likesPerPost: {
@@ -150,12 +166,9 @@ router.get("/u/top/writers", async (req, res) => {
         },
       },
 
-      // Best ratio first
       { $sort: { likesPerPost: -1 } },
-
       { $limit: 5 },
 
-      // Return only the fields the client needs
       {
         $project: {
           _id: 1,
@@ -168,6 +181,8 @@ router.get("/u/top/writers", async (req, res) => {
         },
       },
     ]);
+
+    cache.set(CACHE_KEY, topWriters, TTL.TOP_WRITERS);
 
     res.status(200).json({ success: true, data: topWriters });
   } catch (err) {

@@ -15,7 +15,7 @@ import LoadingPage from "./pages/Others/LoadingPage";
 
 // Loaded with the main bundle - pages users hit immediately on arrival
 import LandingPage from "./pages/LandingPage/LandingPage";
-import ArticleFeed from "./pages/Feed/ArticlesPage";
+import ArticleFeed from "./pages/Feed/FeedPage";
 
 import "./services/fingerprintService";
 

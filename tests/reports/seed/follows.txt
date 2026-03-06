@@ -1,0 +1,13 @@
+tests  (git)-[main]- ➤ node seed-follows.js
+Connected to DB.
+Processed 10000 / 100000
+Processed 20000 / 100000
+Processed 30000 / 100000
+Processed 40000 / 100000
+Processed 50000 / 100000
+Processed 60000 / 100000
+Processed 70000 / 100000
+Processed 80000 / 100000
+Processed 90000 / 100000
+Processed 100000 / 100000
+Seeding complete.

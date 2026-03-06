@@ -825,8 +825,8 @@ export const PostList = memo(function PostList({
                           <MarkdownPreview
                             title={post.title}
                             content={
-                              (post.content ?? "").slice(0, 700) +
-                              (post.content ? "..." : "")
+                              (post.contentPreview ?? "").slice(0, 700) +
+                              (post.contentPreview ? "..." : "")
                             }
                             thumbnailUrl={post.thumbnailUrl}
                             isDark={isDark}

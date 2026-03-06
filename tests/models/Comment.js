@@ -13,31 +13,30 @@ const commentSchema = new Schema(
       index: true,
     },
 
-    // Flattened Threading Logic
+    // mx 1 lv
     parentId: {
       type: Schema.Types.ObjectId,
       ref: "Comment",
       default: null,
-      index: true, // Faster lookups for replies
+      index: true, // faster look ups
     },
 
-    // Optional: Snapshot to avoid population
+    // snapshot to cuz i dont want population
     authorSnapshot: {
       username: String,
       profilePicture: String,
     },
 
-    // SCALABLE STATS
     stats: {
       likesCount: { type: Number, default: 0 },
       dislikesCount: { type: Number, default: 0 },
       repliesCount: { type: Number, default: 0 }, // Sub-comments count
     },
-  }, // Handles createdAt/updatedAt automatically
+  },
   { timestamps: true },
 );
 
-// Index to find all comments for a post, sorted by date
+// indexes
 commentSchema.index({ postId: 1, parentId: 1, createdAt: 1 });
 
 const Comment = mongoose.model("Comment", commentSchema);

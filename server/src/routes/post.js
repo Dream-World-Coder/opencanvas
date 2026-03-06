@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Post = require("../models/Post");
 const Interaction = require("../models/Interaction");
+const { cache } = require("../services/cacheService");
 const {
   authenticateToken,
   checkUserExists,
@@ -16,14 +17,13 @@ const {
 const extractPostId = (slug) => {
   const parts = slug.split("-");
   const last = parts[parts.length - 1];
-  // A valid ObjectId is exactly 24 hex characters
   return /^[a-f0-9]{24}$/i.test(last) ? last : null;
 };
 
 // ─── Public Routes ────────────────────────────────────────────────────────────
 
 // GET /p/:slug
-// Public post page - resolves the post by extracting the ID from the slug
+// Public post page — resolves the post by extracting the ObjectId from the slug
 router.get("/p/:slug", async (req, res) => {
   try {
     const postId = extractPostId(req.params.slug);
@@ -51,7 +51,7 @@ router.get("/p/:slug", async (req, res) => {
 });
 
 // GET /u/posts/byids?ids=id1,id2,...
-// Batch-fetch posts by IDs (used on profile page to load post cards efficiently)
+// Batch-fetch posts by IDs (used on profile pages to load post cards efficiently)
 router.get("/u/posts/byids", async (req, res) => {
   try {
     const ids = req.query.ids?.split(",").filter(Boolean);
@@ -62,7 +62,7 @@ router.get("/u/posts/byids", async (req, res) => {
     }
 
     const posts = await Post.find({ _id: { $in: ids }, isPublic: true }).select(
-      "title slug type tags readTime thumbnailUrl isPremium authorSnapshot stats createdAt",
+      "title contentPreview slug type tags readTime thumbnailUrl isPremium authorSnapshot stats createdAt",
     );
 
     res.status(200).json({ success: true, results: posts.length, data: posts });
@@ -78,23 +78,21 @@ router.get("/u/posts/byids", async (req, res) => {
 // ─── Protected Routes ─────────────────────────────────────────────────────────
 
 // GET /get-new-post-id
-// Returns a fresh ObjectId for the editor to use as the post ID before the post is saved.
-// Just logged in - no full user check needed.
+// Returns a fresh ObjectId for the editor before the post is saved.
 router.get("/get-new-post-id", authenticateToken, (req, res) => {
   const newId = new mongoose.Types.ObjectId();
   res.status(200).json({ success: true, data: { postId: newId } });
 });
 
 // GET /private/p/:slug
-// View a private post - only the author (or mod/admin) can access
+// View a private post — only the author (or mod/admin) can access
 router.get(
   "/private/p/:slug",
   authenticateToken,
   checkUserExists,
   async (req, res) => {
     try {
-      const slug = req.params.slug;
-      const postId = req.query.postId ?? extractPostId(slug);
+      const postId = req.query.postId ?? extractPostId(req.params.slug);
       if (!postId) {
         return res
           .status(400)
@@ -130,7 +128,9 @@ router.get(
 
 // POST /post/like-dislike
 // Like or dislike a post. Same vote twice removes it. Opposite vote switches it.
-// Also updates stats.likesReceivedCount on the post's author.
+// Also keeps stats.likesReceivedCount on the author in sync.
+//
+// Cache: invalidates "writers:top" because likesReceivedCount affects the ranking.
 router.post("/post/like-dislike", authenticateToken, async (req, res) => {
   try {
     const { postId, vote } = req.body; // vote: "like" | "dislike"
@@ -165,12 +165,12 @@ router.post("/post/like-dislike", authenticateToken, async (req, res) => {
         // Same vote → remove
         await existing.deleteOne();
         await Post.findByIdAndUpdate(postId, { $inc: { [statField]: -1 } });
-        // Decrement author's received likes if it was a like being removed
         if (vote === "like") {
           await mongoose.model("User").findByIdAndUpdate(post.authorId, {
             $inc: { "stats.likesReceivedCount": -1 },
           });
         }
+        cache.del("writers:top"); // likes changed, ranking may have shifted
         return res.status(200).json({ success: true, message: "Vote removed" });
       } else {
         // Opposite vote → switch
@@ -179,11 +179,11 @@ router.post("/post/like-dislike", authenticateToken, async (req, res) => {
         await Post.findByIdAndUpdate(postId, {
           $inc: { [statField]: 1, [oppositeField]: -1 },
         });
-        // If switching to like, add +1; if switching away from like, add -1
         const likesDelta = vote === "like" ? 1 : -1;
         await mongoose.model("User").findByIdAndUpdate(post.authorId, {
           $inc: { "stats.likesReceivedCount": likesDelta },
         });
+        cache.del("writers:top");
         return res
           .status(200)
           .json({ success: true, message: "Vote switched" });
@@ -203,6 +203,7 @@ router.post("/post/like-dislike", authenticateToken, async (req, res) => {
         $inc: { "stats.likesReceivedCount": 1 },
       });
     }
+    cache.del("writers:top");
 
     res.status(201).json({ success: true, message: "Vote recorded" });
   } catch (err) {
@@ -215,7 +216,7 @@ router.post("/post/like-dislike", authenticateToken, async (req, res) => {
 });
 
 // POST /post/save-unsave
-// Save or unsave a post (toggle). Saved posts are stored as Interactions with type "save".
+// Toggle save state for a post (stored as an Interaction with type "save").
 router.post("/post/save-unsave", authenticateToken, async (req, res) => {
   try {
     const { postId } = req.body;
@@ -255,7 +256,9 @@ router.post("/post/save-unsave", authenticateToken, async (req, res) => {
 
 // POST /save/post/written
 // Create or update a written post (upsert by _id).
-// The post ID was pre-generated by /get-new-post-id.
+// The post ID was pre-generated by GET /get-new-post-id.
+//
+// Cache: always busts "articles:" because the feed order or content may have changed.
 router.post(
   "/save/post/written",
   authenticateToken,
@@ -286,6 +289,7 @@ router.post(
 
       const postData = {
         title,
+        contentPreview: content?.slice(0, 700) ?? "", // truncated for feed cards
         content,
         slug,
         tags,
@@ -295,13 +299,13 @@ router.post(
         isPremium,
         isPublic,
         authorId: req.userId,
-        // Always keep the snapshot current with the latest author profile
+        // Always keep snapshot current — avoids stale author data in feed cards
         authorSnapshot: {
           username: req.user.username,
           profilePicture: req.user.profilePicture,
           fullName: req.user.fullName,
         },
-        isEdited: !isNew, // Mark as edited on any update after creation
+        isEdited: !isNew,
       };
 
       const post = await Post.findByIdAndUpdate(
@@ -310,16 +314,20 @@ router.post(
         { upsert: true, new: true, runValidators: true },
       );
 
-      // Increment user's post count only on creation
       if (isNew) {
         await mongoose.model("User").findByIdAndUpdate(req.userId, {
           $inc: { "stats.postsCount": 1 },
         });
       }
 
+      // A new public post (or an edit to one) changes the feed
+      if (isPublic) {
+        cache.invalidatePrefix("articles:");
+      }
+
       res.status(isNew ? 201 : 200).json({ success: true, data: post });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       res.status(500).json({
         success: false,
         message: "Failed to save post",
@@ -331,6 +339,8 @@ router.post(
 
 // PUT /change-post-visibility-status
 // Toggle a post between public and private. Author only.
+//
+// Cache: busts "articles:" because the post either enters or leaves the public feed.
 router.put(
   "/change-post-visibility-status",
   authenticateToken,
@@ -359,6 +369,8 @@ router.put(
 
       post.isPublic = !post.isPublic;
       await post.save();
+
+      cache.invalidatePrefix("articles:");
 
       res.status(200).json({
         success: true,
@@ -448,6 +460,8 @@ router.put(
 
 // DELETE /post/delete
 // Permanently delete a post. Author or mod/admin only.
+//
+// Cache: busts "articles:" (post leaves feed) and "writers:top" (postsCount changes ratio).
 router.delete(
   "/post/delete",
   authenticateToken,
@@ -479,10 +493,12 @@ router.delete(
 
       await post.deleteOne();
 
-      // Decrement the author's post count
       await mongoose.model("User").findByIdAndUpdate(post.authorId, {
         $inc: { "stats.postsCount": -1 },
       });
+
+      cache.invalidatePrefix("articles:");
+      cache.del("writers:top");
 
       res.status(200).json({ success: true, message: "Post deleted" });
     } catch (err) {
@@ -496,7 +512,7 @@ router.delete(
 );
 
 // PATCH /update-post-views/:slug
-// Increments view count. Called by a cron job, uses fingerprinting to avoid double-counting.
+// Increments view count. Uses fingerprinting to avoid double-counting.
 router.patch(
   "/update-post-views/:slug",
   fingerprintMiddleware,
@@ -506,7 +522,6 @@ router.patch(
       await Post.findByIdAndUpdate(postId, {
         $inc: { "stats.viewsCount": 1 },
       });
-
       res.status(200).json({ success: true, message: "View counted" });
     } catch (err) {
       res.status(500).json({
@@ -519,7 +534,7 @@ router.patch(
 );
 
 // GET /u/posts/mine?page=1&limit=20
-// Returns the logged-in user's own posts including private ones
+// Returns the logged-in user's own posts, including private ones
 router.get("/u/posts/mine", authenticateToken, async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -558,7 +573,7 @@ router.get("/u/:userId/posts", async (req, res) => {
         .skip(skip)
         .limit(limit)
         .select(
-          "title content slug type tags readTime thumbnailUrl isPremium isPublic authorSnapshot stats createdAt updatedAt",
+          "title contentPreview slug type tags readTime thumbnailUrl isPremium isPublic authorSnapshot stats createdAt updatedAt",
         ),
       Post.countDocuments({ authorId: req.params.userId, isPublic: true }),
     ]);
@@ -594,7 +609,7 @@ router.get("/saved/posts", authenticateToken, async (req, res) => {
           path: "targetId",
           model: "Post",
           select:
-            "title slug type tags readTime thumbnailUrl isPremium isPublic authorSnapshot stats createdAt",
+            "title contentPreview slug type tags readTime thumbnailUrl isPremium isPublic authorSnapshot stats createdAt",
         }),
       Interaction.countDocuments({
         userId: req.userId,
@@ -603,7 +618,8 @@ router.get("/saved/posts", authenticateToken, async (req, res) => {
       }),
     ]);
 
-    const posts = saves.map((s) => s.targetId).filter(Boolean); // filter nulls from deleted posts
+    // filter(Boolean) handles the case where a saved post was later deleted
+    const posts = saves.map((s) => s.targetId).filter(Boolean);
 
     res.status(200).json({ success: true, data: posts, total });
   } catch (err) {
@@ -616,7 +632,7 @@ router.get("/saved/posts", authenticateToken, async (req, res) => {
 });
 
 // GET /post/:postId/my-interactions
-// Returns the logged-in user's like/dislike/save state for a post
+// Returns the logged-in user's like/dislike/save state for a single post
 router.get(
   "/post/:postId/my-interactions",
   authenticateToken,

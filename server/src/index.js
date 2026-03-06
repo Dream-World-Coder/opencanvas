@@ -16,7 +16,7 @@ const { router: collectionRoutes } = require("./routes/collection");
 const { router: imageService } = require("./services/imageService");
 const { router: searchRoutes } = require("./routes/search");
 
-const updateDefaultEngagementScore = require("./migrations/Post/updateDefaultEngagementScore");
+const updateDefaultEngagementScore = require("./jobs/updateEngagementScore");
 
 require("dotenv").config();
 

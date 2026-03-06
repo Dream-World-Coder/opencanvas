@@ -65,7 +65,7 @@ const userSchema = new Schema(
       default: "user",
     },
 
-    // Profile Details
+    // __profile details__
     profilePicture: {
       type: String,
       default: "https://opencanvas.in/defaults/profile.jpeg",
@@ -79,7 +79,7 @@ const userSchema = new Schema(
     },
     contactInformation: [ContactInfoSchema],
 
-    // Premium
+    // __premium__
     premiumUser: {
       isPremium: { type: Boolean, default: false },
       subscriptionType: {
@@ -91,7 +91,7 @@ const userSchema = new Schema(
       subscriptionEndDate: Date,
     },
 
-    // storing counts here, actual data is in 'Follow' and 'Interaction' collections.
+    // stats
     stats: {
       followersCount: { type: Number, default: 0 },
       followingCount: { type: Number, default: 0 },
@@ -108,7 +108,7 @@ const userSchema = new Schema(
 
     lastFiveLogin: [lastLoginsSchema],
 
-    // Settings
+    // settings
     notifications: {
       emailNotification: { type: Boolean, default: true },
       pushNotification: { type: Boolean, default: true },

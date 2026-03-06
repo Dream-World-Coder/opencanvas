@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 import Header from "@/components/Header/Header";
@@ -25,7 +25,7 @@ import {
 } from "./components";
 
 const ViewPost = () => {
-  const location = useLocation();
+  // const location = useLocation();
   const { currentUser } = useAuth();
   const { slug } = useParams();
   const isDark = useDarkMode();
@@ -108,14 +108,15 @@ const ViewPost = () => {
 
     // If navigated from a feed/list, the post data may be in router state
     // avoiding a redundant network request for the full post
-    if (location.state?.post) {
-      init(location.state.post);
-    } else {
-      setLoading(true);
-      getPost(slug)
-        .then(init)
-        .catch(() => setLoading(false));
-    }
+    // if (location.state?.post) {
+    //   // init(location.state.post); changed now, .contentPreview is present only
+    // } else {
+    //   //
+    // }
+    setLoading(true);
+    getPost(slug)
+      .then(init)
+      .catch(() => setLoading(false));
 
     // Reset per-post UI state when slug changes
     setAuthorPosts([]);

@@ -1,56 +1,84 @@
 const mongoose = require("mongoose");
 const { faker } = require("@faker-js/faker");
-const Post = require("./models/Post"); // Update path to your Post model
+const Post = require("./models/Post");
+const User = require("./models/User");
 
-const MONGO_URI = "mongodb://localhost:27017/opencanvas-new"; // Update if using Atlas
-const TOTAL_POSTS = 50000;
-const BATCH_SIZE = 5000;
+const MONGO_URI = "mongodb://127.0.0.1:27017/opencanvas_test";
+const TOTAL_POSTS = 100000;
+const BATCH_SIZE = 10000;
+const POOL_SIZE = 1000;
 
-async function seedDB() {
+async function seedPosts() {
   try {
     await mongoose.connect(MONGO_URI);
     console.log("Connected to DB.");
 
-    // Generate 50 dummy authors to reuse
-    const users = Array.from({ length: 50 }).map(() => ({
-      _id: new mongoose.Types.ObjectId(),
-      username: faker.internet.username(),
-      fullName: faker.person.fullName(),
-      profilePicture: faker.image.avatar(),
-    }));
+    // Fetch users to assign as authors (limiting to 10k for memory efficiency)
+    const users = await User.find()
+      .select("_id username profilePicture fullName")
+      .limit(10000)
+      .lean();
+
+    if (users.length === 0) {
+      throw new Error(
+        "No users found. Please run the users seed script first.",
+      );
+    }
+
+    console.log("Generating content pool...");
+    const contentPool = Array.from({ length: POOL_SIZE }).map(() => {
+      const title = faker.lorem.sentence({ min: 3, max: 8 });
+      return {
+        title: title,
+        slug:
+          faker.helpers.slugify(title).toLowerCase() +
+          "-" +
+          faker.string.alphanumeric(5),
+        content: faker.lorem.paragraphs(3),
+        contentPreview: faker.lorem.paragraph(),
+        tags: faker.helpers.arrayElements(
+          ["tech", "science", "coding", "history", "math", "art"],
+          3,
+        ),
+        type: faker.helpers.arrayElement([
+          "research-paper",
+          "article",
+          "poem",
+          "story",
+          "book",
+          "written",
+        ]),
+        readTime: `${faker.number.int({ min: 1, max: 20 })} min`,
+        createdAt: faker.date.past({ years: 2 }),
+      };
+    });
 
     let inserted = 0;
 
     for (let i = 0; i < TOTAL_POSTS / BATCH_SIZE; i++) {
       const batch = [];
       for (let j = 0; j < BATCH_SIZE; j++) {
-        const randomUser = users[Math.floor(Math.random() * users.length)];
-        const title = faker.lorem.sentence();
+        const u = users[Math.floor(Math.random() * users.length)];
+        const c = contentPool[Math.floor(Math.random() * POOL_SIZE)];
 
         batch.push({
-          title: title,
-          content: faker.lorem.paragraphs(5),
-          slug: faker.helpers.slugify(title).toLowerCase(),
-          authorId: randomUser._id,
+          ...c,
+          authorId: u._id,
           authorSnapshot: {
-            username: randomUser.username,
-            profilePicture: randomUser.profilePicture,
-            fullName: randomUser.fullName,
+            username: u.username,
+            profilePicture: u.profilePicture,
+            fullName: u.fullName,
           },
           isPublic: true,
-          type: faker.helpers.arrayElement(["research-paper", "article", "poem", "story", "book", "written"]),
-          readTime: `${faker.number.int({ min: 1, max: 20 })} min`,
-          tags: faker.helpers.arrayElements(["tech", "science", "coding", "history", "math", "art"], 3),
           stats: {
-            viewsCount: faker.number.int({ min: 0, max: 5000 }),
-            likesCount: faker.number.int({ min: 0, max: 500 }),
+            // Using standard Math.random for speed over Faker here
+            viewsCount: Math.floor(Math.random() * 5000),
+            likesCount: Math.floor(Math.random() * 500),
           },
-          // Spread creation dates over the last 2 years for realistic sorting
-          createdAt: faker.date.past({ years: 2 }),
         });
       }
 
-      await Post.insertMany(batch);
+      await Post.insertMany(batch, { ordered: false });
       inserted += BATCH_SIZE;
       console.log(`Inserted ${inserted} / ${TOTAL_POSTS}`);
     }
@@ -63,4 +91,4 @@ async function seedDB() {
   }
 }
 
-seedDB();
+seedPosts();

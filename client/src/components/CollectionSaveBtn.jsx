@@ -106,9 +106,9 @@ const PostCard = ({ post }) => {
         </div>
 
         {/* Post content preview */}
-        {post.content && (
+        {post?.contentPreview && (
           <p className="text-neutral-600 dark:text-neutral-400 text-sm line-clamp-3 mb-3">
-            {post.content.substring(0, 150)}...
+            {post?.contentPreview?.substring(0, 150)}...
           </p>
         )}
 

@@ -6,7 +6,7 @@ import Butterfly from "./images/butterfly.png";
 
 import { useAuth } from "../../contexts/AuthContext";
 import { SlidingButton, Navbar, Footer } from "./components";
-import ArticleFeed from "../Feed/ArticlesPage";
+import ArticleFeed from "../Feed/FeedPage";
 
 const LandingPage = () => {
   const { currentUser } = useAuth();
