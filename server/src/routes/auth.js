@@ -49,7 +49,7 @@ const verifyCallback = async (
   };
 
   try {
-    // checking if user already exists
+    // check: already exists
     let user = await User.findOne({
       email: profile.emails[0].value,
     });
@@ -104,19 +104,19 @@ router.get(
   }),
   (req, res) => {
     try {
-      // Generate JWT token
+      // generate jwt
       const token = jwt.sign(
         { userId: req.user._id, email: req.user.email },
         JWT_SECRET,
         { expiresIn: "7d" },
       );
 
-      // Redirect to frontend with token
+      // redirect to frontend with token
       res.redirect(`${FRONTEND_URL}/auth/success?token=${token}`);
     } catch (error) {
       console.error("Google callback error:", error);
       res.redirect(`${FRONTEND_URL}/login?error=server_error`);
-      // handle proper error display in frontend
+      // -> handled proper error display in frontend
     }
   },
 );
