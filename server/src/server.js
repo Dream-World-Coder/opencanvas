@@ -1,8 +1,8 @@
 /**
- * server.js : express app
+ * server.js :: express app
  *
  * loaded by every worker spawned in index.js.
- * no cluster logic and no cron, just the Express app.
+ * no cluster logic and no cron, just the express app.
  */
 
 const express = require("express");
@@ -28,16 +28,15 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const FRONTEND_URL = process.env.FRONTEND_URL;
 
-// ::::: Database :::::
-// Each worker opens its own MongoDB connection pool.
-// Mongoose handles this fine — Atlas supports many concurrent connections.
+// ::::: db :::::
+// each thread opens its own db conn pool
+// mongoose & Atlas handles this fine, supports many concurrent conn
 mongoose
   .connect(process.env.MONGODB_URI_PROD || process.env.MONGODB_URI)
   .then(() => console.log(`[Worker ${process.pid}] Connected to MongoDB`))
   .catch((err) => console.error(`[Worker ${process.pid}] MongoDB error:`, err));
 
-// ::::: Middleware :::::
-
+// ::::: middlewares :::::
 app.use(helmet());
 app.use(morgan("dev"));
 
@@ -51,7 +50,7 @@ app.use(
   }),
 );
 
-// Max request body → 160 KB
+// max request body → 160 KB
 app.use(express.json({ limit: "160kb" }));
 app.use(express.urlencoded({ limit: "160kb", extended: true }));
 
@@ -59,7 +58,6 @@ app.use(passport.initialize());
 app.set("trust proxy", true);
 
 // ::::: Routes :::::
-
 app.use("/auth", authRoutes);
 app.use(userRoutes);
 app.use(postRoutes);
@@ -70,17 +68,16 @@ app.use(feedRoutes);
 app.use("/api", imageService);
 app.use(searchRoutes);
 
-// Root health check
+// tst
 app.get("/", (req, res) => {
   res.json({
     message: "Welcome to OpenCanvas API",
     environment: process.env.NODE_ENV || "development",
-    worker: process.pid, // handy to confirm clustering is working
+    worker: process.pid,
   });
 });
 
-// ::::: Global error handler :::::
-
+// ::::: glob Err handler :::::
 app.use((err, req, res, next) => {
   let statusCode = 500;
   let message = "Something went wrong";
@@ -104,8 +101,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ::::: Start :::::
-
+// ::::: start :::::
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`[Worker ${process.pid}] Listening on port ${PORT}`);
 });
