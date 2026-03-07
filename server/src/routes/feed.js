@@ -26,7 +26,6 @@ router.post("/articles/anonymous-user", async (req, res) => {
           Buffer.from(cursor, "base64").toString("utf-8"),
         );
 
-        // Use $or so that ties on score are broken deterministically by _id
         if (cursorData.lastId) {
           query.$or = [
             { anonymousEngagementScore: { $lt: cursorData.score } },
@@ -50,7 +49,7 @@ router.post("/articles/anonymous-user", async (req, res) => {
         "title contentPreview slug type tags readTime thumbnailUrl isPremium authorSnapshot stats anonymousEngagementScore createdAt",
       )
       .sort({ anonymousEngagementScore: -1, _id: -1 })
-      .limit(limit + 1) // one extra to determine if a next page exists
+      .limit(limit + 1) // +1 to check if next page exists
       .lean();
 
     const hasMore = posts.length > limit;
@@ -87,7 +86,7 @@ router.get("/articles", async (req, res) => {
     const rawCursor = req.query.cursor || "";
     const cacheKey = `articles:c${rawCursor}:l${limit}`;
 
-    // ::::: Cache hit :::::
+    // hit
     const cached = cache.get(cacheKey);
     if (cached) {
       return res
@@ -95,7 +94,7 @@ router.get("/articles", async (req, res) => {
         .json({ success: true, ...cached, fromCache: true });
     }
 
-    // ::::: Build query from cursor :::::
+    // query from cursor
     const query = { isPublic: true };
 
     if (rawCursor) {
@@ -113,15 +112,15 @@ router.get("/articles", async (req, res) => {
       const cursorDate = new Date(cursorData.createdAt);
       const cursorId = new mongoose.Types.ObjectId(cursorData.lastId);
 
-      // Fetch posts older than the cursor, breaking ties with _id
+      // posts older than cursor, tie-break : _id
       query.$or = [
         { createdAt: { $lt: cursorDate } },
         { createdAt: cursorDate, _id: { $lt: cursorId } },
       ];
     }
 
-    // ::::: Cache miss — hit the DB :::::
-    // Fetch one extra to know whether a next page exists
+    // miss -> hit the DB
+    // +1 -> check next page
     const posts = await Post.find(query)
       .sort({ createdAt: -1, _id: -1 })
       .limit(limit + 1)
@@ -133,7 +132,7 @@ router.get("/articles", async (req, res) => {
     const hasMore = posts.length > limit;
     if (hasMore) posts.pop();
 
-    // Encode the last post's position as the next cursor
+    // next cursor <- encoded(last post's position)
     let nextCursor = null;
     if (hasMore && posts.length > 0) {
       const last = posts[posts.length - 1];

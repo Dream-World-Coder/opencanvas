@@ -1,22 +1,6 @@
-/**
- * cacheService.js
- *
- * Lightweight in-memory TTL cache. No external dependencies.
- * Exported as a singleton — every file that requires this gets the same instance.
- *
- * Usage:
- *   const { cache, TTL } = require("../services/cacheService");
- *
- *   cache.set("my:key", data, 30);          // store for 30 seconds
- *   const data = cache.get("my:key");       // null if missing or expired
- *   cache.invalidatePrefix("articles:");    // bust all article pages at once
- */
-
-// TTL constants — defined here so every route uses the same values,
-// and you can tune them in one place.
 const TTL = {
-  ARTICLES_FEED: 30, // seconds — public feed pages (acceptable staleness)
-  TOP_WRITERS: 5 * 60, // 5 minutes — changes rarely
+  ARTICLES_FEED: 30, // 30s
+  TOP_WRITERS: 5 * 60, // 5mns
 };
 
 class CacheService {
@@ -24,16 +8,13 @@ class CacheService {
     /** @type {Map<string, { value: any, expiresAt: number }>} */
     this.store = new Map();
 
-    // Evict expired entries every 2 minutes to prevent memory growth.
-    // .unref() means this interval won't keep the Node process alive on shutdown.
+    // evicting expired entries every 2 mins to prevent memory growth
     setInterval(() => this._evictExpired(), 2 * 60 * 1000).unref();
   }
 
   /**
-   * Store a value under a key for `ttlSeconds` seconds.
-   * @param {string} key
-   * @param {*} value
-   * @param {number} ttlSeconds
+   * store a value under a key for ttlSeconds sec
+   * key:string, value:*, ttlSeconds:number
    */
   set(key, value, ttlSeconds) {
     this.store.set(key, {
@@ -43,9 +24,8 @@ class CacheService {
   }
 
   /**
-   * Retrieve a value. Returns null if missing or expired.
-   * @param {string} key
-   * @returns {*|null}
+   * retrieves a val & returns null if missing or expired
+   * key:string->{*|null}
    */
   get(key) {
     const entry = this.store.get(key);
@@ -59,22 +39,15 @@ class CacheService {
     return entry.value;
   }
 
-  /**
-   * Delete a single key.
-   * @param {string} key
-   */
   del(key) {
+    // del a single key:string
     this.store.delete(key);
   }
 
   /**
-   * Delete all keys that start with `prefix`.
-   * Use this to invalidate an entire logical group at once.
-   *
-   * Example: invalidatePrefix("articles:") removes
-   *   "articles:p1:l10", "articles:p2:l10", etc.
-   *
-   * @param {string} prefix
+   * del all keys that start with prefix:string
+   * using to invalidate an entire logical group at once
+   * eg: invalidatePrefix("articles:") removes "articles:p1:l10", "articles:p2:l10"
    */
   invalidatePrefix(prefix) {
     for (const key of this.store.keys()) {
@@ -83,8 +56,6 @@ class CacheService {
       }
     }
   }
-
-  // ::::: Internal :::::
 
   _evictExpired() {
     const now = Date.now();
@@ -96,7 +67,6 @@ class CacheService {
   }
 }
 
-// Singleton — all modules share the same store
 const cache = new CacheService();
 
 module.exports = { cache, TTL };

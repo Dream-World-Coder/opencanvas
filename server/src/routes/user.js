@@ -10,9 +10,7 @@ const {
 
 // ::::: public :::::
 
-// GET /u/:username
-// Public profile page. Resolves follow status for logged-in callers via
-// optional token inspection (no hard auth, just best-effort).
+// public profile page. gets follow sts for logged in callers via optional token check
 router.get("/u/:username", async (req, res) => {
   try {
     const user = await User.findOne({ username: req.params.username }).select(
@@ -25,8 +23,8 @@ router.get("/u/:username", async (req, res) => {
         .json({ success: false, message: "User not found" });
     }
 
-    // Optionally resolve whether the caller follows this user.
-    // Public route — we inspect the token manually without hard-failing on it.
+    // optional: check whether the caller follows this usr
+    // as public route, so inspecting token manually without hard failing on it
     let isFollowing = false;
     const token = req.headers["authorization"]?.split(" ")[1];
     if (token) {
@@ -39,7 +37,7 @@ router.get("/u/:username", async (req, res) => {
         });
         isFollowing = !!follow;
       } catch {
-        // Expired or invalid token — skip the follow check, don't block the request
+        // expired / invalid tok -> skipping the follow check not blocking the req
       }
     }
 
@@ -53,8 +51,7 @@ router.get("/u/:username", async (req, res) => {
   }
 });
 
-// GET /u/users/byids?ids=id1,id2,...
-// Batch-fetch minimal user data by IDs (used for follower/following lists).
+// I used this in follower folloing previously
 router.get("/u/users/byids", async (req, res) => {
   try {
     const ids = req.query.ids?.split(",").filter(Boolean);
@@ -80,8 +77,7 @@ router.get("/u/users/byids", async (req, res) => {
 
 // ::::: private :::::
 
-// PUT /update/user
-// Update the logged-in user's own profile. Username and email are intentionally excluded.
+// update the logged-in user's self profile, username & email -> can't be changed
 router.put(
   "/update/user",
   authenticateToken,
@@ -108,7 +104,7 @@ router.put(
       if (contactInformation !== undefined)
         user.contactInformation = contactInformation;
 
-      // Merge notification prefs instead of replacing the whole object
+      // merge notif prefs instead replacing whole obj
       if (notifications !== undefined) {
         Object.assign(user.notifications, notifications);
       }
@@ -130,21 +126,19 @@ router.put(
 );
 
 /**
- * GET /u/top/writers
+ * top 5 writers by likes-per-post ratio.
+ * This changes when someone publishes a post or receives a like
+ * 5 minute cache here
  *
- * Top 5 writers ranked by likes-per-post ratio.
- * This changes only when someone publishes a post or receives a like —
- * a 5-minute cache is more than acceptable.
- *
- * Cache key : "writers:top"
- * TTL       : TTL.TOP_WRITERS (5 minutes)
- * Busted by : post like/dislike and post create/delete — see post.js
+ * cache key: "writers:top"
+ * TTL: TTL.TOP_WRITERS (5 minutes)
+ * busted by: post like/dislike and post create/delete
  */
 router.get("/u/top/writers", async (req, res) => {
   try {
     const CACHE_KEY = "writers:top";
 
-    // ::::: Cache hit :::::
+    // cache hit
     const cached = cache.get(CACHE_KEY);
     if (cached) {
       return res
@@ -152,12 +146,12 @@ router.get("/u/top/writers", async (req, res) => {
         .json({ success: true, data: cached, fromCache: true });
     }
 
-    // ::::: Cache miss — run the aggregation :::::
+    // cache miss -> now the aggregation runs
     const topWriters = await User.aggregate([
-      // Only users with at least one published post (avoids division by zero)
+      // at least 1 post published
       { $match: { "stats.postsCount": { $gt: 0 } } },
 
-      // Compute likes-per-post as a virtual field
+      // likes-per-post: virtual field
       {
         $addFields: {
           likesPerPost: {
