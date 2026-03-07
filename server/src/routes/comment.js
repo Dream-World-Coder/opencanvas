@@ -1,15 +1,22 @@
 const express = require("express");
 const router = express.Router();
 const Comment = require("../models/Comment");
+const Post = require("../models/Post");
 const {
   authenticateToken,
   checkUserExists,
 } = require("../middlewares/authorisation");
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+// Atomically update a post's commentsCount. delta = +1 or -1.
+const updatePostCommentCount = (postId, delta) =>
+  Post.findByIdAndUpdate(postId, { $inc: { "stats.commentsCount": delta } });
+
 // ─── Public Routes ────────────────────────────────────────────────────────────
 
 // GET /p/:postId/comments?page=1&limit=10
-// Fetches paginated top-level comments for a post (replies excluded - loaded on demand)
+// Paginated top-level comments for a post. Replies are excluded and loaded on demand.
 router.get("/p/:postId/comments", async (req, res) => {
   try {
     const { postId } = req.params;
@@ -17,7 +24,7 @@ router.get("/p/:postId/comments", async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    // parentId: null means top-level only (not a reply)
+    // parentId: null → top-level comments only, not replies
     const comments = await Comment.find({ postId, parentId: null })
       .sort({ createdAt: 1 })
       .skip(skip)
@@ -39,7 +46,7 @@ router.get("/p/:postId/comments", async (req, res) => {
 });
 
 // GET /p/comments/:commentId
-// Fetches a single top-level comment and all its direct replies
+// Single top-level comment + all its direct replies
 router.get("/p/comments/:commentId", async (req, res) => {
   try {
     const { commentId } = req.params;
@@ -51,15 +58,11 @@ router.get("/p/comments/:commentId", async (req, res) => {
         .json({ success: false, message: "Comment not found" });
     }
 
-    // Fetch all direct replies to this comment
     const replies = await Comment.find({ parentId: commentId }).sort({
       createdAt: 1,
     });
 
-    res.status(200).json({
-      success: true,
-      data: { comment, replies },
-    });
+    res.status(200).json({ success: true, data: { comment, replies } });
   } catch (err) {
     res.status(500).json({
       success: false,
@@ -70,7 +73,7 @@ router.get("/p/comments/:commentId", async (req, res) => {
 });
 
 // GET /get-comments/byids?ids=id1,id2,...
-// Fetches multiple comments by their IDs (used in post page to batch-load comments)
+// Batch-fetch comments by ID list (used on the post page)
 router.get("/get-comments/byids", async (req, res) => {
   try {
     const ids = req.query.ids?.split(",").filter(Boolean);
@@ -82,11 +85,9 @@ router.get("/get-comments/byids", async (req, res) => {
 
     const comments = await Comment.find({ _id: { $in: ids } });
 
-    res.status(200).json({
-      success: true,
-      results: comments.length,
-      data: comments,
-    });
+    res
+      .status(200)
+      .json({ success: true, results: comments.length, data: comments });
   } catch (err) {
     res.status(500).json({
       success: false,
@@ -99,7 +100,7 @@ router.get("/get-comments/byids", async (req, res) => {
 // ─── Protected Routes (login required) ───────────────────────────────────────
 
 // POST /new-comment
-// Creates a top-level comment on a post
+// Creates a top-level comment on a post and increments the post's commentsCount.
 router.post(
   "/new-comment",
   authenticateToken,
@@ -117,12 +118,15 @@ router.post(
         content,
         postId,
         authorId: req.userId,
-        // Snapshot avoids needing to populate author on every read
+        // Snapshot avoids a populate() call on every feed/comment read
         authorSnapshot: {
           username: req.user.username,
           profilePicture: req.user.profilePicture,
         },
       });
+
+      // Keep post comment counter in sync
+      await updatePostCommentCount(postId, 1);
 
       res.status(201).json({ success: true, data: comment });
     } catch (err) {
@@ -136,7 +140,9 @@ router.post(
 );
 
 // POST /reply-to-comment
-// Creates a reply to an existing comment (sets parentId)
+// Creates a reply to an existing comment. Increments:
+//   - parent comment's repliesCount
+//   - post's commentsCount (a reply counts as a comment)
 router.post(
   "/reply-to-comment",
   authenticateToken,
@@ -151,7 +157,7 @@ router.post(
         });
       }
 
-      // Make sure the parent comment actually exists before replying
+      // Ensure the parent comment exists before creating the reply
       const parentComment = await Comment.findById(parentId);
       if (!parentComment) {
         return res
@@ -170,10 +176,13 @@ router.post(
         },
       });
 
-      // Increment the parent comment's reply counter atomically
-      await Comment.findByIdAndUpdate(parentId, {
-        $inc: { "stats.repliesCount": 1 },
-      });
+      // Update both counters atomically in parallel — no need to await sequentially
+      await Promise.all([
+        Comment.findByIdAndUpdate(parentId, {
+          $inc: { "stats.repliesCount": 1 },
+        }),
+        updatePostCommentCount(postId, 1),
+      ]);
 
       res.status(201).json({ success: true, data: reply });
     } catch (err) {
@@ -187,7 +196,7 @@ router.post(
 );
 
 // PUT /edit-comment
-// Edits the content of a comment - only the original author can do this
+// Edit comment content. Only the original author is allowed.
 router.put(
   "/edit-comment",
   authenticateToken,
@@ -209,12 +218,13 @@ router.put(
           .json({ success: false, message: "Comment not found" });
       }
 
-      // Only the author can edit their own comment
       if (comment.authorId.toString() !== req.userId) {
-        return res.status(403).json({
-          success: false,
-          message: "Not authorised to edit this comment",
-        });
+        return res
+          .status(403)
+          .json({
+            success: false,
+            message: "Not authorised to edit this comment",
+          });
       }
 
       comment.content = content;
@@ -232,7 +242,9 @@ router.put(
 );
 
 // DELETE /delete-comment
-// Deletes a comment - allowed for the author or a moderator/admin
+// Deletes a comment (author or mod/admin only). Decrements:
+//   - post's commentsCount
+//   - parent's repliesCount (if this is a reply)
 router.delete(
   "/delete-comment",
   authenticateToken,
@@ -255,22 +267,30 @@ router.delete(
 
       const isAuthor = comment.authorId.toString() === req.userId;
       const isMod = ["moderator", "admin"].includes(req.user.role);
-
       if (!isAuthor && !isMod) {
-        return res.status(403).json({
-          success: false,
-          message: "Not authorised to delete this comment",
-        });
+        return res
+          .status(403)
+          .json({
+            success: false,
+            message: "Not authorised to delete this comment",
+          });
       }
 
       await comment.deleteOne();
 
-      // If this was a reply, decrement the parent's reply counter
+      // Build all counter updates and fire them in parallel
+      const counterUpdates = [updatePostCommentCount(comment.postId, -1)];
+
+      // If this is a reply, also decrement the parent's repliesCount
       if (comment.parentId) {
-        await Comment.findByIdAndUpdate(comment.parentId, {
-          $inc: { "stats.repliesCount": -1 },
-        });
+        counterUpdates.push(
+          Comment.findByIdAndUpdate(comment.parentId, {
+            $inc: { "stats.repliesCount": -1 },
+          }),
+        );
       }
+
+      await Promise.all(counterUpdates);
 
       res.status(200).json({ success: true, message: "Comment deleted" });
     } catch (err) {
