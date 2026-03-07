@@ -62,7 +62,7 @@ router.get("/u/posts/byids", async (req, res) => {
     }
 
     const posts = await Post.find({ _id: { $in: ids }, isPublic: true }).select(
-      "title contentPreview slug type tags readTime thumbnailUrl isPremium authorSnapshot stats createdAt",
+      "title contentPreview slug type tags readTime thumbnailUrl isPremium authorSnapshot stats createdAt updatedAt",
     );
 
     res.status(200).json({ success: true, results: posts.length, data: posts });
