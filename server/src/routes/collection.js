@@ -10,8 +10,7 @@ const {
 
 // ::::: public :::::
 
-// GET /collections
-// Browse/discovery - returns all public collections, paginated
+// browse: returns all public collections, paginated
 router.get("/collections", async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -39,8 +38,7 @@ router.get("/collections", async (req, res) => {
   }
 });
 
-// GET /c/:collectionId
-// Public collection page - returns the collection + its posts (card data only)
+// public collection page: returns the collection + its posts (sm data only)
 router.get("/c/:collectionId", async (req, res) => {
   try {
     const collection = await Collection.findOne({
@@ -73,9 +71,8 @@ router.get("/c/:collectionId", async (req, res) => {
 
 // ::::: protected :::::
 
-// GET /u/:userId/collections
-// Returns a user's collections (no posts inside, just collection metadata).
-// Owner/mod sees all; everyone else sees only public collections.
+// returns a user's collections (no posts inside, just collection metadata)
+// owner/mod sees all, everyone else sees only public collections
 router.get(
   "/u/:userId/collections",
   authenticateToken,
@@ -93,8 +90,8 @@ router.get(
 
       const collections = await Collection.find(filter)
         .sort({ createdAt: -1 })
-        // posts is included so the frontend can derive the count via posts.length.
-        // Collection.stats has no postsCount field - the source of truth is the posts array.
+        // posts is included so the frontend can derive the count via posts.length
+        // coll stats has no postsCount so the source of truth is the posts array
         .select(
           "title description thumbnailUrl tags isPrivate stats posts createdAt",
         );
@@ -114,8 +111,7 @@ router.get(
   },
 );
 
-// GET /c/private/:collectionId
-// Private collection viewer - only the author (or mod/admin) can access
+// private collection viewer: only the author or mod can access
 router.get(
   "/c/private/:collectionId",
   authenticateToken,
@@ -138,7 +134,7 @@ router.get(
         });
       }
 
-      // Private collections can contain private posts too, so no isPublic filter here
+      // private collns can contain private posts too, so no isPublic filter here
       const posts = await Post.find({ _id: { $in: collection.posts } }).select(
         "title slug type tags readTime thumbnailUrl isPremium authorSnapshot stats createdAt",
       );
@@ -154,8 +150,7 @@ router.get(
   },
 );
 
-// POST /create/collection
-// Create a new collection. Also registers it in the user's collections array.
+// create a new collection. also registers it in the user's collns arr
 router.post(
   "/create/collection",
   authenticateToken,
@@ -199,9 +194,7 @@ router.post(
   },
 );
 
-// POST /collection/:collectionId/vote
-// Like or dislike a collection. Sending the same vote again removes it (toggle).
-// Sending the opposite vote switches it and corrects both counters.
+// like or dislike a collection (toggle).
 router.post(
   "/collection/:collectionId/vote",
   authenticateToken,
@@ -230,7 +223,7 @@ router.post(
 
       if (existing) {
         if (existing.type === vote) {
-          // Same vote → remove (un-vote)
+          // Same vote → remove (!vote)
           await existing.deleteOne();
           await Collection.findByIdAndUpdate(collectionId, {
             $inc: { [statField]: -1 },
@@ -239,7 +232,7 @@ router.post(
             .status(200)
             .json({ success: true, message: "Vote removed" });
         } else {
-          // Opposite vote → switch
+          // oppoiste vote → switch
           existing.type = vote;
           await existing.save();
           await Collection.findByIdAndUpdate(collectionId, {
@@ -251,7 +244,7 @@ router.post(
         }
       }
 
-      // No prior vote → add it
+      // first vote → add
       await Interaction.create({
         userId: req.userId,
         targetId: collectionId,
@@ -273,8 +266,7 @@ router.post(
   },
 );
 
-// PUT /update-collection/:collectionId
-// Update collection metadata. Author only.
+// update collection metadata. Author only
 router.put(
   "/update-collection/:collectionId",
   authenticateToken,
@@ -315,8 +307,7 @@ router.put(
   },
 );
 
-// PUT /add-remove-post/:postId/collection/:collectionId
-// Toggle a post into/out of a collection. Enforces the 50 post limit.
+// toggle a post into & out of a collection, enforcing the 50 post lim
 router.put(
   "/add-remove-post/:postId/collection/:collectionId",
   authenticateToken,
@@ -374,8 +365,7 @@ router.put(
   },
 );
 
-// DELETE /delete-collection/:collectionId
-// Delete a collection and remove it from the user's collections array.
+// del a collection and remove it from the user's collections arr
 router.delete(
   "/delete-collection/:collectionId",
   authenticateToken,
@@ -400,7 +390,7 @@ router.delete(
 
       await collection.deleteOne();
 
-      // Remove from user's collections reference array
+      // removing from user's collns ref arr
       req.user.collections = req.user.collections.filter(
         (id) => id.toString() !== req.params.collectionId,
       );

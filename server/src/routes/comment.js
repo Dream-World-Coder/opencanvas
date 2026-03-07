@@ -7,15 +7,14 @@ const {
   checkUserExists,
 } = require("../middlewares/authorisation");
 
-// ::::: Helpers :::::
+// ::::: utils :::::
 
-// Atomically update a post's commentsCount. delta = +1 or -1.
+// atomically update a post's commentsCount. delta = +1 or -1.
 const updatePostCommentCount = (postId, delta) =>
   Post.findByIdAndUpdate(postId, { $inc: { "stats.commentsCount": delta } });
 
 // ::::: public :::::
 
-// GET /p/:postId/comments?page=1&limit=10
 // Paginated top-level comments for a post. Replies are excluded and loaded on demand.
 router.get("/p/:postId/comments", async (req, res) => {
   try {
@@ -45,7 +44,6 @@ router.get("/p/:postId/comments", async (req, res) => {
   }
 });
 
-// GET /p/comments/:commentId
 // Single top-level comment + all its direct replies
 router.get("/p/comments/:commentId", async (req, res) => {
   try {
@@ -72,7 +70,6 @@ router.get("/p/comments/:commentId", async (req, res) => {
   }
 });
 
-// GET /get-comments/byids?ids=id1,id2,...
 // Batch-fetch comments by ID list (used on the post page)
 router.get("/get-comments/byids", async (req, res) => {
   try {
@@ -97,9 +94,8 @@ router.get("/get-comments/byids", async (req, res) => {
   }
 });
 
-// ::::: protected (login required) :::::
+// ::::: protected (login req) :::::
 
-// POST /new-comment
 // Creates a top-level comment on a post and increments the post's commentsCount.
 router.post(
   "/new-comment",
@@ -139,7 +135,6 @@ router.post(
   },
 );
 
-// POST /reply-to-comment
 // Creates a reply to an existing comment. Increments:
 //   - parent comment's repliesCount
 //   - post's commentsCount (a reply counts as a comment)
@@ -195,7 +190,6 @@ router.post(
   },
 );
 
-// PUT /edit-comment
 // Edit comment content. Only the original author is allowed.
 router.put(
   "/edit-comment",
@@ -239,7 +233,6 @@ router.put(
   },
 );
 
-// DELETE /delete-comment
 // Deletes a comment (author or mod/admin only). Decrements:
 //   - post's commentsCount
 //   - parent's repliesCount (if this is a reply)
