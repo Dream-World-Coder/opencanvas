@@ -1,15 +1,15 @@
 #!/bin/bash
 
 echo "Stopping React Frontend..."
-kill $(cat ~/react.pid)
-rm ~/react.pid
+kill $(cat ~/react.pid) 2>/dev/null
+rm -f ~/react.pid
 
 echo "Stopping Node Server..."
-kill $(cat ~/node.pid)
-rm ~/node.pid
+pkill -f nodemon 2>/dev/null          # kill nodemon first — stops any restarts
+kill $(cat ~/node.pid) 2>/dev/null    # then kill node itself
+rm -f ~/node.pid
 
 echo "Stopping MongoDB..."
 brew services stop mongodb-community
-sleep 2
 
 echo "All services stopped."

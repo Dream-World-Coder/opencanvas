@@ -5,24 +5,19 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "NODE_ENV=development nodemon src/index.js",
-    "start": "NODE_ENV=production node src/index.js"
+    "dev": "nodemon src/index-single-worker.js",
+    "start": "node src/index-single-worker.js",
+    "devCluster": "nodemon src/index.js",
+    "startCluster": "node src/index.js"
   },
   "keywords": [],
   "author": "Subhajit Gorai",
   "license": "ISC",
   "dependencies": {
-    "apicache": "^1.6.3",
     "axios": "^1.13.6",
-    "bcrypt": "^5.1.1",
-    "bcryptjs": "^2.4.3",
-    "connect-mongo": "^5.1.0",
-    "cookie-parser": "^1.4.7",
-    "cookie-session": "^2.1.1",
     "cors": "^2.8.6",
     "dotenv": "^16.6.1",
     "express": "^4.22.1",
-    "express-session": "^1.19.0",
     "form-data": "^4.0.5",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
@@ -32,8 +27,7 @@
     "node-cron": "^3.0.3",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "sitemap": "^8.0.3",
-    "uuid": "^11.1.0"
+    "sitemap": "^8.0.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

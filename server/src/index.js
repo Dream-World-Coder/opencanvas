@@ -1,113 +1,64 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const passport = require("passport");
-const cors = require("cors");
-const helmet = require("helmet");
-const morgan = require("morgan");
+/**
+ * index.js — Cluster manager
+ *
+ * Forks one worker per CPU core. Each worker runs the full Express app
+ * independently, so all cores handle requests in parallel.
+ *
+ * Why this helps under stress:
+ *   Node is single-threaded. Without clustering, one core does all the work
+ *   while the rest of your CPU sits idle. With clustering, 4 cores = ~4x
+ *   capacity for CPU-bound work (JSON serialisation, gzip, JS execution).
+ *   MongoDB I/O is async either way, so that stays non-blocking.
+ *
+ * Cron job:
+ *   Only the primary process runs the cron. Workers only serve HTTP.
+ *   This prevents updateEngagementScore() from firing N times in parallel.
+ *
+ * In-memory cache (cacheService.js):
+ *   Each worker has its own cache copy — they don't share memory.
+ *   This is fine. Each worker independently caches /articles responses.
+ *   The only downside is a cache miss on one worker doesn't benefit others.
+ *   For a shared cache you'd need Redis, which is overkill for now.
+ */
+
+const cluster = require("cluster");
+const os = require("os");
 const cron = require("node-cron");
-
-const { router: authRoutes } = require("./routes/auth");
-const { router: userRoutes } = require("./routes/user");
-const { router: postRoutes } = require("./routes/post");
-const { router: commentRoutes } = require("./routes/comment");
-const { router: followerRoutes } = require("./routes/follow");
-const { router: feedRoutes } = require("./routes/feed");
-const { router: collectionRoutes } = require("./routes/collection");
-const { router: imageService } = require("./services/imageService");
-const { router: searchRoutes } = require("./routes/search");
-
-const updateDefaultEngagementScore = require("./jobs/updateEngagementScore");
-
+const updateEngagementScore = require("./jobs/updateEngagementScore");
 require("dotenv").config();
 
-const app = express();
-const PORT = process.env.PORT || 3000;
-const FRONTEND_URL = process.env.FRONTEND_URL;
+const NUM_WORKERS = os.cpus().length;
 
-mongoose
-  .connect(process.env.MONGODB_URI_PROD || process.env.MONGODB_URI)
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+if (cluster.isPrimary) {
+  console.log(`Primary process ${process.pid} started`);
+  console.log(`Forking ${NUM_WORKERS} workers (one per CPU core)...`);
 
-app.use(helmet()); // Security headers
-app.use(morgan("dev")); // logger
-
-// cors first
-app.use(
-  cors({
-    origin:
-      process.env.NODE_ENV === "production"
-        ? [FRONTEND_URL]
-        : ["http://localhost:5173", FRONTEND_URL],
-    credentials: true,
-  }),
-);
-
-// max request body -> 160 KB
-app.use(express.json({ limit: "160kb" }));
-app.use(express.urlencoded({ limit: "160kb", extended: true }));
-
-// init passport
-app.use(passport.initialize());
-
-app.set("trust proxy", true);
-
-// routes
-app.use("/auth", authRoutes);
-app.use(userRoutes);
-app.use(postRoutes);
-app.use(commentRoutes);
-app.use(followerRoutes);
-app.use(collectionRoutes);
-// app.use("/feed", feedRoutes);
-app.use(feedRoutes);
-app.use("/api", imageService);
-app.use(searchRoutes);
-
-// root test
-app.get("/", (req, res) => {
-  res.json({
-    message: "Welcome to OpenCanvas API",
-    environment: process.env.NODE_ENV || "development",
-  });
-});
-
-// error handler
-app.use((err, req, res, next) => {
-  let statusCode = 500;
-  let message = "Something went wrong";
-
-  // Handle payload too large (from body-parser / raw-body)
-  if (err.type === "entity.too.large" || err.name === "PayloadTooLargeError") {
-    statusCode = 413;
-    message = "Payload too large";
-    console.warn("Payload too large");
-  }
-  // Handle malformed JSON (body-parser throws SyntaxError)
-  else if (err instanceof SyntaxError && "body" in err) {
-    statusCode = 400;
-    message = "Invalid JSON payload";
-    console.warn("Invalid JSON payload");
-  } else {
-    console.error(err.stack);
+  // Fork one worker per CPU core
+  for (let i = 0; i < NUM_WORKERS; i++) {
+    cluster.fork();
   }
 
-  res.status(statusCode).json({
-    success: false,
-    message,
-    error: process.env.NODE_ENV === "development" ? err.message : undefined,
+  // If a worker crashes, log it and immediately replace it
+  cluster.on("exit", (worker, code, signal) => {
+    console.error(
+      `Worker ${worker.process.pid} died (code: ${code}, signal: ${signal}). Restarting...`,
+    );
+    cluster.fork();
   });
-});
 
-// crons
-cron.schedule("*/15 * * * *", () => {
-  console.log("Running scheduled update...");
-  updateDefaultEngagementScore().catch((err) => {
-    console.error("Scheduled task failed:", err);
+  cluster.on("online", (worker) => {
+    console.log(`Worker ${worker.process.pid} is online`);
   });
-});
 
-// app start
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`SUCCESS: Opencanvas server is running on port ${PORT}.`);
-});
+  // ── Cron runs ONLY in the primary process ─────────────────────────────────
+  // Workers don't run this — avoids N parallel writes to MongoDB every 15 min.
+  cron.schedule("*/15 * * * *", () => {
+    console.log("[Primary] Running scheduled engagement score update...");
+    updateEngagementScore().catch((err) => {
+      console.error("[Primary] Scheduled task failed:", err);
+    });
+  });
+} else {
+  // Workers just run the Express app — no cron, no cluster logic
+  require("./server");
+}

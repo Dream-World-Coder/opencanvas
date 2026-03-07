@@ -4,7 +4,7 @@ echo "Starting MongoDB..."
 brew services start mongodb-community
 sleep 2
 
-echo "Starting Node Server..."
+echo "Starting Node Server (cluster mode)..."
 cd server
 pnpm dev &
 sleep 1

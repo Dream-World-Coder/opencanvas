@@ -1,0 +1,32 @@
+tests  (git)-[main]- ➤ pnpm test:bench:stressed
+
+> tests@1.0.0 test:bench:stressed /Users/subhajitgorai/Codes/current_projects/opencanvas/tests
+> node bench.js stressed
+
+Running STRESSED benchmark on: http://localhost:3000/articles
+Connections: 500 | Pipelining: 10
+
+Running 10s test @ http://localhost:3000/articles
+500 connections with 10 pipelining factor
+
+
+┌─────────┬───────┬────────┬────────┬─────────┬───────────┬───────────┬─────────┐
+│ Stat    │ 2.5%  │ 50%    │ 97.5%  │ 99%     │ Avg       │ Stdev     │ Max     │
+├─────────┼───────┼────────┼────────┼─────────┼───────────┼───────────┼─────────┤
+│ Latency │ 56 ms │ 244 ms │ 740 ms │ 2934 ms │ 302.93 ms │ 518.66 ms │ 8307 ms │
+└─────────┴───────┴────────┴────────┴─────────┴───────────┴───────────┴─────────┘
+┌───────────┬────────┬────────┬────────┬────────┬──────────┬──────────┬────────┐
+│ Stat      │ 1%     │ 2.5%   │ 50%    │ 97.5%  │ Avg      │ Stdev    │ Min    │
+├───────────┼────────┼────────┼────────┼────────┼──────────┼──────────┼────────┤
+│ Req/Sec   │ 11,647 │ 11,647 │ 16,543 │ 17,743 │ 16,280.4 │ 1,680.95 │ 11,640 │
+├───────────┼────────┼────────┼────────┼────────┼──────────┼──────────┼────────┤
+│ Bytes/Sec │ 99 MB  │ 99 MB  │ 141 MB │ 151 MB │ 138 MB   │ 14.3 MB  │ 99 MB  │
+└───────────┴────────┴────────┴────────┴────────┴──────────┴──────────┴────────┘
+
+Req/Bytes counts sampled once per second.
+# of samples: 10
+
+168k requests in 10.07s, 1.38 GB read
+
+Requests per second: 16280.4
+Average Latency: 302.93ms

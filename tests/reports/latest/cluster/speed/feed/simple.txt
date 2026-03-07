@@ -1,0 +1,32 @@
+tests  (git)-[main]- ➤ pnpm test:bench:simple
+
+> tests@1.0.0 test:bench:simple /Users/subhajitgorai/Codes/current_projects/opencanvas/tests
+> node bench.js simple
+
+Running SIMPLE benchmark on: http://localhost:3000/articles
+Connections: 100 | Pipelining: 1
+
+Running 10s test @ http://localhost:3000/articles
+100 connections
+
+
+┌─────────┬──────┬──────┬───────┬───────┬─────────┬─────────┬────────┐
+│ Stat    │ 2.5% │ 50%  │ 97.5% │ 99%   │ Avg     │ Stdev   │ Max    │
+├─────────┼──────┼──────┼───────┼───────┼─────────┼─────────┼────────┤
+│ Latency │ 1 ms │ 5 ms │ 16 ms │ 19 ms │ 5.79 ms │ 9.43 ms │ 879 ms │
+└─────────┴──────┴──────┴───────┴───────┴─────────┴─────────┴────────┘
+┌───────────┬────────┬────────┬────────┬────────┬──────────┬──────────┬────────┐
+│ Stat      │ 1%     │ 2.5%   │ 50%    │ 97.5%  │ Avg      │ Stdev    │ Min    │
+├───────────┼────────┼────────┼────────┼────────┼──────────┼──────────┼────────┤
+│ Req/Sec   │ 12,559 │ 12,559 │ 16,415 │ 16,879 │ 15,913.6 │ 1,196.76 │ 12,552 │
+├───────────┼────────┼────────┼────────┼────────┼──────────┼──────────┼────────┤
+│ Bytes/Sec │ 107 MB │ 107 MB │ 140 MB │ 144 MB │ 135 MB   │ 10.2 MB  │ 107 MB │
+└───────────┴────────┴────────┴────────┴────────┴──────────┴──────────┴────────┘
+
+Req/Bytes counts sampled once per second.
+# of samples: 10
+
+159k requests in 10.02s, 1.35 GB read
+
+Requests per second: 15913.6
+Average Latency: 5.79ms
