@@ -3,19 +3,19 @@ const router = express.Router();
 const User = require("../models/User");
 const Post = require("../models/Post");
 
-// ::::: Search :::::
-//
-// GET /search?q=...&type=users|posts|all
-//
-// Searches:
-//   - users  → fullName, designation  (case-insensitive, partial match)
-//   - posts  → title                  (case-insensitive, partial match, public only)
-//
-// Query params:
-//   q    {string}  required – search term (min 1 char)
-//   type {string}  optional – "users" | "posts" | "all"  (default: "all")
-//
-// Returns up to 10 results per type.
+/*
+GET /search?q=...&type=users|posts|all
+
+Searches:
+  users → fullName, designation (case-insensitive, partial match)
+  posts → title (case-insensitive, partial match, public only)
+
+Query params:
+  q {string}  required –> search term (min 1 char)
+  type {string}  optional –> "users" | "posts" | "all"  (default: "all")
+
+returns up to 10 results per type
+*/
 
 const MAX_RESULTS = 10;
 
@@ -30,12 +30,12 @@ router.get("/search", async (req, res) => {
         .json({ success: false, message: "Search query is required" });
     }
 
-    // Build a case-insensitive regex from the search term
+    // case-insensitive regex from search term
     const regex = new RegExp(query, "i");
 
     const results = {};
 
-    // ::::: User search :::::
+    // ::::: user search :::::
     if (type === "users" || type === "all") {
       results.users = await User.find({
         $or: [{ fullName: regex }, { designation: regex }],
@@ -45,16 +45,16 @@ router.get("/search", async (req, res) => {
         .lean();
     }
 
-    // ::::: Post search :::::
+    // ::::: post search :::::
     if (type === "posts" || type === "all") {
       results.posts = await Post.find({
         title: regex,
-        isPublic: true, // Only surface public posts
+        isPublic: true, // only public posts
       })
         .select(
           "title slug authorSnapshot thumbnailUrl readTime tags stats createdAt",
         )
-        .sort({ "stats.viewsCount": -1 }) // Surface more popular posts first
+        .sort({ "stats.viewsCount": -1 }) // surface more popular posts first
         .limit(MAX_RESULTS)
         .lean();
     }
