@@ -10,7 +10,7 @@ const {
   fingerprintMiddleware,
 } = require("../middlewares/authorisation");
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ::::: Helpers :::::
 
 // URLs look like /p/my-post-title-64abc123def456789012abcd
 // The last 24-char hex segment is always the MongoDB ObjectId
@@ -20,7 +20,7 @@ const extractPostId = (slug) => {
   return /^[a-f0-9]{24}$/i.test(last) ? last : null;
 };
 
-// ─── Public Routes ────────────────────────────────────────────────────────────
+// ::::: Public Routes :::::
 
 // GET /p/:slug
 // Public post page — resolves the post by extracting the ObjectId from the slug
@@ -75,7 +75,7 @@ router.get("/u/posts/byids", async (req, res) => {
   }
 });
 
-// ─── Protected Routes ─────────────────────────────────────────────────────────
+// ::::: Protected Routes :::::
 
 // GET /get-new-post-id
 // Returns a fresh ObjectId for the editor before the post is saved.

@@ -16,7 +16,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCollectionContext } from "@/contexts/CollectionContext";
 import { useDataService } from "@/services/dataService";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ::::: Helpers :::::
 
 const timeAgo = (date) => {
   try {
@@ -26,7 +26,7 @@ const timeAgo = (date) => {
   }
 };
 
-// ─── Single collection row (article-list style) ────────────────────────────────
+// ::::: Single collection row (article-list style) :::::
 
 const CollectionRow = ({ collection, isOwner, onDelete }) => {
   const navigate = useNavigate();
@@ -171,7 +171,7 @@ CollectionRow.propTypes = {
   onDelete: PropTypes.func.isRequired,
 };
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// ::::: Page :::::
 
 const CollectionsPage = () => {
   const { userId } = useParams(); // present only when viewing another user
@@ -220,7 +220,7 @@ const CollectionsPage = () => {
     );
   });
 
-  // ── Render ──────────────────────────────────────────────────────────────────
+  // ::::: Render :::::
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#222] dark:text-white font-sans">

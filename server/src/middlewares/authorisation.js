@@ -63,9 +63,8 @@ const checkUserExists = async (req, res, next) => {
   }
 };
 
-// Fingerprinting middleware
 const fingerprintMiddleware = async (req, res, next) => {
-  // Get user ID if authenticated
+  // get userID if authenticated
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
 
@@ -79,17 +78,16 @@ const fingerprintMiddleware = async (req, res, next) => {
     }
   }
 
-  // If no authenticated user, use fingerprinting
+  // no authenticated user, using fingerprinting
   if (!req.visitorIdentifier) {
-    // Get fingerprint from headers or generate one
+    // fingerprint from headers or generate one
     const clientIp =
       req.headers["x-forwarded-for"] || req.connection.remoteAddress;
     const userAgent = req.headers["user-agent"] || "unknown";
 
-    // Create a unique identifier using available data
+    // unique identifier using available data
     const fingerprintData = `${clientIp}_${userAgent}`;
 
-    // Fixed crypto usage
     const fingerprint = crypto
       .createHash("md5")
       .update(fingerprintData)

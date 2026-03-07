@@ -25,7 +25,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useDataService } from "@/services/dataService";
 import { useCollectionContext } from "@/contexts/CollectionContext";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ::::: Helpers :::::
 
 const timeAgo = (date) => {
   try {
@@ -35,7 +35,7 @@ const timeAgo = (date) => {
   }
 };
 
-// ─── Collection info panel ────────────────────────────────────────────────────
+// ::::: Collection info panel :::::
 // Shows thumbnail, title, description, stats, and owner actions.
 
 const CollectionInfo = ({ collection, isOwner, onDelete, onShare }) => (
@@ -158,7 +158,7 @@ CollectionInfo.propTypes = {
   onShare: PropTypes.func.isRequired,
 };
 
-// ─── Post row ─────────────────────────────────────────────────────────────────
+// ::::: Post row :::::
 // Each post in the playlist list.
 
 const PostRow = ({ post, index, isOwner, onRemove, removingId }) => {
@@ -255,7 +255,7 @@ PostRow.propTypes = {
   removingId: PropTypes.string, // null when nothing is being removed
 };
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// ::::: Page :::::
 
 const CollectionDetailsPage = () => {
   const { id } = useParams();
@@ -345,7 +345,7 @@ const CollectionDetailsPage = () => {
     }
   };
 
-  // ── Loading ────────────────────────────────────────────────────────────────
+  // ::::: Loading :::::
 
   if (loading) {
     return (
@@ -358,7 +358,7 @@ const CollectionDetailsPage = () => {
     );
   }
 
-  // ── Not found ──────────────────────────────────────────────────────────────
+  // ::::: Not found :::::
 
   if (!collection) {
     return (
@@ -374,7 +374,7 @@ const CollectionDetailsPage = () => {
     );
   }
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  // ::::: Render :::::
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#222] dark:text-white font-sans relative">

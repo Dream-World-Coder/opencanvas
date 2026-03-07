@@ -76,7 +76,7 @@ const FollowersPage = () => {
   const displayedFollowers = reversed ? [...followers].reverse() : followers;
   const hasMore = followers.length < total;
 
-  // ── Loading state ────────────────────────────────────────────────────────
+  // ::::: Loading state :::::
   if (profileLoading) {
     return (
       <div className="min-h-screen bg-white dark:bg-[#111]">
@@ -104,7 +104,7 @@ const FollowersPage = () => {
     );
   }
 
-  // ── Null guard — profile failed to load ──────────────────────────────────
+  // ::::: Null guard — profile failed to load :::::
   if (!profile) return null;
 
   return (

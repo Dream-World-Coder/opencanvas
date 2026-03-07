@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require("../models/User");
 const Post = require("../models/Post");
 
-// ─── Search ───────────────────────────────────────────────────────────────────
+// ::::: Search :::::
 //
 // GET /search?q=...&type=users|posts|all
 //
@@ -35,7 +35,7 @@ router.get("/search", async (req, res) => {
 
     const results = {};
 
-    // ── User search ──────────────────────────────────────────────────────────
+    // ::::: User search :::::
     if (type === "users" || type === "all") {
       results.users = await User.find({
         $or: [{ fullName: regex }, { designation: regex }],
@@ -45,7 +45,7 @@ router.get("/search", async (req, res) => {
         .lean();
     }
 
-    // ── Post search ──────────────────────────────────────────────────────────
+    // ::::: Post search :::::
     if (type === "posts" || type === "all") {
       results.posts = await Post.find({
         title: regex,

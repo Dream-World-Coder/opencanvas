@@ -109,7 +109,7 @@ router.get("/articles", async (req, res) => {
     const rawCursor = req.query.cursor || "";
     const cacheKey = `articles:c${rawCursor}:l${limit}`;
 
-    // ── Cache hit ────────────────────────────────────────────────────────────
+    // ::::: Cache hit :::::
     const cached = cache.get(cacheKey);
     if (cached) {
       return res
@@ -117,7 +117,7 @@ router.get("/articles", async (req, res) => {
         .json({ success: true, ...cached, fromCache: true });
     }
 
-    // ── Build query from cursor ──────────────────────────────────────────────
+    // ::::: Build query from cursor :::::
     const query = { isPublic: true };
 
     if (rawCursor) {
@@ -142,7 +142,7 @@ router.get("/articles", async (req, res) => {
       ];
     }
 
-    // ── Cache miss — hit the DB ──────────────────────────────────────────────
+    // ::::: Cache miss — hit the DB :::::
     // Fetch one extra to know whether a next page exists
     const posts = await Post.find(query)
       .sort({ createdAt: -1, _id: -1 })

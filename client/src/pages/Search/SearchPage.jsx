@@ -7,7 +7,7 @@ import Header from "../../components/Header/Header";
 import { slugify } from "@/pages/Create/Editor/hooks/useWritingPad";
 import PropTypes from "prop-types";
 
-// ─── Search Results Page ──────────────────────────────────────────────────────
+// ::::: Search Results Page :::::
 //
 // Route: /search?q=...&type=users|posts|all
 //
@@ -201,7 +201,7 @@ export default function SearchPage() {
   );
 }
 
-// ─── User Card ────────────────────────────────────────────────────────────────
+// ::::: User Card :::::
 
 function UserCard({ user }) {
   return (
@@ -235,7 +235,7 @@ UserCard.propTypes = {
   user: PropTypes.object,
 };
 
-// ─── Post Card ────────────────────────────────────────────────────────────────
+// ::::: Post Card :::::
 
 function PostCard({ post }) {
   return (

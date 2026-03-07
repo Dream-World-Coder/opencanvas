@@ -84,7 +84,7 @@ class CacheService {
     }
   }
 
-  // ─── Internal ─────────────────────────────────────────────────────────────
+  // ::::: Internal :::::
 
   _evictExpired() {
     const now = Date.now();

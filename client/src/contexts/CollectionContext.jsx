@@ -23,7 +23,7 @@ export const CollectionContextProvider = ({ children }) => {
   const { getUserCollections, createCollection, togglePostInCollection } =
     useDataService();
 
-  // ── State ──────────────────────────────────────────────────────────────────
+  // ::::: State :::::
 
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -45,7 +45,7 @@ export const CollectionContextProvider = ({ children }) => {
   const [tagInput, setTagInput] = useState("");
   const [creating, setCreating] = useState(false);
 
-  // ── Load user's collections on login ──────────────────────────────────────
+  // ::::: Load user's collections on login :::::
 
   useEffect(() => {
     if (!currentUser?._id) return;
@@ -70,7 +70,7 @@ export const CollectionContextProvider = ({ children }) => {
     if (postIdToSave) setIsSaveModalOpen(true);
   }, [postIdToSave]);
 
-  // ── Refresh helper (call after create/delete) ─────────────────────────────
+  // ::::: Refresh helper (call after create/delete) :::::
 
   const refreshCollections = async () => {
     if (!currentUser?._id) return;
@@ -85,7 +85,7 @@ export const CollectionContextProvider = ({ children }) => {
     }
   };
 
-  // ── Save post to selected collections ────────────────────────────────────
+  // ::::: Save post to selected collections :::::
 
   const handleSavePost = async () => {
     if (selectedCollectionIds.length === 0) {
@@ -120,7 +120,7 @@ export const CollectionContextProvider = ({ children }) => {
     );
   };
 
-  // ── Create new collection ─────────────────────────────────────────────────
+  // ::::: Create new collection :::::
 
   const handleCreateCollection = async () => {
     if (!newCollForm.title.trim()) {
@@ -181,7 +181,7 @@ export const CollectionContextProvider = ({ children }) => {
     }));
   };
 
-  // ── Close helpers ─────────────────────────────────────────────────────────
+  // ::::: Close helpers :::::
 
   const closeSaveModal = () => {
     setIsSaveModalOpen(false);
@@ -195,7 +195,7 @@ export const CollectionContextProvider = ({ children }) => {
     if (postIdToSave) setIsSaveModalOpen(true);
   };
 
-  // ── Context value ─────────────────────────────────────────────────────────
+  // ::::: Context value :::::
 
   return (
     <CollectionContext.Provider

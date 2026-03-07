@@ -8,7 +8,7 @@ const {
   checkUserExists,
 } = require("../middlewares/authorisation");
 
-// ─── Public Routes ────────────────────────────────────────────────────────────
+// ::::: Public Routes :::::
 
 // GET /u/:username
 // Public profile page. Resolves follow status for logged-in callers via
@@ -78,7 +78,7 @@ router.get("/u/users/byids", async (req, res) => {
   }
 });
 
-// ─── Private Routes ───────────────────────────────────────────────────────────
+// ::::: Private Routes :::::
 
 // PUT /update/user
 // Update the logged-in user's own profile. Username and email are intentionally excluded.
@@ -144,7 +144,7 @@ router.get("/u/top/writers", async (req, res) => {
   try {
     const CACHE_KEY = "writers:top";
 
-    // ── Cache hit ──────────────────────────────────────────────────────────
+    // ::::: Cache hit :::::
     const cached = cache.get(CACHE_KEY);
     if (cached) {
       return res
@@ -152,7 +152,7 @@ router.get("/u/top/writers", async (req, res) => {
         .json({ success: true, data: cached, fromCache: true });
     }
 
-    // ── Cache miss — run the aggregation ──────────────────────────────────
+    // ::::: Cache miss — run the aggregation :::::
     const topWriters = await User.aggregate([
       // Only users with at least one published post (avoids division by zero)
       { $match: { "stats.postsCount": { $gt: 0 } } },

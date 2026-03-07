@@ -7,13 +7,13 @@ const {
   checkUserExists,
 } = require("../middlewares/authorisation");
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ::::: Helpers :::::
 
 // Atomically update a post's commentsCount. delta = +1 or -1.
 const updatePostCommentCount = (postId, delta) =>
   Post.findByIdAndUpdate(postId, { $inc: { "stats.commentsCount": delta } });
 
-// ─── Public Routes ────────────────────────────────────────────────────────────
+// ::::: Public Routes :::::
 
 // GET /p/:postId/comments?page=1&limit=10
 // Paginated top-level comments for a post. Replies are excluded and loaded on demand.
@@ -97,7 +97,7 @@ router.get("/get-comments/byids", async (req, res) => {
   }
 });
 
-// ─── Protected Routes (login required) ───────────────────────────────────────
+// ::::: Protected Routes (login required) :::::
 
 // POST /new-comment
 // Creates a top-level comment on a post and increments the post's commentsCount.
@@ -219,12 +219,10 @@ router.put(
       }
 
       if (comment.authorId.toString() !== req.userId) {
-        return res
-          .status(403)
-          .json({
-            success: false,
-            message: "Not authorised to edit this comment",
-          });
+        return res.status(403).json({
+          success: false,
+          message: "Not authorised to edit this comment",
+        });
       }
 
       comment.content = content;
@@ -268,12 +266,10 @@ router.delete(
       const isAuthor = comment.authorId.toString() === req.userId;
       const isMod = ["moderator", "admin"].includes(req.user.role);
       if (!isAuthor && !isMod) {
-        return res
-          .status(403)
-          .json({
-            success: false,
-            message: "Not authorised to delete this comment",
-          });
+        return res.status(403).json({
+          success: false,
+          message: "Not authorised to delete this comment",
+        });
       }
 
       await comment.deleteOne();

@@ -57,7 +57,7 @@ import { useDataService } from "@/services/dataService";
 import { formatDateDetails } from "@/services/formatDate";
 import { useDarkModeContext } from "@/contexts/ThemeContext";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ::::: Helpers :::::
 
 function getDeviceInfo(deviceInfo) {
   const parser = new UAParser(deviceInfo);
@@ -106,7 +106,7 @@ LoginSessionCard.propTypes = {
   isActive: PropTypes.bool,
 };
 
-// ─── Main Component ────────────────────────────────────────────────────────────
+// ::::: Main Component :::::
 
 const ProfileSettings = () => {
   const { currentUser, setCurrentUser, logout } = useAuth();
@@ -144,7 +144,7 @@ const ProfileSettings = () => {
     if (hash?.toLowerCase() === "pro") setActiveTab("pro");
   }, []);
 
-  // ─── Form handlers ──────────────────────────────────────────────────────────
+  // ::::: Form handlers :::::
 
   const handleContactInfoChange = (index, field, value) => {
     const updated = [...formValues.contactInformation];
@@ -214,7 +214,7 @@ const ProfileSettings = () => {
     }
   }
 
-  // ─── Tab: General ───────────────────────────────────────────────────────────
+  // ::::: Tab: General :::::
 
   const general = {
     id: "general",
@@ -408,7 +408,7 @@ const ProfileSettings = () => {
     ),
   };
 
-  // ─── Tab: Account ───────────────────────────────────────────────────────────
+  // ::::: Tab: Account :::::
 
   // lastFiveLogin may be undefined if the server hasn't sent it yet — guard everywhere
   const recentLogin = currentUser?.lastFiveLogin?.slice(0, 1);
@@ -511,7 +511,7 @@ const ProfileSettings = () => {
     ),
   };
 
-  // ─── Tab: Notifications ─────────────────────────────────────────────────────
+  // ::::: Tab: Notifications :::::
 
   const notifications = {
     id: "notifications",
@@ -603,7 +603,7 @@ const ProfileSettings = () => {
     ),
   };
 
-  // ─── Tab: Pro ───────────────────────────────────────────────────────────────
+  // ::::: Tab: Pro :::::
 
   const plans = [
     {
@@ -740,7 +740,7 @@ const ProfileSettings = () => {
     ),
   };
 
-  // ─── Render ─────────────────────────────────────────────────────────────────
+  // ::::: Render :::::
 
   const settingsSections = [general, account, notifications, pro];
 

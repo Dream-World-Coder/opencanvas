@@ -16,7 +16,7 @@ import { useDataService } from "../../services/dataService";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
-// ─── OpenCanvas Illustration ────────────────────────────────────────────────
+// ::::: OpenCanvas Illustration :::::
 // A minimal SVG illustration representing reading, discovery, and science.
 // Uses lime, violet, and sky color palette.
 const OpenCanvasIllustration = () => (
@@ -156,7 +156,7 @@ const OpenCanvasIllustration = () => (
   </svg>
 );
 
-// ─── Donate Button ───────────────────────────────────────────────────────────
+// ::::: Donate Button :::::
 // Small, unobtrusive donate CTA using violet accent.
 const DonateButton = () => (
   <a
@@ -169,7 +169,7 @@ const DonateButton = () => (
   </a>
 );
 
-// ─── LeftSideBar ─────────────────────────────────────────────────────────────
+// ::::: LeftSideBar :::::
 // Collapsible left sidebar for the feed page.
 // Feed options and topic filters are hidden (not yet implemented).
 // Shows an OpenCanvas illustration and donate button when open.
@@ -364,7 +364,7 @@ export const RightSideBar = () => {
   );
 };
 
-// ── Single writer row ─────────────────────────────────────────────────────────
+// ::::: Single writer row :::::
 
 function WriterRow({ writer, isFollowing, onNavigate, onFollow }) {
   return (
@@ -398,7 +398,7 @@ function WriterRow({ writer, isFollowing, onNavigate, onFollow }) {
   );
 }
 
-// ── Loading skeleton ──────────────────────────────────────────────────────────
+// ::::: Loading skeleton :::::
 
 function WritersSkeleton() {
   return Array.from({ length: 4 }).map((_, i) => (

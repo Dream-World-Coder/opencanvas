@@ -53,7 +53,7 @@ import { useCollectionContext } from "../../contexts/CollectionContext";
 import { slugify } from "@/pages/Create/Editor/hooks/useWritingPad";
 import { Heart } from "lucide-react";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ::::: Helpers :::::
 
 const formatDates = (date) => {
   try {
@@ -101,7 +101,7 @@ function hidePostCard(id) {
   if (el) el.style.display = "none";
 }
 
-// ─── SEO ──────────────────────────────────────────────────────────────────────
+// ::::: SEO :::::
 
 export const ProfileHelmet = ({ currentProfile }) => {
   if (!currentProfile) return null;
@@ -151,7 +151,7 @@ export const ProfileHelmet = ({ currentProfile }) => {
 };
 ProfileHelmet.propTypes = { currentProfile: PropTypes.object };
 
-// ─── Profile Image ─────────────────────────────────────────────────────────────
+// ::::: Profile Image :::::
 
 export const ProfileImage = ({ user }) => (
   <div className="size-16 md:size-24 rounded-full overflow-hidden bg-gray-100 dark:bg-[#171717]">
@@ -168,7 +168,7 @@ export const ProfileImage = ({ user }) => (
 );
 ProfileImage.propTypes = { user: PropTypes.object };
 
-// ─── Quick Stats ───────────────────────────────────────────────────────────────
+// ::::: Quick Stats :::::
 
 export const QuickStatsProfile = ({ currentUser }) => {
   const [hoveredItem, setHoveredItem] = useState(null);
@@ -255,7 +255,7 @@ export const QuickStatsProfile = ({ currentUser }) => {
 };
 QuickStatsProfile.propTypes = { currentUser: PropTypes.object.isRequired };
 
-// ─── Post Filter Tabs ──────────────────────────────────────────────────────────
+// ::::: Post Filter Tabs :::::
 
 export const PostFilterTabs = ({ activeTab, setActiveTab }) => {
   const tabs = [
@@ -329,7 +329,7 @@ PostFilterTabs.propTypes = {
   setActiveTab: PropTypes.func,
 };
 
-// ─── Post Actions (owner) ──────────────────────────────────────────────────────
+// ::::: Post Actions (owner) :::::
 
 export const PostActions = ({ post, setPosts, loading }) => {
   const navigate = useNavigate();
@@ -506,7 +506,7 @@ PostActions.propTypes = {
   loading: PropTypes.bool,
 };
 
-// ─── Post Actions (public visitor) ────────────────────────────────────────────
+// ::::: Post Actions (public visitor) :::::
 
 export const PostActionsPublic = ({ post }) => {
   const navigate = useNavigate();
@@ -551,7 +551,7 @@ export const PostActionsPublic = ({ post }) => {
 };
 PostActionsPublic.propTypes = { post: PropTypes.object };
 
-// ─── Contact Information ───────────────────────────────────────────────────────
+// ::::: Contact Information :::::
 
 export const ContactInformationDropdown = ({ currentProfile }) => (
   <AlertDialog>
@@ -588,7 +588,7 @@ export const ContactInformationDropdown = ({ currentProfile }) => (
 );
 ContactInformationDropdown.propTypes = { currentProfile: PropTypes.object };
 
-// ─── Featured Works ────────────────────────────────────────────────────────────
+// ::::: Featured Works :::::
 
 const FEATURED_COLORS = [
   "bg-gradient-to-br from-[#E8F5E8] to-[#D4F1D4] dark:bg-zinc-900 border-[#E8F5E8] dark:border-neutral-800 dark:text-neutral-200",
@@ -719,7 +719,7 @@ export const FeaturedWorks = memo(function FeaturedWorks({ currentUser }) {
 });
 FeaturedWorks.propTypes = { currentUser: PropTypes.object };
 
-// ─── Post Stats ────────────────────────────────────────────────────────────────
+// ::::: Post Stats :::::
 
 export const PostStats = ({ post }) => (
   <div className="flex flex-wrap gap-4 items-center text-xs">
@@ -743,7 +743,7 @@ export const PostStats = ({ post }) => (
 );
 PostStats.propTypes = { post: PropTypes.object };
 
-// ─── Post Details ──────────────────────────────────────────────────────────────
+// ::::: Post Details :::::
 
 export const PostDetails = ({ post }) => (
   <div>
@@ -775,7 +775,7 @@ export const PostDetails = ({ post }) => (
 );
 PostDetails.propTypes = { post: PropTypes.object };
 
-// ─── Post List ─────────────────────────────────────────────────────────────────
+// ::::: Post List :::::
 
 export const PostList = memo(function PostList({
   posts,
@@ -885,7 +885,7 @@ PostList.propTypes = {
   forPrivate: PropTypes.bool,
 };
 
-// ─── Collection List ───────────────────────────────────────────────────────────
+// ::::: Collection List :::::
 // Renders a user's collections as article-style rows (no heading — caller adds one).
 // forPrivate=true shows the private badge and routes private collections to /c/private/:id.
 
@@ -981,7 +981,7 @@ CollectionList.propTypes = {
   forPrivate: PropTypes.bool,
 };
 
-// ─── Name + Designation ────────────────────────────────────────────────────────
+// ::::: Name + Designation :::::
 
 export const NameDesignation = ({ name, designation }) => (
   <h1

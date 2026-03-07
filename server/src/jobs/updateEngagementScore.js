@@ -7,11 +7,11 @@ const WEIGHTS = {
   likes: 2,
   dislikes: 1.5,
   randomBoost: 1,
-  decay: 1.37,
+  decay: 1.37, //decay exponent
 };
 
 /**
- * Returns the average age of a post in days,
+ * returns the average age of a post in days,
  * using both createdAt and updatedAt to reward recently edited posts.
  */
 function getAgeInDays(createdAt, updatedAt) {
@@ -23,7 +23,7 @@ function getAgeInDays(createdAt, updatedAt) {
 }
 
 /**
- * Recalculates anonymousEngagementScore for every post and bulk-writes
+ * recalculates \"anonymousEngagementScore\" for every post and bulk-writes
  * the results in one DB round-trip per batch.
  *
  * Score formula:
@@ -31,8 +31,7 @@ function getAgeInDays(createdAt, updatedAt) {
  *   ─────────────────────────────────────────────────────────────────
  *                       (ageInDays + 2) ^ 1.37
  *
- * The +2 floor prevents division by near-zero for brand-new posts.
- * The decay exponent makes older posts naturally sink in the feed.
+ * +2 -> prevents division by near-zero
  */
 
 async function updateDefaultEngagementScore() {
@@ -42,7 +41,7 @@ async function updateDefaultEngagementScore() {
   let bulkOps = [];
   let updatedCount = 0;
 
-  // Use a cursor to stream posts instead of loading all into memory
+  // cursor to stream posts instead of loading all into memory :: was very slow
   const cursor = Post.find({})
     .select("_id stats createdAt updatedAt")
     .lean()
@@ -69,15 +68,15 @@ async function updateDefaultEngagementScore() {
       },
     });
 
-    // Execute bulk write when batch size is reached
+    // bulk write ops on batch size reach
     if (bulkOps.length >= BATCH_SIZE) {
       await Post.bulkWrite(bulkOps, { ordered: false });
       updatedCount += bulkOps.length;
-      bulkOps = []; // Clear the batch array to free memory
+      bulkOps = []; // free batch array memory
     }
   }
 
-  // Process any remaining operations in the final batch
+  // any remaining ops in the final batch
   if (bulkOps.length > 0) {
     await Post.bulkWrite(bulkOps, { ordered: false });
     updatedCount += bulkOps.length;

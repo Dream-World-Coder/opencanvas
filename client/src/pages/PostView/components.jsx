@@ -61,7 +61,7 @@ import { timeAgo } from "../../services/formatDate";
 import { CodeBlock } from "@/pages/Create/Editor/components";
 import { slugify } from "@/pages/Create/Editor/hooks/useWritingPad";
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ::::: Helpers :::::
 
 // Share post URL — uses proper slug so links are human-readable
 function sharePost(post) {
@@ -83,7 +83,7 @@ function toISOStringSafe(date) {
   return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
 }
 
-// ─── PostHelmet ───────────────────────────────────────────────────────────────
+// ::::: PostHelmet :::::
 
 export const PostHelmet = ({ post, author }) => {
   const slug = `${slugify(post.title)}-${post._id}`;
@@ -831,7 +831,7 @@ EngagementSection.propTypes = {
   likes: PropTypes.number,
 };
 
-// ─── Comment (single comment row) ────────────────────────────────────────────
+// ::::: Comment (single comment row) :::::
 //
 // Uses `comment.authorSnapshot` (denormalized on the Comment model - no populate needed).
 // Uses `comment.parentId` to detect replies (replaces the old `comment.isReply` flag).
@@ -975,7 +975,7 @@ Comment.propTypes = {
   handleDelete: PropTypes.func,
 };
 
-// ─── CommentsBox ──────────────────────────────────────────────────────────────
+// ::::: CommentsBox :::::
 //
 // Loads top-level comments via GET /p/:postId/comments (new route).
 // Replies are loaded on-demand when the user clicks the reply count.
@@ -1021,7 +1021,7 @@ export const CommentsBox = memo(function CommentsBox({
     replyToComment,
   } = useDataService();
 
-  // ── Helpers ────────────────────────────────────────────────────────────────
+  // ::::: Helpers :::::
 
   // Returns fetched replies for a given comment, or false if not yet loaded
   function getFetchedReplies(commentId) {
@@ -1035,7 +1035,7 @@ export const CommentsBox = memo(function CommentsBox({
     return expandedReplies.includes(commentId.toString());
   }
 
-  // ── Load comments on mount ─────────────────────────────────────────────────
+  // ::::: Load comments on mount :::::
 
   useEffect(() => {
     async function loadComments() {
@@ -1064,7 +1064,7 @@ export const CommentsBox = memo(function CommentsBox({
     if (commentTrayOpen && inputRef.current) inputRef.current.focus();
   }, [commentTrayOpen]);
 
-  // ── Handlers ───────────────────────────────────────────────────────────────
+  // ::::: Handlers :::::
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -1232,7 +1232,7 @@ export const CommentsBox = memo(function CommentsBox({
     );
   };
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  // ::::: Render :::::
 
   return (
     <div
@@ -1396,7 +1396,7 @@ CommentsBox.propTypes = {
   commentTrayOpen: PropTypes.bool,
 };
 
-// ─── Markdown Preview ─────────────────────────────────────────────────────────
+// ::::: Markdown Preview :::::
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";

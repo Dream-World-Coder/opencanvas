@@ -8,7 +8,7 @@ const {
   checkUserExists,
 } = require("../middlewares/authorisation");
 
-// ─── Public Routes ────────────────────────────────────────────────────────────
+// ::::: Public Routes :::::
 
 // GET /collections
 // Browse/discovery - returns all public collections, paginated
@@ -72,7 +72,7 @@ router.get("/c/:collectionId", async (req, res) => {
   }
 });
 
-// ─── Protected Routes ─────────────────────────────────────────────────────────
+// ::::: Protected Routes :::::
 
 // GET /u/:userId/collections
 // Returns a user's collections (no posts inside, just collection metadata).

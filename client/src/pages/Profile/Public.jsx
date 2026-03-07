@@ -134,7 +134,7 @@ const PublicProfile = () => {
     }
   };
 
-  // ── Loading ──────────────────────────────────────────────────────────────
+  // ::::: Loading :::::
   if (profileLoading) {
     return (
       <div className="min-h-screen bg-white dark:bg-[#222]">
@@ -146,7 +146,7 @@ const PublicProfile = () => {
     );
   }
 
-  // ── Not found ────────────────────────────────────────────────────────────
+  // ::::: Not found :::::
   if (!profile) {
     return (
       <>

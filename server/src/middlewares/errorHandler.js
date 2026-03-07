@@ -7,13 +7,13 @@ router.use((err, req, res, next) => {
   let statusCode = 500;
   let message = "Something went wrong";
 
-  // Handle payload too large (from body-parser / raw-body)
+  // payload too large (from body-parser / raw-body)
   if (err.type === "entity.too.large" || err.name === "PayloadTooLargeError") {
     statusCode = 413;
     message = "Payload too large";
     console.warn("Payload too large");
   }
-  // Handle malformed JSON (body-parser throws SyntaxError)
+  // malformed json (body-parser: SyntaxError)
   else if (err instanceof SyntaxError && "body" in err) {
     statusCode = 400;
     message = "Invalid JSON payload";

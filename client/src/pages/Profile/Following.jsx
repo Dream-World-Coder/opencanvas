@@ -73,7 +73,7 @@ const FollowingPage = () => {
   const displayedFollowing = reversed ? [...following].reverse() : following;
   const hasMore = following.length < total;
 
-  // ── Loading state ────────────────────────────────────────────────────────
+  // ::::: Loading state :::::
   if (profileLoading) {
     return (
       <div className="min-h-screen bg-white dark:bg-[#111]">

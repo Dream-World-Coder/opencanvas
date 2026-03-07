@@ -1,9 +1,8 @@
 /**
- * server.js — Express app
+ * server.js : express app
  *
- * This file is loaded by every worker spawned in index.js.
- * It has no cluster logic and no cron — just the Express app.
- * Keep it that way. Cluster management lives in index.js only.
+ * loaded by every worker spawned in index.js.
+ * no cluster logic and no cron, just the Express app.
  */
 
 const express = require("express");
@@ -29,7 +28,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const FRONTEND_URL = process.env.FRONTEND_URL;
 
-// ── Database ──────────────────────────────────────────────────────────────────
+// ::::: Database :::::
 // Each worker opens its own MongoDB connection pool.
 // Mongoose handles this fine — Atlas supports many concurrent connections.
 mongoose
@@ -37,7 +36,7 @@ mongoose
   .then(() => console.log(`[Worker ${process.pid}] Connected to MongoDB`))
   .catch((err) => console.error(`[Worker ${process.pid}] MongoDB error:`, err));
 
-// ── Middleware ────────────────────────────────────────────────────────────────
+// ::::: Middleware :::::
 
 app.use(helmet());
 app.use(morgan("dev"));
@@ -59,7 +58,7 @@ app.use(express.urlencoded({ limit: "160kb", extended: true }));
 app.use(passport.initialize());
 app.set("trust proxy", true);
 
-// ── Routes ────────────────────────────────────────────────────────────────────
+// ::::: Routes :::::
 
 app.use("/auth", authRoutes);
 app.use(userRoutes);
@@ -80,7 +79,7 @@ app.get("/", (req, res) => {
   });
 });
 
-// ── Global error handler ──────────────────────────────────────────────────────
+// ::::: Global error handler :::::
 
 app.use((err, req, res, next) => {
   let statusCode = 500;
@@ -105,7 +104,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ── Start ─────────────────────────────────────────────────────────────────────
+// ::::: Start :::::
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`[Worker ${process.pid}] Listening on port ${PORT}`);

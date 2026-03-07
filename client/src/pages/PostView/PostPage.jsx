@@ -135,7 +135,7 @@ const ViewPost = () => {
     }
   }, [viewCounted]);
 
-  // ── Vote handler ─────────────────────────────────────────────────────────
+  // ::::: Vote handler :::::
   // Single handler for both like and dislike. Derives the new local state
   // from the server's response message rather than trying to predict it.
   const handleVote = async (vote) => {
@@ -190,7 +190,7 @@ const ViewPost = () => {
     }
   };
 
-  // ── Save handler ──────────────────────────────────────────────────────────
+  // ::::: Save handler :::::
   const handleSave = async () => {
     if (!currentUser) {
       toast.error("You need to log in first");
@@ -207,7 +207,7 @@ const ViewPost = () => {
     }
   };
 
-  // ── Follow handler ────────────────────────────────────────────────────────
+  // ::::: Follow handler :::::
   const handleFollow = async () => {
     if (!currentUser) {
       toast.error("You need to log in first");

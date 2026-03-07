@@ -50,7 +50,7 @@ if (cluster.isPrimary) {
     console.log(`Worker ${worker.process.pid} is online`);
   });
 
-  // ── Cron runs ONLY in the primary process ─────────────────────────────────
+  // ::::: Cron runs ONLY in the primary process :::::
   // Workers don't run this — avoids N parallel writes to MongoDB every 15 min.
   cron.schedule("*/15 * * * *", () => {
     console.log("[Primary] Running scheduled engagement score update...");

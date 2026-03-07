@@ -4,7 +4,7 @@ import { toast } from "sonner";
 export const useDataService = () => {
   const { authAxios } = useAuth();
 
-  // ─── User ──────────────────────────────────────────────────────────────────
+  // ::::: User :::::
 
   // Returns public profile + isFollowing boolean for the logged-in user
   const getUserProfile = async (username) => {
@@ -84,7 +84,7 @@ export const useDataService = () => {
     return res.data; // { data, total }
   };
 
-  // ─── Feed ──────────────────────────────────────────────────────────────────
+  // ::::: Feed :::::
 
   // Cursor-based public articles feed.
   // First call: no cursor. Subsequent calls: pass nextCursor from the previous response.
@@ -101,7 +101,7 @@ export const useDataService = () => {
     }
   };
 
-  // ─── Posts ─────────────────────────────────────────────────────────────────
+  // ::::: Posts :::::
 
   // Get a public post by its full slug (e.g. "my-post-title-64abc123")
   const getPost = async (slug) => {
@@ -244,7 +244,7 @@ export const useDataService = () => {
     }
   };
 
-  // ─── Comments ──────────────────────────────────────────────────────────────
+  // ::::: Comments :::::
 
   // Fetch paginated top-level comments for a post (replies loaded separately on demand)
   const getPostComments = async (postId, page = 1, limit = 10) => {
@@ -320,7 +320,7 @@ export const useDataService = () => {
     }
   };
 
-  // ─── Collections ───────────────────────────────────────────────────────────
+  // ::::: Collections :::::
 
   // Browse all public collections
   const getAllCollections = async ({

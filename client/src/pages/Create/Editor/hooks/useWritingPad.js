@@ -28,7 +28,7 @@ export function useWritingPad({ postId, frontendOnly, artType, editing }) {
     }
   }, [postId, frontendOnly]);
 
-  // ─── Local draft ─────────────────────────────────────────────────────────────
+  // ::::: Local draft :::::
 
   const saveDraftLocally = () => {
     const draft = {
@@ -45,7 +45,7 @@ export function useWritingPad({ postId, frontendOnly, artType, editing }) {
     if (frontendOnly) setIsSaved(true);
   };
 
-  // ─── Backend sync ─────────────────────────────────────────────────────────────
+  // ::::: Backend sync :::::
 
   const syncWithBackend = async () => {
     if (frontendOnly) return;
@@ -84,7 +84,7 @@ export function useWritingPad({ postId, frontendOnly, artType, editing }) {
     }
   };
 
-  // ─── Save handler ─────────────────────────────────────────────────────────────
+  // ::::: Save handler :::::
 
   const handleSave = async () => {
     saveDraftLocally();
@@ -100,7 +100,7 @@ export function useWritingPad({ postId, frontendOnly, artType, editing }) {
     setShowUnsavedAlert(false);
   };
 
-  // ─── Load existing post or local draft on mount ───────────────────────────────
+  // ::::: Load existing post or local draft on mount :::::
 
   useEffect(() => {
     if (editing === true) {
@@ -155,7 +155,7 @@ export function useWritingPad({ postId, frontendOnly, artType, editing }) {
     }
   }, [artType, postId]);
 
-  // ─── Autosave ─────────────────────────────────────────────────────────────────
+  // ::::: Autosave :::::
 
   useEffect(() => {
     // Save to localStorage every 5 seconds if there are unsaved changes
@@ -177,7 +177,7 @@ export function useWritingPad({ postId, frontendOnly, artType, editing }) {
     };
   }, [isSaved, content, title, frontendOnly]);
 
-  // ─── Network status ───────────────────────────────────────────────────────────
+  // ::::: Network status :::::
 
   useEffect(() => {
     // No-op handler kept in case we want to show UI feedback on reconnect
@@ -192,7 +192,7 @@ export function useWritingPad({ postId, frontendOnly, artType, editing }) {
     };
   }, []);
 
-  // ─── Warn before leaving with unsaved changes ─────────────────────────────────
+  // ::::: Warn before leaving with unsaved changes :::::
 
   useEffect(() => {
     const handleBeforeUnload = (e) => {
@@ -229,7 +229,7 @@ export function useWritingPad({ postId, frontendOnly, artType, editing }) {
   };
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ::::: Helpers :::::
 
 // Auto-resize the markdown textarea to fit its content after a state update
 function resizeTextarea() {
