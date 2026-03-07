@@ -50,7 +50,7 @@ const postSchema = new Schema(
       validate: [(val) => val.length <= 5, "Maximum 5 tags allowed"],
     },
 
-    media: [{ type: String }], // arr of strings (url or hashes)
+    media: [{ type: String }], // arr of strings (url || hashes)
 
     // stats (atomic ctns)
     stats: {
@@ -59,7 +59,7 @@ const postSchema = new Schema(
       dislikesCount: { type: Number, default: 0 },
       sharesCount: { type: Number, default: 0 },
       commentsCount: { type: Number, default: 0 },
-      readsCount: { type: Number, default: 0 }, // total full reads
+      readsCount: { type: Number, default: 0 }, // tot full reads
     },
 
     anonymousEngagementScore: { type: Number },

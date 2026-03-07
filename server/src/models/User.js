@@ -57,7 +57,7 @@ const userSchema = new Schema(
       maxlength: [32, "Fullname can be 32 characters long at max"],
     },
 
-    // Auth & Role
+    // AuthProvider && role
     provider: { type: String, enum: ["google", "opencanvas"], required: true },
     role: {
       type: String,

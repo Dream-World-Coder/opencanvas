@@ -30,7 +30,7 @@ const commentSchema = new Schema(
     stats: {
       likesCount: { type: Number, default: 0 },
       dislikesCount: { type: Number, default: 0 },
-      repliesCount: { type: Number, default: 0 }, // Sub-comments count
+      repliesCount: { type: Number, default: 0 },
     },
   },
   { timestamps: true },
