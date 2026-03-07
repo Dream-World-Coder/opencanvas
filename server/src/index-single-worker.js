@@ -29,7 +29,7 @@ mongoose
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-app.use(helmet()); // Security headers
+app.use(helmet()); // security headers
 app.use(morgan("dev")); // logger
 
 // cors first
@@ -59,7 +59,6 @@ app.use(postRoutes);
 app.use(commentRoutes);
 app.use(followerRoutes);
 app.use(collectionRoutes);
-// app.use("/feed", feedRoutes);
 app.use(feedRoutes);
 app.use("/api", imageService);
 app.use(searchRoutes);
@@ -72,18 +71,18 @@ app.get("/", (req, res) => {
   });
 });
 
-// error handler
+// global error handler
 app.use((err, req, res, next) => {
   let statusCode = 500;
   let message = "Something went wrong";
 
-  // Handle payload too large (from body-parser / raw-body)
+  // payload too large :: from body-parser / raw-body
   if (err.type === "entity.too.large" || err.name === "PayloadTooLargeError") {
     statusCode = 413;
     message = "Payload too large";
     console.warn("Payload too large");
   }
-  // Handle malformed JSON (body-parser throws SyntaxError)
+  // malformed json :: body-parser -> SyntaxError
   else if (err instanceof SyntaxError && "body" in err) {
     statusCode = 400;
     message = "Invalid JSON payload";
