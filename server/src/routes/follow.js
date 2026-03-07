@@ -7,9 +7,8 @@ const {
   checkUserExists,
 } = require("../middlewares/authorisation");
 
-// POST /follow-unfollow/user
-// Toggle follow on a user. Following adds a Follow doc and increments both counters.
-// Unfollowing removes it and decrements.
+// toggle follow on a user. following adds a Follow doc and increments both ctrs
+// unfollowing removes it and decrements.
 router.post(
   "/follow-unfollow/user",
   authenticateToken,
@@ -30,7 +29,7 @@ router.post(
           .json({ success: false, message: "You cannot follow yourself" });
       }
 
-      // Make sure the target user exists before creating a follow relationship
+      // check: target user exists before creating a follow reln
       const targetUser = await User.findById(targetUserId);
       if (!targetUser) {
         return res
@@ -44,10 +43,10 @@ router.post(
       });
 
       if (existing) {
-        // Already following → unfollow
+        // following → unfollow
         await existing.deleteOne();
 
-        // Decrement both sides atomically
+        // dec-- both sides, atomic
         await User.findByIdAndUpdate(req.userId, {
           $inc: { "stats.followingCount": -1 },
         });
@@ -58,7 +57,7 @@ router.post(
         return res.status(200).json({ success: true, message: "Unfollowed" });
       }
 
-      // Not following yet → follow
+      // !following → follow
       await Follow.create({
         followerId: req.userId,
         followingId: targetUserId,
@@ -82,15 +81,13 @@ router.post(
   },
 );
 
-// GET /u/:userId/followers?page=1&limit=10
-// Returns paginated followers with user data + followed-since date
+// returns paginated followers with user data + followed-since date
 router.get("/u/:userId/followers", async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    // Each Follow doc has followerId, followingId, since
     const follows = await Follow.find({ followingId: req.params.userId })
       .sort({ since: -1 })
       .skip(skip)
@@ -115,7 +112,7 @@ router.get("/u/:userId/followers", async (req, res) => {
     });
   }
 });
-// GET /u/:userId/following?page=1&limit=10
+
 router.get("/u/:userId/following", authenticateToken, async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -146,4 +143,5 @@ router.get("/u/:userId/following", authenticateToken, async (req, res) => {
     });
   }
 });
+
 module.exports = { router };

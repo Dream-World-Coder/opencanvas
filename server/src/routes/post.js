@@ -20,7 +20,7 @@ const extractPostId = (slug) => {
   return /^[a-f0-9]{24}$/i.test(last) ? last : null;
 };
 
-// ::::: Public Routes :::::
+// ::::: public :::::
 
 // GET /p/:slug
 // Public post page — resolves the post by extracting the ObjectId from the slug
@@ -75,7 +75,7 @@ router.get("/u/posts/byids", async (req, res) => {
   }
 });
 
-// ::::: Protected Routes :::::
+// ::::: protected :::::
 
 // GET /get-new-post-id
 // Returns a fresh ObjectId for the editor before the post is saved.

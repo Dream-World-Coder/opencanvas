@@ -13,7 +13,7 @@ const {
 const updatePostCommentCount = (postId, delta) =>
   Post.findByIdAndUpdate(postId, { $inc: { "stats.commentsCount": delta } });
 
-// ::::: Public Routes :::::
+// ::::: public :::::
 
 // GET /p/:postId/comments?page=1&limit=10
 // Paginated top-level comments for a post. Replies are excluded and loaded on demand.
@@ -97,7 +97,7 @@ router.get("/get-comments/byids", async (req, res) => {
   }
 });
 
-// ::::: Protected Routes (login required) :::::
+// ::::: protected (login required) :::::
 
 // POST /new-comment
 // Creates a top-level comment on a post and increments the post's commentsCount.

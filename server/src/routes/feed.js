@@ -6,10 +6,6 @@ const { cache, TTL } = require("../services/cacheService");
 
 /**
  * LEGACY
- *
- * POST /articles/anonymous-user
- * Cursor-based feed sorted by anonymousEngagementScore.
- * Not cached — every request carries a unique cursor value.
  */
 router.post("/articles/anonymous-user", async (req, res) => {
   try {
@@ -83,25 +79,7 @@ router.post("/articles/anonymous-user", async (req, res) => {
 });
 
 /**
- * GET /articles?cursor=<base64>&limit=10
- *
- * Cursor-based public feed, sorted newest-first.
- * Replaces skip() — skip walks the index from the start on every request,
- * which gets progressively slower as the collection grows.
- * A cursor filter lets MongoDB seek directly to the right position.
- *
- * Cursor encodes: { createdAt: <ISO string>, lastId: <ObjectId string> }
- *   - createdAt  → primary sort key
- *   - lastId     → tie-breaker when two posts share the exact same createdAt
- *
- * The existing index { isPublic: 1, createdAt: -1 } covers this query fully.
- *
- * Cache key : "articles:c{cursor}:l{limit}"  (first page key is "articles:c:l{limit}")
- * TTL       : TTL.ARTICLES_FEED (30 seconds)
- * Busted by : post create, delete, or visibility toggle — see post.js
- *
- * Response shape:
- *   { success, results, data, nextCursor, hasMore }
+ * curr
  */
 router.get("/articles", async (req, res) => {
   try {

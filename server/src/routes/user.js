@@ -8,7 +8,7 @@ const {
   checkUserExists,
 } = require("../middlewares/authorisation");
 
-// ::::: Public Routes :::::
+// ::::: public :::::
 
 // GET /u/:username
 // Public profile page. Resolves follow status for logged-in callers via
@@ -78,7 +78,7 @@ router.get("/u/users/byids", async (req, res) => {
   }
 });
 
-// ::::: Private Routes :::::
+// ::::: private :::::
 
 // PUT /update/user
 // Update the logged-in user's own profile. Username and email are intentionally excluded.

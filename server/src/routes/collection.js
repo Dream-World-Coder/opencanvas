@@ -8,7 +8,7 @@ const {
   checkUserExists,
 } = require("../middlewares/authorisation");
 
-// ::::: Public Routes :::::
+// ::::: public :::::
 
 // GET /collections
 // Browse/discovery - returns all public collections, paginated
@@ -54,12 +54,11 @@ router.get("/c/:collectionId", async (req, res) => {
         .json({ success: false, message: "Collection not found" });
     }
 
-    // Only select what post cards need - authorSnapshot avoids a populate() call
     const posts = await Post.find({
       _id: { $in: collection.posts },
       isPublic: true,
     }).select(
-      "title slug type tags readTime thumbnailUrl isPremium authorSnapshot stats createdAt",
+      "title contentPreview slug type tags readTime thumbnailUrl isPremium authorSnapshot stats createdAt updatedAt",
     );
 
     res.status(200).json({ success: true, data: { collection, posts } });
@@ -72,7 +71,7 @@ router.get("/c/:collectionId", async (req, res) => {
   }
 });
 
-// ::::: Protected Routes :::::
+// ::::: protected :::::
 
 // GET /u/:userId/collections
 // Returns a user's collections (no posts inside, just collection metadata).
