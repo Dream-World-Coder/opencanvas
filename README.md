@@ -36,6 +36,7 @@ Discover OpenCanvas: Find and read high-quality scientific articles, research pa
 - [Support](#support)
 - [Version](#sersion)
 - [Preview](#preview)
+- [Disclosure](#disclosure)
 
 
 ---
@@ -476,3 +477,15 @@ This is a prototype just now. Lots of features are incomplete.
 
 #### article desktop
 <img src="./images/xxl.png" alt="desktop article page">
+
+---
+
+## Disclosure
+
+FRONTEND: The core architecture, overall layout, and design system (color schemes, typography) were completely designed and developed by me. I also independently built the majority of the pages, including the Landing Page, Feed, PostView, Profile, About, and Contact pages.
+
+To accelerate development, I used AI tools (Claude and Gemini) to help draft and iterate on specific frontend components, primarily for the Collection and Saved pages.
+
+BACKEND: Everything done by me. I used claude to document some files as they were too large for me to maintain and documentise in my current time frame.
+
+TEST: DB seeding codes & Autocannon, Artillery Test codes written by me, updated with gemini.
