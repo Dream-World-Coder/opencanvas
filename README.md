@@ -34,6 +34,7 @@ Discover OpenCanvas: Find and read high-quality scientific articles, research pa
 - [Running Locally](#running-locally)
 - [Performance Benchmarks](#performance-benchmarks)
 - [Support](#support)
+- [Version](#sersion)
 - [Preview](#preview)
 
 
@@ -449,8 +450,15 @@ Hi, I'm Subhajit, an IT undergrad at IIEST Shibpur. While exploring various rese
 My goal is to build a middle ground between ResearchGate and Reddit. By creating dedicated channels for specific colleges, this platform provides a centralized hub to easily publish, discover, and discuss early-stage scientific work. 
 
 If you find this project valuable and believe in making academic research more accessible, consider supporting my work!
+(The platform currently relies on free hosting tiers (Vercel, Render, MongoDB Atlas). Your contribution will help upgrade to standard plans, ensuring consistent uptime and a reliable experience for everyone.)
 
 **Support my work:** [https://ko-fi.com/myopencanvas](https://ko-fi.com/myopencanvas)
+
+---
+
+## Version 
+
+This is a prototype just now. Lots of features are incomplete.
 
 ---
 
@@ -465,5 +473,6 @@ If you find this project valuable and believe in making academic research more a
   
 #### Feed dark mode
 <img src="./images/feed-dark-mode.png" alt="articles feed page">
+
 #### article desktop
 <img src="./images/xxl.png" alt="desktop article page">

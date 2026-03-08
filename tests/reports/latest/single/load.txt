@@ -1,3 +1,5 @@
+path: tests/reports/latest/single/load.txt
+
 tests  (git)-[main]- ➤ pnpm test:load:local
 
 > tests@1.0.0 test:load:local /Users/subhajitgorai/Codes/current_projects/opencanvas/tests

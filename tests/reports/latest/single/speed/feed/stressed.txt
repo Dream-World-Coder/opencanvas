@@ -1,3 +1,5 @@
+path: tests/reports/latest/single/speed/feed/stressed.txt
+
 tests  (git)-[main]- ➤ pnpm test:bench:stressed
 
 > tests@1.0.0 test:bench:stressed /Users/subhajitgorai/Codes/current_projects/opencanvas/tests

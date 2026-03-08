@@ -49,7 +49,7 @@ router.get("/search", async (req, res) => {
     if (type === "posts" || type === "all") {
       results.posts = await Post.find({
         title: regex,
-        isPublic: true, // only public posts
+        isPublic: true, // public only
       })
         .select(
           "title slug authorSnapshot thumbnailUrl readTime tags stats createdAt",
