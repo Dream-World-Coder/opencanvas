@@ -1,28 +1,36 @@
 # OpenCanvas
 
-OpenCanvas is a full-stack publishing platform where writers, researchers, and thinkers can create and share long-form written content. It supports rich-text and Markdown authoring, post collections, follower/following social graphs, and a scored public feed for content discovery.
+Discover OpenCanvas: Find and read high-quality scientific articles, research papers, and compelling stories. Explore our library and expand your knowledge today.
 
 ---
 
 ## Table of Contents
 
-- [Project Structure](#project-structure)
-- [Technology Stack](#technology-stack)
-- [Architecture Overview](#architecture-overview)
-- [Database Models](#database-models)
-- [API Reference](#api-reference)
-  - [Authentication](#authentication)
-  - [Users](#users)
-  - [Posts](#posts)
-  - [Comments](#comments)
-  - [Collections](#collections)
-  - [Feed](#feed)
+_ [Project Structure](#project-structure)
+_ [Technology Stack](#technology-stack)
+_ [Architecture Overview](#architecture-overview)
+_ [Database Models](#database-models)
+  - [User](#user)
+  - [Post](#post)
+  - [Collection](#collection)
   - [Follow](#follow)
+  - [Interaction](#interaction)
+  - [Comment](#comment)
+_ [API Reference](#api-reference)
+  _ [Authentication](#authentication)
+  _ [Users](#users)
+  _ [Posts](#posts)
+  _ [Comments](#comments)
+  _ [Collections](#collections)
+  _ [Feed](#feed)
+  _ [Follow](#follow)
+  _ [Search](#search)
 - [Authentication Flow](#authentication-flow)
 - [Access Control](#access-control)
 - [Engagement Scoring](#engagement-scoring)
 - [Environment Variables](#environment-variables)
-- [Running Locally](#running-locally)
+_ [Running Locally](#running-locally)
+_ [Performance Benchmarks](#performance-benchmarks)
 
 ---
 
@@ -31,20 +39,19 @@ OpenCanvas is a full-stack publishing platform where writers, researchers, and t
 ```txt
 opencanvas/
 ├── client/                  # React frontend (Vite)
-│   └── src/
-│       ├── pages/           # Route-level page components
-│       ├── components/      # Shared UI components
-│       ├── contexts/        # React context providers (Auth, Theme, etc.)
-│       ├── services/        # API call helpers (dataService.js, etc.)
-│       └── hooks/           # Custom React hooks
+│ └── src/
+│   ├── pages/           # Route-level page components
+│   ├── components/      # Shared UI components
+│   ├── contexts/        # React context providers (Auth, Theme, etc.)
+│   └── services/        # API call helpers (dataService.js, etc.)
 └── server/                  # Express backend
-    └── src/
-        ├── models/          # Mongoose schemas
-        ├── routes/          # Express route handlers
-        ├── middlewares/     # Auth, error handling, fingerprinting
-        ├── services/        # Image upload, notifications
-        ├── jobs/            # Cron job logic
-        └── utils/           # Helpers and validators
+  └── src/
+    ├── models/          # Mongoose schemas
+    ├── routes/          # Express route handlers
+    ├── middlewares/     # Auth, error handling, fingerprinting
+    ├── services/        # Caching, image upload, notifications
+    └── jobs/            # Cron job logic
+
 ```
 
 ---
@@ -117,7 +124,8 @@ Stores the full content and metadata for a written post.
 | Field | Type | Notes |
 |---|---|---|
 | `title` | String | Required |
-| `content` | String | Full post body (Markdown or rich text) |
+| `content` | String | Full post body (Markdown) |
+| `contentPreview` | String | 700 chars sliced for preview |
 | `slug` | String | URL-friendly title fragment |
 | `authorId` | ObjectId | Reference to User |
 | `authorSnapshot` | Object | Denormalised `username`, `profilePicture`, `fullName` |
@@ -191,82 +199,88 @@ All responses follow the shape `{ success: boolean, data?, message?, error? }`. 
 ### Authentication
 
 | Method | Path | Auth | Description |
-|---|---|---|---|
-| GET | `/auth/google` | None | Initiates the Google OAuth flow |
-| GET | `/auth/google/callback` | None | OAuth callback; redirects to frontend with JWT |
-| GET | `/auth/user` | Required | Returns the current user's full document |
+| --- | --- | --- | --- |
+| GET | `/auth/google` | None | Initiates Google OAuth flow |
+| GET | `/auth/google/callback` | None | OAuth callback; redirects with JWT |
+| GET | `/auth/user` | Required | Returns current user's full document |
 
 ### Users
 
 | Method | Path | Auth | Description |
-|---|---|---|---|
-| GET | `/u/:username` | Optional | Public profile + `isFollowing` boolean |
-| GET | `/u/users/byids?ids=...` | None | Batch-fetch minimal user data by ID |
-| PUT | `/update/user` | Required | Update own profile (whitelisted fields only) |
+| --- | --- | --- | --- |
+| GET | `/u/:username` | Optional | Public profile (checks follow status if token provided) |
+| GET | `/u/users/byids?ids=...` | None | Batch-fetch minimal user data |
+| GET | `/u/top/writers` | None | Top 5 writers by engagement (Cached) |
+| PUT | `/update/user` | Required | Update own profile |
 
 ### Posts
 
 | Method | Path | Auth | Description |
-|---|---|---|---|
-| GET | `/p/:slug` | None | Fetch a single public post |
+| --- | --- | --- | --- |
+| GET | `/p/:slug` | None | Fetch single public post |
 | GET | `/u/posts/byids?ids=...` | None | Batch-fetch public post cards |
-| GET | `/u/:userId/posts` | None | Public posts by a specific author (paginated) |
-| GET | `/u/posts/mine` | Required | Own posts including private (paginated) |
-| GET | `/saved/posts` | Required | Saved posts for the logged-in user (paginated) |
-| GET | `/get-new-post-id` | Required | Reserve a new post ObjectId for the editor |
-| GET | `/private/p/:slug` | Required | View a private post (author/mod only) |
+| GET | `/u/:userId/posts` | None | Public posts by a specific author |
+| GET | `/u/posts/mine` | Required | Own posts including private |
+| GET | `/saved/posts` | Required | Saved posts for logged-in user |
+| GET | `/get-new-post-id` | Required | Reserve new post ObjectId for editor |
+| GET | `/private/p/:slug` | Required | View private post (author/mod) |
 | GET | `/post/:postId/my-interactions` | Required | Like/dislike/save state for a post |
-| POST | `/post/like-dislike` | Required | Toggle like or dislike on a post |
-| POST | `/post/save-unsave` | Required | Toggle saved state on a post |
-| POST | `/save/post/written` | Required | Create or update a written post (upsert) |
-| PUT | `/change-post-visibility-status` | Required | Toggle public/private (author only) |
-| PUT | `/change-post-featured-status` | Required | Pin/unpin on profile (author only) |
-| PATCH | `/update-post-views/:postId` | None | Increment view counter |
-| DELETE | `/post/delete` | Required | Delete a post (author/mod only) |
+| POST | `/post/like-dislike` | Required | Toggle like/dislike |
+| POST | `/post/save-unsave` | Required | Toggle save state |
+| POST | `/save/post/written` | Required | Upsert written post |
+| PUT | `/change-post-visibility-status` | Required | Toggle public/private |
+| PUT | `/change-post-featured-status` | Required | Pin/unpin on profile |
+| PATCH | `/update-post-views/:slug` | None | Increment view counter (fingerprinted) |
+| DELETE | `/post/delete` | Required | Delete post |
 
 **Post URL format:** `/p/<title-slug>-<24-char-objectid>`. The ObjectId is always the last segment and is used for the database lookup. The slug is cosmetic.
 
 ### Comments
 
 | Method | Path | Auth | Description |
-|---|---|---|---|
-| GET | `/p/comments/:commentId` | None | Fetch a comment and its replies |
-| GET | `/get-comments/byids?ids=...` | None | Batch-fetch comments by ID |
-| POST | `/new-comment` | Required | Add a top-level comment to a post |
-| POST | `/reply-to-comment` | Required | Reply to an existing comment |
+| --- | --- | --- | --- |
+| GET | `/p/:postId/comments` | None | Paginated top-level comments |
+| GET | `/p/comments/:commentId` | None | Single comment + direct replies |
+| GET | `/get-comments/byids?ids=...` | None | Batch-fetch comments |
+| POST | `/new-comment` | Required | Create top-level comment |
+| POST | `/reply-to-comment` | Required | Reply to existing comment |
 | PUT | `/edit-comment` | Required | Edit own comment |
-| DELETE | `/delete-comment` | Required | Delete comment (author/mod only) |
+| DELETE | `/delete-comment` | Required | Delete comment |
 
 ### Collections
 
 | Method | Path | Auth | Description |
-|---|---|---|---|
-| GET | `/collections` | None | Browse public collections (paginated) |
-| GET | `/c/:collectionId` | None | Public collection + its public posts |
-| GET | `/u/:userId/collections` | Required | User's collections (filtered by access) |
-| GET | `/c/private/:collectionId` | Required | Private collection (author/mod only) |
-| POST | `/create/collection` | Required | Create a new collection |
-| POST | `/collection/:collectionId/vote` | Required | Like or dislike a collection |
-| PUT | `/update-collection/:collectionId` | Required | Update metadata (author only) |
-| PUT | `/add-remove-post/:postId/collection/:collectionId` | Required | Toggle a post in/out (author only) |
-| DELETE | `/delete-collection/:collectionId` | Required | Delete a collection (author/mod only) |
+| --- | --- | --- | --- |
+| GET | `/collections` | None | Browse public collections |
+| GET | `/c/:collectionId` | None | Public collection + posts |
+| GET | `/u/:userId/collections` | Required | User's collections metadata |
+| GET | `/c/private/:collectionId` | Required | Private collection (author/mod) |
+| POST | `/create/collection` | Required | Create new collection |
+| POST | `/collection/:collectionId/vote` | Required | Toggle like/dislike on collection |
+| PUT | `/update-collection/:collectionId` | Required | Update metadata |
+| PUT | `/add-remove-post/:postId/collection/:collectionId` | Required | Toggle post in/out of collection |
+| DELETE | `/delete-collection/:collectionId` | Required | Delete collection |
 
 ### Feed
 
 | Method | Path | Auth | Description |
-|---|---|---|---|
-| GET | `/articles` | None | Offset-paginated public feed (newest first) |
-| POST | `/articles/anonymous-user` | None | Cursor-paginated feed ranked by engagement score |
-
-The cursor-based feed encodes `{ score, lastId }` as base64 JSON. Pass the returned `nextCursor` value in the next request body to advance the page.
+| --- | --- | --- | --- |
+| GET | `/articles` | None | Cursor-paginated public feed (Cached) |
+| POST | `/articles/anonymous-user` | None | Legacy engagement-ranked feed |
 
 ### Follow
 
 | Method | Path | Auth | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | POST | `/follow-unfollow/user` | Required | Toggle follow on a user |
 | GET | `/u/:userId/followers` | None | Paginated followers list |
 | GET | `/u/:userId/following` | Required | Paginated following list |
+
+### Search
+
+| Method | Path | Auth | Description |
+| --- | --- | --- | --- |
+| GET | `/search?q=...&type=...` | None | Global search for users and posts |
 
 ---
 
@@ -294,7 +308,7 @@ Three roles exist: `user`, `moderator`, and `admin`.
 
 ## Engagement Scoring
 
-The `anonymousEngagementScore` field on Post drives the ranked feed for logged-out users. A cron job runs every 15 minutes and recalculates the score for all posts using a weighted formula that combines views, likes, reads, and recency. The formula lives in `server/src/migrations/Post/updateDefaultEngagementScore.js`.
+The `anonymousEngagementScore` field on Post drives the ranked feed for logged-out users. A cron job runs every 15 minutes and recalculates the score for all posts using a weighted formula that combines views, likes, reads, and recency. The formula lives in `server/src/jobs/updateEngagementScore.js`.
 
 Posts without a score are not shown in the ranked feed but do appear in the chronological `/articles` feed.
 
@@ -307,13 +321,25 @@ All variables are read from a `.env` file in the `server/` directory.
 | Variable | Description |
 |---|---|
 | `PORT` | Server port (default: `3000`) |
-| `MONGODB_URI` | MongoDB connection string |
-| `JWT_SECRET` | Secret used to sign and verify JWTs |
-| `GOOGLE_CLIENT_ID` | Google OAuth client ID |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
-| `CURRENT_URL` | Public URL of the server (used to build the OAuth callback URL) |
-| `FRONTEND_URL` | Public URL of the frontend (used for CORS and post-auth redirects) |
 | `NODE_ENV` | `"development"` or `"production"` |
+| `SESSION_SECRET` | `hard to guess string` |
+| `JWT_SECRET` | `hard to guess string` |
+| `FRONTEND_URL` | Public URL of the frontend (used for CORS and post-auth redirects) |
+| `CURRENT_URL` | Public URL of the server (used to build the OAuth callback URL), use `localhost:3000` in dev |
+| `CURRENT_URL_LOCAL` | used in dev, `http://localhost:3000` |
+| `MONGODB_URI` | MongoDB connection string |
+| `MONGODB_URI_PROD` | MongoDB connection string |
+| `IMGUR_API_URL` | `https://api.imgur.com/3/upload` |
+| `IMGUR_CLIENT_ID` | your imgur client id |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
+
+All variables are read from a `.env` file in the `client/` directory.
+
+| Variable | Description |
+|---|---|
+| `VITE_BACKEND_URL` | `http://localhost:3000` |
+
 
 ---
 
@@ -322,25 +348,30 @@ All variables are read from a `.env` file in the `server/` directory.
 **Prerequisites:** Node.js 18+, MongoDB running locally or a MongoDB Atlas URI.
 
 ```bash
+# clone the repo
+git clone git@github.com:Dream-World-Coder/opencanvas.git
+
+# or
+git clone https://github.com/Dream-World-Coder/opencanvas.git
+```
+
+```bash
 # Install server dependencies
 cd server
 pnpm install
 
-# Set up environment
-cp .env.example .env
-# Edit .env with your values
-
 # Start the server
-node src/index.js
+pnpm dev # single worker
+pnpm devCluster # for cluster
 ```
 
 ```bash
 # Install client dependencies
 cd client
-npm install
+pnpm install
 
 # Start the dev server
-npm run dev
+pnpm dev 
 ```
 
 The backend listens on `http://localhost:3000` by default. The Vite dev server runs on `http://localhost:5173` and is included in the CORS allow-list automatically when `NODE_ENV` is not `"production"`.
@@ -348,6 +379,58 @@ The backend listens on `http://localhost:3000` by default. The Vite dev server r
 Alternatively, use the provided shell scripts from the project root:
 
 ```bash
-./start.sh   # Start both client and server
-./stop.sh    # Stop both processes
+# for macOS only, uses homebrew
+chmod +x start.sh stop.sh
+
+./start.sh   # Start both client and server & mongodb
+./stop.sh    # Stop all processes
 ```
+
+And for clusters instead of a single thread:
+
+```bash
+# for macOS only, uses homebrew
+chmod +x cluster-start.sh cluster-stop.sh
+
+./cluster-start.sh   
+./cluster-stop.sh    
+```
+---
+
+## Performance Benchmarks
+
+To ensure the platform scales gracefully, the database was seeded with a massive dataset: **400,000 users, 100,000 posts, 500,000 interactions, 100,000 follows, and 320,000 comments**.
+
+### The Optimizations
+
+To handle this volume and maximize Requests Per Second (RPS), the following backend optimizations were implemented:
+
+* **Denormalization:** Embedded `authorSnapshot` directly into post documents.
+* **Payload Reduction:** Introduced `contentPreview` (first 700 characters) to avoid sending full article bodies in the feed, saving massive bandwidth.
+* **Lean Queries:** Replaced `.populate()` and utilized `.lean()` for faster read operations.
+* **Aggregation & Pipelining:** Grouped database calls and utilized pipelined requests.
+* **Atomic Operations:** Offloaded interaction tracking to a separate `Interaction` collection and used `$inc` for atomic stat updates on parent documents.
+* **Caching:** Implemented an in-memory TTL cache for high-traffic routes like the feed.
+* **Database Indexing:** Ensured proper indexing and replaced expensive `.skip()` operations with cursor-based pagination.
+
+### Autocannon Stress Tests (The `/articles` Feed)
+
+These optimizations yielded incredible improvements on a single Node.js thread, which were then scaled further using Node Cluster mode.
+
+| Condition (10s Test) | Pre-Optimization | Post-Optimization (Single Thread) | Post-Optimization (Cluster Mode) |
+| --- | --- | --- | --- |
+| **Simple** *(100 conn)* | **1,993 RPS** (Avg: 49ms) | **6,138 RPS** (Avg: 15ms) | **15,913 RPS** (Avg: 5ms) |
+| **Stressed** *(500 conn, 10 pipe)* | **2,504 RPS** (Avg: 1609ms) | **6,679 RPS** (Avg: 353ms) | **17,007 RPS** (Avg: 209ms) |
+
+*The optimized single thread handles 2.6x more traffic under stress, and cluster mode achieves nearly a 7x increase in RPS over the unoptimized baseline.*
+
+### Artillery Real-World Load Simulation
+
+A comprehensive Artillery load test was run simulating a real-world scenario (Warm up → Ramp up → Sudden Viral Spike) totaling **8,600 concurrent user requests**.
+
+The **Single Thread** performance metrics were exceptional:
+
+* **Success Rate:** 100% (0 request failures during peak viral spike).
+* **Latency Consistency:** The median response time was **1ms**.
+* **Percentiles:** The p95 response time was an impressive **1ms**, and the p99 was **2ms**, proving that even the absolute slowest requests were resolved near-instantly despite the heavy cache-miss and DB stress conditions.
+* **Max Latency:** Only peaked at 18ms across the entire test cycle.
