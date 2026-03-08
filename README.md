@@ -1,3 +1,5 @@
+![image](https://i.imgur.com/WxcxAXR.png)
+
 # OpenCanvas
 
 Discover OpenCanvas: Find and read high-quality scientific articles, research papers, and compelling stories. Explore our library and expand your knowledge today.
@@ -6,31 +8,34 @@ Discover OpenCanvas: Find and read high-quality scientific articles, research pa
 
 ## Table of Contents
 
-_ [Project Structure](#project-structure)
-_ [Technology Stack](#technology-stack)
-_ [Architecture Overview](#architecture-overview)
-_ [Database Models](#database-models)
+- [Project Structure](#project-structure)
+- [Technology Stack](#technology-stack)
+- [Architecture Overview](#architecture-overview)
+- [Database Models](#database-models)
   - [User](#user)
   - [Post](#post)
   - [Collection](#collection)
   - [Follow](#follow)
   - [Interaction](#interaction)
   - [Comment](#comment)
-_ [API Reference](#api-reference)
-  _ [Authentication](#authentication)
-  _ [Users](#users)
-  _ [Posts](#posts)
-  _ [Comments](#comments)
-  _ [Collections](#collections)
-  _ [Feed](#feed)
-  _ [Follow](#follow)
-  _ [Search](#search)
+- [API Reference](#api-reference)
+  - [Authentication](#authentication)
+  - [Users](#users)
+  - [Posts](#posts)
+  - [Comments](#comments)
+  - [Collections](#collections)
+  - [Feed](#feed)
+  - [Follow](#follow)
+  - [Search](#search)
 - [Authentication Flow](#authentication-flow)
 - [Access Control](#access-control)
 - [Engagement Scoring](#engagement-scoring)
 - [Environment Variables](#environment-variables)
-_ [Running Locally](#running-locally)
-_ [Performance Benchmarks](#performance-benchmarks)
+- [Running Locally](#running-locally)
+- [Performance Benchmarks](#performance-benchmarks)
+- [Support](#support)
+- [Preview](#preview)
+
 
 ---
 
@@ -434,3 +439,31 @@ The **Single Thread** performance metrics were exceptional:
 * **Latency Consistency:** The median response time was **1ms**.
 * **Percentiles:** The p95 response time was an impressive **1ms**, and the p99 was **2ms**, proving that even the absolute slowest requests were resolved near-instantly despite the heavy cache-miss and DB stress conditions.
 * **Max Latency:** Only peaked at 18ms across the entire test cycle.
+
+---
+
+## Support
+
+Hi, I'm Subhajit, an IT undergrad at IIEST Shibpur. While exploring various research works, I noticed a recurring problem: countless early-stage college research papers never see the light of day. They either get stuck in the publishing pipeline or remain buried deep within individual university websites, making them incredibly difficult for enthusiasts to find.
+
+My goal is to build a middle ground between ResearchGate and Reddit. By creating dedicated channels for specific colleges, this platform provides a centralized hub to easily publish, discover, and discuss early-stage scientific work. 
+
+If you find this project valuable and believe in making academic research more accessible, consider supporting my work!
+
+**Support my work:** [https://ko-fi.com/myopencanvas](https://ko-fi.com/myopencanvas)
+
+---
+
+## Preview
+
+<img src="./images/lp.png" alt="landing page">
+<img src="./images/feed-light-mode.png" alt="articles feed page">
+<img src="./images/profile.png" alt="profile page">
+<img src="./images/profile-settings.png" alt="profile settings page">
+<img src="./images/md-prev.png" alt="markdown editor page">
+<img src="./images/about.png" alt="about page">
+  
+#### Feed dark mode
+<img src="./images/feed-dark-mode.png" alt="articles feed page">
+#### article desktop
+<img src="./images/xxl.png" alt="desktop article page">
