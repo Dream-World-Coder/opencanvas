@@ -27,9 +27,9 @@ const AboutMeta = () => {
       />
       <meta
         property="og:image"
-        content="https://opencanvas.blog/social-preview.png"
+        content="https://opencanvas.institute/social-preview.png"
       />
-      <meta property="og:url" content="https://opencanvas.blog/about" />
+      <meta property="og:url" content="https://opencanvas.institute/about" />
       <meta property="og:type" content="website" />
 
       {/* Twitter Card */}
@@ -44,34 +44,34 @@ const AboutMeta = () => {
       />
       <meta
         name="twitter:image"
-        content="https://opencanvas.blog/social-preview.png"
+        content="https://opencanvas.institute/social-preview.png"
       />
       <meta name="twitter:site" content="@opencanvas" />
 
       {/* canonical */}
-      <link rel="canonical" href="https://opencanvas.blog/about" />
+      <link rel="canonical" href="https://opencanvas.institute/about" />
 
       <script type="application/ld+json">
         {JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebSite",
           name: "OpenCanvas",
-          url: "https://opencanvas.blog",
+          url: "https://opencanvas.institute",
           description:
             "OpenCanvas is a creative platform where writers and artists freely express their thoughts through poems, stories, articles, and more. Join a vibrant community of dreamers.",
-          image: "https://opencanvas.blog/social-preview.png",
+          image: "https://opencanvas.institute/social-preview.png",
           author: {
             "@type": "Organization",
             name: "OpenCanvas",
-            url: "https://opencanvas.blog/about",
+            url: "https://opencanvas.institute/about",
           },
           publisher: {
             "@type": "Organization",
             name: "OpenCanvas",
-            url: "https://opencanvas.blog",
+            url: "https://opencanvas.institute",
             logo: {
               "@type": "ImageObject",
-              url: "https://opencanvas.blog/logo.png",
+              url: "https://opencanvas.institute/logo.png",
             },
           },
           sameAs: [

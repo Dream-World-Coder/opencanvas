@@ -64,7 +64,7 @@ export const getSchemaData = (title) => {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: { title },
-    // image: ["https://opencanvas.blog/photos/1x1/photo.jpg"],
+    // image: ["https://opencanvas.institute/photos/1x1/photo.jpg"],
     datePublished: {},
     dateModified: {},
     author: {
@@ -76,14 +76,14 @@ export const getSchemaData = (title) => {
       name: "Opencanvas",
       logo: {
         "@type": "ImageObject",
-        url: "https://opencanvas.blog/logo.png",
+        url: "https://opencanvas.institute/logo.png",
       },
     },
     description:
       "A sample article description goes here, summarizing the main content of the article.",
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": "https://opencanvas.blog/sample-article",
+      "@id": "https://opencanvas.institute/sample-article",
     },
     keywords:
       "SEO, keywords, search engine optimization, blog, web development",

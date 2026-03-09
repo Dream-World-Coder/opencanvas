@@ -1,4 +1,4 @@
--- [x] change seo urls from opencanvas.blog -> myopencanvas.in
+-- [x] change seo urls from opencanvas._blog -> myopencanvas.in
 -- [x] Theme options: yellow, white, black
 -- [x] Dropcaps and [less imp]:image direction & orientation
 -- [x] Mobile Responsive

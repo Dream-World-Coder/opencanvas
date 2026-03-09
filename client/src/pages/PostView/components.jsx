@@ -104,7 +104,7 @@ export const PostHelmet = ({ post, author }) => {
       name: "Opencanvas",
       logo: {
         "@type": "ImageObject",
-        url: "https://opencanvas.blog/logo.png",
+        url: "https://opencanvas.institute/logo.png",
       },
     },
     description: post.title,

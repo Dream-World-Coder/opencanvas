@@ -11,7 +11,7 @@ const ContactPage = ({ bgClr = "bg-cream-light" }) => {
   const connectLinks = [
     {
       name: "OpenCanvas",
-      href: "https://opencanvas.blog/u/subhajit",
+      href: "https://opencanvas.institute/u/subhajit",
       icon: (
         <div className="size-4">
           <OpenCanvasIcon />
@@ -72,10 +72,13 @@ const ContactPage = ({ bgClr = "bg-cream-light" }) => {
           property="og:description"
           content="Reach out to Subhajit Gorai for collaborations, suggestions, or inquiries regarding OpenCanvas."
         />
-        <meta property="og:url" content="https://www.opencanvas.blog/contact" />
+        <meta
+          property="og:url"
+          content="https://www.opencanvas.institute/contact"
+        />
         <meta
           property="og:image"
-          content="https://www.opencanvas.blog/social-preview.png"
+          content="https://www.opencanvas.institute/social-preview.png"
         />
 
         <meta name="twitter:card" content="summary_large_image" />
@@ -86,23 +89,23 @@ const ContactPage = ({ bgClr = "bg-cream-light" }) => {
         />
         <meta
           name="twitter:image"
-          content="https://www.opencanvas.blog/social-preview.png"
+          content="https://www.opencanvas.institute/social-preview.png"
         />
 
-        <link rel="canonical" href="https://www.opencanvas.blog/contact" />
+        <link rel="canonical" href="https://www.opencanvas.institute/contact" />
 
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebPage",
             name: "Contact | OpenCanvas",
-            url: "https://www.opencanvas.blog/contact",
+            url: "https://www.opencanvas.institute/contact",
             description:
               "Get in touch with Subhajit Gorai, the developer and maintainer of OpenCanvas. Feel free to suggest any thoughts or connect via email, LinkedIn, GitHub, or other platforms.",
             publisher: {
               "@type": "Person",
               name: "Subhajit Gorai",
-              url: "https://www.opencanvas.blog/u/subhajit",
+              url: "https://www.opencanvas.institute/u/subhajit",
             },
             mainEntity: {
               "@type": "ContactPage",
@@ -110,11 +113,11 @@ const ContactPage = ({ bgClr = "bg-cream-light" }) => {
                 "@type": "ContactPoint",
                 email: "mailto:blog.opencanvas@gmail.com",
                 contactType: "Customer Service",
-                url: "https://www.opencanvas.blog/contact",
+                url: "https://www.opencanvas.institute/contact",
               },
             },
             sameAs: [
-              "https://opencanvas.blog/u/subhajit",
+              "https://opencanvas.institute/u/subhajit",
               "https://github.com/Dream-World-Coder",
               "https://www.linkedin.com/in/subhajitgorai",
               "https://subhajit.pages.dev",
@@ -178,7 +181,7 @@ const ContactPage = ({ bgClr = "bg-cream-light" }) => {
               <input
                 type="hidden"
                 name="redirect"
-                value="https://www.opencanvas.blog/thanks"
+                value="https://www.opencanvas.institute/thanks"
               />
               <div>
                 <input

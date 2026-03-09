@@ -638,7 +638,7 @@ const ProfileSettings = () => {
     },
     {
       feature: "Personal Subdomain",
-      description: "Host content at {username}.opencanvas.blog.",
+      description: "Host content at {username}.opencanvas.institute.",
       icon: <GlobeIcon className="h-4 w-4" />,
     },
     {
