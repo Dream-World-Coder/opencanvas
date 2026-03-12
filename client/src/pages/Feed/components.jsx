@@ -16,9 +16,6 @@ import { useDataService } from "../../services/dataService";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
-// ::::: OpenCanvas Illustration :::::
-// A minimal SVG illustration representing reading, discovery, and science.
-// Uses lime, violet, and sky color palette.
 const OpenCanvasIllustration = () => (
   <svg
     viewBox="0 0 160 180"
@@ -156,30 +153,29 @@ const OpenCanvasIllustration = () => (
   </svg>
 );
 
-// ::::: Donate Button :::::
-// Small, unobtrusive donate CTA using violet accent.
-const DonateButton = () => (
+const GitHubStarButton = () => (
   <a
-    href="https://ko-fi.com/myopencanvas"
+    href="https://github.com/Dream-World-Coder/opencanvas"
     target="_blank"
     rel="noopener noreferrer"
-    className="block w-full text-center text-xs py-2 px-3 rounded-lg border border-lime-200 dark:border-lime-900 text-lime-600 dark:text-lime-400 hover:bg-lime-50 dark:hover:bg-lime-950 transition-colors duration-150"
+    className="flex items-center justify-center gap-1.5 w-full text-xs py-2 px-3 rounded-lg border border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 hover:border-neutral-300 dark:hover:border-neutral-600 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors duration-150"
   >
-    ♥ Support OpenCanvas
+    <svg
+      viewBox="0 0 16 16"
+      className="w-3.5 h-3.5 fill-current"
+      aria-hidden="true"
+    >
+      <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.873 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z" />
+    </svg>
+    Star on GitHub
   </a>
 );
 
-// ::::: LeftSideBar :::::
-// Collapsible left sidebar for the feed page.
-// Feed options and topic filters are hidden (not yet implemented).
-// Shows an OpenCanvas illustration and donate button when open.
-export const LeftSideBar = ({ selectedTopics, setSelectedTopics }) => {
-  // Persist sidebar open/closed state across sessions
+export const LeftSideBar = () => {
   const [sidebarClosed, setSidebarClosed] = useState(
     JSON.parse(localStorage.getItem("feedSidebarClosed")) ?? false,
   );
 
-  // Toggle sidebar and save preference to localStorage
   const toggleSidebar = () => {
     const next = !sidebarClosed;
     localStorage.setItem("feedSidebarClosed", JSON.stringify(next));
@@ -221,13 +217,10 @@ export const LeftSideBar = ({ selectedTopics, setSelectedTopics }) => {
             </p>
           </div>
 
-          {/* Donate CTA */}
-          <DonateButton />
+          {/*  */}
+          <GitHubStarButton />
 
           {/*
-            Feed Options and Trending Topics are hidden until implemented.
-            Uncomment and restore these sections when ready:
-
             <FeedOptions feedOptions={feedOptions} />
             <TopicFilters filters={filters} selectedTopics={selectedTopics} toggleTopic={toggleTopic} />
           */}
