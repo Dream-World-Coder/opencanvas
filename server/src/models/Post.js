@@ -70,8 +70,7 @@ const postSchema = new Schema(
 
 // indexes
 postSchema.index({ authorId: 1, isPublic: 1, createdAt: -1 });
-postSchema.index({ isPublic: 1, createdAt: -1, _id: -1 }); // for articles feed
-// actually _id: -1 is needed for the tests only, else same createdAt is extremely rare unless millions of active users
+postSchema.index({ isPublic: 1, anonymousEngagementScore: -1, _id: -1 }); // for articles feed
 postSchema.index({ tags: 1, isPublic: 1 }); // for topic srch
 
 const Post = mongoose.model("Post", postSchema);
