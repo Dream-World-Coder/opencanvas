@@ -135,7 +135,6 @@ const ViewPost = () => {
     }
   }, [viewCounted]);
 
-  // ::::: Vote handler :::::
   // Single handler for both like and dislike. Derives the new local state
   // from the server's response message rather than trying to predict it.
   const handleVote = async (vote) => {
@@ -190,7 +189,6 @@ const ViewPost = () => {
     }
   };
 
-  // ::::: Save handler :::::
   const handleSave = async () => {
     if (!currentUser) {
       toast.error("You need to log in first");
@@ -207,7 +205,6 @@ const ViewPost = () => {
     }
   };
 
-  // ::::: Follow handler :::::
   const handleFollow = async () => {
     if (!currentUser) {
       toast.error("You need to log in first");
@@ -243,7 +240,7 @@ const ViewPost = () => {
         />
 
         <div
-          className={`flex flex-col md:flex-row w-full min-h-screen max-w-screen-xl 2xl:max-w-[1536px] 2xl:w-[1536px] mx-auto bg-white
+          className={`flex flex-col md:flex-row md:gap-10 w-full min-h-screen max-w-screen-xl 2xl:max-w-[1536px] 2xl:w-[1536px] mx-auto bg-white
             ${darkTheme.colors.bg} text-neutral-900 ${darkTheme.colors.primaryText}`}
         >
           <LeftSidebar />
@@ -261,7 +258,7 @@ const ViewPost = () => {
               setDarkTheme={setDarkTheme}
             />
 
-            {/* Article content */}
+            {/* article content */}
             <article className="w-full max-w-full min-w-0 p-0 mb-16">
               <ThemedMarkdownPreview
                 title={post.title}

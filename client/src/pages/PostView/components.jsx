@@ -213,7 +213,7 @@ export const LeftSidebar = () => {
 
   return (
     <>
-      <div className="md:hidden w-full fixed bottom-0 dark:text-white">
+      <div className="md:hidden fixed bottom-0 dark:text-white">
         <Drawer>
           {list?.length > 0 && (
             <DrawerTrigger className="bg-lime-300 w-full py-2 rounded-t-xl z-[50000]">
@@ -250,7 +250,8 @@ export const LeftSidebar = () => {
       </div>
 
       <aside
-        className={`relative w-full md:w-72 px-4 py-6 hidden md:flex flex-col md:mr-4`}
+        className={`relative w-full md:w-0 px-4 py-6 hidden md:flex flex-col md:mr-4`}
+        // hidden, no need now
       >
         <div className="dark:text-white">
           {list?.length > 0 && <div className="mb-4 pl-2">Collection Name</div>}
@@ -308,60 +309,70 @@ export const TableOfContents = memo(function Toc({
               className="dropdown max-h-[600px] overflow-y-auto pb-4 bg-lime-100 dark:bg-neutral-700
               rounded lg:bg-transparent lg:dark:bg-transparent shadow-md md:shadow-none no-scrollbar"
             >
-              <ul className="pl-1 pt-2">
+              <ul className="pl-1 pt-2 space-y-3">
                 {tableOfContents.map((title, titleIndex) => (
-                  <li key={`title-${titleIndex}`} className="mb-1">
+                  <li key={`title-${titleIndex}`}>
                     {title.text && (
                       <a
                         href={`#${title.id}`}
-                        className="font-bold text-base text-neutral-800 dark:text-neutral-300 hover:underline leading-tight"
+                        className="flex items-start gap-2 font-bold text-base text-neutral-800 dark:text-neutral-200 hover:underline leading-snug group"
                       >
-                        {title.text}
+                        <span className="shrink-0 mt-0.5 text-xs font-mono font-semibold text-lime-600 dark:text-lime-400 bg-lime-100 dark:bg-lime-900/40 rounded px-1 py-0.5 group-hover:bg-lime-200 dark:group-hover:bg-lime-800/50 transition-colors">
+                          {titleIndex + 1}
+                        </span>
+                        <span>{title.text}</span>
                       </a>
                     )}
+
                     {title.headings.length > 0 && (
-                      <details open className="pl-0 mt-1">
+                      <details open className="mt-2">
                         <summary className="list-none text-sm text-neutral-500 dark:text-neutral-300 cursor-pointer" />
-                        <ul className="pl-4 mt-1">
+                        <ul className="pl-4 mt-1 space-y-2 border-l-2 border-lime-200 dark:border-neutral-600 ml-2">
                           {title.headings.map((heading, headingIndex) => (
-                            <li
-                              key={`heading-${titleIndex}-${headingIndex}`}
-                              className="mb-0"
-                            >
+                            <li key={`heading-${titleIndex}-${headingIndex}`}>
                               {heading.text && (
                                 <a
                                   href={`#${heading.id}`}
-                                  className="font-medium text-sm text-neutral-700 dark:text-neutral-300 hover:underline leading-tight"
+                                  className="flex items-start gap-2 font-medium text-sm text-neutral-700 dark:text-neutral-300 hover:underline leading-snug group"
                                 >
-                                  {heading.text}
+                                  <span className="shrink-0 mt-0.5 text-xs text-neutral-400 dark:text-neutral-500 font-mono">
+                                    {titleIndex + 1}.{headingIndex + 1}
+                                  </span>
+                                  <span>{heading.text}</span>
                                 </a>
                               )}
+
                               {heading.subheadings.length > 0 && (
-                                <details open className="mt-1">
+                                <details open className="mt-1.5">
                                   <summary className="list-none text-xs rounded px-1 w-fit bg-neutral-400/30 text-neutral-500 dark:text-neutral-400 cursor-pointer ml-2">
                                     Subsections
                                   </summary>
-                                  <ul className="pl-4 mt-1">
+                                  <ul className="pl-4 mt-1 space-y-1.5 border-l border-neutral-300 dark:border-neutral-600 ml-1">
                                     {heading.subheadings.map(
                                       (subheading, subheadingIndex) => (
                                         <li
                                           key={`subheading-${titleIndex}-${headingIndex}-${subheadingIndex}`}
-                                          className="mb-0"
                                         >
                                           {subheading.text && (
                                             <a
                                               href={`#${subheading.id}`}
-                                              className="text-neutral-600 dark:text-neutral-300 text-xs hover:underline leading-tight"
+                                              className="flex items-start gap-2 text-neutral-600 dark:text-neutral-300 text-xs hover:underline leading-snug"
                                             >
-                                              {subheading.text}
+                                              <span className="shrink-0 mt-0.5 text-neutral-400 dark:text-neutral-500 font-mono">
+                                                {titleIndex + 1}.
+                                                {headingIndex + 1}.
+                                                {subheadingIndex + 1}
+                                              </span>
+                                              <span>{subheading.text}</span>
                                             </a>
                                           )}
+
                                           {subheading.h4s.length > 0 && (
                                             <details open className="mt-1">
                                               <summary className="list-none text-xs text-neutral-400 cursor-pointer ml-2 rounded px-1 w-fit bg-neutral-400/30">
                                                 Subsections
                                               </summary>
-                                              <ul className="pl-4 mt-1">
+                                              <ul className="pl-4 mt-1 space-y-1 border-l border-neutral-200 dark:border-neutral-700 ml-1">
                                                 {subheading.h4s.map(
                                                   (h4, h4Index) => (
                                                     <li
@@ -369,9 +380,15 @@ export const TableOfContents = memo(function Toc({
                                                     >
                                                       <a
                                                         href={`#${h4.id}`}
-                                                        className="text-neutral-500 dark:text-neutral-400 hover:underline text-xs leading-tight"
+                                                        className="flex items-start gap-2 text-neutral-500 dark:text-neutral-400 hover:underline text-xs leading-snug"
                                                       >
-                                                        {h4.text}
+                                                        <span className="shrink-0 mt-0.5 text-neutral-400 dark:text-neutral-500 font-mono">
+                                                          {titleIndex + 1}.
+                                                          {headingIndex + 1}.
+                                                          {subheadingIndex + 1}.
+                                                          {h4Index + 1}
+                                                        </span>
+                                                        <span>{h4.text}</span>
                                                       </a>
                                                     </li>
                                                   ),
@@ -400,6 +417,7 @@ export const TableOfContents = memo(function Toc({
     </aside>
   );
 });
+
 TableOfContents.propTypes = {
   tableOfContents: PropTypes.array,
   isArticle: PropTypes.bool,
