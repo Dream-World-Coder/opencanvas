@@ -1,6 +1,6 @@
 // src/pages/Create/Editor/components.jsx
 
-import { useRef, useState, memo } from "react";
+import { useRef, useState, memo, forwardRef } from "react";
 import {
   X,
   Bold,
@@ -477,21 +477,15 @@ export const MarkdownPreview = memo(function MarkdownPreview({
   lightModeBg = "bg-white",
   insidePost = false,
   darkBg = "bg-[#222]",
-  contentOnly = false, // preview in feed or profile
+  contentOnly = false,
   artType = "written",
 }) {
   const insideGallery = contentOnly;
 
-  //useref to store settings for all images individually
   const imageSettingsRef = useRef({});
-
-  //to track which image's settings are being edited
   const [activeImageId, setActiveImageId] = useState(null);
-
-  // force re-render when settings change
   const [, forceUpdate] = useState({});
 
-  //get the default settings for an image or use existing settings
   const getImageSettings = (imageId) => {
     if (!imageSettingsRef.current[imageId]) {
       imageSettingsRef.current[imageId] = {
@@ -505,7 +499,6 @@ export const MarkdownPreview = memo(function MarkdownPreview({
     return imageSettingsRef.current[imageId];
   };
 
-  //update a specific setting for an image
   const updateImageSetting = (imageId, setting, value) => {
     const settings = getImageSettings(imageId);
     settings[setting] = value;
@@ -528,6 +521,527 @@ export const MarkdownPreview = memo(function MarkdownPreview({
 
   if (!isVisible) return null;
 
+  const isResearchPaper = artType === "research-paper";
+  const isBook = artType === "book";
+
+  if (isResearchPaper) {
+    return (
+      <>
+        <div className="w-full bg-white flex flex-col items-center font-serif text-black">
+          <div
+            id="export"
+            className="w-full max-w-[780px] px-12 py-10 text-[15px] leading-[1.55]"
+            style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}
+          >
+            {title && (
+              <div className="text-center mb-6 border-b border-black pb-6">
+                <h1 className="text-[22px] font-bold leading-tight tracking-tight uppercase mb-3">
+                  {title}
+                </h1>
+                <div className="flex items-center justify-center gap-2 mt-3">
+                  <div className="h-px w-16 bg-black" />
+                  <div className="h-1.5 w-1.5 rounded-full bg-black" />
+                  <div className="h-px w-16 bg-black" />
+                </div>
+              </div>
+            )}
+
+            {thumbnailUrl && (
+              <figure className="my-6 border border-black/20">
+                <img
+                  src={thumbnailUrl}
+                  alt={title || "Figure"}
+                  className="w-full object-contain"
+                  loading="lazy"
+                />
+                <figcaption className="text-center text-[12px] text-black/60 py-1 border-t border-black/10 px-2">
+                  Figure 1. {title}
+                </figcaption>
+              </figure>
+            )}
+
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
+              rehypePlugins={[rehypeRaw, rehypeKatex]}
+              components={{
+                img: (props) => (
+                  <ImageRender
+                    setActiveImageId={setActiveImageId}
+                    getImageSettings={getImageSettings}
+                    props={props}
+                  />
+                ),
+                hr: () => <hr className="my-8 border-t border-black/20" />,
+                code: ({ inline, className, children, ...props }) => (
+                  <CodeBlock
+                    isDark={false}
+                    inline={inline}
+                    className={className}
+                    {...props}
+                  >
+                    {children}
+                  </CodeBlock>
+                ),
+                blockquote: ({ children }) => (
+                  <blockquote className="border-l-2 border-black/40 pl-4 py-0.5 my-4 text-black/70 italic text-[14px]">
+                    {children}
+                  </blockquote>
+                ),
+                h1: ({ children }) => (
+                  <h1
+                    id={generateId(children)}
+                    className="mt-10 mb-3 text-[17px] font-bold uppercase tracking-widest border-b border-black/30 pb-1"
+                  >
+                    {children}
+                  </h1>
+                ),
+                h2: ({ children }) => (
+                  <h2
+                    id={generateId(children)}
+                    className="mt-8 mb-2 text-[15px] font-bold uppercase tracking-wider"
+                  >
+                    {children}
+                  </h2>
+                ),
+                h3: ({ children }) => (
+                  <h3
+                    id={generateId(children)}
+                    className="mt-6 mb-2 text-[14px] font-bold italic"
+                  >
+                    {children}
+                  </h3>
+                ),
+                h4: ({ children }) => (
+                  <h4
+                    id={generateId(children)}
+                    className="mt-4 mb-1 text-[14px] font-semibold"
+                  >
+                    {children}
+                  </h4>
+                ),
+                h5: ({ children }) => (
+                  <h5 className="mt-4 mb-1 text-[13px] font-semibold uppercase tracking-wide">
+                    {children}
+                  </h5>
+                ),
+                h6: ({ children }) => (
+                  <h6 className="mt-3 mb-1 text-[12px] font-semibold uppercase tracking-widest text-black/60">
+                    {children}
+                  </h6>
+                ),
+                p: ({ children }) => (
+                  <p className="my-3 text-[15px] leading-[1.7] text-justify hyphens-auto text-black">
+                    {children}
+                  </p>
+                ),
+                strong: ({ children }) => (
+                  <strong className="font-bold">{children}</strong>
+                ),
+                em: ({ children }) => <em className="italic">{children}</em>,
+                a: ({ href, children }) => (
+                  <a
+                    href={href}
+                    className="text-black underline underline-offset-2 hover:text-black/60 transition-colors"
+                    target={href.startsWith("http") ? "_blank" : "_self"}
+                    rel={href.startsWith("http") ? "noopener noreferrer" : ""}
+                  >
+                    {children}
+                  </a>
+                ),
+                ul: ({ children }) => (
+                  <ul className="list-disc pl-6 my-3 space-y-1 text-[14px]">
+                    {children}
+                  </ul>
+                ),
+                ol: ({ children }) => (
+                  <ol className="list-decimal pl-6 my-3 space-y-1 text-[14px]">
+                    {children}
+                  </ol>
+                ),
+                li: ({ children }) => (
+                  <li className="text-[14px] leading-[1.6]">{children}</li>
+                ),
+                table: ({ children }) => (
+                  <div className="overflow-x-auto my-5">
+                    <table className="border-collapse w-full text-[13px] text-black border border-black/30">
+                      {children}
+                    </table>
+                  </div>
+                ),
+                thead: ({ children }) => (
+                  <thead className="border-b-2 border-black">{children}</thead>
+                ),
+                tbody: ({ children }) => <tbody>{children}</tbody>,
+                tr: ({ children }) => (
+                  <tr className="border-b border-black/15 even:bg-black/[0.03]">
+                    {children}
+                  </tr>
+                ),
+                th: ({ children }) => (
+                  <th className="px-3 py-1.5 font-bold text-left uppercase tracking-wide text-[11px] border-r border-black/20 last:border-r-0">
+                    {children}
+                  </th>
+                ),
+                td: ({ children }) => (
+                  <td className="px-3 py-1.5 border-r border-black/10 last:border-r-0">
+                    {children}
+                  </td>
+                ),
+              }}
+            >
+              {content}
+            </ReactMarkdown>
+          </div>
+          <div className="h-[10vh]" />
+        </div>
+
+        {!insidePost && activeImageId && <ImageSettingsModal />}
+      </>
+    );
+  }
+
+  if (isBook) {
+    return (
+      <>
+        <div
+          className={`w-full flex flex-col items-center ${isDark ? `${darkBg} text-white` : "bg-[#faf8f4] text-neutral-900"}`}
+        >
+          <div
+            id="export"
+            className="w-full max-w-[680px] px-10 py-14"
+            style={{ fontFamily: "'Georgia', 'Palatino Linotype', serif" }}
+          >
+            {title && (
+              <div className="text-center mb-16">
+                <p
+                  className={`text-[11px] uppercase tracking-[0.25em] mb-4 ${isDark ? "text-neutral-400" : "text-neutral-500"}`}
+                >
+                  Chapter
+                </p>
+                <h1
+                  className={`text-[32px] md:text-[40px] font-bold leading-tight tracking-tight ${isDark ? "text-white" : "text-neutral-900"}`}
+                >
+                  {title}
+                </h1>
+                <div className="flex items-center justify-center gap-3 mt-8">
+                  <div
+                    className={`h-px w-10 ${isDark ? "bg-neutral-500" : "bg-neutral-400"}`}
+                  />
+                  <div
+                    className={`text-lg ${isDark ? "text-neutral-500" : "text-neutral-400"}`}
+                  >
+                    ❧
+                  </div>
+                  <div
+                    className={`h-px w-10 ${isDark ? "bg-neutral-500" : "bg-neutral-400"}`}
+                  />
+                </div>
+              </div>
+            )}
+
+            {thumbnailUrl && !insideGallery && (
+              <figure className="my-10 text-center">
+                <img
+                  src={thumbnailUrl}
+                  alt={title || "Illustration"}
+                  className="w-full max-w-[480px] mx-auto object-contain"
+                  loading="lazy"
+                />
+              </figure>
+            )}
+
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
+              rehypePlugins={[rehypeRaw, rehypeKatex]}
+              components={{
+                img: (props) => (
+                  <ImageRender
+                    setActiveImageId={setActiveImageId}
+                    getImageSettings={getImageSettings}
+                    props={props}
+                  />
+                ),
+                hr: () => (
+                  <div className="flex items-center justify-center gap-3 my-10">
+                    <div
+                      className={`h-px w-8 ${isDark ? "bg-neutral-600" : "bg-neutral-300"}`}
+                    />
+                    <span
+                      className={`text-base ${isDark ? "text-neutral-500" : "text-neutral-400"}`}
+                    >
+                      ✦
+                    </span>
+                    <div
+                      className={`h-px w-8 ${isDark ? "bg-neutral-600" : "bg-neutral-300"}`}
+                    />
+                  </div>
+                ),
+                code: ({ inline, className, children, ...props }) => (
+                  <CodeBlock
+                    isDark={isDark}
+                    inline={inline}
+                    className={className}
+                    {...props}
+                  >
+                    {children}
+                  </CodeBlock>
+                ),
+                blockquote: ({ children }) => (
+                  <blockquote
+                    className={`text-center italic text-[17px] md:text-[19px] leading-relaxed my-10 mx-4 px-6 py-4
+                      ${isDark ? "text-neutral-300 border-y border-neutral-600" : "text-neutral-600 border-y border-neutral-300"}`}
+                  >
+                    {children}
+                  </blockquote>
+                ),
+                h1: ({ children }) => (
+                  <h1
+                    id={generateId(children)}
+                    className={`text-[26px] md:text-[30px] font-bold text-center mt-16 mb-6 leading-tight tracking-tight
+                      ${isDark ? "text-white" : "text-neutral-900"}`}
+                  >
+                    {children}
+                  </h1>
+                ),
+                h2: ({ children }) => (
+                  <h2
+                    id={generateId(children)}
+                    className={`text-[20px] md:text-[23px] font-bold mt-12 mb-4 leading-snug tracking-tight
+                      ${isDark ? "text-white" : "text-neutral-800"}`}
+                  >
+                    {children}
+                  </h2>
+                ),
+                h3: ({ children }) => (
+                  <h3
+                    id={generateId(children)}
+                    className={`text-[17px] md:text-[19px] font-semibold italic mt-10 mb-3
+                      ${isDark ? "text-neutral-100" : "text-neutral-800"}`}
+                  >
+                    {children}
+                  </h3>
+                ),
+                h4: ({ children }) => (
+                  <h4
+                    id={generateId(children)}
+                    className={`text-[15px] font-semibold mt-8 mb-2 uppercase tracking-wide
+                      ${isDark ? "text-neutral-200" : "text-neutral-700"}`}
+                  >
+                    {children}
+                  </h4>
+                ),
+                h5: ({ children }) => (
+                  <h5
+                    className={`text-[14px] font-semibold mt-6 mb-2 ${isDark ? "text-neutral-200" : "text-neutral-700"}`}
+                  >
+                    {children}
+                  </h5>
+                ),
+                h6: ({ children }) => (
+                  <h6
+                    className={`text-[13px] font-semibold uppercase tracking-widest mt-5 mb-2 ${isDark ? "text-neutral-400" : "text-neutral-500"}`}
+                  >
+                    {children}
+                  </h6>
+                ),
+                p: ({ children }) => (
+                  <p
+                    className={`text-[16px] md:text-[17px] leading-[1.85] my-5 text-justify
+                      ${isDark ? "text-neutral-200" : "text-neutral-800"}`}
+                    style={{ textIndent: "1.5em" }}
+                  >
+                    {children}
+                  </p>
+                ),
+                strong: ({ children }) => (
+                  <strong
+                    className={`font-bold ${isDark ? "text-white" : "text-neutral-900"}`}
+                  >
+                    {children}
+                  </strong>
+                ),
+                em: ({ children }) => (
+                  <em
+                    className={`italic ${isDark ? "text-neutral-300" : "text-neutral-700"}`}
+                  >
+                    {children}
+                  </em>
+                ),
+                a: ({ href, children }) => (
+                  <a
+                    href={href}
+                    className={`underline underline-offset-2 transition-colors ${isDark ? "text-neutral-300 hover:text-white" : "text-neutral-700 hover:text-black"}`}
+                    target={href.startsWith("http") ? "_blank" : "_self"}
+                    rel={href.startsWith("http") ? "noopener noreferrer" : ""}
+                  >
+                    {children}
+                  </a>
+                ),
+                ul: ({ children }) => (
+                  <ul
+                    className={`list-disc pl-7 my-4 space-y-1.5 ${isDark ? "text-neutral-200" : "text-neutral-800"}`}
+                  >
+                    {children}
+                  </ul>
+                ),
+                ol: ({ children }) => (
+                  <ol
+                    className={`list-decimal pl-7 my-4 space-y-1.5 ${isDark ? "text-neutral-200" : "text-neutral-800"}`}
+                  >
+                    {children}
+                  </ol>
+                ),
+                li: ({ children }) => (
+                  <li
+                    className={`text-[16px] leading-[1.75] ${isDark ? "text-neutral-200" : "text-neutral-800"}`}
+                  >
+                    {children}
+                  </li>
+                ),
+                table: ({ children }) => (
+                  <div className="overflow-x-auto my-6">
+                    <table
+                      className={`w-full text-[14px] border-collapse ${isDark ? "text-neutral-200" : "text-neutral-800"}`}
+                    >
+                      {children}
+                    </table>
+                  </div>
+                ),
+                thead: ({ children }) => (
+                  <thead
+                    className={`border-b-2 ${isDark ? "border-neutral-500" : "border-neutral-400"}`}
+                  >
+                    {children}
+                  </thead>
+                ),
+                tbody: ({ children }) => <tbody>{children}</tbody>,
+                tr: ({ children }) => (
+                  <tr
+                    className={`border-b ${isDark ? "border-neutral-700" : "border-neutral-200"}`}
+                  >
+                    {children}
+                  </tr>
+                ),
+                th: ({ children }) => (
+                  <th
+                    className={`px-4 py-2 text-left font-semibold uppercase text-[11px] tracking-wider ${isDark ? "text-neutral-300" : "text-neutral-600"}`}
+                  >
+                    {children}
+                  </th>
+                ),
+                td: ({ children }) => <td className="px-4 py-2">{children}</td>,
+              }}
+            >
+              {content}
+            </ReactMarkdown>
+          </div>
+          <div className="h-[10vh]" />
+        </div>
+
+        {!insidePost && activeImageId && <ImageSettingsModal />}
+      </>
+    );
+  }
+
+  // ── Default: article / poem / story / written ────────────────────────────
+  // Extracted image settings modal to avoid repetition
+  const ImageSettingsModal = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="relative bg-white text-black rounded-lg p-6 w-80">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute right-2 top-2"
+          onClick={() => setActiveImageId(null)}
+        >
+          <X className="h-4 w-4" />
+        </Button>
+        <h3 className="text-lg font-semibold mb-4">Image Settings</h3>
+        <div className="grid grid-cols-1 gap-6">
+          <div className="space-y-2">
+            <Label>
+              Margin Top: {imageSettingsRef.current[activeImageId]?.marginTop}px
+            </Label>
+            <Slider
+              value={[imageSettingsRef.current[activeImageId]?.marginTop]}
+              min={35}
+              max={100}
+              step={1}
+              onValueChange={(value) =>
+                updateImageSetting(activeImageId, "marginTop", value[0])
+              }
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>
+              Margin Bottom:{" "}
+              {imageSettingsRef.current[activeImageId]?.marginBottom}px
+            </Label>
+            <Slider
+              value={[imageSettingsRef.current[activeImageId]?.marginBottom]}
+              min={35}
+              max={100}
+              step={1}
+              onValueChange={(value) =>
+                updateImageSetting(activeImageId, "marginBottom", value[0])
+              }
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>
+              Max Height: {imageSettingsRef.current[activeImageId]?.maxHeight}px
+            </Label>
+            <Slider
+              value={[imageSettingsRef.current[activeImageId]?.maxHeight]}
+              min={360}
+              max={800}
+              step={10}
+              onValueChange={(value) =>
+                updateImageSetting(activeImageId, "maxHeight", value[0])
+              }
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>
+              Max Width: {imageSettingsRef.current[activeImageId]?.maxWidth}px
+            </Label>
+            <Slider
+              value={[imageSettingsRef.current[activeImageId]?.maxWidth]}
+              min={500}
+              max={1000}
+              step={10}
+              onValueChange={(value) =>
+                updateImageSetting(activeImageId, "maxWidth", value[0])
+              }
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Position</Label>
+            <RadioGroup
+              value={imageSettingsRef.current[activeImageId]?.alignment}
+              onValueChange={(value) =>
+                updateImageSetting(activeImageId, "alignment", value)
+              }
+              className="flex space-x-4"
+            >
+              {["flex-start", "center", "flex-end"].map((position) => (
+                <div className="flex items-center space-x-2" key={position}>
+                  <RadioGroupItem
+                    value={position}
+                    id={`${activeImageId}-${position}`}
+                  />
+                  <Label htmlFor={`${activeImageId}-${position}`}>
+                    {convertFlexAlignment(position)}
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <>
       <Card
@@ -540,21 +1054,18 @@ export const MarkdownPreview = memo(function MarkdownPreview({
             id="export"
             className="prose prose-slate max-w-none sentient-regular"
           >
-            {/* title */}
             {title && (
               <div
                 className={`leading-tight tracking-tight capitalize ${
                   insideGallery
                     ? "text-xl font-semibold font-sans pt-0 mb-4"
                     : "text-4xl font-bold font-serif pt-2 mb-10"
-                }
-                ${artType === "poem" ? "!max-w-[600px] !font-boskaBold" : ""}`}
+                } ${artType === "poem" ? "!max-w-[600px] !font-boskaBold" : ""}`}
               >
                 {title}
               </div>
             )}
 
-            {/* thumbnail */}
             {thumbnailUrl && !insideGallery && (
               <div
                 className="relative mb-8 w-full md:w-[110%] md:transform md:translate-x-[-5%] max-h-[370px] bg-gray-200 dark:bg-[#333]
@@ -569,7 +1080,6 @@ export const MarkdownPreview = memo(function MarkdownPreview({
               </div>
             )}
 
-            {/* markdown content */}
             <ReactMarkdown
               remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
               rehypePlugins={[rehypeRaw, rehypeKatex]}
@@ -581,7 +1091,6 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                     props={props}
                   />
                 ),
-
                 hr: (props) => (
                   <hr
                     className={`border-t ${isDark ? "border-oneDarkBorder" : "border-gray-200"}
@@ -589,7 +1098,6 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                     {...props}
                   />
                 ),
-
                 code: ({ inline, className, children, ...props }) => (
                   <CodeBlock
                     isDark={isDark}
@@ -600,8 +1108,6 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                     {children}
                   </CodeBlock>
                 ),
-
-                // blockquote styles are fixed in app.css
                 blockquote: ({ children }) => {
                   return insideGallery ? (
                     <p className="border-l-2 pl-2">{children}</p>
@@ -614,7 +1120,6 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                     </blockquote>
                   );
                 },
-
                 h1: ({ children }) => (
                   <h1
                     id={generateId(children)}
@@ -679,7 +1184,6 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                     {children}
                   </h6>
                 ),
-
                 p: ({ children }) => (
                   <p
                     className={`
@@ -688,17 +1192,11 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                           ? "text-xs leading-relaxed my-2 max-w-[110ch] montserrat-regular"
                           : "text-base md:text-lg md:leading-[28px] my-8 max-w-prose"
                       }
-                      ${
-                        artType === "poem"
-                          ? "!font-boskaLight !text-xl !leading-[32px] !my-0"
-                          : ""
-                      }`}
+                      ${artType === "poem" ? "!font-boskaLight !text-xl !leading-[32px] !my-0" : ""}`}
                   >
-                    {/* initially it was : leading-[40px] */}
                     {children}
                   </p>
                 ),
-
                 strong: ({ children }) => (
                   <strong
                     className={`font-semibold ${insideGallery ? "" : "sentient-bold"}`}
@@ -706,7 +1204,6 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                     {children}
                   </strong>
                 ),
-
                 em: ({ children }) => (
                   <em
                     className={`italic ${artType === "poem" ? "font-boska" : "sentient-italic"}`}
@@ -714,7 +1211,6 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                     {children}
                   </em>
                 ),
-
                 a: ({ href, children }) => (
                   <a
                     href={href}
@@ -729,7 +1225,6 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                     {children}
                   </a>
                 ),
-
                 ul: ({ children }) => (
                   <ul className="sentient-regular list-disc pl-6 md:pl-8 my-3 md:my-4 space-y-1">
                     {children}
@@ -751,12 +1246,9 @@ export const MarkdownPreview = memo(function MarkdownPreview({
                     {children}
                   </li>
                 ),
-
                 table: ({ children }) => (
                   <div className="overflow-x-auto">
-                    <table
-                      className={`border border-gray-400 dark:border-[#3e4451] bg-white dark:bg-[#282c34] w-full text-gray-900 dark:text-[#abb2bf]`}
-                    >
+                    <table className="border border-gray-400 dark:border-[#3e4451] bg-white dark:bg-[#282c34] w-full text-gray-900 dark:text-[#abb2bf]">
                       {children}
                     </table>
                   </div>
@@ -798,122 +1290,7 @@ export const MarkdownPreview = memo(function MarkdownPreview({
         <CardFooter className="bg-transparent h-[15vh]" />
       </Card>
 
-      {/* create a seperate comp later */}
-      {!insidePost && activeImageId && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className={`relative bg-white text-black rounded-lg p-6 w-80`}>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-2 top-2"
-              onClick={() => setActiveImageId(null)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-
-            <h3 className="text-lg font-semibold mb-4">Image Settings</h3>
-
-            <div className="grid grid-cols-1 gap-6">
-              {/* Margin Top */}
-              <div className="space-y-2">
-                <Label>
-                  Margin Top:{" "}
-                  {imageSettingsRef.current[activeImageId]?.marginTop}
-                  px
-                </Label>
-                <Slider
-                  value={[imageSettingsRef.current[activeImageId]?.marginTop]}
-                  min={35}
-                  max={100}
-                  step={1}
-                  onValueChange={(value) =>
-                    updateImageSetting(activeImageId, "marginTop", value[0])
-                  }
-                />
-              </div>
-
-              {/* Margin Bottom */}
-              <div className="space-y-2">
-                <Label>
-                  Margin Bottom:{" "}
-                  {imageSettingsRef.current[activeImageId]?.marginBottom}
-                  px
-                </Label>
-                <Slider
-                  value={[
-                    imageSettingsRef.current[activeImageId]?.marginBottom,
-                  ]}
-                  min={35}
-                  max={100}
-                  step={1}
-                  onValueChange={(value) =>
-                    updateImageSetting(activeImageId, "marginBottom", value[0])
-                  }
-                />
-              </div>
-
-              {/* Max Height */}
-              <div className="space-y-2">
-                <Label>
-                  Max Height:{" "}
-                  {imageSettingsRef.current[activeImageId]?.maxHeight}
-                  px
-                </Label>
-                <Slider
-                  value={[imageSettingsRef.current[activeImageId]?.maxHeight]}
-                  min={360}
-                  max={800}
-                  step={10}
-                  onValueChange={(value) =>
-                    updateImageSetting(activeImageId, "maxHeight", value[0])
-                  }
-                />
-              </div>
-
-              {/* Max Width */}
-              <div className="space-y-2">
-                <Label>
-                  Max Width: {imageSettingsRef.current[activeImageId]?.maxWidth}
-                  px
-                </Label>
-                <Slider
-                  value={[imageSettingsRef.current[activeImageId]?.maxWidth]}
-                  min={500}
-                  max={1000}
-                  step={10}
-                  onValueChange={(value) =>
-                    updateImageSetting(activeImageId, "maxWidth", value[0])
-                  }
-                />
-              </div>
-
-              {/* Position */}
-              <div className="space-y-2">
-                <Label>Position</Label>
-                <RadioGroup
-                  value={imageSettingsRef.current[activeImageId]?.alignment}
-                  onValueChange={(value) =>
-                    updateImageSetting(activeImageId, "alignment", value)
-                  }
-                  className="flex space-x-4"
-                >
-                  {["flex-start", "center", "flex-end"].map((position) => (
-                    <div className="flex items-center space-x-2" key={position}>
-                      <RadioGroupItem
-                        value={position}
-                        id={`${activeImageId}-${position}`}
-                      />
-                      <Label htmlFor={`${activeImageId}-${position}`}>
-                        {convertFlexAlignment(position)}
-                      </Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {!insidePost && activeImageId && <ImageSettingsModal />}
     </>
   );
 });
@@ -1322,17 +1699,19 @@ export function TitleInput({
   lightModeBg,
 }) {
   return (
-    <input
-      type="text"
+    <textarea
       value={title}
+      rows={1}
       onChange={(e) => {
         setTitle(e.target.value);
         setIsSaved(false);
+
+        e.target.style.height = "auto";
         e.target.style.height = e.target.scrollHeight + "px";
       }}
       placeholder="Title"
-      className={`w-full h-auto text-4xl font-bold font-serif mb-8 focus:outline-none transition-all duration-0
-      leading-tight tracking-tight capitalize
+      className={`w-full h-fit text-4xl font-bold font-serif mb-8 focus:outline-none transition-all duration-0
+      leading-tight tracking-tight capitalize resize-none
       ${isDark ? "bg-[#222]" : lightModeBg}
       ${isPreview ? "opacity-0" : "opacity-100"}`}
     />
@@ -1347,34 +1726,41 @@ TitleInput.propTypes = {
   lightModeBg: PropTypes.string,
 };
 
-export function ContentInput({
-  content,
-  isDark,
-  isPreview,
-  lightModeBg,
-  setIsSaved,
-  textAlignment,
-  handleContentChange,
-}) {
+export const ContentInput = forwardRef(function ContentInput(
+  {
+    content,
+    isDark,
+    isPreview,
+    lightModeBg,
+    setIsSaved,
+    textAlignment,
+    handleContentChange,
+    onKeyDown,
+  },
+  ref,
+) {
   return (
     <textarea
+      ref={ref}
       data-lenis-prevent
       id="txtArea"
       value={content}
       onChange={(e) => {
         handleContentChange(e, setIsSaved);
       }}
+      onKeyDown={onKeyDown}
       placeholder="Fill your canvas..."
       className={`w-full font-[montserrat] min-h-screen h-auto
-    resize-none focus:outline-none
-    text-lg text-left Xsentient-regular
-    transition-all duration-0
-    ${isDark ? "bg-[#222]" : lightModeBg}
-    ${isPreview ? "opacity-0 max-h-screen" : "opacity-100 max-h-auto"}
-    ${textAlignment === "center" ? "text-center" : "text-left"}`}
+        resize-none focus:outline-none
+        text-lg text-left Xsentient-regular
+        transition-all duration-0
+        ${isDark ? "bg-[#222]" : lightModeBg}
+        ${isPreview ? "opacity-0 max-h-screen" : "opacity-100 max-h-auto"}
+        ${textAlignment === "center" ? "text-center" : "text-left"}`}
     />
   );
-}
+});
+
 ContentInput.propTypes = {
   content: PropTypes.any,
   isDark: PropTypes.bool,
@@ -1383,6 +1769,7 @@ ContentInput.propTypes = {
   textAlignment: PropTypes.string,
   setIsSaved: PropTypes.func,
   handleContentChange: PropTypes.func,
+  onKeyDown: PropTypes.func,
 };
 
 export const rawText = `

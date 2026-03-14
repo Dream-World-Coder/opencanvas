@@ -1516,11 +1516,460 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
   textAlignment = "left",
   lightModeBg = "bg-white",
   darkBg = "bg-[#222222]",
-  artType = "written",
+  artType = "written", // ["research-paper", "article", "poem", "story", "book", "written"],
   darkTheme = null,
 }) {
   if (!isVisible) return <></>;
 
+  const isResearchPaper = artType === "research-paper";
+  const isBook = artType === "book";
+  const isDocType = isResearchPaper || isBook;
+
+  // Research paper / book get their own self-contained layout — ignore isDark for these
+  if (isResearchPaper) {
+    return (
+      <div className="w-full bg-white flex flex-col items-center font-serif text-black">
+        <div
+          id="export"
+          className="w-full max-w-[780px] px-12 py-10 text-[15px] leading-[1.55]"
+          style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}
+        >
+          {/* Title block */}
+          {title && (
+            <div className="text-center mb-6 border-b border-black pb-6">
+              <h1
+                className="text-[22px] font-bold leading-tight tracking-tight uppercase mb-3"
+                style={{ fontFamily: "inherit" }}
+              >
+                {title}
+              </h1>
+              {/* Decorative rule under title */}
+              <div className="flex items-center justify-center gap-2 mt-3">
+                <div className="h-px w-16 bg-black" />
+                <div className="h-1.5 w-1.5 rounded-full bg-black" />
+                <div className="h-px w-16 bg-black" />
+              </div>
+            </div>
+          )}
+
+          {/* Thumbnail as figure */}
+          {thumbnailUrl && (
+            <figure className="my-6 border border-black/20">
+              <img
+                src={thumbnailUrl}
+                alt={title || "Figure"}
+                className="w-full object-contain"
+                loading="lazy"
+              />
+              <figcaption className="text-center text-[12px] text-black/60 py-1 border-t border-black/10 px-2">
+                Figure 1. {title}
+              </figcaption>
+            </figure>
+          )}
+
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
+            rehypePlugins={[rehypeRaw, rehypeKatex]}
+            components={{
+              img: MarkdownImage,
+              hr: () => <hr className="my-8 border-t border-black/20" />,
+              code: ({ inline, className, children, ...props }) => (
+                <CodeBlock
+                  isDark={false}
+                  inline={inline}
+                  className={className}
+                  {...props}
+                >
+                  {children}
+                </CodeBlock>
+              ),
+              blockquote: ({ children }) => (
+                <blockquote className="border-l-2 border-black/40 pl-4 py-0.5 my-4 text-black/70 italic text-[14px]">
+                  {children}
+                </blockquote>
+              ),
+              h1: ({ children }) => (
+                <h1
+                  id={generateId(children)}
+                  className="mt-10 mb-3 text-[17px] font-bold uppercase tracking-widest border-b border-black/30 pb-1 flex items-center gap-2 group"
+                >
+                  {children}
+                  <Link
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={() => copyHeaderLink(children)}
+                  />
+                </h1>
+              ),
+              h2: ({ children }) => (
+                <h2
+                  id={generateId(children)}
+                  className="mt-8 mb-2 text-[15px] font-bold uppercase tracking-wider flex items-center gap-2 group"
+                >
+                  {children}
+                  <Link
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={() => copyHeaderLink(children)}
+                  />
+                </h2>
+              ),
+              h3: ({ children }) => (
+                <h3
+                  id={generateId(children)}
+                  className="mt-6 mb-2 text-[14px] font-bold italic flex items-center gap-2 group"
+                >
+                  {children}
+                  <Link
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={() => copyHeaderLink(children)}
+                  />
+                </h3>
+              ),
+              h4: ({ children }) => (
+                <h4
+                  id={generateId(children)}
+                  className="mt-4 mb-1 text-[14px] font-semibold flex items-center gap-2 group"
+                >
+                  {children}
+                  <Link
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={() => copyHeaderLink(children)}
+                  />
+                </h4>
+              ),
+              h5: ({ children }) => (
+                <h5 className="mt-4 mb-1 text-[13px] font-semibold uppercase tracking-wide">
+                  {children}
+                </h5>
+              ),
+              h6: ({ children }) => (
+                <h6 className="mt-3 mb-1 text-[12px] font-semibold uppercase tracking-widest text-black/60">
+                  {children}
+                </h6>
+              ),
+              p: ({ children }) => (
+                <p className="my-3 text-[15px] leading-[1.7] text-justify hyphens-auto text-black">
+                  {children}
+                </p>
+              ),
+              strong: ({ children }) => (
+                <strong className="font-bold text-black">{children}</strong>
+              ),
+              em: ({ children }) => (
+                <em className="italic text-black">{children}</em>
+              ),
+              a: ({ href, children }) => (
+                <a
+                  href={href}
+                  className="text-black underline underline-offset-2 hover:text-black/60 transition-colors"
+                  target={href.startsWith("http") ? "_blank" : "_self"}
+                  rel={href.startsWith("http") ? "noopener noreferrer" : ""}
+                >
+                  {children}
+                </a>
+              ),
+              ul: ({ children }) => (
+                <ul className="list-disc pl-6 my-3 space-y-1 text-[14px] text-black">
+                  {children}
+                </ul>
+              ),
+              ol: ({ children }) => (
+                <ol className="list-decimal pl-6 my-3 space-y-1 text-[14px] text-black">
+                  {children}
+                </ol>
+              ),
+              li: ({ children }) => (
+                <li className="text-[14px] leading-[1.6] text-black">
+                  {children}
+                </li>
+              ),
+              table: ({ children }) => (
+                <div className="overflow-x-auto my-5">
+                  <table className="border-collapse w-full text-[13px] text-black border border-black/30">
+                    {children}
+                  </table>
+                </div>
+              ),
+              thead: ({ children }) => (
+                <thead className="border-b-2 border-black">{children}</thead>
+              ),
+              tbody: ({ children }) => <tbody>{children}</tbody>,
+              tr: ({ children }) => (
+                <tr className="border-b border-black/15 even:bg-black/[0.03]">
+                  {children}
+                </tr>
+              ),
+              th: ({ children }) => (
+                <th className="px-3 py-1.5 font-bold text-left uppercase tracking-wide text-[11px] border-r border-black/20 last:border-r-0">
+                  {children}
+                </th>
+              ),
+              td: ({ children }) => (
+                <td className="px-3 py-1.5 border-r border-black/10 last:border-r-0">
+                  {children}
+                </td>
+              ),
+            }}
+          >
+            {content}
+          </ReactMarkdown>
+        </div>
+        <div className="h-[10vh]" />
+      </div>
+    );
+  }
+
+  if (isBook) {
+    return (
+      <div
+        className={`w-full flex flex-col items-center ${isDark ? `${darkBg} ${darkTheme?.primaryText}` : "bg-[#faf8f4]"}`}
+      >
+        <div
+          id="export"
+          className="w-full max-w-[680px] px-10 py-14"
+          style={{ fontFamily: "'Georgia', 'Palatino Linotype', serif" }}
+        >
+          {/* Chapter / Title */}
+          {title && (
+            <div className="text-center mb-16">
+              <p
+                className={`text-[11px] uppercase tracking-[0.25em] mb-4 ${isDark ? "text-neutral-400" : "text-neutral-500"}`}
+              >
+                Chapter
+              </p>
+              <h1
+                className={`text-[32px] md:text-[40px] font-bold leading-tight tracking-tight ${isDark ? darkTheme?.primaryText : "text-neutral-900"}`}
+              >
+                {title}
+              </h1>
+              <div className="flex items-center justify-center gap-3 mt-8">
+                <div
+                  className={`h-px w-10 ${isDark ? "bg-neutral-500" : "bg-neutral-400"}`}
+                />
+                <div
+                  className={`text-lg ${isDark ? "text-neutral-500" : "text-neutral-400"}`}
+                >
+                  ❧
+                </div>
+                <div
+                  className={`h-px w-10 ${isDark ? "bg-neutral-500" : "bg-neutral-400"}`}
+                />
+              </div>
+            </div>
+          )}
+
+          {thumbnailUrl && (
+            <figure className="my-10 text-center">
+              <img
+                src={thumbnailUrl}
+                alt={title || "Illustration"}
+                className="w-full max-w-[480px] mx-auto object-contain"
+                loading="lazy"
+              />
+            </figure>
+          )}
+
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
+            rehypePlugins={[rehypeRaw, rehypeKatex]}
+            components={{
+              img: MarkdownImage,
+              hr: () => (
+                <div className="flex items-center justify-center gap-3 my-10">
+                  <div
+                    className={`h-px w-8 ${isDark ? "bg-neutral-600" : "bg-neutral-300"}`}
+                  />
+                  <span
+                    className={`text-base ${isDark ? "text-neutral-500" : "text-neutral-400"}`}
+                  >
+                    ✦
+                  </span>
+                  <div
+                    className={`h-px w-8 ${isDark ? "bg-neutral-600" : "bg-neutral-300"}`}
+                  />
+                </div>
+              ),
+              code: ({ inline, className, children, ...props }) => (
+                <CodeBlock
+                  isDark={isDark}
+                  inline={inline}
+                  className={className}
+                  {...props}
+                >
+                  {children}
+                </CodeBlock>
+              ),
+              blockquote: ({ children }) => (
+                <blockquote
+                  className={`text-center italic text-[17px] md:text-[19px] leading-relaxed my-10 mx-4 px-6
+                    ${isDark ? "text-neutral-300 border-y border-neutral-600" : "text-neutral-600 border-y border-neutral-300"}
+                    py-4`}
+                >
+                  {children}
+                </blockquote>
+              ),
+              h1: ({ children }) => (
+                <h1
+                  id={generateId(children)}
+                  className={`text-[26px] md:text-[30px] font-bold text-center mt-16 mb-6 leading-tight tracking-tight
+                    ${isDark ? darkTheme?.primaryText : "text-neutral-900"} flex items-center justify-center gap-2 group`}
+                >
+                  {children}
+                  <Link
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={() => copyHeaderLink(children)}
+                  />
+                </h1>
+              ),
+              h2: ({ children }) => (
+                <h2
+                  id={generateId(children)}
+                  className={`text-[20px] md:text-[23px] font-bold mt-12 mb-4 leading-snug tracking-tight
+                    ${isDark ? darkTheme?.primaryText : "text-neutral-800"} flex items-center gap-2 group`}
+                >
+                  {children}
+                  <Link
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={() => copyHeaderLink(children)}
+                  />
+                </h2>
+              ),
+              h3: ({ children }) => (
+                <h3
+                  id={generateId(children)}
+                  className={`text-[17px] md:text-[19px] font-semibold italic mt-10 mb-3
+                    ${isDark ? darkTheme?.primaryText : "text-neutral-800"} flex items-center gap-2 group`}
+                >
+                  {children}
+                  <Link
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={() => copyHeaderLink(children)}
+                  />
+                </h3>
+              ),
+              h4: ({ children }) => (
+                <h4
+                  id={generateId(children)}
+                  className={`text-[15px] font-semibold mt-8 mb-2 uppercase tracking-wide
+                    ${isDark ? darkTheme?.primaryText : "text-neutral-700"} flex items-center gap-2 group`}
+                >
+                  {children}
+                  <Link
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={() => copyHeaderLink(children)}
+                  />
+                </h4>
+              ),
+              h5: ({ children }) => (
+                <h5
+                  className={`text-[14px] font-semibold mt-6 mb-2 ${isDark ? darkTheme?.primaryText : "text-neutral-700"}`}
+                >
+                  {children}
+                </h5>
+              ),
+              h6: ({ children }) => (
+                <h6
+                  className={`text-[13px] font-semibold uppercase tracking-widest mt-5 mb-2 ${isDark ? "text-neutral-400" : "text-neutral-500"}`}
+                >
+                  {children}
+                </h6>
+              ),
+              p: ({ children }) => (
+                <p
+                  className={`text-[16px] md:text-[17px] leading-[1.85] my-5 text-justify
+                    ${isDark ? darkTheme?.secondaryText : "text-neutral-800"}`}
+                  style={{ textIndent: "1.5em" }}
+                >
+                  {children}
+                </p>
+              ),
+              strong: ({ children }) => (
+                <strong
+                  className={`font-bold ${isDark ? darkTheme?.secondaryText : "text-neutral-900"}`}
+                >
+                  {children}
+                </strong>
+              ),
+              em: ({ children }) => (
+                <em
+                  className={`italic ${isDark ? darkTheme?.secondaryText : "text-neutral-700"}`}
+                >
+                  {children}
+                </em>
+              ),
+              a: ({ href, children }) => (
+                <a
+                  href={href}
+                  className={`underline underline-offset-2 transition-colors ${isDark ? "text-neutral-300 hover:text-white" : "text-neutral-700 hover:text-black"}`}
+                  target={href.startsWith("http") ? "_blank" : "_self"}
+                  rel={href.startsWith("http") ? "noopener noreferrer" : ""}
+                >
+                  {children}
+                </a>
+              ),
+              ul: ({ children }) => (
+                <ul
+                  className={`list-disc pl-7 my-4 space-y-1.5 ${isDark ? darkTheme?.secondaryText : "text-neutral-800"}`}
+                >
+                  {children}
+                </ul>
+              ),
+              ol: ({ children }) => (
+                <ol
+                  className={`list-decimal pl-7 my-4 space-y-1.5 ${isDark ? darkTheme?.secondaryText : "text-neutral-800"}`}
+                >
+                  {children}
+                </ol>
+              ),
+              li: ({ children }) => (
+                <li
+                  className={`text-[16px] leading-[1.75] ${isDark ? darkTheme?.secondaryText : "text-neutral-800"}`}
+                >
+                  {children}
+                </li>
+              ),
+              table: ({ children }) => (
+                <div className="overflow-x-auto my-6">
+                  <table
+                    className={`w-full text-[14px] border-collapse ${isDark ? "text-neutral-200" : "text-neutral-800"}`}
+                  >
+                    {children}
+                  </table>
+                </div>
+              ),
+              thead: ({ children }) => (
+                <thead
+                  className={`border-b-2 ${isDark ? "border-neutral-500" : "border-neutral-400"}`}
+                >
+                  {children}
+                </thead>
+              ),
+              tbody: ({ children }) => <tbody>{children}</tbody>,
+              tr: ({ children }) => (
+                <tr
+                  className={`border-b ${isDark ? "border-neutral-700" : "border-neutral-200"}`}
+                >
+                  {children}
+                </tr>
+              ),
+              th: ({ children }) => (
+                <th
+                  className={`px-4 py-2 text-left font-semibold uppercase text-[11px] tracking-wider ${isDark ? "text-neutral-300" : "text-neutral-600"}`}
+                >
+                  {children}
+                </th>
+              ),
+              td: ({ children }) => <td className="px-4 py-2">{children}</td>,
+            }}
+          >
+            {content}
+          </ReactMarkdown>
+        </div>
+        <div className="h-[10vh]" />
+      </div>
+    );
+  }
+
+  // ── Default: article / poem / story / written ────────────────────────────
   return (
     <div
       className={`w-full bg-white flex flex-col

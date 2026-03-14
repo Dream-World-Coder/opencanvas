@@ -834,6 +834,7 @@ export const PostList = memo(function PostList({
                             textAlignment="left"
                             insidePost={true}
                             contentOnly={true}
+                            artType={post.type}
                           />
                         </div>
                         <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white dark:from-[#222] to-transparent" />

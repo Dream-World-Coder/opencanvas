@@ -64,7 +64,7 @@ export function useWritingPad({ postId, frontendOnly, artType, editing }) {
       isPublic,
       type: artType, // server expects "type", not "artType"
       thumbnailUrl,
-      readTime: `${Math.ceil((content.split(" ").length * 0.8) / 137)} min read`,
+      readTime: `${Math.ceil((content.split(" ").length * 0.8) / 225)} min read`,
       media,
     };
 

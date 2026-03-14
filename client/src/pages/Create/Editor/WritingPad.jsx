@@ -1,4 +1,6 @@
-import { useState, useEffect, useRef, memo } from "react";
+// WritingPad.jsx
+
+import { useState, useRef, memo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
@@ -52,7 +54,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  // MarkdownPreview,
   LinkInsertButton,
   ImageUploadButton,
   ScrollToBottomButton,
@@ -69,24 +70,22 @@ import {
 import { postDarkThemes } from "@/services/themes";
 import { ThemedMarkdownPreview } from "@/pages/PostView/components";
 
-// hooks
 import { useWritingPad } from "./hooks/useWritingPad";
-import { useEditorFormatting } from "./hooks/useEditorFormatting";
+import { useEditor } from "./hooks/useEditor"; // ← single hook
 import { useEditorAppearance } from "./hooks/useEditorAppearance";
 import { useExport } from "./hooks/useExport";
-
 import { useAuth } from "@/contexts/AuthContext";
 
-// global const
 const frontendOnly = false;
-// ----------------------------
 
 const WritingPad = memo(function WritingPad() {
   const { currentUser } = useAuth();
   const publishBtnRef = useRef(null);
+  const textareaRef = useRef(null);
+  const undoBtnRef = useRef(null);
+  const redoBtnRef = useRef(null);
   const navigate = useNavigate();
 
-  // Post ID and type come from URL: /editor/markdown/create?type=article&id=...
   const [searchParams] = useSearchParams();
   const postId = searchParams.get("id") ?? "";
   const artType = searchParams.get("type") ?? "article";
@@ -97,8 +96,6 @@ const WritingPad = memo(function WritingPad() {
     setTitle,
     content,
     setContent,
-    isSaved,
-    setIsSaved,
     showUnsavedAlert,
     setShowUnsavedAlert,
     handleSave,
@@ -112,19 +109,28 @@ const WritingPad = memo(function WritingPad() {
     setThumbnailUrl,
   } = useWritingPad({ postId, frontendOnly, artType, editing });
 
-  // formatting
+  // ── Single combined hook ──────────────────────────────────────────────────
   const {
     textAlignment,
     setTextAlignment,
-    handleContentChange,
+    isSaved,
+    setIsSaved,
     undoStack,
     redoStack,
+    handleContentChange,
     handleUndo,
     handleRedo,
     handleFormat,
-  } = useEditorFormatting(content, setContent);
+    onKeyDown,
+  } = useEditor({
+    content,
+    setContent,
+    textareaRef,
+    publishBtnRef,
+    undoBtnRef,
+    redoBtnRef,
+  });
 
-  // Editor appearance
   const {
     sepia,
     setSepia,
@@ -137,7 +143,6 @@ const WritingPad = memo(function WritingPad() {
     setOptionsDropdownOpen,
   } = useEditorAppearance();
 
-  // Export
   const {
     isPreview,
     setIsPreview,
@@ -151,46 +156,7 @@ const WritingPad = memo(function WritingPad() {
   const lastButton = formattingButtons[formattingButtons.length - 1];
   const LastIcon = lastButton.icon;
 
-  // listen for keystrokes and apply formatting
-  // cmd+b:handleFrmat(bold), cmd+i:handleFrmat(italics), cmd+u:handleFrmat(underline), cmd+h:handleFrmat(highlight)
-  // use control instead cmd for windows
-  // and for cmd+s, click the publish button, publishBtnRef.current.click()
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      // Check if cmd key (Mac) or ctrl key (Windows/Linux) is pressed
-      const isCmdOrCtrlPressed = e.metaKey || e.ctrlKey;
-
-      if (!isCmdOrCtrlPressed) return;
-
-      if (isCmdOrCtrlPressed) {
-        if (e.key === "b" || e.key === "B") {
-          e.preventDefault();
-          handleFormat("bold");
-        } else if (e.key === "i" || e.key === "I") {
-          e.preventDefault();
-          handleFormat("italic");
-        } else if (e.key === "u" || e.key === "U") {
-          e.preventDefault();
-          handleFormat("underline");
-        } else if (e.key === "s" || e.key === "S") {
-          // For ⌘+S, browsers always try to save the page
-          e.preventDefault();
-          e.stopPropagation();
-          if (publishBtnRef.current) {
-            publishBtnRef.current.click();
-          }
-        }
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
-
-  const [darkTheme, setDT] = useState(
+  const [darkTheme] = useState(
     isDark ? postDarkThemes.dark : postDarkThemes.light,
   );
 
@@ -212,7 +178,7 @@ const WritingPad = memo(function WritingPad() {
         className={`min-h-screen transition-all duration-0 relative h-fit
           ${isDark ? "bg-[#222] text-[#f0f0f0]" : `${lightModeBg} text-black`}`}
       >
-        {/* Top Bar */}
+        {/* ── Top Bar ───────────────────────────────────────────────────────── */}
         <div
           className={`fixed top-0 left-0 right-0 border-b z-50 transition-all duration-0
             ${isDark ? "bg-[#222] border-[#333]" : "bg-white border-gray-100"}`}
@@ -244,14 +210,13 @@ const WritingPad = memo(function WritingPad() {
                 </div>
               </div>
 
-              {/* options */}
               <div className="flex items-center space-x-3 md:space-x-4">
-                {/* publish btn */}
+                {/* Publish */}
                 <Dialog>
                   <DialogTrigger asChild>
                     <button
                       ref={publishBtnRef}
-                      className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm bg-lime-500 text-white`}
+                      className="flex items-center space-x-1 px-3 py-1 rounded-full text-sm bg-lime-500 text-white"
                     >
                       publish
                     </button>
@@ -263,7 +228,7 @@ const WritingPad = memo(function WritingPad() {
                         account: {currentUser.email}
                       </DialogDescription>
                     </DialogHeader>
-                    <div className="flex  flex-col md:flex-row items-start justify-center gap-4 md:gap-16 p-4">
+                    <div className="flex flex-col md:flex-row items-start justify-center gap-4 md:gap-16 p-4">
                       <div>
                         <TagInputComponent tags={tags} setTags={setTags} />
                         <PublicPreferenceInput
@@ -277,7 +242,6 @@ const WritingPad = memo(function WritingPad() {
                         setMedia={setMedia}
                       />
                     </div>
-
                     <DialogFooter>
                       <Button
                         type="submit"
@@ -290,19 +254,21 @@ const WritingPad = memo(function WritingPad() {
                   </DialogContent>
                 </Dialog>
 
-                {/* preview btn */}
+                {/* Preview toggle */}
                 {!twoColumn && (
                   <button
                     className={`flex items-center space-x-1 px-2 md:px-3 py-1 rounded-full text-sm border
                       ${isDark ? "border-[#555]" : "border-gray-300"}
                       ${
                         isPreview
-                          ? `${isDark ? "text-gray-200 bg-[#555]" : "text-gray-700 bg-gray-300"}`
-                          : `${isDark ? "text-gray-200" : "text-gray-700"}`
+                          ? isDark
+                            ? "text-gray-200 bg-[#555]"
+                            : "text-gray-700 bg-gray-300"
+                          : isDark
+                            ? "text-gray-200"
+                            : "text-gray-700"
                       }`}
-                    onClick={() => {
-                      setIsPreview(!isPreview);
-                    }}
+                    onClick={() => setIsPreview(!isPreview)}
                   >
                     {isPreview ? (
                       <>
@@ -318,7 +284,7 @@ const WritingPad = memo(function WritingPad() {
                   </button>
                 )}
 
-                {/* export dropdown */}
+                {/* Export */}
                 <DropdownMenu>
                   <DropdownMenuTrigger>
                     <Download className="size-5" />
@@ -326,43 +292,45 @@ const WritingPad = memo(function WritingPad() {
                   <DropdownMenuContent>
                     <DropdownMenuLabel>Export document</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                      <button
-                        onClick={() => {
+                    {[
+                      {
+                        label: "pdf",
+                        icon: <FileText className="size-5" />,
+                        action: () => {
                           setTwoColumn(false);
                           handlePdfExport();
-                        }}
-                        className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
-                      >
-                        <FileText className="size-5" /> pdf
-                      </button>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <button
-                        onClick={() => {
+                        },
+                      },
+                      {
+                        label: "txt",
+                        icon: <FileType className="size-4 md:size-5" />,
+                        action: () => {
                           setTwoColumn(false);
                           handleTxtExport("txt");
-                        }}
-                        className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
-                      >
-                        <FileType className="size-4 md:size-5" /> txt
-                      </button>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <button
-                        onClick={() => {
+                        },
+                      },
+                      {
+                        label: "md",
+                        icon: <FileType className="size-4 md:size-5" />,
+                        action: () => {
                           setTwoColumn(false);
                           handleTxtExport("md");
-                        }}
-                        className={`hover:opacity-70 transition-opacity flex items-center justify-start gap-2 size-full ${loading ? "opacity-20" : ""}`}
-                      >
-                        <FileType className="size-4 md:size-5" /> md
-                      </button>
-                    </DropdownMenuItem>
+                        },
+                      },
+                    ].map(({ label, icon, action }) => (
+                      <DropdownMenuItem key={label}>
+                        <button
+                          onClick={action}
+                          className={`hover:opacity-70 transition-opacity flex items-center gap-2 size-full ${loading ? "opacity-20" : ""}`}
+                        >
+                          {icon} {label}
+                        </button>
+                      </DropdownMenuItem>
+                    ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
 
-                {/* dark mode button */}
+                {/* Dark mode */}
                 <button
                   onClick={toggleDarkMode}
                   className="hover:opacity-70 transition-opacity"
@@ -374,7 +342,7 @@ const WritingPad = memo(function WritingPad() {
                   )}
                 </button>
 
-                {/* additional more button */}
+                {/* More */}
                 <DropdownMenu
                   open={optionsDropdownOpen}
                   onOpenChange={setOptionsDropdownOpen}
@@ -383,7 +351,6 @@ const WritingPad = memo(function WritingPad() {
                     <MoreHorizontal className="size-5" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {/* theme */}
                     <DropdownMenuItem
                       className="cursor-pointer"
                       onClick={(e) => {
@@ -393,20 +360,16 @@ const WritingPad = memo(function WritingPad() {
                     >
                       <div
                         className={`rounded-full size-4 border border-[#222] ${sepia ? "bg-white" : "bg-[#FCF5E6]"}`}
-                      ></div>
+                      />
                       {sepia ? "White" : "Sepia"}
                     </DropdownMenuItem>
-
-                    {/* align */}
                     <DropdownMenuItem
                       className="cursor-pointer"
                       onClick={(e) => {
                         e.preventDefault();
-                        {
-                          textAlignment === "center"
-                            ? setTextAlignment("left")
-                            : setTextAlignment("center");
-                        }
+                        setTextAlignment(
+                          textAlignment === "center" ? "left" : "center",
+                        );
                       }}
                     >
                       {textAlignment === "center" ? (
@@ -419,17 +382,14 @@ const WritingPad = memo(function WritingPad() {
                         </>
                       )}
                     </DropdownMenuItem>
-
                     <DropdownMenuItem
                       onClick={(e) => {
                         e.preventDefault();
                         findAndReplace(content, setContent, toast);
                       }}
                     >
-                      <FileSearch />
-                      Find &amp; replace
+                      <FileSearch /> Find &amp; replace
                     </DropdownMenuItem>
-
                     {!isPreview && (
                       <DropdownMenuItem
                         className="hidden md:flex"
@@ -440,19 +400,15 @@ const WritingPad = memo(function WritingPad() {
                       >
                         {!twoColumn ? (
                           <>
-                            <Columns2 />
-                            side preview
+                            <Columns2 /> side preview
                           </>
                         ) : (
                           <>
-                            <PanelTop />
-                            single column
+                            <PanelTop /> single column
                           </>
                         )}
                       </DropdownMenuItem>
                     )}
-
-                    {/* help */}
                     <DropdownMenuItem
                       className="cursor-pointer"
                       onClick={(e) => {
@@ -460,15 +416,14 @@ const WritingPad = memo(function WritingPad() {
                         setHelpOpen(!helpOpen);
                       }}
                     >
-                      <Info />
-                      {helpOpen ? "close Help" : "Help"}
+                      <Info /> {helpOpen ? "close Help" : "Help"}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
             </div>
 
-            {/* Formatting Tools */}
+            {/* Formatting toolbar */}
             <div
               className={`mb-2 mx-4 md:mx-0 flex items-center justify-between rounded-md transition-all duration-0
                 ${isDark ? "bg-[#333]" : "bg-gray-50"}
@@ -482,8 +437,8 @@ const WritingPad = memo(function WritingPad() {
                       key={format}
                       onClick={() => handleFormat(format)}
                       className={`px-[6px] md:px-2 py-3 md:rounded-lg transition-all duration-0 border-r md:border-none
-                        ${isDark ? "hover:bg-gray-500 border-[#222]" : "hover:bg-gray-200 border-gray-200"}
-                        ${["heading", "quote", "list", "inlineCode", "dropCap"].includes(format) ? "hidden md:block" : ""}`}
+                      ${isDark ? "hover:bg-gray-500 border-[#222]" : "hover:bg-gray-200 border-gray-200"}
+                      ${["heading", "quote", "list", "inlineCode", "dropCap"].includes(format) ? "hidden md:block" : ""}`}
                     >
                       <Icon className="size-4" />
                     </button>
@@ -493,69 +448,53 @@ const WritingPad = memo(function WritingPad() {
                     onClick={() => handleFormat(lastButton.format)}
                     className={`px-[6px] md:px-2 py-3 md:rounded-lg transition-all duration-0 border-r md:border-none
                       ${isDark ? "hover:bg-gray-500 border-[#222]" : "hover:bg-gray-200 border-gray-200"}
-                      ${
-                        [
-                          "heading",
-                          "quote",
-                          "list",
-                          "inlineCode",
-                          "dropCap",
-                        ].includes(lastButton.format)
-                          ? "hidden md:block"
-                          : ""
-                      }`}
+                      ${["heading", "quote", "list", "inlineCode", "dropCap"].includes(lastButton.format) ? "hidden md:block" : ""}`}
                   >
                     <LastIcon className="size-4" />
                   </button>
                 )}
                 <LinkInsertButton
-                  onLinkInsert={(markdownImageText) => {
-                    const textarea = document.querySelector("textarea");
-                    const start = textarea.selectionStart;
-                    const newContent =
-                      content.substring(0, start) +
-                      markdownImageText +
-                      content.substring(start);
-                    setContent(newContent);
+                  onLinkInsert={(text) => {
+                    const ta = textareaRef.current;
+                    if (!ta) return;
+                    const s = ta.selectionStart;
+                    setContent(
+                      content.substring(0, s) + text + content.substring(s),
+                    );
                   }}
                   sizing="px-[6px] md:px-2 py-3"
                 />
                 <ImageUploadButton
                   setMedia={setMedia}
-                  onImageInsert={(markdownImageText) => {
-                    const textarea = document.querySelector("textarea");
-                    const start = textarea.selectionStart;
-                    const newContent =
-                      content.substring(0, start) +
-                      markdownImageText +
-                      content.substring(start);
-                    setContent(newContent);
+                  onImageInsert={(text) => {
+                    const ta = textareaRef.current;
+                    if (!ta) return;
+                    const s = ta.selectionStart;
+                    setContent(
+                      content.substring(0, s) + text + content.substring(s),
+                    );
                   }}
                   sizing="px-[6px] md:px-2 py-3"
                 />
               </div>
 
-              {/* undo/redo */}
+              {/* Undo / Redo */}
               <div className="flex items-center space-x-1 md:space-x-2">
                 <button
+                  ref={undoBtnRef}
                   onClick={handleUndo}
                   disabled={undoStack.length === 0}
-                  className={`px-[6px] md:px-2 py-3 rounded-lg transition-all duration-0 ${
-                    undoStack.length === 0
-                      ? "opacity-50"
-                      : `${isDark ? "hover:bg-gray-700" : "hover:bg-gray-200"}`
-                  }`}
+                  className={`px-[6px] md:px-2 py-3 rounded-lg transition-all duration-0
+                    ${undoStack.length === 0 ? "opacity-50" : isDark ? "hover:bg-gray-700" : "hover:bg-gray-200"}`}
                 >
                   <Undo className="size-4" />
                 </button>
                 <button
+                  ref={redoBtnRef}
                   onClick={handleRedo}
                   disabled={redoStack.length === 0}
-                  className={`p-1 md:p-2 rounded-lg transition-all duration-0 ${
-                    redoStack.length === 0
-                      ? "opacity-50"
-                      : `${isDark ? "hover:bg-gray-700" : "hover:bg-gray-200"}`
-                  }`}
+                  className={`p-1 md:p-2 rounded-lg transition-all duration-0
+                    ${redoStack.length === 0 ? "opacity-50" : isDark ? "hover:bg-gray-700" : "hover:bg-gray-200"}`}
                 >
                   <Redo className="size-4" />
                 </button>
@@ -564,7 +503,7 @@ const WritingPad = memo(function WritingPad() {
           </div>
         </div>
 
-        {/* unsaved changes alert */}
+        {/* Unsaved alert */}
         {showUnsavedAlert && (
           <div className="fixed inset-0 bg-[#222] bg-opacity-20 flex items-center justify-center z-20">
             <Alert className="w-96 relative">
@@ -604,55 +543,80 @@ const WritingPad = memo(function WritingPad() {
           </div>
         )}
 
-        {/* Writing Area */}
-        <div className={`pt-[8.25rem] pb-[600px] px-6 relative h-fit`}>
+        {/* ── Writing Area ──────────────────────────────────────────────────── */}
+        <div className="pt-[8.25rem] pb-[600px] px-6 relative h-fit">
           <div
             className={`${twoColumn ? "max-w-[1536px]" : "max-w-3xl"} mx-auto relative h-fit`}
           >
-            {/* help div */}
+            {/* Help card */}
             <div
-              className={`w-[100%] h-auto mx-auto  relative mb-4 z-30
-                rounded text-lg transition-all duration-0 max-w-3xl
-                ${helpOpen ? "" : "hidden"} ${isDark ? "invert" : ""}`}
+              className={`w-full h-auto mx-auto relative mb-4 z-30 rounded text-lg transition-all duration-0 max-w-3xl ${helpOpen ? "" : "hidden"} ${isDark ? "invert" : ""}`}
             >
               <Card className="bg-white">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     Formatting tools &amp; keyboard shortcuts
-                    <X
-                      onClick={() => {
-                        setHelpOpen(false);
-                      }}
-                    />
+                    <X onClick={() => setHelpOpen(false)} />
                   </CardTitle>
                   <CardDescription>grasp in minutes</CardDescription>
                 </CardHeader>
+                <CardContent>
+                  <div className="text-sm font-sans space-y-1 mb-4">
+                    {[
+                      ["⌘ / Ctrl + S", "Save / Publish"],
+                      ["⌘ / Ctrl + Z", "Undo"],
+                      ["⌘ / Ctrl + Shift + Z", "Redo"],
+                      ["⌘ / Ctrl + B", "Bold"],
+                      ["⌘ / Ctrl + I", "Italic"],
+                      ["⌘ / Ctrl + U", "Underline"],
+                      ["⌘ / Ctrl + ]", "Indent line(s)"],
+                      ["⌘ / Ctrl + [", "Dedent line(s)"],
+                      ["Tab", "Indent / insert spaces"],
+                      ["Shift + Tab", "Dedent"],
+                      ["⌘ / Ctrl + D", "Duplicate line"],
+                      ["⌘ / Ctrl + Shift + K", "Delete line"],
+                      ["⌘ / Ctrl + /", "Toggle comment"],
+                      ["⌘ / Ctrl + L", "Select line"],
+                      ["Alt + ↑ / ↓", "Move line up / down"],
+                      ["Enter", "Auto-continue lists & blockquotes"],
+                      ["( [ { \" ` '", "Auto-close pair (or wrap selection)"],
+                      ["Backspace", "Delete matching pair"],
+                    ].map(([key, desc]) => (
+                      <div key={key} className="flex items-center gap-3 h-6">
+                        <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs font-mono min-w-fit">
+                          {key}
+                        </kbd>
+                        <span className="text-gray-600">{desc}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
                 {formattingButtons.map(({ format, icon: Icon }) => (
                   <CardContent
                     key={format}
                     className="flex items-center justify-start gap-3 h-fit md:h-6 text-sm font-sans"
                   >
-                    <Icon className="size-5 md:size-4" />{" "}
-                    {`${format}, ${format === "dropCap" ? "select the paragraph where you want to implment drop-cap and then click this icon" : `select the text you want to ${format} and click this button`}`}
+                    <Icon className="size-5 md:size-4" />
+                    {`${format}, ${
+                      format === "dropCap"
+                        ? "select the paragraph where you want to implement drop-cap and then click this icon"
+                        : `select the text you want to ${format} and click this button`
+                    }`}
                   </CardContent>
                 ))}
                 <CardContent className="mt-4">
                   <h1 className="text-3xl font-serif font-black">
-                    Paste these in writing area for better understading.
+                    Paste these in writing area for better understanding.
                   </h1>
                   <button
-                    onClick={() => {
-                      handleCopy(rawText);
-                    }}
+                    onClick={() => handleCopy(rawText)}
                     className="bg-gray-200 hover:bg-gray-400 rounded px-2 py-1"
                   >
                     {copied ? "Copied!" : "Copy"}
                   </button>
                   <pre
                     className="text-sm font-sans"
-                    style={{
-                      whiteSpace: "pre-wrap",
-                    }}
+                    style={{ whiteSpace: "pre-wrap" }}
                   >
                     {rawText}
                   </pre>
@@ -676,8 +640,8 @@ const WritingPad = memo(function WritingPad() {
                   isPreview={isPreview}
                   lightModeBg={lightModeBg}
                 />
-
                 <ContentInput
+                  ref={textareaRef}
                   content={content}
                   isDark={isDark}
                   isPreview={isPreview}
@@ -685,10 +649,11 @@ const WritingPad = memo(function WritingPad() {
                   setIsSaved={setIsSaved}
                   textAlignment={textAlignment}
                   handleContentChange={handleContentChange}
+                  onKeyDown={onKeyDown}
                 />
               </div>
 
-              {/* preview div */}
+              {/* Preview pane */}
               <div
                 data-lenis-prevent
                 className={`prose rounded text-lg transition-all duration-0
@@ -702,15 +667,15 @@ const WritingPad = memo(function WritingPad() {
                   isDark={isDark}
                   textAlignment={textAlignment}
                   lightModeBg={lightModeBg}
-                  artType={"markdown to pdf"}
+                  artType={artType}
                   darkBg={darkTheme.colors.bg}
                   darkTheme={darkTheme.colors}
-                  // no need to add thumbnail here
                 />
               </div>
             </div>
           </div>
         </div>
+
         <ScrollToBottomButton isDark={isDark} />
       </div>
     </>
@@ -718,5 +683,4 @@ const WritingPad = memo(function WritingPad() {
 });
 
 export default WritingPad;
-
 WritingPad.propTypes = {};
