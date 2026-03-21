@@ -671,7 +671,7 @@ export const FeaturedWorks = memo(function FeaturedWorks({ currentUser }) {
             onClick={() =>
               navigate(
                 item.itemType.toLowerCase() === "post"
-                  ? `/p/${item.itemId}`
+                  ? `/p/${slugify(item.itemTitle)}-${item.itemId}`
                   : `/c/${item.itemId}`,
               )
             }
