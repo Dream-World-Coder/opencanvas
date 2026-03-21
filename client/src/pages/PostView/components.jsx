@@ -1544,11 +1544,11 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                 {title}
               </h1>
               {/* Decorative rule under title */}
-              <div className="flex items-center justify-center gap-2 mt-3">
+              {/* <div className="flex items-center justify-center gap-2 mt-3">
                 <div className="h-px w-16 bg-black" />
                 <div className="h-1.5 w-1.5 rounded-full bg-black" />
                 <div className="h-px w-16 bg-black" />
-              </div>
+              </div>*/}
             </div>
           )}
 
