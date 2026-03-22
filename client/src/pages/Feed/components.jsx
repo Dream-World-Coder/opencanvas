@@ -352,7 +352,7 @@ export const RightSideBar = () => {
         </div>
       )}
 
-      <div className="text-xs">© OPENCANVAS 2025 All rights reserved</div>
+      <div className="text-xs">© OPENCANVAS {new Date().getFullYear()} All rights reserved</div>
     </div>
   );
 };
