@@ -76,7 +76,8 @@ export function useWritingPad({ postId, frontendOnly, artType, editing }) {
         toast.success("Post saved successfully");
         // Build the canonical slug: {title-slugified}-{id}
         const slug = `${slugify(title)}-${postId}`;
-        navigate(isPublic ? `/p/${slug}` : `/private/p/${slug}`);
+        // Use server's isPublic value to avoid stale state after edits
+        navigate(data.isPublic ? `/p/${slug}` : `/private/p/${slug}`);
       }
     } catch (error) {
       // saveWrittenPost already shows a toast; log for debugging
