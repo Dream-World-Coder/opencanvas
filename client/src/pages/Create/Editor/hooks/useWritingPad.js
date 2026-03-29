@@ -81,6 +81,12 @@ export function useWritingPad({ postId, frontendOnly, artType, editing }) {
     } catch (error) {
       // saveWrittenPost already shows a toast; log for debugging
       console.error("Error saving post:", error);
+      
+      // Handle session expiration - save draft locally before redirect
+      if (error.response?.status === 401) {
+        saveDraftLocally();
+        toast.error("Session expired - draft saved locally. Please login to continue.");
+      }
     }
   };
 
