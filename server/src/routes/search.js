@@ -8,7 +8,7 @@ GET /search?q=...&type=users|posts|all
 
 Searches:
   users → fullName, designation (case-insensitive, partial match)
-  posts → title (case-insensitive, partial match, public only)
+  posts → title, tags (case-insensitive, partial match, public only)
 
 Query params:
   q {string}  required –> search term (min 1 char)
@@ -48,7 +48,7 @@ router.get("/search", async (req, res) => {
     // ::::: post search :::::
     if (type === "posts" || type === "all") {
       results.posts = await Post.find({
-        title: regex,
+        $or: [{ title: regex }, { tags: regex }],
         isPublic: true, // public only
       })
         .select(
