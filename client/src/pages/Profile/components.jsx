@@ -671,7 +671,7 @@ export const FeaturedWorks = memo(function FeaturedWorks({ currentUser }) {
             onClick={() =>
               navigate(
                 item.itemType.toLowerCase() === "post"
-                  ? `/p/${item.itemId}`
+                  ? `/p/${slugify(item.itemTitle)}-${item.itemId}`
                   : `/c/${item.itemId}`,
               )
             }
@@ -702,7 +702,9 @@ export const FeaturedWorks = memo(function FeaturedWorks({ currentUser }) {
                   const type =
                     item.itemType.toLowerCase() === "collection" ? "c" : "p";
                   await navigator.clipboard.writeText(
-                    `${window.location.origin}/${type}/${item.itemId}`,
+                    type === "p"
+                      ? `${window.location.origin}/p/${slugify(item.itemTitle)}-${item.itemId}`
+                      : `${window.location.origin}/c/${item.itemId}`,
                   );
                   toast.success("Link copied to clipboard");
                 }}
