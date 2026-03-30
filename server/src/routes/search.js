@@ -2,17 +2,19 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const Post = require("../models/Post");
+const Collection = require("../models/Collection");
 
 /*
-GET /search?q=...&type=users|posts|all&page=1&limit=100
+GET /search?q=...&type=users|posts|collections|all&page=1&limit=100
 
 Searches:
   users → fullName, designation (case-insensitive, partial match)
   posts → title (case-insensitive, partial match, public only)
+  collections → title, description (case-insensitive, partial match, public only)
 
 Query params:
   q {string}  required –> search term (min 1 char)
-  type {string}  optional –> "users" | "posts" | "all"  (default: "all")
+  type {string}  optional –> "users" | "posts" | "collections" | "all"  (default: "all")
   page {number} optional –> page number (default: 1)
   limit {number} optional –> results per page, max 1000 (default: 100)
 
@@ -82,7 +84,28 @@ router.get("/search", async (req, res) => {
       results.postsTotal = postTotal;
     }
 
-    results.total = (results.usersTotal || 0) + (results.postsTotal || 0);
+    // ::::: collection search :::::
+    if (type === "collections" || type === "all") {
+      const [collections, collectionsTotal] = await Promise.all([
+        Collection.find({
+          $or: [{ title: regex }, { description: regex }],
+          isPrivate: false,
+        })
+          .select("title description thumbnailUrl authorId tags stats createdAt")
+          .sort({ "stats.viewsCount": -1 })
+          .skip(skip)
+          .limit(limit)
+          .lean(),
+        Collection.countDocuments({
+          $or: [{ title: regex }, { description: regex }],
+          isPrivate: false,
+        }),
+      ]);
+      results.collections = collections;
+      results.collectionsTotal = collectionsTotal;
+    }
+
+    results.total = (results.usersTotal || 0) + (results.postsTotal || 0) + (results.collectionsTotal || 0);
 
     res.status(200).json({ success: true, data: results });
   } catch (err) {
