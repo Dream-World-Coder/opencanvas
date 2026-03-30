@@ -28,14 +28,14 @@ router.get("/search", async (req, res) => {
   try {
     const query = req.query.q?.trim();
     const type = req.query.type || "all"; // "users" | "posts" | "all"
-    const page = parseInt(req.query.page) || 1;
-    const limit = Math.min(parseInt(req.query.limit) || DEFAULT_LIMIT, MAX_LIMIT);
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.max(1, Math.min(parseInt(req.query.limit) || DEFAULT_LIMIT, MAX_LIMIT));
     const skip = (page - 1) * limit;
 
-    if (!query) {
+    if (!query || query.length < 1) {
       return res
         .status(400)
-        .json({ success: false, message: "Search query is required" });
+        .json({ success: false, message: "Search query is required (min 1 character)" });
     }
 
     // case-insensitive regex from search term
