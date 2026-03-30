@@ -72,6 +72,7 @@ const postSchema = new Schema(
 postSchema.index({ authorId: 1, isPublic: 1, createdAt: -1 });
 postSchema.index({ isPublic: 1, anonymousEngagementScore: -1, _id: -1 }); // for articles feed
 postSchema.index({ tags: 1, isPublic: 1 }); // for topic srch
+postSchema.index({ tags: 1 }); // for tag search queries
 
 const Post = mongoose.model("Post", postSchema);
 module.exports = Post;
