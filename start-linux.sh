@@ -3,17 +3,9 @@
 # Starts MongoDB, Node server, and React frontend
 
 echo "Starting MongoDB..."
-# Try systemctl first (systemd-based systems), fall back to direct mongod
-if command -v systemctl &> /dev/null; then
-    sudo systemctl start mongod
-    sleep 2
-else
-    # Start mongod directly (assumes mongod is in PATH)
-    mongod --fork --logpath /var/log/mongodb/mongodb.log --dbpath /var/lib/mongodb 2>/dev/null || \
-    mongod --fork --logpath ~/mongodb.log --dbpath ~/mongodb_data 2>/dev/null || \
-    echo "Warning: Could not start MongoDB automatically. Please start it manually."
-    sleep 2
-fi
+# Use systemctl for systemd-based Linux distributions
+sudo systemctl start mongod
+sleep 2
 
 echo "Starting Node Server..."
 cd server
