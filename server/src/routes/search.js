@@ -8,7 +8,7 @@ GET /search?q=...&type=users|posts|all&page=1&limit=100
 
 Searches:
   users → fullName, designation (case-insensitive, partial match)
-  posts → title (case-insensitive, partial match, public only)
+  posts → title, tags (case-insensitive, partial match, public only)
 
 Query params:
   q {string}  required –> search term (min 1 char)
