@@ -65,7 +65,7 @@ router.get("/search", async (req, res) => {
     if (type === "posts" || type === "all") {
       const [posts, postTotal] = await Promise.all([
         Post.find({
-          title: regex,
+          $or: [{ title: regex }, { tags: regex }],
           isPublic: true, // public only
         })
           .select(
@@ -76,7 +76,7 @@ router.get("/search", async (req, res) => {
           .limit(limit)
           .lean(),
         Post.countDocuments({
-          title: regex,
+          $or: [{ title: regex }, { tags: regex }],
           isPublic: true,
         }),
       ]);
