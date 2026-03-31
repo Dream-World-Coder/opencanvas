@@ -34,7 +34,7 @@ Discover OpenCanvas: Find and read high-quality scientific articles, research pa
 - [Running Locally](#running-locally)
 - [Performance Benchmarks](#performance-benchmarks)
 - [Support](#support)
-- [Version](#sersion)
+- [Version](#version)
 - [Preview](#preview)
 - [Disclosure](#disclosure)
 
