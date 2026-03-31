@@ -387,10 +387,10 @@ Alternatively, use the provided shell scripts from the project root:
 
 ```bash
 # for macOS only, uses homebrew
-chmod +x start.sh stop.sh
+chmod +x scripts/start.sh scripts/stop.sh
 
-./start.sh   # Start both client and server & mongodb
-./stop.sh    # Stop all processes
+./scripts/start.sh   # Start both client and server & mongodb
+./scripts/stop.sh    # Stop all processes
 ```
 
 And for clusters instead of a single thread:
@@ -399,8 +399,8 @@ And for clusters instead of a single thread:
 # for macOS only, uses homebrew
 chmod +x cluster-start.sh cluster-stop.sh
 
-./cluster-start.sh   
-./cluster-stop.sh    
+./scripts/cluster-start.sh   
+./scripts/cluster-stop.sh    
 ```
 ---
 
@@ -451,9 +451,8 @@ Hi, I'm Subhajit, an IT undergrad at IIEST Shibpur. While exploring various rese
 My goal is to build a middle ground between ResearchGate and Reddit. By creating dedicated channels for specific colleges, this platform provides a centralized hub to easily publish, discover, and discuss early-stage scientific work. 
 
 If you find this project valuable and believe in making academic research more accessible, consider supporting my work!
-(The platform currently relies on free hosting tiers (Vercel, Render, MongoDB Atlas). Your contribution will help upgrade to standard plans, ensuring consistent uptime and a reliable experience for everyone.)
+By supporting, you can star the repo, contribute to the community by writing articles and help developing it offcourse.
 
-**Support my work:** [https://ko-fi.com/myopencanvas](https://ko-fi.com/myopencanvas)
 
 ---
 
@@ -482,10 +481,12 @@ This is a prototype just now. Lots of features are incomplete.
 
 ## Disclosure
 
-FRONTEND: The core architecture, overall layout, and design system (color schemes, typography) were completely designed and developed by me. I also independently built the majority of the pages, including the Landing Page, Feed, PostView, Profile, About, and Contact pages.
+FRONTEND: The core architecture, overall layout, and design system (color schemes, typography) were completely designed and developed by me. I also independently built the majority of the pages first-hand, including the Landing Page, Feed, PostView, Profile, About, and Contact etc.
 
-To accelerate development, I used AI tools (Claude and Gemini) to help draft and iterate on specific frontend components, primarily for the Collection and Saved pages.
+However to accelerate development, I used AI tools (Claude and Gemini) to help draft and iterate on frontend components. the Collection, Follower, Following and Saved page, some editor components, lots of Profile and Post components, Feed components are AI Assisted.
 
-BACKEND: Everything done by me. I used claude to document some files as they were too large for me to maintain and documentise in my current time frame.
+[*EDIT]: Not by me anymore, we have contributors! And thanks to them the development is going rapidly.
 
-TEST: DB seeding codes & Autocannon, Artillery Test codes written by me, updated with gemini.
+BACKEND: Almost everything done by me. I used claude to document some files as they were too large for me to maintain and documentise in my current time frame. 
+
+TEST: DB seeding codes & Autocannon, Artillery Test codes written by me, updated with gemini, some test codes are totally AI generated.
