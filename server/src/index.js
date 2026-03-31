@@ -6,6 +6,7 @@ const cluster = require("cluster");
 const os = require("os");
 const cron = require("node-cron");
 const updateEngagementScore = require("./jobs/updateEngagementScore");
+const processMediaDeletionQueue = require("./jobs/mediaCleanup");
 require("dotenv").config();
 
 const NUM_WORKERS = os.cpus().length;
@@ -36,6 +37,14 @@ if (cluster.isPrimary) {
     console.log("[Primary] Running scheduled engagement score update...");
     updateEngagementScore().catch((err) => {
       console.error("[Primary] Scheduled task failed:", err);
+    });
+  });
+
+  // Media deletion queue - runs every 30 minutes
+  cron.schedule("*/30 * * * *", () => {
+    console.log("[Primary] Running scheduled media cleanup job...");
+    processMediaDeletionQueue().catch((err) => {
+      console.error("[Primary] Media cleanup failed:", err);
     });
   });
 } else {
