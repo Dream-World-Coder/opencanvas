@@ -489,3 +489,9 @@ To accelerate development, I used AI tools (Claude and Gemini) to help draft and
 BACKEND: Everything done by me. I used claude to document some files as they were too large for me to maintain and document in my current time frame.
 
 TEST: DB seeding codes & Autocannon, Artillery Test codes written by me, updated with gemini.
+
+---
+
+## License
+
+MIT - see [LICENSE](LICENSE) for details.
