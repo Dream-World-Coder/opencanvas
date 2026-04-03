@@ -338,7 +338,7 @@ All variables are read from a `.env` file in the `server/` directory.
 | `MONGODB_URI_PROD` | MongoDB connection string |
 | `IMGUR_API_URL` | `https://api.imgur.com/3/upload` |
 | `IMGUR_CLIENT_ID` | your imgur client id |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
 
 All variables are read from a `.env` file in the `client/` directory.
