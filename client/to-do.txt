@@ -44,7 +44,7 @@ fix it in posts: author: {
 -- contact info not synced on userame update, also rate limit it
 -- [] repost someones post
 -- collectionssssssss
-  no seperate btn to create,
+  no separate btn to create,
   in every post this modal will be present to add things in collection, & create new collection
   you can add private posts also, but it will be hidden when someone clicks like usual
 
