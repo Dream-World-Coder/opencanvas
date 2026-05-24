@@ -71,8 +71,8 @@ const fingerprintMiddleware = async (req, res, next) => {
   if (token) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.userId = decoded.id;
-      req.visitorIdentifier = `user_${decoded.id}`;
+      req.userId = decoded.userId;
+      req.visitorIdentifier = `user_${decoded.userId}`;
     } catch (err) {
       req.visitorIdentifier = null;
     }
