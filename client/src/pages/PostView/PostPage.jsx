@@ -59,19 +59,6 @@ const ViewPost = () => {
     isDark ? postDarkThemes.dark : postDarkThemes.light,
   );
 
-  // Scroll to heading anchor if URL has a hash
-  useEffect(() => {
-    const hash = decodeURIComponent(window.location.hash.slice(1));
-    if (!hash) return;
-    setTimeout(() => {
-      const el = document.getElementById(hash);
-      if (!el) return;
-      el.scrollIntoView({ behavior: "smooth" });
-      el.classList.add("highlighted__heading");
-      setTimeout(() => el.classList.remove("highlighted__heading"), 3000);
-    }, 600);
-  }, []);
-
   useEffect(() => {
     const init = async (postData) => {
       setPost(postData);
