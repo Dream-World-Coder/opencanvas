@@ -32,8 +32,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-import Header from "../../components/Header/Header";
-import { generateId } from "@/services/regex";
+import Header from "@/components/Header/Header";
+import { generateId, extractTextFromReactChildren } from "@/services/regex";
 
 import {
   DropdownMenu,
@@ -53,15 +53,15 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-import { useAuth } from "../../contexts/AuthContext";
-import { useDataService } from "../../services/dataService";
-import { postDarkThemes } from "../../services/themes";
-import { copyHeaderLink } from "../../services/copyToClipBoard";
-import { timeAgo } from "../../services/formatDate";
+import { useAuth } from "@/contexts/AuthContext";
+import { useDataService } from "@/services/dataService";
+import { postDarkThemes } from "@/services/themes";
+import { copyHeaderLink } from "@/services/copyToClipBoard";
+import { timeAgo } from "@/services/formatDate";
 import { CodeBlock } from "@/pages/Create/Editor/components";
 import { slugify } from "@/pages/Create/Editor/hooks/useWritingPad";
 
-// ::::: Helpers :::::
+// ::::: helpers :::::
 
 // Share post URL — uses proper slug so links are human-readable
 function sharePost(post) {
@@ -2035,54 +2035,68 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                 {children}
               </blockquote>
             ),
-            h1: ({ children }) => (
-              <h1
-                id={generateId(children)}
-                className="mt-12 mb-6 leading-tight tracking-tight text-3xl md:text-4xl font-bold font-serif flex items-center gap-2 justify-start group"
-              >
-                {children}{" "}
-                <Link
-                  className="opacity-0 group-hover:opacity-100"
-                  onClick={() => copyHeaderLink(children)}
-                />
-              </h1>
-            ),
-            h2: ({ children }) => (
-              <h2
-                id={generateId(children)}
-                className="font-serif mt-10 mb-5 leading-tight tracking-tight text-2xl md:text-3xl font-bold flex items-center gap-2 justify-start group"
-              >
-                {children}{" "}
-                <Link
-                  className="opacity-0 group-hover:opacity-100"
-                  onClick={() => copyHeaderLink(children)}
-                />
-              </h2>
-            ),
-            h3: ({ children }) => (
-              <h3
-                id={generateId(children)}
-                className="font-serif mt-8 mb-4 leading-snug text-xl md:text-2xl font-bold flex items-center gap-2 justify-start group"
-              >
-                {children}{" "}
-                <Link
-                  className="opacity-0 group-hover:opacity-100"
-                  onClick={() => copyHeaderLink(children)}
-                />
-              </h3>
-            ),
-            h4: ({ children }) => (
-              <h4
-                id={generateId(children)}
-                className="sentient-regular font-semibold mt-6 mb-3 leading-snug text-lg md:text-xl flex items-center gap-2 justify-start group"
-              >
-                {children}{" "}
-                <Link
-                  className="opacity-0 group-hover:opacity-100"
-                  onClick={() => copyHeaderLink(children)}
-                />
-              </h4>
-            ),
+
+            h1: ({ children }) => {
+              const plainText = extractTextFromReactChildren(children);
+              return (
+                <h1
+                  id={generateId(children)}
+                  className="mt-12 mb-6 leading-tight tracking-tight text-3xl md:text-4xl font-bold font-serif flex items-center gap-2 justify-start group"
+                >
+                  {children}{" "}
+                  <Link
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={() => copyHeaderLink(plainText)}
+                  />
+                </h1>
+              );
+            },
+            h2: ({ children }) => {
+              const plainText = extractTextFromReactChildren(children);
+              return (
+                <h2
+                  id={generateId(children)}
+                  className="font-serif mt-10 mb-5 leading-tight tracking-tight text-2xl md:text-3xl font-bold flex items-center gap-2 justify-start group"
+                >
+                  {children}{" "}
+                  <Link
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={() => copyHeaderLink(plainText)}
+                  />
+                </h2>
+              );
+            },
+            h3: ({ children }) => {
+              const plainText = extractTextFromReactChildren(children);
+              return (
+                <h3
+                  id={generateId(children)}
+                  className="font-serif mt-8 mb-4 leading-snug text-xl md:text-2xl font-bold flex items-center gap-2 justify-start group"
+                >
+                  {children}{" "}
+                  <Link
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={() => copyHeaderLink(plainText)}
+                  />
+                </h3>
+              );
+            },
+            h4: ({ children }) => {
+              const plainText = extractTextFromReactChildren(children);
+              return (
+                <h4
+                  id={generateId(children)}
+                  className="sentient-regular font-semibold mt-6 mb-3 leading-snug text-lg md:text-xl flex items-center gap-2 justify-start group"
+                >
+                  {children}{" "}
+                  <Link
+                    className="opacity-0 group-hover:opacity-100"
+                    onClick={() => copyHeaderLink(plainText)}
+                  />
+                </h4>
+              );
+            },
+
             h5: ({ children }) => (
               <h5 className="sentient-regular font-semibold mt-5 mb-3 leading-snug text-base md:text-lg">
                 {children}
