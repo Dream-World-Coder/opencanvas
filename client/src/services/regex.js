@@ -28,17 +28,21 @@ export function generateId(children) {
   } else {
     resId = children;
   }
-  return resId
-    .toString()
-    .toLowerCase()
-    // Remove LaTeX expressions before processing (e.g., $...$, \[...\], \(...\))
-    .replace(/\$\$[\s\S]*?\$\$/g, "") // remove display math $$...$$
-    .replace(/\$[^$]*?\$/g, "") // remove inline math $...$
-    .replace(/\\\[[\s\S]*?\\\]/g, "") // remove \[...\]
-    .replace(/\\\([\s\S]*?\\\)/g, "") // remove \(...\)
-    .replace(/\\[a-zA-Z]+\{[^}]*\}/g, "") // remove LaTeX commands like \frac{...}
-    .replace(/[^a-z0-9\s-]/g, "") // remove special chars except space and hyphen
-    .replace(/\s+/g, "-") // replace spaces/tabs with hyphens
-    .replace(/-+/g, "-") // collapse multiple hyphens
-    .replace(/^-|-$/g, ""); // trim hyphens from start/end
+  return (
+    resId
+      .toString()
+      .toLowerCase()
+      //  <u> and </u> tags
+      .replace(/<\/?u>/g, "")
+      // LaTeX expressions
+      .replace(/\$\$[\s\S]*?\$\$/g, "") // display math $$...$$
+      .replace(/\$[^$]*?\$/g, "") // inline math $...$
+      .replace(/\\\[[\s\S]*?\\\]/g, "") // \[...\]
+      .replace(/\\\([\s\S]*?\\\)/g, "") // \(...\)
+      .replace(/\\[a-zA-Z]+\{[^}]*\}/g, "") // LaTeX commands like \frac{...}
+      .replace(/[^a-z0-9\s-]/g, "") // special chars except space and hyphen
+      .replace(/\s+/g, "-") // replace spaces/tabs with hyphens
+      .replace(/-+/g, "-") // collapse multiple hyphens
+      .replace(/^-|-$/g, "")
+  ); // trim hyphens from start/end
 }

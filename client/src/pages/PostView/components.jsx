@@ -427,7 +427,7 @@ export const RightSidebar = memo(function RightSidebar({
   content,
   isArticle = true,
 }) {
-  // Strip triple-backtick code blocks so headings inside them aren't parsed
+  // skipping code blocks so headings inside them aren't parsed
   content = content?.replace(/```[\s\S]*?```/g, "");
 
   const parseTableOfContents = (content) => {
@@ -435,22 +435,27 @@ export const RightSidebar = memo(function RightSidebar({
 
     const lines = content.split("\n");
     const tableOfContents = [];
-    let currentTitle = null;
-    let currentHeading = null;
-    let currentSubheading = null;
+    let currentTitle = null,
+      currentHeading = null,
+      currentSubheading = null;
+
+    const cleanText = (str) => str.trim().replace(/<\/?u>/g, "");
 
     for (const line of lines) {
       if (line.startsWith("# ")) {
-        const text = line.substring(2).trim();
+        const text = cleanText(line.substring(2).trim());
         const id = generateId(text);
+
         currentTitle = { text, id, headings: [] };
         tableOfContents.push(currentTitle);
         currentHeading = null;
         currentSubheading = null;
       } else if (line.startsWith("## ")) {
-        const text = line.substring(3).trim();
+        const text = cleanText(line.substring(3).trim());
         const id = generateId(text);
+
         currentHeading = { text, id, subheadings: [] };
+
         if (!currentTitle) {
           currentTitle = { text: "", id: "", headings: [] };
           tableOfContents.push(currentTitle);
@@ -458,9 +463,11 @@ export const RightSidebar = memo(function RightSidebar({
         currentTitle.headings.push(currentHeading);
         currentSubheading = null;
       } else if (line.startsWith("### ")) {
-        const text = line.substring(4).trim();
+        const text = cleanText(line.substring(4).trim());
         const id = generateId(text);
+
         currentSubheading = { text, id, h4s: [] };
+
         if (!currentHeading && currentTitle) {
           currentHeading = { text: "", id: "", subheadings: [] };
           currentTitle.headings.push(currentHeading);
@@ -472,8 +479,9 @@ export const RightSidebar = memo(function RightSidebar({
         }
         currentHeading.subheadings.push(currentSubheading);
       } else if (line.startsWith("#### ")) {
-        const text = line.substring(5).trim();
+        const text = cleanText(line.substring(5).trim());
         const id = generateId(text);
+
         const h4 = { text, id };
         if (!currentSubheading && currentHeading) {
           currentSubheading = { text: "", id: "", h4s: [] };
