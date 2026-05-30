@@ -17,6 +17,8 @@ import LoadingPage from "./pages/Others/LoadingPage";
 import LandingPage from "./pages/LandingPage/LandingPage";
 import ArticleFeed from "./pages/Feed/FeedPage";
 
+import HashScroll from "./components/HashHighlight";
+
 import "./services/fingerprintService";
 
 // Everything else is lazy - loaded only when the route is first visited
@@ -60,6 +62,7 @@ export default function App() {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <Router>
+          <HashScroll />
           <DarkModeProvider>
             <AuthProvider>
               <CollectionContextProvider>
@@ -165,14 +168,12 @@ export default function App() {
                       />
                     </Route>
 
-                    {/* ── Catch-all ────────────────────────────────────── */}
                     <Route
                       path="*"
                       element={<NotFoundPage bgClr="bg-white" />}
                     />
                   </Routes>
                 </Suspense>
-
                 <Toaster />
                 <Analytics />
               </CollectionContextProvider>
