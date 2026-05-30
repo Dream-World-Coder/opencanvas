@@ -470,6 +470,7 @@ This is a prototype just now. Lots of features are incomplete.
 <img src="./images/profile-settings.png" alt="profile settings page">
 <img src="./images/md-prev.png" alt="markdown editor page">
 <img src="./images/about.png" alt="about page">
+<img src="./images/mockup.png" alt="mockup page">
   
 #### Feed dark mode
 <img src="./images/feed-dark-mode.png" alt="articles feed page">
