@@ -6,6 +6,10 @@ Discover OpenCanvas: Find and read high-quality scientific articles, research pa
 
 ---
 
+Discord: [https://discord.gg/wkhEh9QRM5](https://discord.gg/wkhEh9QRM5)
+
+---
+
 ## Table of Contents
 
 - [Project Structure](#project-structure)
