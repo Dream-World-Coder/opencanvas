@@ -36,17 +36,22 @@ const ViewPost = lazy(() => import("./pages/PostView/PostPage"));
 const PrivatePostView = lazy(() => import("./pages/PostView/PrivatePostPage"));
 
 const CollectionView = lazy(
-  () => import("./pages/Collection/CollectionDetailsPage"),
+    () => import("./pages/Collection/CollectionDetailsPage"),
 );
+
+// Publications routes
+const PublicationsFeed = lazy(() => import("./pages/PublicationsFeed"));
+const InstitutionFeed = lazy(() => import("./pages/InstitutionFeed"));
+const PublicationView = lazy(() => import("./pages/PublicationView"));
 
 const AboutPage = lazy(() => import("./pages/About/About"));
 const ContactPage = lazy(() => import("./pages/Contact/Contact"));
 
-// WritingPad     → requires auth, saves to backend
-// WritingPadMd   → public, frontend-only markdown editor / md2pdf tool
+// WritingPad    → requires auth, saves to backend
+// WritingPadMd  → public, frontend-only markdown editor / md2pdf tool
 const WritingPad = lazy(() => import("./pages/Create/Editor/WritingPad"));
 const WritingPadMd = lazy(
-  () => import("./pages/Create/Editor/WritingPadFrontend"),
+    () => import("./pages/Create/Editor/WritingPadFrontend"),
 );
 
 const SearchPage = lazy(() => import("./pages/Search/SearchPage"));
@@ -58,129 +63,203 @@ const NotFoundPage = lazy(() => import("./pages/Others/404"));
 const queryClient = new QueryClient();
 
 export default function App() {
-  return (
-    <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
-        <Router>
-          <HashScroll />
-          <DarkModeProvider>
-            <AuthProvider>
-              <CollectionContextProvider>
-                <Suspense fallback={<LoadingPage />}>
-                  <Routes>
-                    {/* ── Static ──────────────────────────────────────── */}
-                    <Route path="/" element={<LandingPage />} />
-                    <Route
-                      path="/about"
-                      element={<AboutPage bgClr="bg-white" />}
-                    />
-                    <Route
-                      path="/contact"
-                      element={<ContactPage bgClr="bg-white" />}
-                    />
-                    <Route
-                      path="/thanks"
-                      element={<Thanks bgClr="bg-white" />}
-                    />
-                    <Route
-                      path="/loading"
-                      element={<LoadingPage bgClr="bg-white" />}
-                    />
+    return (
+        <HelmetProvider>
+            <QueryClientProvider client={queryClient}>
+                <Router>
+                    <HashScroll />
+                    <DarkModeProvider>
+                        <AuthProvider>
+                            <CollectionContextProvider>
+                                <Suspense fallback={<LoadingPage />}>
+                                    <Routes>
+                                        {/* ── Static ──────────────────────────────────────── */}
+                                        <Route
+                                            path="/"
+                                            element={<LandingPage />}
+                                        />
+                                        <Route
+                                            path="/about"
+                                            element={
+                                                <AboutPage bgClr="bg-white" />
+                                            }
+                                        />
+                                        <Route
+                                            path="/contact"
+                                            element={
+                                                <ContactPage bgClr="bg-white" />
+                                            }
+                                        />
+                                        <Route
+                                            path="/thanks"
+                                            element={
+                                                <Thanks bgClr="bg-white" />
+                                            }
+                                        />
+                                        <Route
+                                            path="/loading"
+                                            element={
+                                                <LoadingPage bgClr="bg-white" />
+                                            }
+                                        />
 
-                    {/* ── Auth ────────────────────────────────────────── */}
-                    <Route
-                      path="/login"
-                      element={<LoginPage bgClr="bg-cream-light" />}
-                    />
-                    <Route path="/register" element={<LoginPage />} />
-                    <Route path="/signup" element={<LoginPage />} />
-                    <Route
-                      path="/login-needed"
-                      element={<LoginPage backBtn={true} />}
-                    />
-                    <Route path="/auth/success" element={<AuthSuccess />} />
+                                        {/* ── Auth ────────────────────────────────────────── */}
+                                        <Route
+                                            path="/login"
+                                            element={
+                                                <LoginPage bgClr="bg-cream-light" />
+                                            }
+                                        />
+                                        <Route
+                                            path="/register"
+                                            element={<LoginPage />}
+                                        />
+                                        <Route
+                                            path="/signup"
+                                            element={<LoginPage />}
+                                        />
+                                        <Route
+                                            path="/login-needed"
+                                            element={
+                                                <LoginPage backBtn={true} />
+                                            }
+                                        />
+                                        <Route
+                                            path="/auth/success"
+                                            element={<AuthSuccess />}
+                                        />
 
-                    {/* ── Feed ────────────────────────────────────────── */}
-                    <Route path="/articles" element={<ArticleFeed />} />
-                    <Route path="/home" element={<ArticleFeed />} />
-                    {/* alias */}
+                                        {/* ── Feed ────────────────────────────────────────── */}
+                                        <Route
+                                            path="/articles"
+                                            element={<ArticleFeed />}
+                                        />
+                                        <Route
+                                            path="/home"
+                                            element={<ArticleFeed />}
+                                        />
+                                        {/* alias */}
 
-                    {/* ── Public profiles ─────────────────────────────── */}
-                    <Route
-                      path="/u/:username"
-                      element={<PublicProfile bgClr="bg-white" />}
-                    />
-                    <Route
-                      path="/u/:username/followers"
-                      element={<FollowersPage />}
-                    />
+                                        {/* ── Publications ────────────────────────────────── */}
+                                        <Route
+                                            path="/publications"
+                                            element={<PublicationsFeed />}
+                                        />
+                                        <Route
+                                            path="/publications/:uni"
+                                            element={<InstitutionFeed />}
+                                        />
+                                        <Route
+                                            path="/publications/:uni/:id"
+                                            element={<PublicationView />}
+                                        />
 
-                    <Route path="/search" element={<SearchPage />} />
+                                        {/* ── Public profiles ─────────────────────────────── */}
+                                        <Route
+                                            path="/u/:username"
+                                            element={
+                                                <PublicProfile bgClr="bg-white" />
+                                            }
+                                        />
+                                        <Route
+                                            path="/u/:username/followers"
+                                            element={<FollowersPage />}
+                                        />
 
-                    {/* ── Public posts & collections ───────────────────── */}
-                    <Route path="/p/:slug" element={<ViewPost />} />
-                    <Route path="/c/:id" element={<CollectionView />} />
+                                        <Route
+                                            path="/search"
+                                            element={<SearchPage />}
+                                        />
 
-                    {/* ── Public editor (markdown preview / md→pdf tool) ── */}
-                    <Route path="/editor/markdown" element={<WritingPadMd />} />
-                    {/* Short aliases for the md→pdf tool */}
-                    <Route path="/markdown2pdf" element={<WritingPadMd />} />
-                    <Route path="/md2pdf" element={<WritingPadMd />} />
-                    <Route path="/m2p" element={<WritingPadMd />} />
+                                        {/* ── Public posts & collections ───────────────────── */}
+                                        <Route
+                                            path="/p/:slug"
+                                            element={<ViewPost />}
+                                        />
+                                        <Route
+                                            path="/c/:id"
+                                            element={<CollectionView />}
+                                        />
 
-                    {/* ── Protected ───────────────────────────────────── */}
-                    <Route element={<ProtectedRoute />}>
-                      <Route
-                        path="/profile"
-                        element={<Profile bgClr="bg-white" />}
-                      />
-                      <Route
-                        path="/profile/settings"
-                        element={<ProfileSettings />}
-                      />
-                      <Route path="/saved" element={<SavedPosts />} />
+                                        {/* ── Public editor (markdown preview / md→pdf tool) ── */}
+                                        <Route
+                                            path="/editor/markdown"
+                                            element={<WritingPadMd />}
+                                        />
+                                        {/* Short aliases for the md→pdf tool */}
+                                        <Route
+                                            path="/markdown2pdf"
+                                            element={<WritingPadMd />}
+                                        />
+                                        <Route
+                                            path="/md2pdf"
+                                            element={<WritingPadMd />}
+                                        />
+                                        <Route
+                                            path="/m2p"
+                                            element={<WritingPadMd />}
+                                        />
 
-                      <Route
-                        path="/u/:username/following"
-                        element={<FollowingPage />}
-                      />
+                                        {/* ── Protected ───────────────────────────────────── */}
+                                        <Route element={<ProtectedRoute />}>
+                                            <Route
+                                                path="/profile"
+                                                element={
+                                                    <Profile bgClr="bg-white" />
+                                                }
+                                            />
+                                            <Route
+                                                path="/profile/settings"
+                                                element={<ProfileSettings />}
+                                            />
+                                            <Route
+                                                path="/saved"
+                                                element={<SavedPosts />}
+                                            />
 
-                      <Route
-                        path="/private/p/:slug"
-                        element={<PrivatePostView />}
-                      />
+                                            <Route
+                                                path="/u/:username/following"
+                                                element={<FollowingPage />}
+                                            />
 
-                      {/* Private collection — auth required */}
-                      <Route
-                        path="/c/private/:id"
-                        element={<CollectionView />}
-                      />
+                                            <Route
+                                                path="/private/p/:slug"
+                                                element={<PrivatePostView />}
+                                            />
 
-                      {/*
+                                            {/* Private collection — auth required */}
+                                            <Route
+                                                path="/c/private/:id"
+                                                element={<CollectionView />}
+                                            />
+
+                                            {/*
                         Editor - create or edit a post.
                         artType is not passed as a prop, post ID comes from
                         ?id= query param (pre-fetched via /get-new-post-id).
                         /editor/markdown/create?type=article&id=...
                       */}
-                      <Route
-                        path="/editor/markdown/create"
-                        element={<WritingPad />}
-                      />
-                    </Route>
+                                            <Route
+                                                path="/editor/markdown/create"
+                                                element={<WritingPad />}
+                                            />
+                                        </Route>
 
-                    <Route
-                      path="*"
-                      element={<NotFoundPage bgClr="bg-white" />}
-                    />
-                  </Routes>
-                </Suspense>
-                <Toaster />
-                <Analytics />
-              </CollectionContextProvider>
-            </AuthProvider>
-          </DarkModeProvider>
-        </Router>
-      </QueryClientProvider>
-    </HelmetProvider>
-  );
+                                        <Route
+                                            path="*"
+                                            element={
+                                                <NotFoundPage bgClr="bg-white" />
+                                            }
+                                        />
+                                    </Routes>
+                                </Suspense>
+                                <Toaster />
+                                <Analytics />
+                            </CollectionContextProvider>
+                        </AuthProvider>
+                    </DarkModeProvider>
+                </Router>
+            </QueryClientProvider>
+        </HelmetProvider>
+    );
 }

@@ -5,67 +5,67 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
 import {
-  X,
-  Eye,
-  Undo,
-  Redo,
-  Edit,
-  Info,
-  Download,
-  FileText,
-  Columns2,
-  FileType,
-  PanelTop,
-  ArrowLeft,
-  AlignLeft,
-  FileSearch,
-  AlignCenter,
-  AlertTriangle,
-  MoreHorizontal,
-  Sun,
-  Moon,
+    X,
+    Eye,
+    Undo,
+    Redo,
+    Edit,
+    Info,
+    Download,
+    FileText,
+    Columns2,
+    FileType,
+    PanelTop,
+    ArrowLeft,
+    AlignLeft,
+    FileSearch,
+    AlignCenter,
+    AlertTriangle,
+    MoreHorizontal,
+    Sun,
+    Moon,
 } from "lucide-react";
 
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuItem,
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  LinkInsertButton,
-  ImageUploadButton,
-  ScrollToBottomButton,
-  TagInputComponent,
-  ThumbnailUploader,
-  PublicPreferenceInput,
-  formattingButtons,
-  rawText,
-  findAndReplace,
-  getSchemaData,
-  TitleInput,
-  ContentInput,
+    LinkInsertButton,
+    ImageUploadButton,
+    ScrollToBottomButton,
+    TagInputComponent,
+    ThumbnailUploader,
+    PublicPreferenceInput,
+    formattingButtons,
+    rawText,
+    findAndReplace,
+    getSchemaData,
+    TitleInput,
+    ContentInput,
 } from "./components";
 import { postDarkThemes } from "@/services/themes";
 import { ThemedMarkdownPreview } from "@/pages/PostView/components";
@@ -79,607 +79,672 @@ import { useAuth } from "@/contexts/AuthContext";
 const frontendOnly = false;
 
 const WritingPad = memo(function WritingPad() {
-  const { currentUser } = useAuth();
-  const publishBtnRef = useRef(null);
-  const textareaRef = useRef(null);
-  const undoBtnRef = useRef(null);
-  const redoBtnRef = useRef(null);
-  const navigate = useNavigate();
+    const { currentUser } = useAuth();
+    const publishBtnRef = useRef(null);
+    const textareaRef = useRef(null);
+    const undoBtnRef = useRef(null);
+    const redoBtnRef = useRef(null);
+    const navigate = useNavigate();
 
-  const [searchParams] = useSearchParams();
-  const postId = searchParams.get("id") ?? "";
-  const artType = searchParams.get("type") ?? "article";
-  const editing = searchParams.get("editing") === "true";
+    const [searchParams] = useSearchParams();
+    const postId = searchParams.get("id") ?? "";
+    const artType = searchParams.get("type") ?? "article";
+    const editing = searchParams.get("editing") === "true";
 
-  const {
-    title,
-    setTitle,
-    content,
-    setContent,
-    showUnsavedAlert,
-    setShowUnsavedAlert,
-    handleSave,
-    twoColumn,
-    setTwoColumn,
-    tags,
-    setTags,
-    isPublic,
-    setIsPublic,
-    setMedia,
-    setThumbnailUrl,
-  } = useWritingPad({ postId, frontendOnly, artType, editing });
+    const {
+        title,
+        setTitle,
+        content,
+        setContent,
+        showUnsavedAlert,
+        setShowUnsavedAlert,
+        handleSave,
+        twoColumn,
+        setTwoColumn,
+        tags,
+        setTags,
+        isPublic,
+        setIsPublic,
+        setMedia,
+        setThumbnailUrl,
+    } = useWritingPad({ postId, frontendOnly, artType, editing });
 
-  // ── Single combined hook ──────────────────────────────────────────────────
-  const {
-    textAlignment,
-    setTextAlignment,
-    isSaved,
-    setIsSaved,
-    undoStack,
-    redoStack,
-    handleContentChange,
-    handleUndo,
-    handleRedo,
-    handleFormat,
-    onKeyDown,
-  } = useEditor({
-    content,
-    setContent,
-    textareaRef,
-    publishBtnRef,
-    undoBtnRef,
-    redoBtnRef,
-  });
+    // ── Single combined hook ──────────────────────────────────────────────────
+    const {
+        textAlignment,
+        setTextAlignment,
+        isSaved,
+        setIsSaved,
+        undoStack,
+        redoStack,
+        handleContentChange,
+        handleUndo,
+        handleRedo,
+        handleFormat,
+        onKeyDown,
+    } = useEditor({
+        content,
+        setContent,
+        textareaRef,
+        publishBtnRef,
+        undoBtnRef,
+        redoBtnRef,
+    });
 
-  const {
-    sepia,
-    setSepia,
-    lightModeBg,
-    isDark,
-    toggleDarkMode,
-    helpOpen,
-    setHelpOpen,
-    optionsDropdownOpen,
-    setOptionsDropdownOpen,
-  } = useEditorAppearance();
+    const {
+        sepia,
+        setSepia,
+        lightModeBg,
+        isDark,
+        toggleDarkMode,
+        helpOpen,
+        setHelpOpen,
+        optionsDropdownOpen,
+        setOptionsDropdownOpen,
+    } = useEditorAppearance();
 
-  const {
-    isPreview,
-    setIsPreview,
-    loading,
-    copied,
-    handlePdfExport,
-    handleTxtExport,
-    handleCopy,
-  } = useExport(title, content);
+    const {
+        isPreview,
+        setIsPreview,
+        loading,
+        copied,
+        handlePdfExport,
+        handleTxtExport,
+        handleCopy,
+    } = useExport(title, content);
 
-  const lastButton = formattingButtons[formattingButtons.length - 1];
-  const LastIcon = lastButton.icon;
+    const lastButton = formattingButtons[formattingButtons.length - 1];
+    const LastIcon = lastButton.icon;
 
-  const [darkTheme] = useState(
-    isDark ? postDarkThemes.dark : postDarkThemes.light,
-  );
+    const [darkTheme] = useState(
+        isDark ? postDarkThemes.dark : postDarkThemes.light,
+    );
 
-  return (
-    <>
-      <Helmet>
-        <title>{title || "Editor"}</title>
-        <meta name="description" content={title} />
-        <meta
-          name="keywords"
-          content="technology, blog, javascript, SEO, web development"
-        />
-        <script type="application/ld+json">
-          {JSON.stringify(getSchemaData(title))}
-        </script>
-      </Helmet>
+    return (
+        <>
+            <Helmet>
+                <title>{title || "Editor"}</title>
+                <meta name="description" content={title} />
+                <meta
+                    name="keywords"
+                    content="technology, blog, javascript, SEO, web development"
+                />
+                <script type="application/ld+json">
+                    {JSON.stringify(getSchemaData(title))}
+                </script>
+            </Helmet>
 
-      <div
-        className={`min-h-screen transition-all duration-0 relative h-fit
+            <div
+                className={`min-h-screen transition-all duration-0 relative h-fit
           ${isDark ? "bg-[#222] text-[#f0f0f0]" : `${lightModeBg} text-black`}`}
-      >
-        {/* ── Top Bar ───────────────────────────────────────────────────────── */}
-        <div
-          className={`fixed top-0 left-0 right-0 border-b z-50 transition-all duration-0
+            >
+                {/* ── Top Bar ───────────────────────────────────────────────────────── */}
+                <div
+                    className={`fixed top-0 left-0 right-0 border-b z-50 transition-all duration-0
             ${isDark ? "bg-[#222] border-[#333]" : "bg-white border-gray-100"}`}
-        >
-          <div className="max-w-4xl mx-auto">
-            <div className="px-6 py-4 flex justify-between items-center">
-              <div className="flex items-center space-x-1 md:space-x-4">
-                <button
-                  onClick={() => {
-                    if (!isSaved) {
-                      setShowUnsavedAlert(true);
-                      return;
-                    }
-                    navigate("/profile");
-                  }}
-                  className="hover:opacity-70 transition-opacity p-1 border rounded-full"
                 >
-                  <ArrowLeft className="w-5 h-5" />
-                </button>
-                <div className="hidden md:flex items-center space-x-2">
-                  <button
-                    className={`text-base mr-4 hover:text-green-600 underline underline-offset-2 decoration-lime-300/60 decoration-4 ${isDark ? "text-white" : "text-black"}`}
-                  >
-                    {artType}
-                  </button>
-                  <span className={isDark ? "text-[#555]" : "text-gray-400"}>
-                    {isSaved ? "saved" : "unsaved"}
-                  </span>
-                </div>
-              </div>
+                    <div className="max-w-4xl mx-auto">
+                        <div className="px-6 py-4 flex justify-between items-center">
+                            <div className="flex items-center space-x-1 md:space-x-4">
+                                <button
+                                    onClick={() => {
+                                        if (!isSaved) {
+                                            setShowUnsavedAlert(true);
+                                            return;
+                                        }
+                                        navigate("/profile");
+                                    }}
+                                    className="hover:opacity-70 transition-opacity p-1 border rounded-full"
+                                >
+                                    <ArrowLeft className="w-5 h-5" />
+                                </button>
+                                <div className="hidden md:flex items-center space-x-2">
+                                    <button
+                                        className={`text-base mr-4 hover:text-green-600 underline underline-offset-2 decoration-lime-300/60 decoration-4 ${isDark ? "text-white" : "text-black"}`}
+                                    >
+                                        {artType}
+                                    </button>
+                                    <span
+                                        className={
+                                            isDark
+                                                ? "text-[#555]"
+                                                : "text-gray-400"
+                                        }
+                                    >
+                                        {isSaved ? "saved" : "unsaved"}
+                                    </span>
+                                </div>
+                            </div>
 
-              <div className="flex items-center space-x-3 md:space-x-4">
-                {/* Publish */}
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <button
-                      ref={publishBtnRef}
-                      className="flex items-center space-x-1 px-3 py-1 rounded-full text-sm bg-lime-500 text-white"
-                    >
-                      publish
-                    </button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-6xl h-screen md:h-auto">
-                    <DialogHeader>
-                      <DialogTitle>Publish {artType}</DialogTitle>
-                      <DialogDescription>
-                        account: {currentUser.email}
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="flex flex-col md:flex-row items-start justify-center gap-4 md:gap-16 p-4">
-                      <div>
-                        <TagInputComponent tags={tags} setTags={setTags} />
-                        <PublicPreferenceInput
-                          isPublic={isPublic}
-                          setIsPublic={setIsPublic}
-                        />
-                      </div>
-                      <ThumbnailUploader
-                        artType={artType}
-                        setThumbnailUrl={setThumbnailUrl}
-                        setMedia={setMedia}
-                      />
-                    </div>
-                    <DialogFooter>
-                      <Button
-                        type="submit"
-                        onClick={handleSave}
-                        className="bg-lime-500 rounded-full hover:bg-lime-500"
-                      >
-                        Publish
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                            <div className="flex items-center space-x-3 md:space-x-4">
+                                {/* Publish */}
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <button
+                                            ref={publishBtnRef}
+                                            className="flex items-center space-x-1 px-3 py-1 rounded-full text-sm bg-lime-500 text-white"
+                                        >
+                                            publish
+                                        </button>
+                                    </DialogTrigger>
+                                    <DialogContent className="max-w-6xl h-screen md:h-auto">
+                                        <DialogHeader>
+                                            <DialogTitle>
+                                                Publish {artType}
+                                            </DialogTitle>
+                                            <DialogDescription>
+                                                account: {currentUser.email}
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="flex flex-col md:flex-row items-start justify-center gap-4 md:gap-16 p-4">
+                                            <div>
+                                                <TagInputComponent
+                                                    tags={tags}
+                                                    setTags={setTags}
+                                                />
+                                                <PublicPreferenceInput
+                                                    isPublic={isPublic}
+                                                    setIsPublic={setIsPublic}
+                                                />
+                                            </div>
+                                            <ThumbnailUploader
+                                                artType={artType}
+                                                setThumbnailUrl={
+                                                    setThumbnailUrl
+                                                }
+                                                setMedia={setMedia}
+                                            />
+                                        </div>
+                                        <DialogFooter>
+                                            <Button
+                                                type="submit"
+                                                onClick={handleSave}
+                                                className="bg-lime-500 rounded-full hover:bg-lime-500"
+                                            >
+                                                Publish
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
 
-                {/* Preview toggle */}
-                {!twoColumn && (
-                  <button
-                    className={`flex items-center space-x-1 px-2 md:px-3 py-1 rounded-full text-sm border
+                                {/* Preview toggle */}
+                                {!twoColumn && (
+                                    <button
+                                        className={`flex items-center space-x-1 px-2 md:px-3 py-1 rounded-full text-sm border
                       ${isDark ? "border-[#555]" : "border-gray-300"}
                       ${
-                        isPreview
-                          ? isDark
-                            ? "text-gray-200 bg-[#555]"
-                            : "text-gray-700 bg-gray-300"
-                          : isDark
-                            ? "text-gray-200"
-                            : "text-gray-700"
+                          isPreview
+                              ? isDark
+                                  ? "text-gray-200 bg-[#555]"
+                                  : "text-gray-700 bg-gray-300"
+                              : isDark
+                                ? "text-gray-200"
+                                : "text-gray-700"
                       }`}
-                    onClick={() => setIsPreview(!isPreview)}
-                  >
-                    {isPreview ? (
-                      <>
-                        <Eye className="size-3 md:size-4" />
-                        <span>Preview</span>
-                      </>
-                    ) : (
-                      <>
-                        <Edit className="size-4" />
-                        <span>Edit</span>
-                      </>
-                    )}
-                  </button>
-                )}
+                                        onClick={() => setIsPreview(!isPreview)}
+                                    >
+                                        {isPreview ? (
+                                            <>
+                                                <Eye className="size-3 md:size-4" />
+                                                <span>Preview</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Edit className="size-4" />
+                                                <span>Edit</span>
+                                            </>
+                                        )}
+                                    </button>
+                                )}
 
-                {/* Export */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger>
-                    <Download className="size-5" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuLabel>Export document</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    {[
-                      {
-                        label: "pdf",
-                        icon: <FileText className="size-5" />,
-                        action: () => {
-                          setTwoColumn(false);
-                          handlePdfExport();
-                        },
-                      },
-                      {
-                        label: "txt",
-                        icon: <FileType className="size-4 md:size-5" />,
-                        action: () => {
-                          setTwoColumn(false);
-                          handleTxtExport("txt");
-                        },
-                      },
-                      {
-                        label: "md",
-                        icon: <FileType className="size-4 md:size-5" />,
-                        action: () => {
-                          setTwoColumn(false);
-                          handleTxtExport("md");
-                        },
-                      },
-                    ].map(({ label, icon, action }) => (
-                      <DropdownMenuItem key={label}>
-                        <button
-                          onClick={action}
-                          className={`hover:opacity-70 transition-opacity flex items-center gap-2 size-full ${loading ? "opacity-20" : ""}`}
-                        >
-                          {icon} {label}
-                        </button>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                                {/* Export */}
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger>
+                                        <Download className="size-5" />
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                        <DropdownMenuLabel>
+                                            Export document
+                                        </DropdownMenuLabel>
+                                        <DropdownMenuSeparator />
+                                        {[
+                                            {
+                                                label: "pdf",
+                                                icon: (
+                                                    <FileText className="size-5" />
+                                                ),
+                                                action: () => {
+                                                    setTwoColumn(false);
+                                                    handlePdfExport();
+                                                },
+                                            },
+                                            {
+                                                label: "txt",
+                                                icon: (
+                                                    <FileType className="size-4 md:size-5" />
+                                                ),
+                                                action: () => {
+                                                    setTwoColumn(false);
+                                                    handleTxtExport("txt");
+                                                },
+                                            },
+                                            {
+                                                label: "md",
+                                                icon: (
+                                                    <FileType className="size-4 md:size-5" />
+                                                ),
+                                                action: () => {
+                                                    setTwoColumn(false);
+                                                    handleTxtExport("md");
+                                                },
+                                            },
+                                        ].map(({ label, icon, action }) => (
+                                            <DropdownMenuItem key={label}>
+                                                <button
+                                                    onClick={action}
+                                                    className={`hover:opacity-70 transition-opacity flex items-center gap-2 size-full ${loading ? "opacity-20" : ""}`}
+                                                >
+                                                    {icon} {label}
+                                                </button>
+                                            </DropdownMenuItem>
+                                        ))}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
 
-                {/* Dark mode */}
-                <button
-                  onClick={toggleDarkMode}
-                  className="hover:opacity-70 transition-opacity"
-                >
-                  {isDark ? (
-                    <Sun className="size-5" />
-                  ) : (
-                    <Moon className="size-5" />
-                  )}
-                </button>
+                                {/* Dark mode */}
+                                <button
+                                    onClick={toggleDarkMode}
+                                    className="hover:opacity-70 transition-opacity"
+                                >
+                                    {isDark ? (
+                                        <Sun className="size-5" />
+                                    ) : (
+                                        <Moon className="size-5" />
+                                    )}
+                                </button>
 
-                {/* More */}
-                <DropdownMenu
-                  open={optionsDropdownOpen}
-                  onOpenChange={setOptionsDropdownOpen}
-                >
-                  <DropdownMenuTrigger>
-                    <MoreHorizontal className="size-5" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem
-                      className="cursor-pointer"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setSepia(!sepia);
-                      }}
-                    >
-                      <div
-                        className={`rounded-full size-4 border border-[#222] ${sepia ? "bg-white" : "bg-[#FCF5E6]"}`}
-                      />
-                      {sepia ? "White" : "Sepia"}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="cursor-pointer"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setTextAlignment(
-                          textAlignment === "center" ? "left" : "center",
-                        );
-                      }}
-                    >
-                      {textAlignment === "center" ? (
-                        <>
-                          <AlignLeft /> Left
-                        </>
-                      ) : (
-                        <>
-                          <AlignCenter /> Center
-                        </>
-                      )}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={(e) => {
-                        e.preventDefault();
-                        findAndReplace(content, setContent, toast);
-                      }}
-                    >
-                      <FileSearch /> Find &amp; replace
-                    </DropdownMenuItem>
-                    {!isPreview && (
-                      <DropdownMenuItem
-                        className="hidden md:flex"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setTwoColumn(!twoColumn);
-                        }}
-                      >
-                        {!twoColumn ? (
-                          <>
-                            <Columns2 /> side preview
-                          </>
-                        ) : (
-                          <>
-                            <PanelTop /> single column
-                          </>
-                        )}
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem
-                      className="cursor-pointer"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setHelpOpen(!helpOpen);
-                      }}
-                    >
-                      <Info /> {helpOpen ? "close Help" : "Help"}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
+                                {/* More */}
+                                <DropdownMenu
+                                    open={optionsDropdownOpen}
+                                    onOpenChange={setOptionsDropdownOpen}
+                                >
+                                    <DropdownMenuTrigger>
+                                        <MoreHorizontal className="size-5" />
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                        <DropdownMenuItem
+                                            className="cursor-pointer"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                setSepia(!sepia);
+                                            }}
+                                        >
+                                            <div
+                                                className={`rounded-full size-4 border border-[#222] ${sepia ? "bg-white" : "bg-[#FCF5E6]"}`}
+                                            />
+                                            {sepia ? "White" : "Sepia"}
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            className="cursor-pointer"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                setTextAlignment(
+                                                    textAlignment === "center"
+                                                        ? "left"
+                                                        : "center",
+                                                );
+                                            }}
+                                        >
+                                            {textAlignment === "center" ? (
+                                                <>
+                                                    <AlignLeft /> Left
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <AlignCenter /> Center
+                                                </>
+                                            )}
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                findAndReplace(
+                                                    content,
+                                                    setContent,
+                                                    toast,
+                                                );
+                                            }}
+                                        >
+                                            <FileSearch /> Find &amp; replace
+                                        </DropdownMenuItem>
+                                        {!isPreview && (
+                                            <DropdownMenuItem
+                                                className="hidden md:flex"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    setTwoColumn(!twoColumn);
+                                                }}
+                                            >
+                                                {!twoColumn ? (
+                                                    <>
+                                                        <Columns2 /> side
+                                                        preview
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <PanelTop /> single
+                                                        column
+                                                    </>
+                                                )}
+                                            </DropdownMenuItem>
+                                        )}
+                                        <DropdownMenuItem
+                                            className="cursor-pointer"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                setHelpOpen(!helpOpen);
+                                            }}
+                                        >
+                                            <Info />{" "}
+                                            {helpOpen ? "close Help" : "Help"}
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
+                        </div>
 
-            {/* Formatting toolbar */}
-            <div
-              className={`mb-2 mx-4 md:mx-0 flex items-center justify-between rounded-md transition-all duration-0
+                        {/* Formatting toolbar */}
+                        <div
+                            className={`mb-2 mx-4 md:mx-0 flex items-center justify-between rounded-md transition-all duration-0
                 ${isDark ? "bg-[#333]" : "bg-gray-50"}
                 ${isPreview ? "opacity-0 h-0" : ""}`}
-            >
-              <div className="flex items-center md:space-x-2">
-                {formattingButtons
-                  .slice(0, -1)
-                  .map(({ format, icon: Icon }) => (
-                    <button
-                      key={format}
-                      onClick={() => handleFormat(format)}
-                      className={`px-[6px] md:px-2 py-3 md:rounded-lg transition-all duration-0 border-r md:border-none
+                        >
+                            <div className="flex items-center md:space-x-2">
+                                {formattingButtons
+                                    .slice(0, -1)
+                                    .map(({ format, icon: Icon }) => (
+                                        <button
+                                            key={format}
+                                            onClick={() => handleFormat(format)}
+                                            className={`px-[6px] md:px-2 py-3 md:rounded-lg transition-all duration-0 border-r md:border-none
                       ${isDark ? "hover:bg-gray-500 border-[#222]" : "hover:bg-gray-200 border-gray-200"}
                       ${["heading", "quote", "list", "inlineCode", "dropCap"].includes(format) ? "hidden md:block" : ""}`}
-                    >
-                      <Icon className="size-4" />
-                    </button>
-                  ))}
-                {frontendOnly && (
-                  <button
-                    onClick={() => handleFormat(lastButton.format)}
-                    className={`px-[6px] md:px-2 py-3 md:rounded-lg transition-all duration-0 border-r md:border-none
+                                        >
+                                            <Icon className="size-4" />
+                                        </button>
+                                    ))}
+                                {frontendOnly && (
+                                    <button
+                                        onClick={() =>
+                                            handleFormat(lastButton.format)
+                                        }
+                                        className={`px-[6px] md:px-2 py-3 md:rounded-lg transition-all duration-0 border-r md:border-none
                       ${isDark ? "hover:bg-gray-500 border-[#222]" : "hover:bg-gray-200 border-gray-200"}
                       ${["heading", "quote", "list", "inlineCode", "dropCap"].includes(lastButton.format) ? "hidden md:block" : ""}`}
-                  >
-                    <LastIcon className="size-4" />
-                  </button>
-                )}
-                <LinkInsertButton
-                  onLinkInsert={(text) => {
-                    const ta = textareaRef.current;
-                    if (!ta) return;
-                    const s = ta.selectionStart;
-                    setContent(
-                      content.substring(0, s) + text + content.substring(s),
-                    );
-                  }}
-                  sizing="px-[6px] md:px-2 py-3"
-                />
-                <ImageUploadButton
-                  setMedia={setMedia}
-                  onImageInsert={(text) => {
-                    const ta = textareaRef.current;
-                    if (!ta) return;
-                    const s = ta.selectionStart;
-                    setContent(
-                      content.substring(0, s) + text + content.substring(s),
-                    );
-                  }}
-                  sizing="px-[6px] md:px-2 py-3"
-                />
-              </div>
+                                    >
+                                        <LastIcon className="size-4" />
+                                    </button>
+                                )}
+                                <LinkInsertButton
+                                    onLinkInsert={(text) => {
+                                        const ta = textareaRef.current;
+                                        if (!ta) return;
+                                        const s = ta.selectionStart;
+                                        setContent(
+                                            content.substring(0, s) +
+                                                text +
+                                                content.substring(s),
+                                        );
+                                    }}
+                                    sizing="px-[6px] md:px-2 py-3"
+                                />
+                                <ImageUploadButton
+                                    setMedia={setMedia}
+                                    onImageInsert={(text) => {
+                                        const ta = textareaRef.current;
+                                        if (!ta) return;
+                                        const s = ta.selectionStart;
+                                        setContent(
+                                            content.substring(0, s) +
+                                                text +
+                                                content.substring(s),
+                                        );
+                                    }}
+                                    sizing="px-[6px] md:px-2 py-3"
+                                />
+                            </div>
 
-              {/* Undo / Redo */}
-              <div className="flex items-center space-x-1 md:space-x-2">
-                <button
-                  ref={undoBtnRef}
-                  onClick={handleUndo}
-                  disabled={undoStack.length === 0}
-                  className={`px-[6px] md:px-2 py-3 rounded-lg transition-all duration-0
+                            {/* Undo / Redo */}
+                            <div className="flex items-center space-x-1 md:space-x-2">
+                                <button
+                                    ref={undoBtnRef}
+                                    onClick={handleUndo}
+                                    disabled={undoStack.length === 0}
+                                    className={`px-[6px] md:px-2 py-3 rounded-lg transition-all duration-0
                     ${undoStack.length === 0 ? "opacity-50" : isDark ? "hover:bg-gray-700" : "hover:bg-gray-200"}`}
-                >
-                  <Undo className="size-4" />
-                </button>
-                <button
-                  ref={redoBtnRef}
-                  onClick={handleRedo}
-                  disabled={redoStack.length === 0}
-                  className={`p-1 md:p-2 rounded-lg transition-all duration-0
+                                >
+                                    <Undo className="size-4" />
+                                </button>
+                                <button
+                                    ref={redoBtnRef}
+                                    onClick={handleRedo}
+                                    disabled={redoStack.length === 0}
+                                    className={`p-1 md:p-2 rounded-lg transition-all duration-0
                     ${redoStack.length === 0 ? "opacity-50" : isDark ? "hover:bg-gray-700" : "hover:bg-gray-200"}`}
-                >
-                  <Redo className="size-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Unsaved alert */}
-        {showUnsavedAlert && (
-          <div className="fixed inset-0 bg-[#222] bg-opacity-20 flex items-center justify-center z-20">
-            <Alert className="w-96 relative">
-              <button
-                onClick={() => setShowUnsavedAlert(false)}
-                className="absolute top-2 right-2 p-1 hover:bg-gray-100 rounded-full"
-              >
-                <X className="w-4 h-4" />
-              </button>
-              <div className="flex items-start">
-                <AlertTriangle className="h-5 w-5 text-yellow-500 mr-2" />
-                <div>
-                  <h3 className="font-medium">Unsaved Changes</h3>
-                  <AlertDescription>
-                    You have unsaved changes. Would you like to save them first?
-                  </AlertDescription>
-                  <div className="mt-4 flex space-x-2">
-                    <button
-                      onClick={handleSave}
-                      className="px-3 py-1.5 bg-[#222] text-white rounded-md text-sm hover:bg-gray-800 transition-colors"
-                    >
-                      Save Changes
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShowUnsavedAlert(false);
-                        navigate(-1);
-                      }}
-                      className="px-3 py-1.5 border border-gray-300 rounded-md text-sm hover:bg-gray-50 transition-colors"
-                    >
-                      Dismiss
-                    </button>
-                  </div>
+                                >
+                                    <Redo className="size-4" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </Alert>
-          </div>
-        )}
 
-        {/* ── Writing Area ──────────────────────────────────────────────────── */}
-        <div className="pt-[8.25rem] pb-[600px] px-6 relative h-fit">
-          <div
-            className={`${twoColumn ? "max-w-[1536px]" : "max-w-3xl"} mx-auto relative h-fit`}
-          >
-            {/* Help card */}
-            <div
-              className={`w-full h-auto mx-auto relative mb-4 z-30 rounded text-lg transition-all duration-0 max-w-3xl ${helpOpen ? "" : "hidden"} ${isDark ? "invert" : ""}`}
-            >
-              <Card className="bg-white">
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    Formatting tools &amp; keyboard shortcuts
-                    <X onClick={() => setHelpOpen(false)} />
-                  </CardTitle>
-                  <CardDescription>grasp in minutes</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-sm font-sans space-y-1 mb-4">
-                    {[
-                      ["⌘ / Ctrl + S", "Save / Publish"],
-                      ["⌘ / Ctrl + Z", "Undo"],
-                      ["⌘ / Ctrl + Shift + Z", "Redo"],
-                      ["⌘ / Ctrl + B", "Bold"],
-                      ["⌘ / Ctrl + I", "Italic"],
-                      ["⌘ / Ctrl + U", "Underline"],
-                      ["⌘ / Ctrl + ]", "Indent line(s)"],
-                      ["⌘ / Ctrl + [", "Dedent line(s)"],
-                      ["Tab", "Indent / insert spaces"],
-                      ["Shift + Tab", "Dedent"],
-                      ["⌘ / Ctrl + D", "Duplicate line"],
-                      ["⌘ / Ctrl + Shift + K", "Delete line"],
-                      ["⌘ / Ctrl + /", "Toggle comment"],
-                      ["⌘ / Ctrl + L", "Select line"],
-                      ["Alt + ↑ / ↓", "Move line up / down"],
-                      ["Enter", "Auto-continue lists & blockquotes"],
-                      ["( [ { \" ` '", "Auto-close pair (or wrap selection)"],
-                      ["Backspace", "Delete matching pair"],
-                    ].map(([key, desc]) => (
-                      <div key={key} className="flex items-center gap-3 h-6">
-                        <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs font-mono min-w-fit">
-                          {key}
-                        </kbd>
-                        <span className="text-gray-600">{desc}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-                {formattingButtons.map(({ format, icon: Icon }) => (
-                  <CardContent
-                    key={format}
-                    className="flex items-center justify-start gap-3 h-fit md:h-6 text-sm font-sans"
-                  >
-                    <Icon className="size-5 md:size-4" />
-                    {`${format}, ${
-                      format === "dropCap"
-                        ? "select the paragraph where you want to implement drop-cap and then click this icon"
-                        : `select the text you want to ${format} and click this button`
-                    }`}
-                  </CardContent>
-                ))}
-                <CardContent className="mt-4">
-                  <h1 className="text-3xl font-serif font-black">
-                    Paste these in writing area for better understanding.
-                  </h1>
-                  <button
-                    onClick={() => handleCopy(rawText)}
-                    className="bg-gray-200 hover:bg-gray-400 rounded px-2 py-1"
-                  >
-                    {copied ? "Copied!" : "Copy"}
-                  </button>
-                  <pre
-                    className="text-sm font-sans"
-                    style={{ whiteSpace: "pre-wrap" }}
-                  >
-                    {rawText}
-                  </pre>
-                </CardContent>
-              </Card>
-            </div>
+                {/* Unsaved alert */}
+                {showUnsavedAlert && (
+                    <div className="fixed inset-0 bg-[#222] bg-opacity-20 flex items-center justify-center z-20">
+                        <Alert className="w-96 relative">
+                            <button
+                                onClick={() => setShowUnsavedAlert(false)}
+                                className="absolute top-2 right-2 p-1 hover:bg-gray-100 rounded-full"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                            <div className="flex items-start">
+                                <AlertTriangle className="h-5 w-5 text-yellow-500 mr-2" />
+                                <div>
+                                    <h3 className="font-medium">
+                                        Unsaved Changes
+                                    </h3>
+                                    <AlertDescription>
+                                        You have unsaved changes. Would you like
+                                        to save them first?
+                                    </AlertDescription>
+                                    <div className="mt-4 flex space-x-2">
+                                        <button
+                                            onClick={handleSave}
+                                            className="px-3 py-1.5 bg-[#222] text-white rounded-md text-sm hover:bg-gray-800 transition-colors"
+                                        >
+                                            Save Changes
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setShowUnsavedAlert(false);
+                                                navigate(-1);
+                                            }}
+                                            className="px-3 py-1.5 border border-gray-300 rounded-md text-sm hover:bg-gray-50 transition-colors"
+                                        >
+                                            Dismiss
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </Alert>
+                    </div>
+                )}
 
-            <div className={twoColumn ? "flex gap-4" : ""}>
-              <div
-                className={
-                  twoColumn
-                    ? `border-r-2 w-1/2 h-[200%] pr-2 ${isDark ? "border-[#333]" : "border-gray-400"}`
-                    : ""
-                }
-              >
-                <TitleInput
-                  title={title}
-                  setTitle={setTitle}
-                  setIsSaved={setIsSaved}
-                  isDark={isDark}
-                  isPreview={isPreview}
-                  lightModeBg={lightModeBg}
-                />
-                <ContentInput
-                  ref={textareaRef}
-                  content={content}
-                  isDark={isDark}
-                  isPreview={isPreview}
-                  lightModeBg={lightModeBg}
-                  setIsSaved={setIsSaved}
-                  textAlignment={textAlignment}
-                  handleContentChange={handleContentChange}
-                  onKeyDown={onKeyDown}
-                />
-              </div>
+                {/* ── Writing Area ──────────────────────────────────────────────────── */}
+                <div className="pt-[8.25rem] pb-[600px] px-6 relative h-fit">
+                    <div
+                        className={`${twoColumn ? "max-w-[1536px]" : "max-w-3xl"} mx-auto relative h-fit`}
+                    >
+                        {/* Help card */}
+                        <div
+                            className={`w-full h-auto mx-auto relative mb-4 z-30 rounded text-lg transition-all duration-0 max-w-3xl ${helpOpen ? "" : "hidden"} ${isDark ? "invert" : ""}`}
+                        >
+                            <Card className="bg-white">
+                                <CardHeader>
+                                    <CardTitle className="flex items-center justify-between">
+                                        Formatting tools &amp; keyboard
+                                        shortcuts
+                                        <X onClick={() => setHelpOpen(false)} />
+                                    </CardTitle>
+                                    <CardDescription>
+                                        grasp in minutes
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-sm font-sans space-y-1 mb-4">
+                                        {[
+                                            ["⌘ / Ctrl + S", "Save / Publish"],
+                                            ["⌘ / Ctrl + Z", "Undo"],
+                                            ["⌘ / Ctrl + Shift + Z", "Redo"],
+                                            ["⌘ / Ctrl + B", "Bold"],
+                                            ["⌘ / Ctrl + I", "Italic"],
+                                            ["⌘ / Ctrl + U", "Underline"],
+                                            ["⌘ / Ctrl + ]", "Indent line(s)"],
+                                            ["⌘ / Ctrl + [", "Dedent line(s)"],
+                                            ["Tab", "Indent / insert spaces"],
+                                            ["Shift + Tab", "Dedent"],
+                                            ["⌘ / Ctrl + D", "Duplicate line"],
+                                            [
+                                                "⌘ / Ctrl + Shift + K",
+                                                "Delete line",
+                                            ],
+                                            ["⌘ / Ctrl + /", "Toggle comment"],
+                                            ["⌘ / Ctrl + L", "Select line"],
+                                            [
+                                                "Alt + ↑ / ↓",
+                                                "Move line up / down",
+                                            ],
+                                            [
+                                                "Enter",
+                                                "Auto-continue lists & blockquotes",
+                                            ],
+                                            [
+                                                "( [ { \" ` '",
+                                                "Auto-close pair (or wrap selection)",
+                                            ],
+                                            [
+                                                "Backspace",
+                                                "Delete matching pair",
+                                            ],
+                                        ].map(([key, desc]) => (
+                                            <div
+                                                key={key}
+                                                className="flex items-center gap-3 h-6"
+                                            >
+                                                <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs font-mono min-w-fit">
+                                                    {key}
+                                                </kbd>
+                                                <span className="text-gray-600">
+                                                    {desc}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                                {formattingButtons.map(
+                                    ({ format, icon: Icon }) => (
+                                        <CardContent
+                                            key={format}
+                                            className="flex items-center justify-start gap-3 h-fit md:h-6 text-sm font-sans"
+                                        >
+                                            <Icon className="size-5 md:size-4" />
+                                            {`${format}, ${
+                                                format === "dropCap"
+                                                    ? "select the paragraph where you want to implement drop-cap and then click this icon"
+                                                    : `select the text you want to ${format} and click this button`
+                                            }`}
+                                        </CardContent>
+                                    ),
+                                )}
+                                <CardContent className="mt-4">
+                                    <h1 className="text-3xl font-serif font-black">
+                                        Paste these in writing area for better
+                                        understanding.
+                                    </h1>
+                                    <button
+                                        onClick={() => handleCopy(rawText)}
+                                        className="bg-gray-200 hover:bg-gray-400 rounded px-2 py-1"
+                                    >
+                                        {copied ? "Copied!" : "Copy"}
+                                    </button>
+                                    <pre
+                                        className="text-sm font-sans"
+                                        style={{ whiteSpace: "pre-wrap" }}
+                                    >
+                                        {rawText}
+                                    </pre>
+                                </CardContent>
+                            </Card>
+                        </div>
 
-              {/* Preview pane */}
-              <div
-                data-lenis-prevent
-                className={`prose rounded text-lg transition-all duration-0
+                        <div className={twoColumn ? "flex gap-4" : ""}>
+                            <div
+                                className={
+                                    twoColumn
+                                        ? `border-r-2 w-1/2 h-[200%] pr-2 ${isDark ? "border-[#333]" : "border-gray-400"}`
+                                        : ""
+                                }
+                            >
+                                <TitleInput
+                                    title={title}
+                                    setTitle={setTitle}
+                                    setIsSaved={setIsSaved}
+                                    isDark={isDark}
+                                    isPreview={isPreview}
+                                    lightModeBg={lightModeBg}
+                                />
+                                <ContentInput
+                                    ref={textareaRef}
+                                    content={content}
+                                    isDark={isDark}
+                                    isPreview={isPreview}
+                                    lightModeBg={lightModeBg}
+                                    setIsSaved={setIsSaved}
+                                    textAlignment={textAlignment}
+                                    handleContentChange={handleContentChange}
+                                    onKeyDown={onKeyDown}
+                                />
+                            </div>
+
+                            {/* Preview pane */}
+                            <div
+                                data-lenis-prevent
+                                className={`prose rounded text-lg transition-all duration-0
                   ${!twoColumn ? "w-[100%] h-auto mx-auto absolute top-0 left-0" : "w-1/2 h-full"}
                   ${isPreview || twoColumn ? "" : "hidden"}`}
-              >
-                <ThemedMarkdownPreview
-                  title={title}
-                  content={content}
-                  isVisible={twoColumn ? true : isPreview}
-                  isDark={isDark}
-                  textAlignment={textAlignment}
-                  lightModeBg={lightModeBg}
-                  artType={artType}
-                  darkBg={darkTheme.colors.bg}
-                  darkTheme={darkTheme.colors}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+                            >
+                                <ThemedMarkdownPreview
+                                    title={title}
+                                    content={content}
+                                    isVisible={twoColumn ? true : isPreview}
+                                    isDark={isDark}
+                                    textAlignment={textAlignment}
+                                    lightModeBg={lightModeBg}
+                                    artType={artType}
+                                    darkBg={darkTheme.colors.bg}
+                                    darkTheme={darkTheme.colors}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        <ScrollToBottomButton isDark={isDark} />
-      </div>
-    </>
-  );
+                <ScrollToBottomButton isDark={isDark} />
+            </div>
+        </>
+    );
 });
 
 export default WritingPad;

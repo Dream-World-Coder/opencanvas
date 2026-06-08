@@ -13,195 +13,210 @@ import { CreateMenuDesktop } from "./CreateMenu";
 import { MobileNav } from "./MobileNav";
 
 const Header = ({
-  noBlur = false,
-  ballClr = "text-lime-300",
-  exclude = [""],
-  abs = false,
-  darkBg = "dark:bg-[#222]",
-  noShadow = false,
-  borderClrLight = "border-gray-100",
-  searchBarHidden = false,
+    noBlur = false,
+    ballClr = "text-lime-300",
+    exclude = [""],
+    abs = false,
+    darkBg = "dark:bg-[#222]",
+    noShadow = false,
+    borderClrLight = "border-gray-100",
+    searchBarHidden = false,
 }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [createMenuOpen, setCreateMenuOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [createMenuOpen, setCreateMenuOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-  const { currentUser } = useAuth();
-  const { getNewPostId } = useDataService();
-  const navigate = useNavigate();
+    const { currentUser } = useAuth();
+    const { getNewPostId } = useDataService();
+    const navigate = useNavigate();
 
-  async function handlePostCreate(option) {
+    async function handlePostCreate(option) {
+        if (!currentUser) {
+            toast.error("You need to login first");
+            return;
+        }
+
+        setLoading(true);
+        setCreateMenuOpen(false);
+        localStorage.setItem("blogPost", "");
+
+        try {
+            const postId = await getNewPostId();
+            navigate(
+                `/editor/markdown/create?type=${option.type}&id=${postId}`,
+            );
+        } catch (e) {
+            console.error("Failed to get new post ID", e);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    let navLinks = [
+        { name: "Articles", href: "/articles" },
+        { name: "Publications", href: "/publications" },
+        { name: "About", href: "/about" },
+        { name: "Contact", href: "/contact" },
+    ];
+
     if (!currentUser) {
-      toast.error("You need to login first");
-      return;
+        navLinks.push({ name: "Login", href: "/login" });
+    } else {
+        navLinks.push({ name: "Profile", href: "/profile" });
     }
 
-    setLoading(true);
-    setCreateMenuOpen(false);
-    localStorage.setItem("blogPost", "");
+    const filteredNavLinks = navLinks.filter(
+        (link) =>
+            !exclude.includes(link.href) &&
+            link.href !== "/profile" &&
+            link.href !== "/login",
+    );
 
-    try {
-      const postId = await getNewPostId();
-      navigate(`/editor/markdown/create?type=${option.type}&id=${postId}`);
-    } catch (e) {
-      console.error("Failed to get new post ID", e);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  let navLinks = [
-    { name: "Articles", href: "/articles" },
-    { name: "About", href: "/about" },
-    { name: "Contact", href: "/contact" },
-  ];
-
-  if (!currentUser) {
-    navLinks.push({ name: "Login", href: "/login" });
-  } else {
-    navLinks.push({ name: "Profile", href: "/profile" });
-  }
-
-  const filteredNavLinks = navLinks.filter(
-    (link) =>
-      !exclude.includes(link.href) &&
-      link.href !== "/profile" &&
-      link.href !== "/login",
-  );
-
-  return (
-    <header
-      className={`${abs ? "absolute" : "fixed"} w-full top-0 z-50
+    return (
+        <header
+            className={`${abs ? "absolute" : "fixed"} w-full top-0 z-50
         ${noShadow ? "shadow-none" : "shadow-sm dark:shadow-none"}
         ${
-          noBlur
-            ? `bg-white ${darkBg} dark:text-white border-b ${borderClrLight} dark:border-[#333]`
-            : `bg-white/20 ${darkBg}/20 backdrop-blur-md`
+            noBlur
+                ? `bg-white ${darkBg} dark:text-white border-b ${borderClrLight} dark:border-[#333]`
+                : `bg-white/20 ${darkBg}/20 backdrop-blur-md`
         }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-0 py-3">
-        <nav className="flex items-center justify-between">
-          {/* Left: Logo + SearchBar */}
-          <div className="flex items-center justify-center gap-2">
-            <AppLogo />
-            {!searchBarHidden && (
-              <SearchBar round={true} hideSubmitBtn={true} />
-            )}
-          </div>
+        >
+            <div className="max-w-7xl mx-auto px-4 sm:px-0 py-3">
+                <nav className="flex items-center justify-between">
+                    {/* Left: Logo + SearchBar */}
+                    <div className="flex items-center justify-center gap-2">
+                        <AppLogo />
+                        {!searchBarHidden && (
+                            <SearchBar round={true} hideSubmitBtn={true} />
+                        )}
+                    </div>
 
-          {/* Desktop nav links + Create button */}
-          <div className="hidden md:flex items-center space-x-2">
-            {navLinks.map((link, index) => (
-              <React.Fragment key={index}>
-                {!exclude.includes(link.href) && (
-                  <>
-                    <button
-                      onClick={() => navigate(link.href)}
-                      className={`text-stone-600 hover:text-stone-800 dark:text-[#f8f8f8] dark:hover:text-[#fff]
+                    {/* Desktop nav links + Create button */}
+                    <div className="hidden md:flex items-center space-x-2">
+                        {navLinks.map((link, index) => (
+                            <React.Fragment key={index}>
+                                {!exclude.includes(link.href) && (
+                                    <>
+                                        <button
+                                            onClick={() => navigate(link.href)}
+                                            className={`text-stone-600 hover:text-stone-800 dark:text-[#f8f8f8] dark:hover:text-[#fff]
                         ${link.href !== "/profile" ? "hover:bg-lime-300/50 dark:hover:bg-lime-700/50" : ""}
                         box-content px-3 py-1 rounded-lg transition-all text-sm`}
-                    >
-                      {link.href !== "/profile" ? (
-                        link.name
-                      ) : (
-                        <Avatar className="size-6 md:size-8 dark:bg-[#333]">
-                          <AvatarImage
-                            src={currentUser.profilePicture}
-                            alt={currentUser.username}
-                          />
-                          <AvatarFallback className="dark:bg-[#333]">
-                            {currentUser.fullName.slice(0, 2).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                      )}
-                    </button>
-                    {index !== navLinks.length - 1 && (
-                      <span className={`${ballClr} flex items-center`}>•</span>
-                    )}
-                  </>
-                )}
-              </React.Fragment>
-            ))}
+                                        >
+                                            {link.href !== "/profile" ? (
+                                                link.name
+                                            ) : (
+                                                <Avatar className="size-6 md:size-8 dark:bg-[#333]">
+                                                    <AvatarImage
+                                                        src={
+                                                            currentUser.profilePicture
+                                                        }
+                                                        alt={
+                                                            currentUser.username
+                                                        }
+                                                    />
+                                                    <AvatarFallback className="dark:bg-[#333]">
+                                                        {currentUser.fullName
+                                                            .slice(0, 2)
+                                                            .toUpperCase()}
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                            )}
+                                        </button>
+                                        {index !== navLinks.length - 1 && (
+                                            <span
+                                                className={`${ballClr} flex items-center`}
+                                            >
+                                                •
+                                            </span>
+                                        )}
+                                    </>
+                                )}
+                            </React.Fragment>
+                        ))}
 
-            {/* Create dropdown — desktop */}
-            {currentUser && (
-              <div className="relative">
-                <button
-                  onClick={() => setCreateMenuOpen(!createMenuOpen)}
-                  className="flex items-center space-x-2 bg-black dark:bg-[#333] text-white px-4 py-2 rounded-full hover:bg-stone-800/90 transition-colors"
-                >
-                  <span className="text-sm">Create</span>
-                  {createMenuOpen ? (
-                    <ChevronUp className="w-4 h-4" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4" />
-                  )}
-                </button>
+                        {/* Create dropdown — desktop */}
+                        {currentUser && (
+                            <div className="relative">
+                                <button
+                                    onClick={() =>
+                                        setCreateMenuOpen(!createMenuOpen)
+                                    }
+                                    className="flex items-center space-x-2 bg-black dark:bg-[#333] text-white px-4 py-2 rounded-full hover:bg-stone-800/90 transition-colors"
+                                >
+                                    <span className="text-sm">Write</span>
+                                    {createMenuOpen ? (
+                                        <ChevronUp className="w-4 h-4" />
+                                    ) : (
+                                        <ChevronDown className="w-4 h-4" />
+                                    )}
+                                </button>
 
-                {createMenuOpen && (
-                  <CreateMenuDesktop
-                    loading={loading}
-                    handlePostCreate={handlePostCreate}
-                  />
-                )}
-              </div>
-            )}
-          </div>
+                                {createMenuOpen && (
+                                    <CreateMenuDesktop
+                                        loading={loading}
+                                        handlePostCreate={handlePostCreate}
+                                    />
+                                )}
+                            </div>
+                        )}
+                    </div>
 
-          <div className="flex md:hidden items-center gap-2">
-            <MobileNav
-              loading={loading}
-              handlePostCreate={handlePostCreate}
-              setCreateMenuOpen={setCreateMenuOpen}
-              createMenuOpen={createMenuOpen}
-              setIsMenuOpen={setIsMenuOpen}
-              isMenuOpen={isMenuOpen}
-              filteredNavLinks={filteredNavLinks}
-            />
-          </div>
-        </nav>
+                    <div className="flex md:hidden items-center gap-2">
+                        <MobileNav
+                            loading={loading}
+                            handlePostCreate={handlePostCreate}
+                            setCreateMenuOpen={setCreateMenuOpen}
+                            createMenuOpen={createMenuOpen}
+                            setIsMenuOpen={setIsMenuOpen}
+                            isMenuOpen={isMenuOpen}
+                            filteredNavLinks={filteredNavLinks}
+                        />
+                    </div>
+                </nav>
 
-        {/* Mobile slide-down nav menu */}
-        <div
-          className={`md:hidden absolute left-0 right-0 bg-white dark:bg-[#111] backdrop-blur-md shadow-lg
+                {/* Mobile slide-down nav menu */}
+                <div
+                    className={`md:hidden absolute left-0 right-0 bg-white dark:bg-[#111] backdrop-blur-md shadow-lg
             border-b border-stone-200/50 dark:border-stone-700/50 transition-all duration-300 ease-in-out ${
-              isMenuOpen
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 -translate-y-2 pointer-events-none"
+                isMenuOpen
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 -translate-y-2 pointer-events-none"
             }`}
-        >
-          <div className="px-4 py-6 space-y-6">
-            <div className="flex flex-col">
-              {filteredNavLinks.map((link, index) => (
-                <button
-                  key={index}
-                  className="py-2 pl-4 rounded-lg text-stone-600 dark:text-gray-300 hover:text-stone-800
-                      dark:hover:text-gray-200 hover:bg-lime-300/50 transition-colors flex items-center justify-start"
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    navigate(link.href);
-                  }}
                 >
-                  {link.name}
-                </button>
-              ))}
+                    <div className="px-4 py-6 space-y-6">
+                        <div className="flex flex-col">
+                            {filteredNavLinks.map((link, index) => (
+                                <button
+                                    key={index}
+                                    className="py-2 pl-4 rounded-lg text-stone-600 dark:text-gray-300 hover:text-stone-800
+                      dark:hover:text-gray-200 hover:bg-lime-300/50 transition-colors flex items-center justify-start"
+                                    onClick={() => {
+                                        setIsMenuOpen(false);
+                                        navigate(link.href);
+                                    }}
+                                >
+                                    {link.name}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </header>
-  );
+        </header>
+    );
 };
 
 Header.propTypes = {
-  noBlur: PropTypes.bool,
-  abs: PropTypes.bool,
-  noShadow: PropTypes.bool,
-  searchBarHidden: PropTypes.bool,
-  ballClr: PropTypes.string,
-  darkBg: PropTypes.string,
-  borderClrLight: PropTypes.string,
-  exclude: PropTypes.array,
+    noBlur: PropTypes.bool,
+    abs: PropTypes.bool,
+    noShadow: PropTypes.bool,
+    searchBarHidden: PropTypes.bool,
+    ballClr: PropTypes.string,
+    darkBg: PropTypes.string,
+    borderClrLight: PropTypes.string,
+    exclude: PropTypes.array,
 };
 
 export default Header;

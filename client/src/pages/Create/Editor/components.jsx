@@ -2,36 +2,36 @@
 
 import { useRef, useState, memo, forwardRef } from "react";
 import {
-  X,
-  Bold,
-  Copy,
-  Code,
-  Link,
-  List,
-  Minus,
-  Quote,
-  Image,
-  Italic,
-  Upload,
-  Heading,
-  FilePlus,
-  FileJson,
-  Underline,
-  LetterText,
-  Highlighter,
-  ArrowDown,
-  Strikethrough,
+    X,
+    Bold,
+    Copy,
+    Code,
+    Link,
+    List,
+    Minus,
+    Quote,
+    Image,
+    Italic,
+    Upload,
+    Heading,
+    FilePlus,
+    FileJson,
+    Underline,
+    LetterText,
+    Highlighter,
+    ArrowDown,
+    Strikethrough,
 } from "lucide-react";
 import PropTypes from "prop-types";
 // ***************************************************
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogTrigger,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -53,41 +53,41 @@ import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import {
-  oneLight,
-  materialDark,
-  // atomDark,
-  // gruvboxDark,
+    oneLight,
+    materialDark,
+    // atomDark,
+    // gruvboxDark,
 } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 export const getSchemaData = (title) => {
-  return {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: { title },
-    // image: ["https://opencanvas.institute/photos/1x1/photo.jpg"],
-    datePublished: {},
-    dateModified: {},
-    author: {
-      "@type": "Person",
-      name: {},
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "Opencanvas",
-      logo: {
-        "@type": "ImageObject",
-        url: "https://opencanvas.institute/logo.png",
-      },
-    },
-    description:
-      "A sample article description goes here, summarizing the main content of the article.",
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": "https://opencanvas.institute/sample-article",
-    },
-    keywords:
-      "SEO, keywords, search engine optimization, blog, web development",
-  };
+    return {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: { title },
+        // image: ["https://opencanvas.institute/photos/1x1/photo.jpg"],
+        datePublished: {},
+        dateModified: {},
+        author: {
+            "@type": "Person",
+            name: {},
+        },
+        publisher: {
+            "@type": "Organization",
+            name: "Opencanvas",
+            logo: {
+                "@type": "ImageObject",
+                url: "https://opencanvas.institute/logo.png",
+            },
+        },
+        description:
+            "A sample article description goes here, summarizing the main content of the article.",
+        mainEntityOfPage: {
+            "@type": "WebPage",
+            "@id": "https://opencanvas.institute/sample-article",
+        },
+        keywords:
+            "SEO, keywords, search engine optimization, blog, web development",
+    };
 };
 
 /**
@@ -99,19 +99,19 @@ export const getSchemaData = (title) => {
  *
  */
 export const formattingButtons = [
-  { format: "bold", icon: Bold },
-  { format: "italic", icon: Italic },
-  { format: "underline", icon: Underline },
-  { format: "strikethrough", icon: Strikethrough },
-  { format: "heading", icon: Heading },
-  { format: "highlight", icon: Highlighter },
-  { format: "quote", icon: Quote },
-  { format: "inlineCode", icon: Code },
-  { format: "code", icon: FileJson },
-  { format: "list", icon: List },
-  { format: "dropCap", icon: LetterText },
-  { format: "line", icon: Minus },
-  { format: "pageBreak", icon: FilePlus },
+    { format: "bold", icon: Bold },
+    { format: "italic", icon: Italic },
+    { format: "underline", icon: Underline },
+    { format: "strikethrough", icon: Strikethrough },
+    { format: "heading", icon: Heading },
+    { format: "highlight", icon: Highlighter },
+    { format: "quote", icon: Quote },
+    { format: "inlineCode", icon: Code },
+    { format: "code", icon: FileJson },
+    { format: "list", icon: List },
+    { format: "dropCap", icon: LetterText },
+    { format: "line", icon: Minus },
+    { format: "pageBreak", icon: FilePlus },
 ];
 
 /**
@@ -123,111 +123,111 @@ export const formattingButtons = [
  *
  */
 export const ImageUploadButton = ({ onImageInsert, sizing, setMedia }) => {
-  const fileInputRef = useRef(null);
-  const [preview, setPreview] = useState(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [error, setError] = useState(null);
-  const [isUploading, setIsUploading] = useState(false);
+    const fileInputRef = useRef(null);
+    const [preview, setPreview] = useState(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [error, setError] = useState(null);
+    const [isUploading, setIsUploading] = useState(false);
 
-  const handleImageSelect = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
+    const handleImageSelect = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
 
-    try {
-      setError(null);
+        try {
+            setError(null);
 
-      // preview URL & preview state
-      const objectUrl = URL.createObjectURL(file);
-      setPreview(objectUrl);
-      setIsUploading(true);
+            // preview URL & preview state
+            const objectUrl = URL.createObjectURL(file);
+            setPreview(objectUrl);
+            setIsUploading(true);
 
-      const { directLink, imgDeleteHash } = await uploadImage(file);
-      onImageInsert(`![image](${directLink})`);
-      setMedia((prev) => [...prev, imgDeleteHash]);
+            const { directLink, imgDeleteHash } = await uploadImage(file);
+            onImageInsert(`![image](${directLink})`);
+            setMedia((prev) => [...prev, imgDeleteHash]);
 
-      setDialogOpen(false);
-    } catch (error) {
-      setError(error.message);
-      console.error("Upload error:", error);
-    } finally {
-      setIsUploading(false);
-      if (preview) {
-        URL.revokeObjectURL(preview);
-      }
-      setPreview(null);
-    }
-  };
+            setDialogOpen(false);
+        } catch (error) {
+            setError(error.message);
+            console.error("Upload error:", error);
+        } finally {
+            setIsUploading(false);
+            if (preview) {
+                URL.revokeObjectURL(preview);
+            }
+            setPreview(null);
+        }
+    };
 
-  return (
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <DialogTrigger asChild>
-        <button
-          className={
-            sizing +
-            " hover:bg-gray-200 md:rounded-lg transition-all duration-0"
-          }
-        >
-          <Image className="size-4" />
-        </button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Insert Image</DialogTitle>
-          <DialogDescription>
-            Upload an image (JPG, JPEG or PNG, max 10MB)
-          </DialogDescription>
-        </DialogHeader>
+    return (
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+                <button
+                    className={
+                        sizing +
+                        " hover:bg-gray-200 md:rounded-lg transition-all duration-0"
+                    }
+                >
+                    <Image className="size-4" />
+                </button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Insert Image</DialogTitle>
+                    <DialogDescription>
+                        Upload an image (JPG, JPEG or PNG, max 10MB)
+                    </DialogDescription>
+                </DialogHeader>
 
-        {error && (
-          <Alert variant="destructive">
-            <AlertDescription>{`${error}`}</AlertDescription>
-          </Alert>
-        )}
+                {error && (
+                    <Alert variant="destructive">
+                        <AlertDescription>{`${error}`}</AlertDescription>
+                    </Alert>
+                )}
 
-        <div className="space-y-4">
-          <Card className="border-2 border-dashed">
-            <CardContent className="flex flex-col items-center justify-center p-6">
-              {preview ? (
-                <img
-                  src={preview}
-                  alt="Preview"
-                  className="max-w-full max-h-48 object-contain mb-4"
-                />
-              ) : (
-                <div className="text-center">
-                  <Image className="mx-auto w-12 h-12 text-gray-400 mb-4" />
-                  <p className="text-sm text-gray-600">
-                    Click to upload or drag and drop
-                  </p>
+                <div className="space-y-4">
+                    <Card className="border-2 border-dashed">
+                        <CardContent className="flex flex-col items-center justify-center p-6">
+                            {preview ? (
+                                <img
+                                    src={preview}
+                                    alt="Preview"
+                                    className="max-w-full max-h-48 object-contain mb-4"
+                                />
+                            ) : (
+                                <div className="text-center">
+                                    <Image className="mx-auto w-12 h-12 text-gray-400 mb-4" />
+                                    <p className="text-sm text-gray-600">
+                                        Click to upload or drag and drop
+                                    </p>
+                                </div>
+                            )}
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageSelect}
+                                className="hidden"
+                            />
+                            <Button
+                                onClick={() => fileInputRef.current?.click()}
+                                variant="outline"
+                                className="mt-4"
+                                disabled={isUploading}
+                            >
+                                {isUploading ? "Uploading..." : "Select Image"}
+                            </Button>
+                        </CardContent>
+                    </Card>
                 </div>
-              )}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleImageSelect}
-                className="hidden"
-              />
-              <Button
-                onClick={() => fileInputRef.current?.click()}
-                variant="outline"
-                className="mt-4"
-                disabled={isUploading}
-              >
-                {isUploading ? "Uploading..." : "Select Image"}
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
+            </DialogContent>
+        </Dialog>
+    );
 };
 
 ImageUploadButton.propTypes = {
-  onImageInsert: PropTypes.func,
-  setMedia: PropTypes.func,
-  sizing: PropTypes.string,
+    onImageInsert: PropTypes.func,
+    setMedia: PropTypes.func,
+    sizing: PropTypes.string,
 };
 
 /**
@@ -237,97 +237,98 @@ ImageUploadButton.propTypes = {
  *
  */
 export const LinkInsertButton = ({ onLinkInsert, sizing }) => {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [linkText, setLinkText] = useState("");
-  const [linkUrl, setLinkUrl] = useState("");
-  const [error, setError] = useState("");
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [linkText, setLinkText] = useState("");
+    const [linkUrl, setLinkUrl] = useState("");
+    const [error, setError] = useState("");
 
-  const handleInsert = () => {
-    // Basic validation
-    if (!linkText.trim() || !linkUrl.trim()) {
-      setError("Both link text and URL are required");
-      return;
-    }
+    const handleInsert = () => {
+        // Basic validation
+        if (!linkText.trim() || !linkUrl.trim()) {
+            setError("Both link text and URL are required");
+            return;
+        }
 
-    // Basic URL validation
-    try {
-      new URL(linkUrl);
-    } catch {
-      setError("Please enter a valid URL");
-      return;
-    }
+        // Basic URL validation
+        try {
+            new URL(linkUrl);
+        } catch {
+            setError("Please enter a valid URL");
+            return;
+        }
 
-    // Insert markdown link
-    onLinkInsert(`[${linkText}](${linkUrl})`);
+        // Insert markdown link
+        onLinkInsert(`[${linkText}](${linkUrl})`);
 
-    // Reset and close
-    setLinkText("");
-    setLinkUrl("");
-    setError("");
-    setDialogOpen(false);
-  };
+        // Reset and close
+        setLinkText("");
+        setLinkUrl("");
+        setError("");
+        setDialogOpen(false);
+    };
 
-  return (
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <DialogTrigger asChild>
-        <button
-          className={
-            sizing + "hover:bg-gray-200 md:rounded-lg transition-all duration-0"
-          }
-        >
-          <Link className="size-4" />
-        </button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Insert Link</DialogTitle>
-        </DialogHeader>
-        {error && (
-          <Alert variant="destructive">
-            <AlertDescription>{error.toString()}</AlertDescription>
-          </Alert>
-        )}
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="linkText">Link Text</Label>
-            <Input
-              id="linkText"
-              value={linkText}
-              onChange={(e) => setLinkText(e.target.value)}
-              placeholder="Display text for the link"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="linkUrl">URL</Label>
-            <Input
-              id="linkUrl"
-              value={linkUrl}
-              onChange={(e) => setLinkUrl(e.target.value)}
-              placeholder="https://example.com"
-            />
-          </div>
-          <div className="flex justify-end space-x-2">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setDialogOpen(false);
-                setError("");
-                setLinkText("");
-                setLinkUrl("");
-              }}
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleInsert}>Insert Link</Button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
+    return (
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+                <button
+                    className={
+                        sizing +
+                        "hover:bg-gray-200 md:rounded-lg transition-all duration-0"
+                    }
+                >
+                    <Link className="size-4" />
+                </button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Insert Link</DialogTitle>
+                </DialogHeader>
+                {error && (
+                    <Alert variant="destructive">
+                        <AlertDescription>{error.toString()}</AlertDescription>
+                    </Alert>
+                )}
+                <div className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="linkText">Link Text</Label>
+                        <Input
+                            id="linkText"
+                            value={linkText}
+                            onChange={(e) => setLinkText(e.target.value)}
+                            placeholder="Display text for the link"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="linkUrl">URL</Label>
+                        <Input
+                            id="linkUrl"
+                            value={linkUrl}
+                            onChange={(e) => setLinkUrl(e.target.value)}
+                            placeholder="https://example.com"
+                        />
+                    </div>
+                    <div className="flex justify-end space-x-2">
+                        <Button
+                            variant="outline"
+                            onClick={() => {
+                                setDialogOpen(false);
+                                setError("");
+                                setLinkText("");
+                                setLinkUrl("");
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button onClick={handleInsert}>Insert Link</Button>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
 };
 LinkInsertButton.propTypes = {
-  onLinkInsert: PropTypes.func,
-  sizing: PropTypes.string,
+    onLinkInsert: PropTypes.func,
+    sizing: PropTypes.string,
 };
 /**
  *
@@ -348,965 +349,1101 @@ LinkInsertButton.propTypes = {
  *
  */
 export const CodeBlock = ({
-  isDark,
-  inline,
-  className,
-  children,
-  ...props
+    isDark,
+    inline,
+    className,
+    children,
+    ...props
 }) => {
-  const match = /language-(\w+)/.exec(className || "");
-  const codeString = String(children).replace(/\n$/, "");
-  const [copied, setCopied] = useState(false);
+    const match = /language-(\w+)/.exec(className || "");
+    const codeString = String(children).replace(/\n$/, "");
+    const [copied, setCopied] = useState(false);
 
-  return !inline && match ? (
-    // block code
-    <div
-      className={`relative my-4 overflow-hidden rounded-sm flex flex-col
+    return !inline && match ? (
+        // block code
+        <div
+            className={`relative my-4 overflow-hidden rounded-sm flex flex-col
          ${isDark ? "bg-[#2F2F2F]" : "bg-[#fafafa]"}`}
-    >
-      {/* codeHeader */}
-      <div
-        className={`flex items-center justify-between px-6 pt-2 ${
-          isDark ? "bg-[#2F2F2F]" : "bg-[#fafafa]"
-        }`}
-      >
-        {/* language */}
-        <span className="text-sm font-sans">{match[1]}</span>
-
-        {/* copy btn */}
-        <button
-          onClick={() => {
-            navigator.clipboard.writeText(codeString);
-            setCopied(true);
-            setTimeout(() => {
-              setCopied(false);
-            }, 500);
-          }}
-          className="text-black dark:text-white p-1 text-xs rounded hover:bg-[#ddd] dark:hover:bg-[#171717] focus:outline-none z-10 flex justify-center items-center gap-1"
         >
-          <Copy size={12} />
-          {copied ? "Copied" : "Copy"}
-        </button>
-      </div>
+            {/* codeHeader */}
+            <div
+                className={`flex items-center justify-between px-6 pt-2 ${
+                    isDark ? "bg-[#2F2F2F]" : "bg-[#fafafa]"
+                }`}
+            >
+                {/* language */}
+                <span className="text-sm font-sans">{match[1]}</span>
 
-      {/* code card */}
-      <div className="rounded-sm overflow-hidden border-none">
-        <SyntaxHighlighter
-          style={isDark ? materialDark : oneLight}
-          language={match[1]}
-          PreTag="div"
-          wrapLongLines
-          showLineNumbers
-          codeTagProps={{
-            style: {
-              fontSize: "0.875rem",
-              lineHeight: "1.375",
-            },
-          }}
-          {...props}
-        >
-          {codeString}
-        </SyntaxHighlighter>
-      </div>
-    </div>
-  ) : (
-    // inline code
-    <code
-      className={`rounded px-1.5 py-[2px] sentient-regular break-words !font-mono
+                {/* copy btn */}
+                <button
+                    onClick={() => {
+                        navigator.clipboard.writeText(codeString);
+                        setCopied(true);
+                        setTimeout(() => {
+                            setCopied(false);
+                        }, 500);
+                    }}
+                    className="text-black dark:text-white p-1 text-xs rounded hover:bg-[#ddd] dark:hover:bg-[#171717] focus:outline-none z-10 flex justify-center items-center gap-1"
+                >
+                    <Copy size={12} />
+                    {copied ? "Copied" : "Copy"}
+                </button>
+            </div>
+
+            {/* code card */}
+            <div className="rounded-sm overflow-hidden border-none">
+                <SyntaxHighlighter
+                    style={isDark ? materialDark : oneLight}
+                    language={match[1]}
+                    PreTag="div"
+                    wrapLongLines
+                    showLineNumbers
+                    codeTagProps={{
+                        style: {
+                            fontSize: "0.875rem",
+                            lineHeight: "1.375",
+                        },
+                    }}
+                    {...props}
+                >
+                    {codeString}
+                </SyntaxHighlighter>
+            </div>
+        </div>
+    ) : (
+        // inline code
+        <code
+            className={`rounded px-1.5 py-[2px] sentient-regular break-words !font-mono
         ${isDark ? "text-oneDarkTagClr bg-oneDarkTagClr/10" : "bg-[#f1f1f1]"}`}
-      style={{ fontSize: "smaller" }}
-    >
-      {children}
-    </code>
-  );
+            style={{ fontSize: "smaller" }}
+        >
+            {children}
+        </code>
+    );
 };
 CodeBlock.propTypes = {
-  isDark: PropTypes.bool,
-  inline: PropTypes.bool,
-  className: PropTypes.any,
-  children: PropTypes.any,
+    isDark: PropTypes.bool,
+    inline: PropTypes.bool,
+    className: PropTypes.any,
+    children: PropTypes.any,
 };
 
 export const ImageRender = ({ setActiveImageId, getImageSettings, props }) => {
-  // console.log(
-  //     `Image details: ${props.node} ${props.src} ${props.alt}`,
-  //     props,
-  // );
-  const { node, src, alt, ...rest } = props;
-  // unique ID for each image based on src and alt
-  const imageId = `img-${src || ""}${alt || ""}`.replace(/[^a-zA-Z0-9]/g, "-");
-  const settings = getImageSettings(imageId);
+    // console.log(
+    //     `Image details: ${props.node} ${props.src} ${props.alt}`,
+    //     props,
+    // );
+    const { node, src, alt, ...rest } = props;
+    // unique ID for each image based on src and alt
+    const imageId = `img-${src || ""}${alt || ""}`.replace(
+        /[^a-zA-Z0-9]/g,
+        "-",
+    );
+    const settings = getImageSettings(imageId);
 
-  return (
-    <div
-      className={`markdown-image-container-div relative cursor-pointer z-15 overflow-hidden
+    return (
+        <div
+            className={`markdown-image-container-div relative cursor-pointer z-15 overflow-hidden
                                                 flex items-center`}
-      style={{
-        justifyContent: `${settings.alignment}`,
-        marginTop: `${settings.marginTop}px`,
-        marginBottom: `${settings.marginBottom}px`,
-      }}
-      onClick={() => setActiveImageId(imageId)}
-    >
-      <img
-        className={`relative object-contain`}
-        style={{
-          maxHeight: `${settings.maxHeight}px`,
-          maxWidth: `${settings.maxWidth}px`,
-        }}
-        src={src}
-        alt={alt}
-        {...rest}
-      />
-    </div>
-  );
+            style={{
+                justifyContent: `${settings.alignment}`,
+                marginTop: `${settings.marginTop}px`,
+                marginBottom: `${settings.marginBottom}px`,
+            }}
+            onClick={() => setActiveImageId(imageId)}
+        >
+            <img
+                className={`relative object-contain`}
+                style={{
+                    maxHeight: `${settings.maxHeight}px`,
+                    maxWidth: `${settings.maxWidth}px`,
+                }}
+                src={src}
+                alt={alt}
+                {...rest}
+            />
+        </div>
+    );
 };
 ImageRender.propTypes = {
-  setActiveImageId: PropTypes.func,
-  getImageSettings: PropTypes.func,
-  props: PropTypes.any,
+    setActiveImageId: PropTypes.func,
+    getImageSettings: PropTypes.func,
+    props: PropTypes.any,
 };
 
 export const MarkdownPreview = memo(function MarkdownPreview({
-  title,
-  content,
-  thumbnailUrl = null,
-  isVisible = true,
-  isDark = false,
-  textAlignment = "left",
-  lightModeBg = "bg-white",
-  insidePost = false,
-  darkBg = "bg-[#222]",
-  contentOnly = false,
-  artType = "written",
+    title,
+    content,
+    thumbnailUrl = null,
+    isVisible = true,
+    isDark = false,
+    textAlignment = "left",
+    lightModeBg = "bg-white",
+    insidePost = false,
+    darkBg = "bg-[#222]",
+    contentOnly = false,
+    artType = "written",
 }) {
-  const insideGallery = contentOnly;
+    const insideGallery = contentOnly;
 
-  const imageSettingsRef = useRef({});
-  const [activeImageId, setActiveImageId] = useState(null);
-  const [, forceUpdate] = useState({});
+    const imageSettingsRef = useRef({});
+    const [activeImageId, setActiveImageId] = useState(null);
+    const [, forceUpdate] = useState({});
 
-  const getImageSettings = (imageId) => {
-    if (!imageSettingsRef.current[imageId]) {
-      imageSettingsRef.current[imageId] = {
-        maxWidth: 468,
-        maxHeight: 468,
-        alignment: "center",
-        marginTop: 35,
-        marginBottom: 35,
-      };
+    const getImageSettings = (imageId) => {
+        if (!imageSettingsRef.current[imageId]) {
+            imageSettingsRef.current[imageId] = {
+                maxWidth: 468,
+                maxHeight: 468,
+                alignment: "center",
+                marginTop: 35,
+                marginBottom: 35,
+            };
+        }
+        return imageSettingsRef.current[imageId];
+    };
+
+    const updateImageSetting = (imageId, setting, value) => {
+        const settings = getImageSettings(imageId);
+        settings[setting] = value;
+        imageSettingsRef.current[imageId] = settings;
+        forceUpdate({});
+    };
+
+    function convertFlexAlignment(alignment) {
+        switch (alignment) {
+            case "flex-start":
+                return "left";
+            case "center":
+                return "center";
+            case "flex-end":
+                return "right";
+            default:
+                return alignment;
+        }
     }
-    return imageSettingsRef.current[imageId];
-  };
 
-  const updateImageSetting = (imageId, setting, value) => {
-    const settings = getImageSettings(imageId);
-    settings[setting] = value;
-    imageSettingsRef.current[imageId] = settings;
-    forceUpdate({});
-  };
+    if (!isVisible) return null;
 
-  function convertFlexAlignment(alignment) {
-    switch (alignment) {
-      case "flex-start":
-        return "left";
-      case "center":
-        return "center";
-      case "flex-end":
-        return "right";
-      default:
-        return alignment;
-    }
-  }
+    const isResearchPaper = artType === "research-paper";
+    const isBook = artType === "book";
 
-  if (!isVisible) return null;
-
-  const isResearchPaper = artType === "research-paper";
-  const isBook = artType === "book";
-
-  if (isResearchPaper) {
-    return (
-      <>
-        <div className="w-full bg-white flex flex-col items-center font-serif text-black">
-          <div
-            id="export"
-            className="w-full max-w-[780px] px-12 py-10 text-[15px] leading-[1.55]"
-            style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}
-          >
-            {title && (
-              <div className="text-center mb-6 border-b border-black pb-6">
-                <h1 className="text-[22px] font-bold leading-tight tracking-tight uppercase mb-3">
-                  {title}
-                </h1>
-                {/* <div className="flex items-center justify-center gap-2 mt-3">
+    if (isResearchPaper) {
+        return (
+            <>
+                <div className="w-full bg-white flex flex-col items-center font-serif text-black">
+                    <div
+                        id="export"
+                        className="w-full max-w-[780px] px-12 py-10 text-[15px] leading-[1.55]"
+                        style={{
+                            fontFamily: "'Georgia', 'Times New Roman', serif",
+                        }}
+                    >
+                        {title && (
+                            <div className="text-center mb-6 border-b border-black pb-6">
+                                <h1 className="text-[22px] font-bold leading-tight tracking-tight uppercase mb-3">
+                                    {title}
+                                </h1>
+                                {/* <div className="flex items-center justify-center gap-2 mt-3">
                   <div className="h-px w-16 bg-black" />
                   <div className="h-1.5 w-1.5 rounded-full bg-black" />
                   <div className="h-px w-16 bg-black" />
                 </div>*/}
-              </div>
-            )}
+                            </div>
+                        )}
 
-            {thumbnailUrl && (
-              <figure className="my-6 border border-black/20">
-                <img
-                  src={thumbnailUrl}
-                  alt={title || "Figure"}
-                  className="w-full object-contain"
-                  loading="lazy"
-                />
-                <figcaption className="text-center text-[12px] text-black/60 py-1 border-t border-black/10 px-2">
-                  Figure 1. {title}
-                </figcaption>
-              </figure>
-            )}
+                        {thumbnailUrl && (
+                            <figure className="my-6 border border-black/20">
+                                <img
+                                    src={thumbnailUrl}
+                                    alt={title || "Figure"}
+                                    className="w-full object-contain"
+                                    loading="lazy"
+                                />
+                                <figcaption className="text-center text-[12px] text-black/60 py-1 border-t border-black/10 px-2">
+                                    Figure 1. {title}
+                                </figcaption>
+                            </figure>
+                        )}
 
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
-              rehypePlugins={[rehypeRaw, rehypeKatex]}
-              components={{
-                img: (props) => (
-                  <ImageRender
-                    setActiveImageId={setActiveImageId}
-                    getImageSettings={getImageSettings}
-                    props={props}
-                  />
-                ),
-                hr: () => <hr className="my-8 border-t border-black/20" />,
-                code: ({ inline, className, children, ...props }) => (
-                  <CodeBlock
-                    isDark={false}
-                    inline={inline}
-                    className={className}
-                    {...props}
-                  >
-                    {children}
-                  </CodeBlock>
-                ),
-                blockquote: ({ children }) => (
-                  <blockquote className="border-l-2 border-black/40 pl-4 py-0.5 my-4 text-black/70 italic text-[14px]">
-                    {children}
-                  </blockquote>
-                ),
-                h1: ({ children }) => (
-                  <h1
-                    id={generateId(children)}
-                    className="mt-10 mb-3 text-[17px] font-bold uppercase tracking-widest border-b border-black/30 pb-1"
-                  >
-                    {children}
-                  </h1>
-                ),
-                h2: ({ children }) => (
-                  <h2
-                    id={generateId(children)}
-                    className="mt-8 mb-2 text-[15px] font-bold uppercase tracking-wider"
-                  >
-                    {children}
-                  </h2>
-                ),
-                h3: ({ children }) => (
-                  <h3
-                    id={generateId(children)}
-                    className="mt-6 mb-2 text-[14px] font-bold italic"
-                  >
-                    {children}
-                  </h3>
-                ),
-                h4: ({ children }) => (
-                  <h4
-                    id={generateId(children)}
-                    className="mt-4 mb-1 text-[14px] font-semibold"
-                  >
-                    {children}
-                  </h4>
-                ),
-                h5: ({ children }) => (
-                  <h5 className="mt-4 mb-1 text-[13px] font-semibold uppercase tracking-wide">
-                    {children}
-                  </h5>
-                ),
-                h6: ({ children }) => (
-                  <h6 className="mt-3 mb-1 text-[12px] font-semibold uppercase tracking-widest text-black/60">
-                    {children}
-                  </h6>
-                ),
-                p: ({ children }) => (
-                  <p className="my-3 text-[15px] leading-[1.7] text-justify hyphens-auto text-black">
-                    {children}
-                  </p>
-                ),
-                strong: ({ children }) => (
-                  <strong className="font-bold">{children}</strong>
-                ),
-                em: ({ children }) => <em className="italic">{children}</em>,
-                a: ({ href, children }) => (
-                  <a
-                    href={href}
-                    className="text-black underline underline-offset-2 hover:text-black/60 transition-colors"
-                    target={href.startsWith("http") ? "_blank" : "_self"}
-                    rel={href.startsWith("http") ? "noopener noreferrer" : ""}
-                  >
-                    {children}
-                  </a>
-                ),
-                ul: ({ children }) => (
-                  <ul className="list-disc pl-6 my-3 space-y-1 text-[14px]">
-                    {children}
-                  </ul>
-                ),
-                ol: ({ children }) => (
-                  <ol className="list-decimal pl-6 my-3 space-y-1 text-[14px]">
-                    {children}
-                  </ol>
-                ),
-                li: ({ children }) => (
-                  <li className="text-[14px] leading-[1.6]">{children}</li>
-                ),
-                table: ({ children }) => (
-                  <div className="overflow-x-auto my-5">
-                    <table className="border-collapse w-full text-[13px] text-black border border-black/30">
-                      {children}
-                    </table>
-                  </div>
-                ),
-                thead: ({ children }) => (
-                  <thead className="border-b-2 border-black">{children}</thead>
-                ),
-                tbody: ({ children }) => <tbody>{children}</tbody>,
-                tr: ({ children }) => (
-                  <tr className="border-b border-black/15 even:bg-black/[0.03]">
-                    {children}
-                  </tr>
-                ),
-                th: ({ children }) => (
-                  <th className="px-3 py-1.5 font-bold text-left uppercase tracking-wide text-[11px] border-r border-black/20 last:border-r-0">
-                    {children}
-                  </th>
-                ),
-                td: ({ children }) => (
-                  <td className="px-3 py-1.5 border-r border-black/10 last:border-r-0">
-                    {children}
-                  </td>
-                ),
-              }}
-            >
-              {content}
-            </ReactMarkdown>
-          </div>
-          <div className="h-[10vh]" />
-        </div>
-
-        {!insidePost && activeImageId && <ImageSettingsModal />}
-      </>
-    );
-  }
-
-  if (isBook) {
-    return (
-      <>
-        <div
-          className={`w-full flex flex-col items-center ${isDark ? `${darkBg} text-white` : "bg-[#faf8f4] text-neutral-900"}`}
-        >
-          <div
-            id="export"
-            className="w-full max-w-[680px] px-10 py-14"
-            style={{ fontFamily: "'Georgia', 'Palatino Linotype', serif" }}
-          >
-            {title && (
-              <div className="text-center mb-16">
-                <p
-                  className={`text-[11px] uppercase tracking-[0.25em] mb-4 ${isDark ? "text-neutral-400" : "text-neutral-500"}`}
-                >
-                  Chapter
-                </p>
-                <h1
-                  className={`text-[32px] md:text-[40px] font-bold leading-tight tracking-tight ${isDark ? "text-white" : "text-neutral-900"}`}
-                >
-                  {title}
-                </h1>
-                <div className="flex items-center justify-center gap-3 mt-8">
-                  <div
-                    className={`h-px w-10 ${isDark ? "bg-neutral-500" : "bg-neutral-400"}`}
-                  />
-                  <div
-                    className={`text-lg ${isDark ? "text-neutral-500" : "text-neutral-400"}`}
-                  >
-                    ❧
-                  </div>
-                  <div
-                    className={`h-px w-10 ${isDark ? "bg-neutral-500" : "bg-neutral-400"}`}
-                  />
+                        <ReactMarkdown
+                            remarkPlugins={[
+                                remarkGfm,
+                                remarkBreaks,
+                                remarkMath,
+                            ]}
+                            rehypePlugins={[rehypeRaw, rehypeKatex]}
+                            components={{
+                                img: (props) => (
+                                    <ImageRender
+                                        setActiveImageId={setActiveImageId}
+                                        getImageSettings={getImageSettings}
+                                        props={props}
+                                    />
+                                ),
+                                hr: () => (
+                                    <hr className="my-8 border-t border-black/20" />
+                                ),
+                                code: ({
+                                    inline,
+                                    className,
+                                    children,
+                                    ...props
+                                }) => (
+                                    <CodeBlock
+                                        isDark={false}
+                                        inline={inline}
+                                        className={className}
+                                        {...props}
+                                    >
+                                        {children}
+                                    </CodeBlock>
+                                ),
+                                blockquote: ({ children }) => (
+                                    <blockquote className="border-l-2 border-black/40 pl-4 py-0.5 my-4 text-black/70 italic text-[14px]">
+                                        {children}
+                                    </blockquote>
+                                ),
+                                h1: ({ children }) => (
+                                    <h1
+                                        id={generateId(children)}
+                                        className="mt-10 mb-3 text-[17px] font-bold uppercase tracking-widest border-b border-black/30 pb-1"
+                                    >
+                                        {children}
+                                    </h1>
+                                ),
+                                h2: ({ children }) => (
+                                    <h2
+                                        id={generateId(children)}
+                                        className="mt-8 mb-2 text-[15px] font-bold uppercase tracking-wider"
+                                    >
+                                        {children}
+                                    </h2>
+                                ),
+                                h3: ({ children }) => (
+                                    <h3
+                                        id={generateId(children)}
+                                        className="mt-6 mb-2 text-[14px] font-bold italic"
+                                    >
+                                        {children}
+                                    </h3>
+                                ),
+                                h4: ({ children }) => (
+                                    <h4
+                                        id={generateId(children)}
+                                        className="mt-4 mb-1 text-[14px] font-semibold"
+                                    >
+                                        {children}
+                                    </h4>
+                                ),
+                                h5: ({ children }) => (
+                                    <h5 className="mt-4 mb-1 text-[13px] font-semibold uppercase tracking-wide">
+                                        {children}
+                                    </h5>
+                                ),
+                                h6: ({ children }) => (
+                                    <h6 className="mt-3 mb-1 text-[12px] font-semibold uppercase tracking-widest text-black/60">
+                                        {children}
+                                    </h6>
+                                ),
+                                p: ({ children }) => (
+                                    <p className="my-3 text-[15px] leading-[1.7] text-justify hyphens-auto text-black">
+                                        {children}
+                                    </p>
+                                ),
+                                strong: ({ children }) => (
+                                    <strong className="font-bold">
+                                        {children}
+                                    </strong>
+                                ),
+                                em: ({ children }) => (
+                                    <em className="italic">{children}</em>
+                                ),
+                                a: ({ href, children }) => (
+                                    <a
+                                        href={href}
+                                        className="text-black underline underline-offset-2 hover:text-black/60 transition-colors"
+                                        target={
+                                            href.startsWith("http")
+                                                ? "_blank"
+                                                : "_self"
+                                        }
+                                        rel={
+                                            href.startsWith("http")
+                                                ? "noopener noreferrer"
+                                                : ""
+                                        }
+                                    >
+                                        {children}
+                                    </a>
+                                ),
+                                ul: ({ children }) => (
+                                    <ul className="list-disc pl-6 my-3 space-y-1 text-[14px]">
+                                        {children}
+                                    </ul>
+                                ),
+                                ol: ({ children }) => (
+                                    <ol className="list-decimal pl-6 my-3 space-y-1 text-[14px]">
+                                        {children}
+                                    </ol>
+                                ),
+                                li: ({ children }) => (
+                                    <li className="text-[14px] leading-[1.6]">
+                                        {children}
+                                    </li>
+                                ),
+                                table: ({ children }) => (
+                                    <div className="overflow-x-auto my-5">
+                                        <table className="border-collapse w-full text-[13px] text-black border border-black/30">
+                                            {children}
+                                        </table>
+                                    </div>
+                                ),
+                                thead: ({ children }) => (
+                                    <thead className="border-b-2 border-black">
+                                        {children}
+                                    </thead>
+                                ),
+                                tbody: ({ children }) => (
+                                    <tbody>{children}</tbody>
+                                ),
+                                tr: ({ children }) => (
+                                    <tr className="border-b border-black/15 even:bg-black/[0.03]">
+                                        {children}
+                                    </tr>
+                                ),
+                                th: ({ children }) => (
+                                    <th className="px-3 py-1.5 font-bold text-left uppercase tracking-wide text-[11px] border-r border-black/20 last:border-r-0">
+                                        {children}
+                                    </th>
+                                ),
+                                td: ({ children }) => (
+                                    <td className="px-3 py-1.5 border-r border-black/10 last:border-r-0">
+                                        {children}
+                                    </td>
+                                ),
+                            }}
+                        >
+                            {content}
+                        </ReactMarkdown>
+                    </div>
+                    <div className="h-[10vh]" />
                 </div>
-              </div>
-            )}
 
-            {thumbnailUrl && !insideGallery && (
-              <figure className="my-10 text-center">
-                <img
-                  src={thumbnailUrl}
-                  alt={title || "Illustration"}
-                  className="w-full max-w-[480px] mx-auto object-contain"
-                  loading="lazy"
-                />
-              </figure>
-            )}
+                {!insidePost && activeImageId && <ImageSettingsModal />}
+            </>
+        );
+    }
 
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
-              rehypePlugins={[rehypeRaw, rehypeKatex]}
-              components={{
-                img: (props) => (
-                  <ImageRender
-                    setActiveImageId={setActiveImageId}
-                    getImageSettings={getImageSettings}
-                    props={props}
-                  />
-                ),
-                hr: () => (
-                  <div className="flex items-center justify-center gap-3 my-10">
+    if (isBook) {
+        return (
+            <>
+                <div
+                    className={`w-full flex flex-col items-center ${isDark ? `${darkBg} text-white` : "bg-[#faf8f4] text-neutral-900"}`}
+                >
                     <div
-                      className={`h-px w-8 ${isDark ? "bg-neutral-600" : "bg-neutral-300"}`}
-                    />
-                    <span
-                      className={`text-base ${isDark ? "text-neutral-500" : "text-neutral-400"}`}
+                        id="export"
+                        className="w-full max-w-[680px] px-10 py-14"
+                        style={{
+                            fontFamily: "'Georgia', 'Palatino Linotype', serif",
+                        }}
                     >
-                      ✦
-                    </span>
-                    <div
-                      className={`h-px w-8 ${isDark ? "bg-neutral-600" : "bg-neutral-300"}`}
-                    />
-                  </div>
-                ),
-                code: ({ inline, className, children, ...props }) => (
-                  <CodeBlock
-                    isDark={isDark}
-                    inline={inline}
-                    className={className}
-                    {...props}
-                  >
-                    {children}
-                  </CodeBlock>
-                ),
-                blockquote: ({ children }) => (
-                  <blockquote
-                    className={`text-center italic text-[17px] md:text-[19px] leading-relaxed my-10 mx-4 px-6 py-4
+                        {title && (
+                            <div className="text-center mb-16">
+                                <p
+                                    className={`text-[11px] uppercase tracking-[0.25em] mb-4 ${isDark ? "text-neutral-400" : "text-neutral-500"}`}
+                                >
+                                    Chapter
+                                </p>
+                                <h1
+                                    className={`text-[32px] md:text-[40px] font-bold leading-tight tracking-tight ${isDark ? "text-white" : "text-neutral-900"}`}
+                                >
+                                    {title}
+                                </h1>
+                                <div className="flex items-center justify-center gap-3 mt-8">
+                                    <div
+                                        className={`h-px w-10 ${isDark ? "bg-neutral-500" : "bg-neutral-400"}`}
+                                    />
+                                    <div
+                                        className={`text-lg ${isDark ? "text-neutral-500" : "text-neutral-400"}`}
+                                    >
+                                        ❧
+                                    </div>
+                                    <div
+                                        className={`h-px w-10 ${isDark ? "bg-neutral-500" : "bg-neutral-400"}`}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {thumbnailUrl && !insideGallery && (
+                            <figure className="my-10 text-center">
+                                <img
+                                    src={thumbnailUrl}
+                                    alt={title || "Illustration"}
+                                    className="w-full max-w-[480px] mx-auto object-contain"
+                                    loading="lazy"
+                                />
+                            </figure>
+                        )}
+
+                        <ReactMarkdown
+                            remarkPlugins={[
+                                remarkGfm,
+                                remarkBreaks,
+                                remarkMath,
+                            ]}
+                            rehypePlugins={[rehypeRaw, rehypeKatex]}
+                            components={{
+                                img: (props) => (
+                                    <ImageRender
+                                        setActiveImageId={setActiveImageId}
+                                        getImageSettings={getImageSettings}
+                                        props={props}
+                                    />
+                                ),
+                                hr: () => (
+                                    <div className="flex items-center justify-center gap-3 my-10">
+                                        <div
+                                            className={`h-px w-8 ${isDark ? "bg-neutral-600" : "bg-neutral-300"}`}
+                                        />
+                                        <span
+                                            className={`text-base ${isDark ? "text-neutral-500" : "text-neutral-400"}`}
+                                        >
+                                            ✦
+                                        </span>
+                                        <div
+                                            className={`h-px w-8 ${isDark ? "bg-neutral-600" : "bg-neutral-300"}`}
+                                        />
+                                    </div>
+                                ),
+                                code: ({
+                                    inline,
+                                    className,
+                                    children,
+                                    ...props
+                                }) => (
+                                    <CodeBlock
+                                        isDark={isDark}
+                                        inline={inline}
+                                        className={className}
+                                        {...props}
+                                    >
+                                        {children}
+                                    </CodeBlock>
+                                ),
+                                blockquote: ({ children }) => (
+                                    <blockquote
+                                        className={`text-center italic text-[17px] md:text-[19px] leading-relaxed my-10 mx-4 px-6 py-4
                       ${isDark ? "text-neutral-300 border-y border-neutral-600" : "text-neutral-600 border-y border-neutral-300"}`}
-                  >
-                    {children}
-                  </blockquote>
-                ),
-                h1: ({ children }) => (
-                  <h1
-                    id={generateId(children)}
-                    className={`text-[26px] md:text-[30px] font-bold text-center mt-16 mb-6 leading-tight tracking-tight
+                                    >
+                                        {children}
+                                    </blockquote>
+                                ),
+                                h1: ({ children }) => (
+                                    <h1
+                                        id={generateId(children)}
+                                        className={`text-[26px] md:text-[30px] font-bold text-center mt-16 mb-6 leading-tight tracking-tight
                       ${isDark ? "text-white" : "text-neutral-900"}`}
-                  >
-                    {children}
-                  </h1>
-                ),
-                h2: ({ children }) => (
-                  <h2
-                    id={generateId(children)}
-                    className={`text-[20px] md:text-[23px] font-bold mt-12 mb-4 leading-snug tracking-tight
+                                    >
+                                        {children}
+                                    </h1>
+                                ),
+                                h2: ({ children }) => (
+                                    <h2
+                                        id={generateId(children)}
+                                        className={`text-[20px] md:text-[23px] font-bold mt-12 mb-4 leading-snug tracking-tight
                       ${isDark ? "text-white" : "text-neutral-800"}`}
-                  >
-                    {children}
-                  </h2>
-                ),
-                h3: ({ children }) => (
-                  <h3
-                    id={generateId(children)}
-                    className={`text-[17px] md:text-[19px] font-semibold italic mt-10 mb-3
+                                    >
+                                        {children}
+                                    </h2>
+                                ),
+                                h3: ({ children }) => (
+                                    <h3
+                                        id={generateId(children)}
+                                        className={`text-[17px] md:text-[19px] font-semibold italic mt-10 mb-3
                       ${isDark ? "text-neutral-100" : "text-neutral-800"}`}
-                  >
-                    {children}
-                  </h3>
-                ),
-                h4: ({ children }) => (
-                  <h4
-                    id={generateId(children)}
-                    className={`text-[15px] font-semibold mt-8 mb-2 uppercase tracking-wide
+                                    >
+                                        {children}
+                                    </h3>
+                                ),
+                                h4: ({ children }) => (
+                                    <h4
+                                        id={generateId(children)}
+                                        className={`text-[15px] font-semibold mt-8 mb-2 uppercase tracking-wide
                       ${isDark ? "text-neutral-200" : "text-neutral-700"}`}
-                  >
-                    {children}
-                  </h4>
-                ),
-                h5: ({ children }) => (
-                  <h5
-                    className={`text-[14px] font-semibold mt-6 mb-2 ${isDark ? "text-neutral-200" : "text-neutral-700"}`}
-                  >
-                    {children}
-                  </h5>
-                ),
-                h6: ({ children }) => (
-                  <h6
-                    className={`text-[13px] font-semibold uppercase tracking-widest mt-5 mb-2 ${isDark ? "text-neutral-400" : "text-neutral-500"}`}
-                  >
-                    {children}
-                  </h6>
-                ),
-                p: ({ children }) => (
-                  <p
-                    className={`text-[16px] md:text-[17px] leading-[1.85] my-5 text-justify
+                                    >
+                                        {children}
+                                    </h4>
+                                ),
+                                h5: ({ children }) => (
+                                    <h5
+                                        className={`text-[14px] font-semibold mt-6 mb-2 ${isDark ? "text-neutral-200" : "text-neutral-700"}`}
+                                    >
+                                        {children}
+                                    </h5>
+                                ),
+                                h6: ({ children }) => (
+                                    <h6
+                                        className={`text-[13px] font-semibold uppercase tracking-widest mt-5 mb-2 ${isDark ? "text-neutral-400" : "text-neutral-500"}`}
+                                    >
+                                        {children}
+                                    </h6>
+                                ),
+                                p: ({ children }) => (
+                                    <p
+                                        className={`text-[16px] md:text-[17px] leading-[1.85] my-5 text-justify
                       ${isDark ? "text-neutral-200" : "text-neutral-800"}`}
-                    style={{ textIndent: "1.5em" }}
-                  >
-                    {children}
-                  </p>
-                ),
-                strong: ({ children }) => (
-                  <strong
-                    className={`font-bold ${isDark ? "text-white" : "text-neutral-900"}`}
-                  >
-                    {children}
-                  </strong>
-                ),
-                em: ({ children }) => (
-                  <em
-                    className={`italic ${isDark ? "text-neutral-300" : "text-neutral-700"}`}
-                  >
-                    {children}
-                  </em>
-                ),
-                a: ({ href, children }) => (
-                  <a
-                    href={href}
-                    className={`underline underline-offset-2 transition-colors ${isDark ? "text-neutral-300 hover:text-white" : "text-neutral-700 hover:text-black"}`}
-                    target={href.startsWith("http") ? "_blank" : "_self"}
-                    rel={href.startsWith("http") ? "noopener noreferrer" : ""}
-                  >
-                    {children}
-                  </a>
-                ),
-                ul: ({ children }) => (
-                  <ul
-                    className={`list-disc pl-7 my-4 space-y-1.5 ${isDark ? "text-neutral-200" : "text-neutral-800"}`}
-                  >
-                    {children}
-                  </ul>
-                ),
-                ol: ({ children }) => (
-                  <ol
-                    className={`list-decimal pl-7 my-4 space-y-1.5 ${isDark ? "text-neutral-200" : "text-neutral-800"}`}
-                  >
-                    {children}
-                  </ol>
-                ),
-                li: ({ children }) => (
-                  <li
-                    className={`text-[16px] leading-[1.75] ${isDark ? "text-neutral-200" : "text-neutral-800"}`}
-                  >
-                    {children}
-                  </li>
-                ),
-                table: ({ children }) => (
-                  <div className="overflow-x-auto my-6">
-                    <table
-                      className={`w-full text-[14px] border-collapse ${isDark ? "text-neutral-200" : "text-neutral-800"}`}
-                    >
-                      {children}
-                    </table>
-                  </div>
-                ),
-                thead: ({ children }) => (
-                  <thead
-                    className={`border-b-2 ${isDark ? "border-neutral-500" : "border-neutral-400"}`}
-                  >
-                    {children}
-                  </thead>
-                ),
-                tbody: ({ children }) => <tbody>{children}</tbody>,
-                tr: ({ children }) => (
-                  <tr
-                    className={`border-b ${isDark ? "border-neutral-700" : "border-neutral-200"}`}
-                  >
-                    {children}
-                  </tr>
-                ),
-                th: ({ children }) => (
-                  <th
-                    className={`px-4 py-2 text-left font-semibold uppercase text-[11px] tracking-wider ${isDark ? "text-neutral-300" : "text-neutral-600"}`}
-                  >
-                    {children}
-                  </th>
-                ),
-                td: ({ children }) => <td className="px-4 py-2">{children}</td>,
-              }}
-            >
-              {content}
-            </ReactMarkdown>
-          </div>
-          <div className="h-[10vh]" />
-        </div>
-
-        {!insidePost && activeImageId && <ImageSettingsModal />}
-      </>
-    );
-  }
-
-  // ── Default: article / poem / story / written ────────────────────────────
-  // Extracted image settings modal to avoid repetition
-  const ImageSettingsModal = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="relative bg-white text-black rounded-lg p-6 w-80">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute right-2 top-2"
-          onClick={() => setActiveImageId(null)}
-        >
-          <X className="h-4 w-4" />
-        </Button>
-        <h3 className="text-lg font-semibold mb-4">Image Settings</h3>
-        <div className="grid grid-cols-1 gap-6">
-          <div className="space-y-2">
-            <Label>
-              Margin Top: {imageSettingsRef.current[activeImageId]?.marginTop}px
-            </Label>
-            <Slider
-              value={[imageSettingsRef.current[activeImageId]?.marginTop]}
-              min={35}
-              max={100}
-              step={1}
-              onValueChange={(value) =>
-                updateImageSetting(activeImageId, "marginTop", value[0])
-              }
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>
-              Margin Bottom:{" "}
-              {imageSettingsRef.current[activeImageId]?.marginBottom}px
-            </Label>
-            <Slider
-              value={[imageSettingsRef.current[activeImageId]?.marginBottom]}
-              min={35}
-              max={100}
-              step={1}
-              onValueChange={(value) =>
-                updateImageSetting(activeImageId, "marginBottom", value[0])
-              }
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>
-              Max Height: {imageSettingsRef.current[activeImageId]?.maxHeight}px
-            </Label>
-            <Slider
-              value={[imageSettingsRef.current[activeImageId]?.maxHeight]}
-              min={360}
-              max={800}
-              step={10}
-              onValueChange={(value) =>
-                updateImageSetting(activeImageId, "maxHeight", value[0])
-              }
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>
-              Max Width: {imageSettingsRef.current[activeImageId]?.maxWidth}px
-            </Label>
-            <Slider
-              value={[imageSettingsRef.current[activeImageId]?.maxWidth]}
-              min={500}
-              max={1000}
-              step={10}
-              onValueChange={(value) =>
-                updateImageSetting(activeImageId, "maxWidth", value[0])
-              }
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Position</Label>
-            <RadioGroup
-              value={imageSettingsRef.current[activeImageId]?.alignment}
-              onValueChange={(value) =>
-                updateImageSetting(activeImageId, "alignment", value)
-              }
-              className="flex space-x-4"
-            >
-              {["flex-start", "center", "flex-end"].map((position) => (
-                <div className="flex items-center space-x-2" key={position}>
-                  <RadioGroupItem
-                    value={position}
-                    id={`${activeImageId}-${position}`}
-                  />
-                  <Label htmlFor={`${activeImageId}-${position}`}>
-                    {convertFlexAlignment(position)}
-                  </Label>
+                                        style={{ textIndent: "1.5em" }}
+                                    >
+                                        {children}
+                                    </p>
+                                ),
+                                strong: ({ children }) => (
+                                    <strong
+                                        className={`font-bold ${isDark ? "text-white" : "text-neutral-900"}`}
+                                    >
+                                        {children}
+                                    </strong>
+                                ),
+                                em: ({ children }) => (
+                                    <em
+                                        className={`italic ${isDark ? "text-neutral-300" : "text-neutral-700"}`}
+                                    >
+                                        {children}
+                                    </em>
+                                ),
+                                a: ({ href, children }) => (
+                                    <a
+                                        href={href}
+                                        className={`underline underline-offset-2 transition-colors ${isDark ? "text-neutral-300 hover:text-white" : "text-neutral-700 hover:text-black"}`}
+                                        target={
+                                            href.startsWith("http")
+                                                ? "_blank"
+                                                : "_self"
+                                        }
+                                        rel={
+                                            href.startsWith("http")
+                                                ? "noopener noreferrer"
+                                                : ""
+                                        }
+                                    >
+                                        {children}
+                                    </a>
+                                ),
+                                ul: ({ children }) => (
+                                    <ul
+                                        className={`list-disc pl-7 my-4 space-y-1.5 ${isDark ? "text-neutral-200" : "text-neutral-800"}`}
+                                    >
+                                        {children}
+                                    </ul>
+                                ),
+                                ol: ({ children }) => (
+                                    <ol
+                                        className={`list-decimal pl-7 my-4 space-y-1.5 ${isDark ? "text-neutral-200" : "text-neutral-800"}`}
+                                    >
+                                        {children}
+                                    </ol>
+                                ),
+                                li: ({ children }) => (
+                                    <li
+                                        className={`text-[16px] leading-[1.75] ${isDark ? "text-neutral-200" : "text-neutral-800"}`}
+                                    >
+                                        {children}
+                                    </li>
+                                ),
+                                table: ({ children }) => (
+                                    <div className="overflow-x-auto my-6">
+                                        <table
+                                            className={`w-full text-[14px] border-collapse ${isDark ? "text-neutral-200" : "text-neutral-800"}`}
+                                        >
+                                            {children}
+                                        </table>
+                                    </div>
+                                ),
+                                thead: ({ children }) => (
+                                    <thead
+                                        className={`border-b-2 ${isDark ? "border-neutral-500" : "border-neutral-400"}`}
+                                    >
+                                        {children}
+                                    </thead>
+                                ),
+                                tbody: ({ children }) => (
+                                    <tbody>{children}</tbody>
+                                ),
+                                tr: ({ children }) => (
+                                    <tr
+                                        className={`border-b ${isDark ? "border-neutral-700" : "border-neutral-200"}`}
+                                    >
+                                        {children}
+                                    </tr>
+                                ),
+                                th: ({ children }) => (
+                                    <th
+                                        className={`px-4 py-2 text-left font-semibold uppercase text-[11px] tracking-wider ${isDark ? "text-neutral-300" : "text-neutral-600"}`}
+                                    >
+                                        {children}
+                                    </th>
+                                ),
+                                td: ({ children }) => (
+                                    <td className="px-4 py-2">{children}</td>
+                                ),
+                            }}
+                        >
+                            {content}
+                        </ReactMarkdown>
+                    </div>
+                    <div className="h-[10vh]" />
                 </div>
-              ))}
-            </RadioGroup>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 
-  return (
-    <>
-      <Card
-        className={`w-full max-w-4xl mx-auto bg-white border-none shadow-none
+                {!insidePost && activeImageId && <ImageSettingsModal />}
+            </>
+        );
+    }
+
+    // ── Default: article / poem / story / written ────────────────────────────
+    // Extracted image settings modal to avoid repetition
+    const ImageSettingsModal = () => (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="relative bg-white text-black rounded-lg p-6 w-80">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-2"
+                    onClick={() => setActiveImageId(null)}
+                >
+                    <X className="h-4 w-4" />
+                </Button>
+                <h3 className="text-lg font-semibold mb-4">Image Settings</h3>
+                <div className="grid grid-cols-1 gap-6">
+                    <div className="space-y-2">
+                        <Label>
+                            Margin Top:{" "}
+                            {imageSettingsRef.current[activeImageId]?.marginTop}
+                            px
+                        </Label>
+                        <Slider
+                            value={[
+                                imageSettingsRef.current[activeImageId]
+                                    ?.marginTop,
+                            ]}
+                            min={35}
+                            max={100}
+                            step={1}
+                            onValueChange={(value) =>
+                                updateImageSetting(
+                                    activeImageId,
+                                    "marginTop",
+                                    value[0],
+                                )
+                            }
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>
+                            Margin Bottom:{" "}
+                            {
+                                imageSettingsRef.current[activeImageId]
+                                    ?.marginBottom
+                            }
+                            px
+                        </Label>
+                        <Slider
+                            value={[
+                                imageSettingsRef.current[activeImageId]
+                                    ?.marginBottom,
+                            ]}
+                            min={35}
+                            max={100}
+                            step={1}
+                            onValueChange={(value) =>
+                                updateImageSetting(
+                                    activeImageId,
+                                    "marginBottom",
+                                    value[0],
+                                )
+                            }
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>
+                            Max Height:{" "}
+                            {imageSettingsRef.current[activeImageId]?.maxHeight}
+                            px
+                        </Label>
+                        <Slider
+                            value={[
+                                imageSettingsRef.current[activeImageId]
+                                    ?.maxHeight,
+                            ]}
+                            min={360}
+                            max={800}
+                            step={10}
+                            onValueChange={(value) =>
+                                updateImageSetting(
+                                    activeImageId,
+                                    "maxHeight",
+                                    value[0],
+                                )
+                            }
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>
+                            Max Width:{" "}
+                            {imageSettingsRef.current[activeImageId]?.maxWidth}
+                            px
+                        </Label>
+                        <Slider
+                            value={[
+                                imageSettingsRef.current[activeImageId]
+                                    ?.maxWidth,
+                            ]}
+                            min={500}
+                            max={1000}
+                            step={10}
+                            onValueChange={(value) =>
+                                updateImageSetting(
+                                    activeImageId,
+                                    "maxWidth",
+                                    value[0],
+                                )
+                            }
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Position</Label>
+                        <RadioGroup
+                            value={
+                                imageSettingsRef.current[activeImageId]
+                                    ?.alignment
+                            }
+                            onValueChange={(value) =>
+                                updateImageSetting(
+                                    activeImageId,
+                                    "alignment",
+                                    value,
+                                )
+                            }
+                            className="flex space-x-4"
+                        >
+                            {["flex-start", "center", "flex-end"].map(
+                                (position) => (
+                                    <div
+                                        className="flex items-center space-x-2"
+                                        key={position}
+                                    >
+                                        <RadioGroupItem
+                                            value={position}
+                                            id={`${activeImageId}-${position}`}
+                                        />
+                                        <Label
+                                            htmlFor={`${activeImageId}-${position}`}
+                                        >
+                                            {convertFlexAlignment(position)}
+                                        </Label>
+                                    </div>
+                                ),
+                            )}
+                        </RadioGroup>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+
+    return (
+        <>
+            <Card
+                className={`w-full max-w-4xl mx-auto bg-white border-none shadow-none
           ${isDark ? `${darkBg} text-white border-none` : lightModeBg}
           ${textAlignment === "center" ? "text-center" : "text-left"}`}
-      >
-        <CardContent className="p-0">
-          <div
-            id="export"
-            className="prose prose-slate max-w-none sentient-regular"
-          >
-            {title && (
-              <div
-                className={`leading-tight tracking-tight capitalize ${
-                  insideGallery
-                    ? "text-xl font-semibold font-sans pt-0 mb-4"
-                    : "text-4xl font-bold font-serif pt-2 mb-10"
-                } ${artType === "poem" ? "!max-w-[600px] !font-boskaBold" : ""}`}
-              >
-                {title}
-              </div>
-            )}
-
-            {thumbnailUrl && !insideGallery && (
-              <div
-                className="relative mb-8 w-full md:w-[110%] md:transform md:translate-x-[-5%] max-h-[370px] bg-gray-200 dark:bg-[#333]
-                  rounded-lg overflow-hidden shadow-none flex items-center justify-center"
-              >
-                <img
-                  src={thumbnailUrl}
-                  alt={title || "Article thumbnail"}
-                  className="aspect-video object-contain w-full"
-                  loading="lazy"
-                />
-              </div>
-            )}
-
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
-              rehypePlugins={[rehypeRaw, rehypeKatex]}
-              components={{
-                img: (props) => (
-                  <ImageRender
-                    setActiveImageId={setActiveImageId}
-                    getImageSettings={getImageSettings}
-                    props={props}
-                  />
-                ),
-                hr: (props) => (
-                  <hr
-                    className={`border-t ${isDark ? "border-oneDarkBorder" : "border-gray-200"}
-                      ${insideGallery ? `my-1` : `my-6`}`}
-                    {...props}
-                  />
-                ),
-                code: ({ inline, className, children, ...props }) => (
-                  <CodeBlock
-                    isDark={isDark}
-                    inline={inline}
-                    className={className}
-                    {...props}
-                  >
-                    {children}
-                  </CodeBlock>
-                ),
-                blockquote: ({ children }) => {
-                  return insideGallery ? (
-                    <p className="border-l-2 pl-2">{children}</p>
-                  ) : (
-                    <blockquote
-                      className={`italic border-l-4 pl-4 py-1 my-3
-                        ${isDark ? "border-[#999] bg-[#999]/0 text-[#ddd]" : "border-gray-400 bg-gray-100/0 text-gray-700"}`}
+            >
+                <CardContent className="p-0">
+                    <div
+                        id="export"
+                        className="prose prose-slate max-w-none sentient-regular"
                     >
-                      {children}
-                    </blockquote>
-                  );
-                },
-                h1: ({ children }) => (
-                  <h1
-                    id={generateId(children)}
-                    className={`leading-tight tracking-tight ${
-                      insideGallery
-                        ? "text-xl font-semibold font-sans mt-2 mb-1"
-                        : "text-4xl font-bold font-serif mt-12 mb-6"
-                    }`}
-                  >
-                    {children}
-                  </h1>
-                ),
-                h2: ({ children }) => (
-                  <h2
-                    id={generateId(children)}
-                    className={`font-serif leading-tight tracking-tight ${
-                      insideGallery
-                        ? "text-lg my-2"
-                        : "text-3xl font-bold mt-10 mb-5"
-                    }`}
-                  >
-                    {children}
-                  </h2>
-                ),
-                h3: ({ children }) => (
-                  <h3
-                    id={generateId(children)}
-                    className={`font-serif leading-snug ${
-                      insideGallery
-                        ? "text-base my-1"
-                        : "text-2xl font-bold mt-8 mb-4"
-                    }`}
-                  >
-                    {children}
-                  </h3>
-                ),
-                h4: ({ children }) => (
-                  <h4
-                    id={generateId(children)}
-                    className={`sentient-regular font-semibold leading-snug ${
-                      insideGallery ? "text-sm my-1" : "text-xl mt-6 mb-3"
-                    }`}
-                  >
-                    {children}
-                  </h4>
-                ),
-                h5: ({ children }) => (
-                  <h5
-                    className={`sentient-regular font-semibold leading-snug ${
-                      insideGallery ? "text-sm my-1" : "text-lg mt-5 mb-3"
-                    }`}
-                  >
-                    {children}
-                  </h5>
-                ),
-                h6: ({ children }) => (
-                  <h6
-                    className={`sentient-regular font-semibold uppercase tracking-wider ${
-                      insideGallery ? "text-sm mb-1" : "text-base mt-4 mb-2"
-                    }`}
-                  >
-                    {children}
-                  </h6>
-                ),
-                p: ({ children }) => (
-                  <p
-                    className={`
+                        {title && (
+                            <div
+                                className={`leading-tight tracking-tight capitalize ${
+                                    insideGallery
+                                        ? "text-xl font-semibold font-sans pt-0 mb-4"
+                                        : "text-4xl font-bold font-serif pt-2 mb-10"
+                                } ${artType === "poem" ? "!max-w-[600px] !font-boskaBold" : ""}`}
+                            >
+                                {title}
+                            </div>
+                        )}
+
+                        {thumbnailUrl && !insideGallery && (
+                            <div
+                                className="relative mb-8 w-full md:w-[110%] md:transform md:translate-x-[-5%] max-h-[370px] bg-gray-200 dark:bg-[#333]
+                  rounded-lg overflow-hidden shadow-none flex items-center justify-center"
+                            >
+                                <img
+                                    src={thumbnailUrl}
+                                    alt={title || "Article thumbnail"}
+                                    className="aspect-video object-contain w-full"
+                                    loading="lazy"
+                                />
+                            </div>
+                        )}
+
+                        <ReactMarkdown
+                            remarkPlugins={[
+                                remarkGfm,
+                                remarkBreaks,
+                                remarkMath,
+                            ]}
+                            rehypePlugins={[rehypeRaw, rehypeKatex]}
+                            components={{
+                                img: (props) => (
+                                    <ImageRender
+                                        setActiveImageId={setActiveImageId}
+                                        getImageSettings={getImageSettings}
+                                        props={props}
+                                    />
+                                ),
+                                hr: (props) => (
+                                    <hr
+                                        className={`border-t ${isDark ? "border-oneDarkBorder" : "border-gray-200"}
+                      ${insideGallery ? `my-1` : `my-6`}`}
+                                        {...props}
+                                    />
+                                ),
+                                code: ({
+                                    inline,
+                                    className,
+                                    children,
+                                    ...props
+                                }) => (
+                                    <CodeBlock
+                                        isDark={isDark}
+                                        inline={inline}
+                                        className={className}
+                                        {...props}
+                                    >
+                                        {children}
+                                    </CodeBlock>
+                                ),
+                                blockquote: ({ children }) => {
+                                    return insideGallery ? (
+                                        <p className="border-l-2 pl-2">
+                                            {children}
+                                        </p>
+                                    ) : (
+                                        <blockquote
+                                            className={`italic border-l-4 pl-4 py-1 my-3
+                        ${isDark ? "border-[#999] bg-[#999]/0 text-[#ddd]" : "border-gray-400 bg-gray-100/0 text-gray-700"}`}
+                                        >
+                                            {children}
+                                        </blockquote>
+                                    );
+                                },
+                                h1: ({ children }) => (
+                                    <h1
+                                        id={generateId(children)}
+                                        className={`leading-tight tracking-tight ${
+                                            insideGallery
+                                                ? "text-xl font-semibold font-sans mt-2 mb-1"
+                                                : "text-4xl font-bold font-serif mt-12 mb-6"
+                                        }`}
+                                    >
+                                        {children}
+                                    </h1>
+                                ),
+                                h2: ({ children }) => (
+                                    <h2
+                                        id={generateId(children)}
+                                        className={`font-serif leading-tight tracking-tight ${
+                                            insideGallery
+                                                ? "text-lg my-2"
+                                                : "text-3xl font-bold mt-10 mb-5"
+                                        }`}
+                                    >
+                                        {children}
+                                    </h2>
+                                ),
+                                h3: ({ children }) => (
+                                    <h3
+                                        id={generateId(children)}
+                                        className={`font-serif leading-snug ${
+                                            insideGallery
+                                                ? "text-base my-1"
+                                                : "text-2xl font-bold mt-8 mb-4"
+                                        }`}
+                                    >
+                                        {children}
+                                    </h3>
+                                ),
+                                h4: ({ children }) => (
+                                    <h4
+                                        id={generateId(children)}
+                                        className={`sentient-regular font-semibold leading-snug ${
+                                            insideGallery
+                                                ? "text-sm my-1"
+                                                : "text-xl mt-6 mb-3"
+                                        }`}
+                                    >
+                                        {children}
+                                    </h4>
+                                ),
+                                h5: ({ children }) => (
+                                    <h5
+                                        className={`sentient-regular font-semibold leading-snug ${
+                                            insideGallery
+                                                ? "text-sm my-1"
+                                                : "text-lg mt-5 mb-3"
+                                        }`}
+                                    >
+                                        {children}
+                                    </h5>
+                                ),
+                                h6: ({ children }) => (
+                                    <h6
+                                        className={`sentient-regular font-semibold uppercase tracking-wider ${
+                                            insideGallery
+                                                ? "text-sm mb-1"
+                                                : "text-base mt-4 mb-2"
+                                        }`}
+                                    >
+                                        {children}
+                                    </h6>
+                                ),
+                                p: ({ children }) => (
+                                    <p
+                                        className={`
                       ${
-                        insideGallery
-                          ? "text-xs leading-relaxed my-2 max-w-[110ch] montserrat-regular"
-                          : "text-base md:text-lg md:leading-[28px] my-8 max-w-prose"
+                          insideGallery
+                              ? "text-xs leading-relaxed my-2 max-w-[110ch] montserrat-regular"
+                              : "text-base md:text-lg md:leading-[28px] my-8 max-w-prose"
                       }
                       ${artType === "poem" ? "!font-boskaLight !text-xl !leading-[32px] !my-0" : ""}`}
-                  >
-                    {children}
-                  </p>
-                ),
-                strong: ({ children }) => (
-                  <strong
-                    className={`font-semibold ${insideGallery ? "" : "sentient-bold"}`}
-                  >
-                    {children}
-                  </strong>
-                ),
-                em: ({ children }) => (
-                  <em
-                    className={`italic ${artType === "poem" ? "font-boska" : "sentient-italic"}`}
-                  >
-                    {children}
-                  </em>
-                ),
-                a: ({ href, children }) => (
-                  <a
-                    href={href}
-                    className={`border-b border-current pb-0.5 font-medium sentient-regular transition-colors duration-200 ${
-                      isDark
-                        ? "text-lime-300 hover:text-lime-400"
-                        : "text-lime-600 hover:text-lime-800"
-                    }`}
-                    target={href.startsWith("http") ? "_blank" : "_self"}
-                    rel={href.startsWith("http") ? "noopener noreferrer" : ""}
-                  >
-                    {children}
-                  </a>
-                ),
-                ul: ({ children }) => (
-                  <ul className="sentient-regular list-disc pl-6 md:pl-8 my-3 md:my-4 space-y-1">
-                    {children}
-                  </ul>
-                ),
-                ol: ({ children }) => (
-                  <ol className="sentient-regular list-decimal pl-6 md:pl-8 my-3 md:my-4 space-y-1">
-                    {children}
-                  </ol>
-                ),
-                li: ({ children }) => (
-                  <li
-                    className={
-                      insideGallery
-                        ? "text-xs leading-tighter montserrat-regular"
-                        : "sentient-regular leading-snug md:leading-normal text-base md:text-lg"
-                    }
-                  >
-                    {children}
-                  </li>
-                ),
-                table: ({ children }) => (
-                  <div className="overflow-x-auto">
-                    <table className="border border-gray-400 dark:border-[#3e4451] bg-white dark:bg-[#282c34] w-full text-gray-900 dark:text-[#abb2bf]">
-                      {children}
-                    </table>
-                  </div>
-                ),
-                thead: ({ children }) => (
-                  <thead className="bg-gray-200 dark:bg-[#21252b]">
-                    {children}
-                  </thead>
-                ),
-                tbody: ({ children }) => (
-                  <tbody className="dark:bg-[#282c34]">{children}</tbody>
-                ),
-                tr: ({ children }) => (
-                  <tr className="border border-gray-300 dark:border-[#3e4451]">
-                    {children}
-                  </tr>
-                ),
-                th: ({ children }) => (
-                  <th
-                    className={`border ${insideGallery ? "text-xs" : "sentient-bold"} border-gray-300 dark:border-[#3e4451] px-4 py-2 bg-gray-100 dark:bg-[#21252b]`}
-                  >
-                    {children}
-                  </th>
-                ),
-                td: ({ children }) => (
-                  <td
-                    className={`border border-gray-300 dark:border-[#3e4451] px-4 py-2 dark:bg-[#282c34] ${insideGallery ? "text-xs" : "sentient-regular"}`}
-                  >
-                    {children}
-                  </td>
-                ),
-              }}
-              className="prose-base"
-            >
-              {content}
-            </ReactMarkdown>
-          </div>
-        </CardContent>
-        <CardFooter className="bg-transparent h-[15vh]" />
-      </Card>
+                                    >
+                                        {children}
+                                    </p>
+                                ),
+                                strong: ({ children }) => (
+                                    <strong
+                                        className={`font-semibold ${insideGallery ? "" : "sentient-bold"}`}
+                                    >
+                                        {children}
+                                    </strong>
+                                ),
+                                em: ({ children }) => (
+                                    <em
+                                        className={`italic ${artType === "poem" ? "font-boska" : "sentient-italic"}`}
+                                    >
+                                        {children}
+                                    </em>
+                                ),
+                                a: ({ href, children }) => (
+                                    <a
+                                        href={href}
+                                        className={`border-b border-current pb-0.5 font-medium sentient-regular transition-colors duration-200 ${
+                                            isDark
+                                                ? "text-lime-300 hover:text-lime-400"
+                                                : "text-lime-600 hover:text-lime-800"
+                                        }`}
+                                        target={
+                                            href.startsWith("http")
+                                                ? "_blank"
+                                                : "_self"
+                                        }
+                                        rel={
+                                            href.startsWith("http")
+                                                ? "noopener noreferrer"
+                                                : ""
+                                        }
+                                    >
+                                        {children}
+                                    </a>
+                                ),
+                                ul: ({ children }) => (
+                                    <ul className="sentient-regular list-disc pl-6 md:pl-8 my-3 md:my-4 space-y-1">
+                                        {children}
+                                    </ul>
+                                ),
+                                ol: ({ children }) => (
+                                    <ol className="sentient-regular list-decimal pl-6 md:pl-8 my-3 md:my-4 space-y-1">
+                                        {children}
+                                    </ol>
+                                ),
+                                li: ({ children }) => (
+                                    <li
+                                        className={
+                                            insideGallery
+                                                ? "text-xs leading-tighter montserrat-regular"
+                                                : "sentient-regular leading-snug md:leading-normal text-base md:text-lg"
+                                        }
+                                    >
+                                        {children}
+                                    </li>
+                                ),
+                                table: ({ children }) => (
+                                    <div className="overflow-x-auto">
+                                        <table className="border border-gray-400 dark:border-[#3e4451] bg-white dark:bg-[#282c34] w-full text-gray-900 dark:text-[#abb2bf]">
+                                            {children}
+                                        </table>
+                                    </div>
+                                ),
+                                thead: ({ children }) => (
+                                    <thead className="bg-gray-200 dark:bg-[#21252b]">
+                                        {children}
+                                    </thead>
+                                ),
+                                tbody: ({ children }) => (
+                                    <tbody className="dark:bg-[#282c34]">
+                                        {children}
+                                    </tbody>
+                                ),
+                                tr: ({ children }) => (
+                                    <tr className="border border-gray-300 dark:border-[#3e4451]">
+                                        {children}
+                                    </tr>
+                                ),
+                                th: ({ children }) => (
+                                    <th
+                                        className={`border ${insideGallery ? "text-xs" : "sentient-bold"} border-gray-300 dark:border-[#3e4451] px-4 py-2 bg-gray-100 dark:bg-[#21252b]`}
+                                    >
+                                        {children}
+                                    </th>
+                                ),
+                                td: ({ children }) => (
+                                    <td
+                                        className={`border border-gray-300 dark:border-[#3e4451] px-4 py-2 dark:bg-[#282c34] ${insideGallery ? "text-xs" : "sentient-regular"}`}
+                                    >
+                                        {children}
+                                    </td>
+                                ),
+                            }}
+                            className="prose-base"
+                        >
+                            {content}
+                        </ReactMarkdown>
+                    </div>
+                </CardContent>
+                <CardFooter className="bg-transparent h-[15vh]" />
+            </Card>
 
-      {!insidePost && activeImageId && <ImageSettingsModal />}
-    </>
-  );
+            {!insidePost && activeImageId && <ImageSettingsModal />}
+        </>
+    );
 });
 
 MarkdownPreview.propTypes = {
-  title: PropTypes.any,
-  content: PropTypes.any,
-  thumbnailUrl: PropTypes.any,
-  isVisible: PropTypes.bool,
-  contentOnly: PropTypes.bool,
-  isDark: PropTypes.bool,
-  textAlignment: PropTypes.string,
-  lightModeBg: PropTypes.string,
-  insidePost: PropTypes.bool,
-  darkBg: PropTypes.string,
-  artType: PropTypes.string,
+    title: PropTypes.any,
+    content: PropTypes.any,
+    thumbnailUrl: PropTypes.any,
+    isVisible: PropTypes.bool,
+    contentOnly: PropTypes.bool,
+    isDark: PropTypes.bool,
+    textAlignment: PropTypes.string,
+    lightModeBg: PropTypes.string,
+    insidePost: PropTypes.bool,
+    darkBg: PropTypes.string,
+    artType: PropTypes.string,
 };
 
 /*
@@ -1316,25 +1453,25 @@ MarkdownPreview.propTypes = {
  *
  */
 export const ScrollToBottomButton = ({
-  position = "fixed",
-  bottom = "bottom-8",
-  right = "right-6 md:right-10 lg:right-32",
-  color = "bg-lime-600 hover:bg-lime-700 active:bg-lime-800",
-  textColor = "text-white",
-  size = "p-4",
-  isDark = false,
+    position = "fixed",
+    bottom = "bottom-8",
+    right = "right-6 md:right-10 lg:right-32",
+    color = "bg-lime-600 hover:bg-lime-700 active:bg-lime-800",
+    textColor = "text-white",
+    size = "p-4",
+    isDark = false,
 }) => {
-  const scrollToBottom = () => {
-    window.scrollTo({
-      top: document.body.scrollHeight,
-      behavior: "smooth",
-    });
-  };
+    const scrollToBottom = () => {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "smooth",
+        });
+    };
 
-  return (
-    <button
-      onClick={scrollToBottom}
-      className={`
+    return (
+        <button
+            onClick={scrollToBottom}
+            className={`
          ${position} ${bottom} ${right}
          ${color} ${textColor} ${size}
          rounded-full shadow-md
@@ -1343,433 +1480,434 @@ export const ScrollToBottomButton = ({
          ${isDark ? "" : ""}
          z-20 flex items-center justify-center
        `}
-      aria-label="Scroll to bottom"
-    >
-      <ArrowDown className="h-6 w-6" />
-    </button>
-  );
+            aria-label="Scroll to bottom"
+        >
+            <ArrowDown className="h-6 w-6" />
+        </button>
+    );
 };
 
 ScrollToBottomButton.propTypes = {
-  position: PropTypes.string,
-  bottom: PropTypes.string,
-  right: PropTypes.string,
-  color: PropTypes.string,
-  textColor: PropTypes.string,
-  size: PropTypes.string,
-  isDark: PropTypes.bool,
+    position: PropTypes.string,
+    bottom: PropTypes.string,
+    right: PropTypes.string,
+    color: PropTypes.string,
+    textColor: PropTypes.string,
+    size: PropTypes.string,
+    isDark: PropTypes.bool,
 };
 
 export const TagInputComponent = ({
-  tags,
-  setTags,
-  MAX_TAGS = 5,
-  MAX_TAG_LENGTH = 30,
+    tags,
+    setTags,
+    MAX_TAGS = 5,
+    MAX_TAG_LENGTH = 30,
 }) => {
-  const [inputValue, setInputValue] = useState("");
-  const [error, setError] = useState("");
+    const [inputValue, setInputValue] = useState("");
+    const [error, setError] = useState("");
 
-  const validateTags = (tagArray) => {
-    // Remove empty tags and trim whitespace
-    const processedTags = tagArray
-      .map((tag) => tag.trim())
-      .filter((tag) => tag.length > 0);
+    const validateTags = (tagArray) => {
+        // Remove empty tags and trim whitespace
+        const processedTags = tagArray
+            .map((tag) => tag.trim())
+            .filter((tag) => tag.length > 0);
 
-    // Check for maximum number of tags
-    if (processedTags.length > MAX_TAGS) {
-      setError(`Maximum ${MAX_TAGS} tags allowed`);
-      return false;
-    }
-
-    // Check for tag length
-    for (const tag of processedTags) {
-      if (tag.length > MAX_TAG_LENGTH) {
-        setError(
-          `Tag "${tag}" exceeds maximum length of ${MAX_TAG_LENGTH} characters`,
-        );
-        return false;
-      }
-
-      // Check for spaces within tags
-      if (tag.includes(" ")) {
-        setError(`Tag "${tag}" contains spaces, which are not allowed`);
-        return false;
-      }
-    }
-
-    // Check for duplicates
-    const uniqueTags = new Set(processedTags);
-    if (uniqueTags.size !== processedTags.length) {
-      // Find which tag is duplicated
-      const seen = new Set();
-      for (const tag of processedTags) {
-        if (seen.has(tag)) {
-          setError(`Duplicate tag "${tag}" is not allowed`);
-          return false;
+        // Check for maximum number of tags
+        if (processedTags.length > MAX_TAGS) {
+            setError(`Maximum ${MAX_TAGS} tags allowed`);
+            return false;
         }
-        seen.add(tag);
-      }
-    }
 
-    setError("");
-    return processedTags;
-  };
+        // Check for tag length
+        for (const tag of processedTags) {
+            if (tag.length > MAX_TAG_LENGTH) {
+                setError(
+                    `Tag "${tag}" exceeds maximum length of ${MAX_TAG_LENGTH} characters`,
+                );
+                return false;
+            }
 
-  const handleInputChange = (e) => {
-    setInputValue(e.target.value);
-    const newTags = e.target.value.split(",");
-    const validTags = validateTags(newTags);
+            // Check for spaces within tags
+            if (tag.includes(" ")) {
+                setError(`Tag "${tag}" contains spaces, which are not allowed`);
+                return false;
+            }
+        }
 
-    if (validTags) {
-      setTags(validTags);
-    }
-  };
+        // Check for duplicates
+        const uniqueTags = new Set(processedTags);
+        if (uniqueTags.size !== processedTags.length) {
+            // Find which tag is duplicated
+            const seen = new Set();
+            for (const tag of processedTags) {
+                if (seen.has(tag)) {
+                    setError(`Duplicate tag "${tag}" is not allowed`);
+                    return false;
+                }
+                seen.add(tag);
+            }
+        }
 
-  return (
-    <div className="p-2">
-      <h2 className="mb-3">
-        Add relevant tags for your article separated by comma. [up to {MAX_TAGS}{" "}
-        tags]
-      </h2>
+        setError("");
+        return processedTags;
+    };
 
-      <div className="grid grid-cols-4 items-center gap-4">
-        {/* <Label htmlFor="tags" className="text-left">
+    const handleInputChange = (e) => {
+        setInputValue(e.target.value);
+        const newTags = e.target.value.split(",");
+        const validTags = validateTags(newTags);
+
+        if (validTags) {
+            setTags(validTags);
+        }
+    };
+
+    return (
+        <div className="p-2">
+            <h2 className="mb-3">
+                Add relevant tags for your article separated by comma. [up to{" "}
+                {MAX_TAGS} tags]
+            </h2>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+                {/* <Label htmlFor="tags" className="text-left">
                     Tags:
                 </Label> */}
-        <Input
-          id="tags"
-          value={inputValue}
-          placeholder="Ex: cs, deeplearning, physics"
-          className="col-span-4"
-          onChange={handleInputChange}
-        />
-      </div>
+                <Input
+                    id="tags"
+                    value={inputValue}
+                    placeholder="Ex: cs, deeplearning, physics"
+                    className="col-span-4"
+                    onChange={handleInputChange}
+                />
+            </div>
 
-      {error && (
-        <Alert variant="destructive" className="mt-2">
-          <AlertDescription>{error.toString()}</AlertDescription>
-        </Alert>
-      )}
+            {error && (
+                <Alert variant="destructive" className="mt-2">
+                    <AlertDescription>{error.toString()}</AlertDescription>
+                </Alert>
+            )}
 
-      <div className="mb-6 mt-4 flex items-start justify-start flex-wrap gap-2">
-        {tags.map((tag) => {
-          {
-            return (
-              tag !== "regular" && (
-                <span
-                  key={tag}
-                  className="px-2 py-1 rounded-full bg-black text-white text-sm"
-                >
-                  {tag}
-                </span>
-              )
-            );
-          }
-        })}
-      </div>
-    </div>
-  );
+            <div className="mb-6 mt-4 flex items-start justify-start flex-wrap gap-2">
+                {tags.map((tag) => {
+                    {
+                        return (
+                            tag !== "regular" && (
+                                <span
+                                    key={tag}
+                                    className="px-2 py-1 rounded-full bg-black text-white text-sm"
+                                >
+                                    {tag}
+                                </span>
+                            )
+                        );
+                    }
+                })}
+            </div>
+        </div>
+    );
 };
 TagInputComponent.propTypes = {
-  tags: PropTypes.array,
-  setTags: PropTypes.func,
-  MAX_TAGS: PropTypes.number,
-  MAX_TAG_LENGTH: PropTypes.number,
+    tags: PropTypes.array,
+    setTags: PropTypes.func,
+    MAX_TAGS: PropTypes.number,
+    MAX_TAG_LENGTH: PropTypes.number,
 };
 
 export const ThumbnailUploader = ({
-  artType = "article",
-  setThumbnailUrl,
-  setMedia,
+    artType = "article",
+    setThumbnailUrl,
+    setMedia,
 }) => {
-  const [preview, setPreview] = useState(null);
-  const [error, setError] = useState("");
-  const [isDragging, setIsDragging] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const fileInputRef = useRef(null);
+    const [preview, setPreview] = useState(null);
+    const [error, setError] = useState("");
+    const [isDragging, setIsDragging] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const fileInputRef = useRef(null);
 
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
+    const handleFileChange = async (e) => {
+        const file = e.target.files[0];
 
-    try {
-      setError("");
-      setLoading(true);
-      await validateFile(file, true);
-      const objectUrl = URL.createObjectURL(file);
-      setPreview(objectUrl);
-      const { directLink, imgDeleteHash } = await uploadImage(file);
-      setThumbnailUrl(directLink);
-      setMedia((prev) => [...prev, imgDeleteHash]);
-    } catch (err) {
-      setError(err);
-      e.target.value = "";
-      setThumbnailUrl("");
-      console.error(`Thumbnail image upload error: ${err}`);
-      toast.error(`Thumbnail image upload error: ${err}`);
-    } finally {
-      setLoading(false);
-    }
-  };
+        try {
+            setError("");
+            setLoading(true);
+            await validateFile(file, true);
+            const objectUrl = URL.createObjectURL(file);
+            setPreview(objectUrl);
+            const { directLink, imgDeleteHash } = await uploadImage(file);
+            setThumbnailUrl(directLink);
+            setMedia((prev) => [...prev, imgDeleteHash]);
+        } catch (err) {
+            setError(err);
+            e.target.value = "";
+            setThumbnailUrl("");
+            console.error(`Thumbnail image upload error: ${err}`);
+            toast.error(`Thumbnail image upload error: ${err}`);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        setIsDragging(true);
+    };
 
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
+    const handleDragLeave = (e) => {
+        e.preventDefault();
+        setIsDragging(false);
+    };
 
-  const handleDrop = async (e) => {
-    e.preventDefault();
-    setIsDragging(false);
+    const handleDrop = async (e) => {
+        e.preventDefault();
+        setIsDragging(false);
 
-    const file = e.dataTransfer.files[0];
-    try {
-      setError("");
-      setLoading(true);
-      await validateFile(file, true);
-      const objectUrl = URL.createObjectURL(file);
-      setPreview(objectUrl);
-      const { directLink, imgDeleteHash } = await uploadImage(file);
-      setThumbnailUrl(directLink);
-      setMedia((prev) => [...prev, imgDeleteHash]);
+        const file = e.dataTransfer.files[0];
+        try {
+            setError("");
+            setLoading(true);
+            await validateFile(file, true);
+            const objectUrl = URL.createObjectURL(file);
+            setPreview(objectUrl);
+            const { directLink, imgDeleteHash } = await uploadImage(file);
+            setThumbnailUrl(directLink);
+            setMedia((prev) => [...prev, imgDeleteHash]);
 
-      // Update the file input for consistency
-      if (fileInputRef.current) {
-        // This is a workaround as we can't directly set the files property
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
-        fileInputRef.current.files = dataTransfer.files;
-      }
-    } catch (err) {
-      setError(err);
-      console.error(`Thumbnail image upload error: ${err}`);
-      toast.error(`Thumbnail image upload error: ${err}`);
-    } finally {
-      setLoading(false);
-    }
-  };
+            // Update the file input for consistency
+            if (fileInputRef.current) {
+                // This is a workaround as we can't directly set the files property
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                fileInputRef.current.files = dataTransfer.files;
+            }
+        } catch (err) {
+            setError(err);
+            console.error(`Thumbnail image upload error: ${err}`);
+            toast.error(`Thumbnail image upload error: ${err}`);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  const handleClickUpload = () => {
-    fileInputRef.current?.click();
-  };
+    const handleClickUpload = () => {
+        fileInputRef.current?.click();
+    };
 
-  return (
-    <div className="p-2">
-      <h2 className="mb-3">
-        Add a suitable thumbnail for your {artType} to engage more readers.
-      </h2>
+    return (
+        <div className="p-2">
+            <h2 className="mb-3">
+                Add a suitable thumbnail for your {artType} to engage more
+                readers.
+            </h2>
 
-      <div className="grid grid-cols-4 items-center gap-4">
-        <div className="col-span-4">
-          <Input
-            id="thumbnail"
-            type="file"
-            ref={fileInputRef}
-            className="hidden"
-            accept=".png,.jpg,.jpeg,"
-            onChange={handleFileChange}
-          />
+            <div className="grid grid-cols-4 items-center gap-4">
+                <div className="col-span-4">
+                    <Input
+                        id="thumbnail"
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
+                        accept=".png,.jpg,.jpeg,"
+                        onChange={handleFileChange}
+                    />
 
-          <div
-            className={`relative w-full border-2 border-dashed rounded-md p-6 text-center ${isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300"}`}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            onClick={handleClickUpload}
-          >
-            {preview ? (
-              <div className="flex flex-col items-center">
-                <img
-                  src={preview}
-                  alt="Thumbnail preview"
-                  className="max-h-40 mb-2 rounded-md"
-                />
-                <p className="text-xs text-gray-400 mt-2">
-                  Click or drag to replace
-                </p>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center w-full">
-                <Upload className="h-12 w-12 text-gray-400 mb-2" />
-                <p className="text-sm font-medium">
-                  Click to upload or drag and drop
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  PNG, JPG or JPEG (max. 10MB)
-                </p>
-              </div>
-            )}
-          </div>
+                    <div
+                        className={`relative w-full border-2 border-dashed rounded-md p-6 text-center ${isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300"}`}
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                        onClick={handleClickUpload}
+                    >
+                        {preview ? (
+                            <div className="flex flex-col items-center">
+                                <img
+                                    src={preview}
+                                    alt="Thumbnail preview"
+                                    className="max-h-40 mb-2 rounded-md"
+                                />
+                                <p className="text-xs text-gray-400 mt-2">
+                                    Click or drag to replace
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center w-full">
+                                <Upload className="h-12 w-12 text-gray-400 mb-2" />
+                                <p className="text-sm font-medium">
+                                    Click to upload or drag and drop
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                    PNG, JPG or JPEG (max. 10MB)
+                                </p>
+                            </div>
+                        )}
+                    </div>
 
-          {error && (
-            <Alert variant="destructive" className="mt-2">
-              <AlertDescription>{`${error}`}</AlertDescription>
-            </Alert>
-          )}
+                    {error && (
+                        <Alert variant="destructive" className="mt-2">
+                            <AlertDescription>{`${error}`}</AlertDescription>
+                        </Alert>
+                    )}
 
-          {loading && (
-            <div className="absolute top-0 left-0 grid place-items-center z-20 size-full bg-gray-200/60 dark:bg-[#222]/60 pointer-events-none">
-              <div className="w-10 h-10 border-4 border-lime-500 border-t-transparent rounded-full animate-spin"></div>
+                    {loading && (
+                        <div className="absolute top-0 left-0 grid place-items-center z-20 size-full bg-gray-200/60 dark:bg-[#222]/60 pointer-events-none">
+                            <div className="w-10 h-10 border-4 border-lime-500 border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                    )}
+                </div>
             </div>
-          )}
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 ThumbnailUploader.propTypes = {
-  artType: PropTypes.string,
-  setThumbnailUrl: PropTypes.func,
-  setMedia: PropTypes.func,
+    artType: PropTypes.string,
+    setThumbnailUrl: PropTypes.func,
+    setMedia: PropTypes.func,
 };
 
 export const PublicPreferenceInput = ({ isPublic, setIsPublic }) => {
-  // rename it to SetPublicVisibility
-  return (
-    <div className="p-2">
-      <h2 className="mb-1">Publish publicly or keep private?</h2>
-      <RadioGroup
-        value={isPublic}
-        onValueChange={setIsPublic}
-        className="flex items-center gap-4"
-      >
-        <div className="flex items-center gap-2">
-          <RadioGroupItem value={true} id="public" />
-          <Label htmlFor="public">Public</Label>
+    // rename it to SetPublicVisibility
+    return (
+        <div className="p-2">
+            <h2 className="mb-1">Publish publicly or keep private?</h2>
+            <RadioGroup
+                value={isPublic}
+                onValueChange={setIsPublic}
+                className="flex items-center gap-4"
+            >
+                <div className="flex items-center gap-2">
+                    <RadioGroupItem value={true} id="public" />
+                    <Label htmlFor="public">Public</Label>
+                </div>
+                <div className="flex items-center gap-2">
+                    <RadioGroupItem value={false} id="private" />
+                    <Label htmlFor="private">Private</Label>
+                </div>
+            </RadioGroup>
         </div>
-        <div className="flex items-center gap-2">
-          <RadioGroupItem value={false} id="private" />
-          <Label htmlFor="private">Private</Label>
-        </div>
-      </RadioGroup>
-    </div>
-  );
+    );
 };
 PublicPreferenceInput.propTypes = {
-  setIsPublic: PropTypes.func,
-  isPublic: PropTypes.bool,
+    setIsPublic: PropTypes.func,
+    isPublic: PropTypes.bool,
 };
 
 export function findAndReplace(content, setContent, toast) {
-  try {
-    const searchTerm = prompt("Enter text or regex to find:");
-    if (!searchTerm) return;
-
-    const replaceTerm = prompt("Enter replacement text:");
-    if (replaceTerm === null) return;
-
-    // Ask for regex flags (default to global)
-    const flags = prompt("Enter regex flags (default = g):", "g") || "g";
-
-    let regex;
     try {
-      regex = new RegExp(searchTerm, flags);
-    } catch (err) {
-      console.log(err);
-      toast.error("Invalid regex pattern");
-      return;
+        const searchTerm = prompt("Enter text or regex to find:");
+        if (!searchTerm) return;
+
+        const replaceTerm = prompt("Enter replacement text:");
+        if (replaceTerm === null) return;
+
+        // Ask for regex flags (default to global)
+        const flags = prompt("Enter regex flags (default = g):", "g") || "g";
+
+        let regex;
+        try {
+            regex = new RegExp(searchTerm, flags);
+        } catch (err) {
+            console.log(err);
+            toast.error("Invalid regex pattern");
+            return;
+        }
+
+        // Replace all occurrences in content
+        const newContent = content.replace(regex, replaceTerm);
+
+        // Update content state
+        setContent(newContent);
+
+        // Count occurrences for the message
+        const occurrences = (content.match(regex) || []).length;
+        toast.success(
+            `Replaced ${occurrences} occurrence${occurrences !== 1 ? "s" : ""} of "${searchTerm}"`,
+        );
+    } catch (error) {
+        toast.error("Error during find & replace");
+        console.error(error);
     }
-
-    // Replace all occurrences in content
-    const newContent = content.replace(regex, replaceTerm);
-
-    // Update content state
-    setContent(newContent);
-
-    // Count occurrences for the message
-    const occurrences = (content.match(regex) || []).length;
-    toast.success(
-      `Replaced ${occurrences} occurrence${occurrences !== 1 ? "s" : ""} of "${searchTerm}"`,
-    );
-  } catch (error) {
-    toast.error("Error during find & replace");
-    console.error(error);
-  }
 }
 
 export function TitleInput({
-  title,
-  setTitle,
-  setIsSaved,
-  isDark,
-  isPreview,
-  lightModeBg,
-}) {
-  return (
-    <textarea
-      value={title}
-      rows={1}
-      onChange={(e) => {
-        setTitle(e.target.value);
-        setIsSaved(false);
-
-        e.target.style.height = "auto";
-        e.target.style.height = e.target.scrollHeight + "px";
-      }}
-      placeholder="Title"
-      className={`w-full h-fit text-4xl font-bold font-serif mb-8 focus:outline-none transition-all duration-0
-      leading-tight tracking-tight capitalize resize-none
-      ${isDark ? "bg-[#222]" : lightModeBg}
-      ${isPreview ? "opacity-0" : "opacity-100"}`}
-    />
-  );
-}
-TitleInput.propTypes = {
-  title: PropTypes.any,
-  setTitle: PropTypes.func,
-  setIsSaved: PropTypes.func,
-  isDark: PropTypes.bool,
-  isPreview: PropTypes.bool,
-  lightModeBg: PropTypes.string,
-};
-
-export const ContentInput = forwardRef(function ContentInput(
-  {
-    content,
+    title,
+    setTitle,
+    setIsSaved,
     isDark,
     isPreview,
     lightModeBg,
-    setIsSaved,
-    textAlignment,
-    handleContentChange,
-    onKeyDown,
-  },
-  ref,
+}) {
+    return (
+        <textarea
+            value={title}
+            rows={1}
+            onChange={(e) => {
+                setTitle(e.target.value);
+                setIsSaved(false);
+
+                e.target.style.height = "auto";
+                e.target.style.height = e.target.scrollHeight + "px";
+            }}
+            placeholder="Title"
+            className={`w-full h-fit text-4xl font-bold font-serif mb-8 focus:outline-none transition-all duration-0
+      leading-tight tracking-tight capitalize resize-none
+      ${isDark ? "bg-[#222]" : lightModeBg}
+      ${isPreview ? "opacity-0" : "opacity-100"}`}
+        />
+    );
+}
+TitleInput.propTypes = {
+    title: PropTypes.any,
+    setTitle: PropTypes.func,
+    setIsSaved: PropTypes.func,
+    isDark: PropTypes.bool,
+    isPreview: PropTypes.bool,
+    lightModeBg: PropTypes.string,
+};
+
+export const ContentInput = forwardRef(function ContentInput(
+    {
+        content,
+        isDark,
+        isPreview,
+        lightModeBg,
+        setIsSaved,
+        textAlignment,
+        handleContentChange,
+        onKeyDown,
+    },
+    ref,
 ) {
-  return (
-    <textarea
-      ref={ref}
-      data-lenis-prevent
-      id="txtArea"
-      value={content}
-      onChange={(e) => {
-        handleContentChange(e, setIsSaved);
-      }}
-      onKeyDown={onKeyDown}
-      placeholder="Fill your canvas..."
-      className={`w-full font-[montserrat] min-h-screen h-auto
+    return (
+        <textarea
+            ref={ref}
+            data-lenis-prevent
+            id="txtArea"
+            value={content}
+            onChange={(e) => {
+                handleContentChange(e, setIsSaved);
+            }}
+            onKeyDown={onKeyDown}
+            placeholder="Fill your canvas..."
+            className={`w-full font-[montserrat] min-h-screen h-auto
         resize-none focus:outline-none
         text-lg text-left Xsentient-regular
         transition-all duration-0
         ${isDark ? "bg-[#222]" : lightModeBg}
         ${isPreview ? "opacity-0 max-h-screen" : "opacity-100 max-h-auto"}
         ${textAlignment === "center" ? "text-center" : "text-left"}`}
-    />
-  );
+        />
+    );
 });
 
 ContentInput.propTypes = {
-  content: PropTypes.any,
-  isDark: PropTypes.bool,
-  isPreview: PropTypes.bool,
-  lightModeBg: PropTypes.string,
-  textAlignment: PropTypes.string,
-  setIsSaved: PropTypes.func,
-  handleContentChange: PropTypes.func,
-  onKeyDown: PropTypes.func,
+    content: PropTypes.any,
+    isDark: PropTypes.bool,
+    isPreview: PropTypes.bool,
+    lightModeBg: PropTypes.string,
+    textAlignment: PropTypes.string,
+    setIsSaved: PropTypes.func,
+    handleContentChange: PropTypes.func,
+    onKeyDown: PropTypes.func,
 };
 
 export const rawText = `

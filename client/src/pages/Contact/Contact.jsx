@@ -35,8 +35,8 @@ const ContactPage = ({ bgClr = "bg-cream-light" }) => {
             ),
         },
         {
-            name: "Portfolio",
-            href: "https://subhajit.pages.dev",
+            name: "Blog",
+            href: "https://dream-world-coder.vercel.app",
             icon: (
                 <Globe className="size-4 p-1 box-content rounded bg-yellow-300 text-black" />
             ),
