@@ -1,5 +1,5 @@
 import { useRef, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
@@ -23,6 +23,26 @@ const PublicationsFeed = () => {
     const isDark = useDarkMode();
     const { getFeed } = usePublicationService();
 
+    const [searchParams, setSearchParams] = useSearchParams();
+    const instParam = searchParams.get("inst") || "";
+    const selectedInsts = instParam ? instParam.split(" ") : [];
+
+    const handleToggleInst = (slug) => {
+        let updatedInsts = [...selectedInsts];
+
+        if (updatedInsts.includes(slug)) {
+            updatedInsts = updatedInsts.filter((s) => s !== slug);
+        } else {
+            updatedInsts.push(slug);
+        }
+
+        if (updatedInsts.length > 0) {
+            setSearchParams({ inst: updatedInsts.join(" ") });
+        } else {
+            setSearchParams({});
+        }
+    };
+
     const {
         data,
         error,
@@ -32,9 +52,9 @@ const PublicationsFeed = () => {
         status,
         refetch,
     } = useInfiniteQuery({
-        queryKey: ["feed", "publications"],
+        queryKey: ["feed", "publications", instParam],
         queryFn: ({ pageParam = "" }) =>
-            getFeed({ cursor: pageParam, limit: LIMIT }),
+            getFeed({ cursor: pageParam, limit: LIMIT, inst: instParam }),
         getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
         staleTime: 1000 * 60 * 5,
     });
@@ -50,10 +70,13 @@ const PublicationsFeed = () => {
         (node) => {
             if (isFetchingNextPage) return;
             if (observer.current) observer.current.disconnect();
-            observer.current = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting && hasNextPage) fetchNextPage();
-            });
-            if (node) observer.current.observe(node);
+            if (node) {
+                observer.current = new IntersectionObserver((entries) => {
+                    if (entries[0].isIntersecting && hasNextPage)
+                        fetchNextPage();
+                });
+                observer.current.observe(node);
+            }
         },
         [isFetchingNextPage, hasNextPage, fetchNextPage],
     );
@@ -94,22 +117,34 @@ const PublicationsFeed = () => {
                             {/* Institution Filter Bar */}
                             <div className="mb-6 overflow-x-auto pb-2 scrollbar-hide">
                                 <div className="flex gap-2 w-max">
+                                    {/* All Institutions Badge */}
                                     <Badge
                                         variant="outline"
-                                        className="px-3 py-1 text-sm cursor-default rounded-full shadow-none font-thin
-                                        border-lime-300 dark:border-lime-700 bg-lime-100 dark:bg-lime-800 dark:hover:bg-inherit"
+                                        onClick={() => setSearchParams({})}
+                                        className={`px-3 py-1 text-sm rounded-full shadow-none font-thin transition-colors cursor-pointer ${
+                                            selectedInsts.length === 0
+                                                ? "border-lime-300 dark:border-lime-700 bg-lime-100 dark:bg-lime-800"
+                                                : "border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                                        }`}
                                     >
                                         All Institutions
                                     </Badge>
-                                    {institutions.map((inst) => (
-                                        <Link
-                                            key={inst.slug}
-                                            to={`/publications?inst=${inst.slug}`}
-                                        >
+
+                                    {institutions.map((inst) => {
+                                        const isSelected =
+                                            selectedInsts.includes(inst.slug);
+                                        return (
                                             <Badge
+                                                key={inst.slug}
                                                 variant="outline"
-                                                className="px-3 py-1 text-sm hover:bg-muted cursor-pointer transition-colors rounded-full shadow-none
-                                                border-neutral-300 dark:border-neutral-700 hover:bg-lime-100 dark:hover:bg-inherit font-thin border-dashed"
+                                                onClick={() =>
+                                                    handleToggleInst(inst.slug)
+                                                }
+                                                className={`px-3 py-1 text-sm cursor-pointer transition-colors rounded-full shadow-none font-thin ${
+                                                    isSelected
+                                                        ? "border-lime-300 dark:border-lime-700 bg-lime-100 dark:bg-lime-800"
+                                                        : "border-neutral-300 dark:border-neutral-700 border-dashed hover:bg-lime-50 dark:hover:bg-neutral-800"
+                                                }`}
                                                 style={{
                                                     color: isDark
                                                         ? "#fff"
@@ -119,8 +154,8 @@ const PublicationsFeed = () => {
                                                 {inst.shortName ||
                                                     inst.displayName}
                                             </Badge>
-                                        </Link>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
 
@@ -153,6 +188,7 @@ const PublicationsFeed = () => {
                                 {(isLoading || isFetchingNextPage) && (
                                     <LoadingSkeleton />
                                 )}
+
                                 {!isLoading &&
                                     !isFetchingNextPage &&
                                     uniquePubs.length > 0 &&

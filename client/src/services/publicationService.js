@@ -4,18 +4,18 @@ import { toast } from "sonner";
 export const usePublicationService = () => {
     const { authAxios } = useAuth();
 
-    const getFeed = async ({ cursor, limit = 20 }) => {
+    const getFeed = async ({ cursor, limit = 20, inst }) => {
         try {
-            const res = await authAxios.get("/publications", {
-                params: { cursor, limit },
-            });
+            const params = { cursor, limit };
+            if (inst) params.inst = inst; // Append filter if it exists
+
+            const res = await authAxios.get("/publications", { params });
             return res.data.data;
         } catch (err) {
             toast.error("Failed to load publications feed");
             throw err;
         }
     };
-
     const getInstitutions = async () => {
         try {
             const res = await authAxios.get("/publications/institutions");

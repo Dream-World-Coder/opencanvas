@@ -14,19 +14,28 @@ const { institutions } = require("../../scraper/config/institutions.js");
 const router = express.Router();
 const CACHE_TTL = 300; // 5 minutes
 
-// 1. GET Feed - All institutions, cursor-paginated
+// 1. GET Feed - Handles both All Institutions and Filtered queries
 router.get("/", async (req, res) => {
     try {
-        const { cursor, limit = 20 } = req.query;
-        const cacheKey = `publications:feed:${cursor || "start"}`;
+        const { cursor, limit = 20, inst } = req.query;
 
-        // cache.get is synchronous in cacheService.js
+        // Use inst in cache key if it exists
+        const cacheKey = `publications:feed:${inst || "all"}:${cursor || "start"}`;
         const cachedData = cache.get(cacheKey);
+
         if (cachedData) return res.json({ success: true, data: cachedData });
 
-        const query = cursor
-            ? { anonymousEngagementScore: { $lt: Number(cursor) } }
-            : {};
+        const query = {};
+
+        // If 'inst' query param exists, split by space (URLSearchParams uses spaces)
+        if (inst) {
+            query.institution = { $in: inst.split(" ") };
+        }
+
+        if (cursor) {
+            query.anonymousEngagementScore = { $lt: Number(cursor) };
+        }
+
         const publications = await Publication.find(query)
             .sort({ anonymousEngagementScore: -1 })
             .limit(Number(limit))
@@ -36,9 +45,9 @@ router.get("/", async (req, res) => {
             publications.length > 0
                 ? publications[publications.length - 1].anonymousEngagementScore
                 : null;
+
         const result = { publications, nextCursor };
 
-        // cache.set is synchronous in cacheService.js
         cache.set(cacheKey, result, CACHE_TTL);
         res.json({ success: true, data: result });
     } catch (err) {
