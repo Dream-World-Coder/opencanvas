@@ -1,8 +1,7 @@
 import { useRef, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { ChevronLeft } from "lucide-react";
 
 import Header from "@/components/Header/Header";
 import { usePublicationService } from "@/services/publicationService";

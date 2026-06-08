@@ -64,6 +64,7 @@ const PublicationView = () => {
                     setIsSaved(interactions.saved);
                 }
             } catch (err) {
+                console.log(err);
                 toast.error("Failed to load publication");
             } finally {
                 setLoading(false);
@@ -75,7 +76,6 @@ const PublicationView = () => {
     const handleVote = async (vote) => {
         if (!currentUser) return toast.error("You need to log in first");
         const wasLiked = isLiked;
-        const wasDisliked = isDisliked;
 
         try {
             const res = await toggleInteraction(pub._id, vote);
@@ -104,7 +104,7 @@ const PublicationView = () => {
                 }
             }
         } catch (err) {
-            // Handled by service
+            console.log(err);
         }
     };
 
@@ -114,7 +114,9 @@ const PublicationView = () => {
             const res = await toggleSave(pub._id);
             setIsSaved(res.message === "Saved");
             toast.success(res.message);
-        } catch (err) {}
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     if (loading) return <LoadingPost />;

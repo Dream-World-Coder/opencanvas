@@ -41,9 +41,11 @@ const CollectionView = lazy(
 );
 
 // Publications routes
-const PublicationsFeed = lazy(() => import("./pages/PublicationsFeed"));
-const InstitutionFeed = lazy(() => import("./pages/InstitutionFeed"));
-const PublicationView = lazy(() => import("./pages/PublicationView"));
+const PublicationsFeed = lazy(() => import("./pages/Publications/Feed"));
+const InstitutionFeed = lazy(
+    () => import("./pages/Publications/InstitutionFeed"),
+);
+const PublicationView = lazy(() => import("./pages/Publications/View"));
 
 const AboutPage = lazy(() => import("./pages/About/About"));
 const ContactPage = lazy(() => import("./pages/Contact/Contact"));
