@@ -20,7 +20,7 @@ import ArticleFeed from "./pages/Feed/FeedPage";
 import HashScroll from "./components/HashHighlight";
 
 import "./services/fingerprintService";
-import Maintainance from "./pages/Others/Maintance";
+import Maintainance from "./pages/Others/Maintenance";
 
 // Everything else is lazy - loaded only when the route is first visited
 const LoginPage = lazy(() => import("./pages/Auth/Login"));
@@ -64,8 +64,8 @@ const NotFoundPage = lazy(() => import("./pages/Others/404"));
 const queryClient = new QueryClient();
 
 export default function App() {
-    const maintaince = true;
-    return maintaince ? (
+    const maintenance = false;
+    return maintenance ? (
         <Maintainance />
     ) : (
         <HelmetProvider>
@@ -77,7 +77,7 @@ export default function App() {
                             <CollectionContextProvider>
                                 <Suspense fallback={<LoadingPage />}>
                                     <Routes>
-                                        {/* ── Static ──────────────────────────────────────── */}
+                                        {/* Statics */}
                                         <Route
                                             path="/"
                                             element={<LandingPage />}
@@ -107,7 +107,7 @@ export default function App() {
                                             }
                                         />
 
-                                        {/* ── Auth ────────────────────────────────────────── */}
+                                        {/* Auth */}
                                         <Route
                                             path="/login"
                                             element={
@@ -133,7 +133,7 @@ export default function App() {
                                             element={<AuthSuccess />}
                                         />
 
-                                        {/* ── Feed ────────────────────────────────────────── */}
+                                        {/* Feed  */}
                                         <Route
                                             path="/articles"
                                             element={<ArticleFeed />}
@@ -144,7 +144,7 @@ export default function App() {
                                         />
                                         {/* alias */}
 
-                                        {/* ── Publications ────────────────────────────────── */}
+                                        {/* Publications  */}
                                         <Route
                                             path="/publications"
                                             element={<PublicationsFeed />}
@@ -158,7 +158,7 @@ export default function App() {
                                             element={<PublicationView />}
                                         />
 
-                                        {/* ── Public profiles ─────────────────────────────── */}
+                                        {/*  Public profiles  */}
                                         <Route
                                             path="/u/:username"
                                             element={
@@ -175,7 +175,7 @@ export default function App() {
                                             element={<SearchPage />}
                                         />
 
-                                        {/* ── Public posts & collections ───────────────────── */}
+                                        {/* Public posts & collections */}
                                         <Route
                                             path="/p/:slug"
                                             element={<ViewPost />}
@@ -185,7 +185,7 @@ export default function App() {
                                             element={<CollectionView />}
                                         />
 
-                                        {/* ── Public editor (markdown preview / md→pdf tool) ── */}
+                                        {/* Public editor (markdown preview / md2pdf)  */}
                                         <Route
                                             path="/editor/markdown"
                                             element={<WritingPadMd />}
@@ -204,7 +204,7 @@ export default function App() {
                                             element={<WritingPadMd />}
                                         />
 
-                                        {/* ── Protected ───────────────────────────────────── */}
+                                        {/* Protected */}
                                         <Route element={<ProtectedRoute />}>
                                             <Route
                                                 path="/profile"
@@ -238,11 +238,11 @@ export default function App() {
                                             />
 
                                             {/*
-                        Editor - create or edit a post.
-                        artType is not passed as a prop, post ID comes from
-                        ?id= query param (pre-fetched via /get-new-post-id).
-                        /editor/markdown/create?type=article&id=...
-                      */}
+                                                Editor - create or edit a post.
+                                                artType is not passed as a prop, post ID comes from
+                                                ?id= query param (pre-fetched via /get-new-post-id).
+                                                /editor/markdown/create?type=article&id=...
+                                            */}
                                             <Route
                                                 path="/editor/markdown/create"
                                                 element={<WritingPad />}
