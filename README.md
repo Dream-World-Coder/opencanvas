@@ -468,20 +468,12 @@ This is a prototype just now. Lots of features are incomplete.
 
 ## Preview
 
-<img src="./images/lp.png" alt="landing page">
-<img src="./images/feed-light-mode.png" alt="articles feed page">
+<img src="./images/feed.png" alt="articles feed page">
 <img src="./images/profile.png" alt="profile page">
 <img src="./images/profile-settings.png" alt="profile settings page">
 <img src="./images/md-prev.png" alt="markdown editor page">
 <img src="./images/about.png" alt="about page">
-<img src="./images/mockup.png" alt="mockup page">
   
-#### Feed dark mode
-<img src="./images/feed-dark-mode.png" alt="articles feed page">
-
-#### article desktop
-<img src="./images/xxl.png" alt="desktop article page">
-
 ---
 
 ## Disclosure
