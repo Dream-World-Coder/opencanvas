@@ -650,21 +650,21 @@ const ProfileSettings = () => {
     const plans = [
         {
             title: "Monthly Plan",
-            price: "$4.99",
+            price: "$2.99",
             subtext: "/ month",
             description: "Great if you just want to try it out.",
             buttonText: "Subscribe Monthly",
         },
         {
             title: "Yearly Plan",
-            price: "$2.99",
+            price: "$2.49",
             subtext: "/ month",
             description: "Billed annually. Save 40% compared to monthly.",
             buttonText: "Subscribe Yearly",
         },
         {
             title: "Lifetime Access",
-            price: "$149.99",
+            price: "$49.99",
             subtext: "",
             description:
                 "Be an early supporter. Includes future premium perks at no extra cost.",

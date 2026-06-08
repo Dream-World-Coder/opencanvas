@@ -441,8 +441,12 @@ NoPosts.propTypes = {
 export const EndOfFeed = () => {
     return (
         <div className="text-center py-8 px-4 bg-white dark:bg-[#222] rounded-xl shadow-sm">
-            <p className="text-gray-500 dark:text-gray-400">
-                You&apos;ve reached the end of your feed
+            <p className="text-neutral-800 dark:text-neutral-200 flex flex-col items-center justify-center text-sm">
+                <img
+                    className="block max-w-[200px] max-h-[200px]"
+                    src="/illustrations/hot-air-balloon.svg"
+                />
+                Looks Like You&apos;ve reached the end of your feed
             </p>
             <Button
                 onClick={() =>
@@ -452,7 +456,7 @@ export const EndOfFeed = () => {
                     })
                 }
                 variant="outline"
-                className="mt-4"
+                className="mt-4 rounded-full"
             >
                 Back to top
             </Button>
