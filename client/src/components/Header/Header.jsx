@@ -86,7 +86,7 @@ const Header = ({
                 <nav className="flex items-center justify-between">
                     {/* Left: Logo + SearchBar */}
                     <div className="flex items-center justify-center gap-2">
-                        <AppLogo />
+                        <AppLogo loggedIn={!!currentUser} />
                         {!searchBarHidden && (
                             <SearchBar round={true} hideSubmitBtn={true} />
                         )}

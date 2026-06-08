@@ -4,21 +4,9 @@ import BlueFlowerImg from "./images/blue-flower.png";
 import Poem from "./images/poem.png";
 import Butterfly from "./images/butterfly.png";
 
-import { useAuth } from "../../contexts/AuthContext";
 import { SlidingButton, Navbar, Footer } from "./components";
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 
 const LandingPage = () => {
-    const { currentUser } = useAuth();
-    const navigate = useNavigate();
-
-    // useEffect(() => {
-    //     if (currentUser) {
-    //         navigate("/publications");
-    //     }
-    // }, [currentUser, navigate]);
-
     return (
         <div className="min-h-auto md:min-h-screen min-w-screen h-[100dvh] md:h-auto bg-[#e2e4e0] relative overflow-hidden">
             <div className="max-w-7xl mx-auto relative h-screen">

@@ -64,7 +64,7 @@ const NotFoundPage = lazy(() => import("./pages/Others/404"));
 const queryClient = new QueryClient();
 
 export default function App() {
-    const maintenance = true;
+    const maintenance = false;
     return maintenance ? (
         <Maintainance />
     ) : (

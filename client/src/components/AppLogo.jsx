@@ -5,10 +5,11 @@ import PropTypes from "prop-types";
 export default function AppLogo({
     size = 32,
     fontSize = "text-xl md:text-2xl",
+    loggedIn = false,
 }) {
     return (
         <NavLink
-            to="/"
+            to={loggedIn ? "/publications" : "/"}
             className={`${fontSize} font-thin text-stone-950 rounded-md box-content px-1 md:px-1 py-0 flex justify-center gap-2 items-center tracking-wide`}
         >
             <OpenCanvasIcon size={size} color="currentColor" strokeWidth={2} />
@@ -21,4 +22,5 @@ export default function AppLogo({
 AppLogo.propTypes = {
     size: PropTypes.number,
     fontSize: PropTypes.string,
+    loggedIn: PropTypes.bool,
 };
