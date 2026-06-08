@@ -54,7 +54,7 @@ publicationSchema.index({ doi: 1 }, { unique: true, sparse: true });
 // Fallback dedup for papers with neither arxivId nor doi
 publicationSchema.index({ title: 1, institution: 1 });
 
-// ─── Model singleton ─────────────────────────────────────────────────────────
+// Model singleton
 
 let Publication = null;
 
@@ -73,8 +73,6 @@ export async function disconnectDb() {
     await mongoose.disconnect();
     logger.info("MongoDB disconnected");
 }
-
-// ─── Upsert ──────────────────────────────────────────────────────────────────
 
 /**
  * Upsert a normalized publication into MongoDB.

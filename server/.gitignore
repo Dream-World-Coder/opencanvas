@@ -11,3 +11,4 @@ db_backups
 src/routes/backup
 __eg*
 indexes.txt
+_backups

@@ -27,7 +27,7 @@ import { fetchFromOaiPmh } from "./sources/oai_pmh.js";
 import { fetchFromSemanticScholar } from "./sources/semantic_scholar.js";
 import { fetchFromCrossRef } from "./sources/crossref.js";
 
-// ─── CLI args ────────────────────────────────────────────────────────────────
+// CLI args
 
 const { values: args } = parseArgs({
     options: {
@@ -44,7 +44,7 @@ const DRY_RUN = args["dry-run"];
 const INST_ARG = args.institution?.trim();
 const SRC_ARG = args.sources?.trim();
 
-// ─── Source registry ─────────────────────────────────────────────────────────
+// Source registry
 // Priority order: OpenAlex (best structured data) → arXiv → OAI-PMH (institutional repos)
 // → Semantic Scholar → CrossRef (fallback, many records lack abstracts)
 
@@ -53,7 +53,7 @@ const ALL_SOURCES = [
     { name: "arxiv", fn: fetchFromArxiv },
     { name: "oai_pmh", fn: fetchFromOaiPmh },
     { name: "s2", fn: fetchFromSemanticScholar },
-    { name: "crossref", fn: fetchFromCrossRef },
+    // { name: "crossref", fn: fetchFromCrossRef },
 ];
 
 const enabledSources = SRC_ARG
@@ -64,39 +64,40 @@ const enabledSources = SRC_ARG
       )
     : ALL_SOURCES;
 
-// ─── Per-paper callback ───────────────────────────────────────────────────────
+// Per-paper callback
 
 /** Called immediately after each paper is successfully normalized. */
 async function onPaper(normalized) {
-    if (!normalized.title) return;
+    if (!normalized.title) return "skip";
 
     const preview = normalized.title.slice(0, 70);
 
     if (DRY_RUN) {
         logger.info(`[DRY RUN] "${preview}"`);
-        return;
+        return "dry";
     }
 
     try {
         const { isNew } = await upsertPublication(normalized);
         if (isNew) {
             logger.success(`Inserted: "${preview}"`);
+            return "inserted";
         } else {
             logger.info(`Updated:  "${preview}"`);
+            return "updated";
         }
     } catch (err) {
-        // Duplicate key errors are expected and fine -- just means we've seen this paper before
         if (err.code === 11000) {
             logger.skip(`Duplicate: "${preview}"`);
+            return "duplicate";
         } else {
             logger.error(`DB write failed for "${preview}": ${err.message}`);
-            // Don't rethrow -- one bad write shouldn't crash the whole batch
+            return "error";
         }
     }
 }
 
-// ─── Institution runner ───────────────────────────────────────────────────────
-
+// Institution runner
 async function runInstitution(institution) {
     logger.section(
         `${institution.displayName}  [${institution.slug}]  (${institution.country})`,
@@ -104,46 +105,53 @@ async function runInstitution(institution) {
 
     const results = {};
 
+    // Real DB counters for this institution
+    const dbCounts = { inserted: 0, updated: 0, duplicate: 0, error: 0 };
+
     for (const source of enabledSources) {
         logger.info(`Trying source: ${source.name}`);
 
+        const sourceDbCounts = {
+            inserted: 0,
+            updated: 0,
+            duplicate: 0,
+            error: 0,
+        };
+
         try {
-            const count = await source.fn(institution, {
-                onPaper: (p) => onPaper(p),
+            const attempted = await source.fn(institution, {
+                onPaper: async (p) => {
+                    const result = await onPaper(p);
+                    if (result in sourceDbCounts) sourceDbCounts[result]++;
+                    if (result in dbCounts) dbCounts[result]++;
+                },
                 limit: LIMIT,
             });
-            results[source.name] = { ok: true, count };
-            logger.success(`${source.name}: wrote ${count} papers`);
+
+            results[source.name] = { ok: true, attempted, ...sourceDbCounts };
+
+            logger.success(
+                `${source.name}: attempted=${attempted} | ` +
+                    `inserted=${sourceDbCounts.inserted} updated=${sourceDbCounts.updated} ` +
+                    `dupes=${sourceDbCounts.duplicate} errors=${sourceDbCounts.error}`,
+            );
         } catch (err) {
-            // Unhandled error from a source -- log and move on
             results[source.name] = { ok: false, error: err.message };
             logger.error(`${source.name}: uncaught error: ${err.message}`);
         }
 
-        // Brief cooldown between sources
         await sleep(1500);
     }
 
-    // Summary for this institution
-    const total = Object.values(results).reduce(
-        (s, r) => s + (r.count ?? 0),
-        0,
+    // Summary
+    logger.stat(
+        "Institution DB summary",
+        `inserted=${dbCounts.inserted} updated=${dbCounts.updated} dupes=${dbCounts.duplicate} errors=${dbCounts.error}`,
+        `(${institution.slug})`,
     );
-    const failed = Object.entries(results)
-        .filter(([, r]) => !r.ok)
-        .map(([n]) => n);
 
-    logger.stat("Institution total", total, `papers (${institution.slug})`);
-    if (failed.length) {
-        logger.warn(
-            `Failed sources for ${institution.slug}: ${failed.join(", ")}`,
-        );
-    }
-
-    return total;
+    return dbCounts;
 }
-
-// ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
     logger.section("OpenCanvas Scraper  v1.0");
@@ -180,17 +188,19 @@ async function main() {
         await connectDb();
     }
 
-    let grandTotal = 0;
+    let grandTotal = { inserted: 0, updated: 0, duplicate: 0, error: 0 };
     let succeeded = 0;
     let failedInsts = [];
 
     for (const institution of targets) {
         try {
-            const count = await runInstitution(institution);
-            grandTotal += count;
+            const counts = await runInstitution(institution);
+            grandTotal.inserted += counts.inserted;
+            grandTotal.updated += counts.updated;
+            grandTotal.duplicate += counts.duplicate;
+            grandTotal.error += counts.error;
             succeeded++;
         } catch (err) {
-            // Institution-level failure -- log and continue to the next
             logger.error(`Fatal error for ${institution.slug}: ${err.message}`);
             failedInsts.push(institution.slug);
         }
@@ -202,9 +212,12 @@ async function main() {
         }
     }
 
-    // ── Final summary ─────────────────────────────────────────────────────
+    // Final summary
     logger.section("Scrape Complete");
-    logger.stat("Total papers written", grandTotal);
+    logger.stat("Inserted (new)", grandTotal.inserted);
+    logger.stat("Updated (existed)", grandTotal.updated);
+    logger.stat("Duplicates skipped", grandTotal.duplicate);
+    logger.stat("DB errors", grandTotal.error);
     logger.stat("Institutions succeeded", `${succeeded} / ${targets.length}`);
 
     if (failedInsts.length) {
