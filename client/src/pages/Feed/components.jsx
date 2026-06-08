@@ -11,159 +11,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { timeAgo } from "@/services/formatDate";
 import { useState } from "react";
-import { PanelLeftClose, PanelRightClose, X } from "lucide-react";
-import { useDataService } from "../../services/dataService";
+import { X } from "lucide-react";
+import { useDataService } from "@/services/dataService";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
 const OpenCanvasIllustration = () => (
-    <svg
-        viewBox="0 0 160 180"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="w-full max-w-[140px] mx-auto"
-        aria-hidden="true"
-    >
-        {/* Background orb — sky */}
-        <circle
-            cx="80"
-            cy="80"
-            r="60"
-            fill="#e0f2fe"
-            className="dark:opacity-10"
-        />
-
-        {/* Open book base */}
-        <rect
-            x="30"
-            y="85"
-            width="100"
-            height="60"
-            rx="4"
-            fill="#f0fdf4"
-            stroke="#a3e635"
-            strokeWidth="1.5"
-        />
-
-        {/* Book spine */}
-        <line
-            x1="80"
-            y1="85"
-            x2="80"
-            y2="145"
-            stroke="#a3e635"
-            strokeWidth="1.5"
-        />
-
-        {/* Left page lines */}
-        <line
-            x1="40"
-            y1="100"
-            x2="72"
-            y2="100"
-            stroke="#bef264"
-            strokeWidth="1"
-            strokeLinecap="round"
-        />
-        <line
-            x1="40"
-            y1="108"
-            x2="72"
-            y2="108"
-            stroke="#bef264"
-            strokeWidth="1"
-            strokeLinecap="round"
-        />
-        <line
-            x1="40"
-            y1="116"
-            x2="60"
-            y2="116"
-            stroke="#bef264"
-            strokeWidth="1"
-            strokeLinecap="round"
-        />
-
-        {/* Right page lines */}
-        <line
-            x1="88"
-            y1="100"
-            x2="120"
-            y2="100"
-            stroke="#bef264"
-            strokeWidth="1"
-            strokeLinecap="round"
-        />
-        <line
-            x1="88"
-            y1="108"
-            x2="120"
-            y2="108"
-            stroke="#bef264"
-            strokeWidth="1"
-            strokeLinecap="round"
-        />
-        <line
-            x1="88"
-            y1="116"
-            x2="108"
-            y2="116"
-            stroke="#bef264"
-            strokeWidth="1"
-            strokeLinecap="round"
-        />
-
-        {/* Floating atom / science icon — violet */}
-        <circle cx="80" cy="50" r="7" fill="#7c3aed" opacity="0.15" />
-        <circle cx="80" cy="50" r="3" fill="#7c3aed" opacity="0.7" />
-        <ellipse
-            cx="80"
-            cy="50"
-            rx="12"
-            ry="5"
-            stroke="#7c3aed"
-            strokeWidth="1"
-            opacity="0.5"
-        />
-        <ellipse
-            cx="80"
-            cy="50"
-            rx="12"
-            ry="5"
-            stroke="#7c3aed"
-            strokeWidth="1"
-            opacity="0.5"
-            transform="rotate(60 80 50)"
-        />
-        <ellipse
-            cx="80"
-            cy="50"
-            rx="12"
-            ry="5"
-            stroke="#7c3aed"
-            strokeWidth="1"
-            opacity="0.5"
-            transform="rotate(120 80 50)"
-        />
-
-        {/* Star sparkles — sky */}
-        <circle cx="50" cy="62" r="2" fill="#38bdf8" opacity="0.8" />
-        <circle cx="110" cy="68" r="1.5" fill="#38bdf8" opacity="0.6" />
-        <circle cx="95" cy="40" r="1.5" fill="#a3e635" opacity="0.8" />
-        <circle cx="60" cy="38" r="1" fill="#7c3aed" opacity="0.5" />
-
-        {/* Upward arrow — discovery */}
-        <path d="M80 28 L76 36 L84 36 Z" fill="#a3e635" opacity="0.9" />
-        <line
-            x1="80"
-            y1="36"
-            x2="80"
-            y2="44"
-            stroke="#a3e635"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-        />
-    </svg>
+    <img src="/illustrations/coding-a-website.svg" />
 );
 
 const GitHubStarButton = () => (
@@ -171,7 +25,18 @@ const GitHubStarButton = () => (
         href="https://github.com/Dream-World-Coder/opencanvas"
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center justify-center gap-1.5 w-full text-xs py-2 px-3 rounded-lg border border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 hover:border-neutral-300 dark:hover:border-neutral-600 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors duration-150"
+        className="flex items-center justify-center gap-1.5 w-full text-xs py-2 px-3 rounded-lg border
+        border-neutral-300 dark:border-neutral-600 text-neutral-900 dark:text-neutral-300
+        transition-colors duration-150 border-dotted"
+        style={{
+            background: `repeating-linear-gradient(
+                135deg,
+                rgba(11, 11, 11, 0.2) 0px,
+                rgba(11, 11, 11, 0.2) 1px,
+                transparent 1px,
+                transparent 3px
+              )`,
+        }}
     >
         <svg
             viewBox="0 0 16 16"
@@ -197,46 +62,53 @@ export const LeftSideBar = () => {
 
     return (
         <div
-            className={`relative p-4 bg-white dark:bg-[#222] h-screen
-        ${sidebarClosed ? "border-none" : "border-r border-gray-100 dark:border-[#333]"}`}
+            className={`relative p-4 bg-white dark:bg-[#222] h-screen ${sidebarClosed ? "border-l border-dashed" : "border-r border-gray-100 dark:border-[#333]"}`}
         >
-            {/* Toggle button — positioned left when closed, right when open */}
             <button
                 className={`absolute top-4 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 cursor-pointer transition-colors
-          ${sidebarClosed ? "left-4" : "right-4"}`}
+                    ${sidebarClosed ? "left-4" : "right-4"}`}
                 onClick={toggleSidebar}
                 aria-label={sidebarClosed ? "Open sidebar" : "Close sidebar"}
             >
                 {sidebarClosed ? (
-                    <PanelRightClose size={20} />
+                    <div className="size-5 border-l flex items-center justify-center border-[#aaa]">
+                        <span
+                            className="block size-2.5 rotate-45"
+                            style={{
+                                borderRight: "1px solid black",
+                                borderTop: "1px solid black",
+                            }}
+                        />
+                    </div>
                 ) : (
-                    <PanelLeftClose size={20} />
+                    <div className="size-5 border-r flex items-center justify-center border-[#aaa]">
+                        <span
+                            className="block size-2.5 rotate-45"
+                            style={{
+                                borderLeft: "1px solid black",
+                                borderBottom: "1px solid black",
+                            }}
+                        />
+                    </div>
                 )}
             </button>
 
-            {/* Sidebar content — only shown when open */}
             {!sidebarClosed && (
-                <div className="flex flex-col items-center gap-6 mt-10 px-2">
-                    {/* Illustration + tagline */}
-                    <div className="text-center">
+                <div className="flex flex-col items-center justify-center gap-6 mt-0 px-2 h-[80vh]">
+                    {/* illustration */}
+
+                    <div className="text-center pt-0">
                         <OpenCanvasIllustration />
-                        <p className="mt-3 text-xs font-semibold tracking-wide text-lime-600 dark:text-lime-400 uppercase">
+                        <p className="mt-3 text-4xl font-['Six_Caps'] text-black dark:text-white">
                             OpenCanvas
                         </p>
-                        <p className="mt-1 text-[11px] text-neutral-400 dark:text-neutral-500 leading-relaxed">
-                            High-quality science,
-                            <br />
-                            papers & stories
+                        <p className="mt-1 italic text-[11px] text-neutral-400 dark:text-neutral-500 leading-relaxed">
+                            For<span className="font-serif">,</span>{" "}
+                            <span className="">Learners</span>
                         </p>
                     </div>
 
-                    {/*  */}
                     <GitHubStarButton />
-
-                    {/*
-            <FeedOptions feedOptions={feedOptions} />
-            <TopicFilters filters={filters} selectedTopics={selectedTopics} toggleTopic={toggleTopic} />
-          */}
                 </div>
             )}
         </div>
@@ -273,7 +145,7 @@ export const RightSideBar = () => {
             const res = await getTopWriters();
             setWriters(res);
 
-            // Fetch follow status for each writer in parallel (only if logged in)
+            // follow status for each writer in parallel (if logged in)
             if (currentUser && res.length > 0) {
                 const profiles = await Promise.all(
                     res.map((w) =>
@@ -372,7 +244,8 @@ export const RightSideBar = () => {
             )}
 
             <div className="text-xs">
-                © OPENCANVAS {new Date().getFullYear()} All rights reserved
+                <span className="text-xl font-['Six_Caps']">OPENCANVAS</span>. ©{" "}
+                {new Date().getFullYear()}. All rights reserved
             </div>
         </div>
     );
@@ -414,6 +287,12 @@ function WriterRow({ writer, isFollowing, onNavigate, onFollow }) {
         </div>
     );
 }
+WriterRow.propTypes = {
+    writer: PropTypes.object,
+    isFollowing: PropTypes.bool,
+    onNavigate: PropTypes.func,
+    onFollow: PropTypes.func,
+};
 
 // ::::: Loading skeleton :::::
 

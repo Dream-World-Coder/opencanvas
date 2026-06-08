@@ -394,9 +394,11 @@ export const TableOfContents = memo(function Toc({
                                                                                                 <span className="shrink-0 mt-0.5 text-neutral-400 dark:text-neutral-500 font-mono">
                                                                                                     {titleIndex +
                                                                                                         1}
+
                                                                                                     .
                                                                                                     {headingIndex +
                                                                                                         1}
+
                                                                                                     .
                                                                                                     {subheadingIndex +
                                                                                                         1}
@@ -436,12 +438,15 @@ export const TableOfContents = memo(function Toc({
                                                                                                                     <span className="shrink-0 mt-0.5 text-neutral-400 dark:text-neutral-500 font-mono">
                                                                                                                         {titleIndex +
                                                                                                                             1}
+
                                                                                                                         .
                                                                                                                         {headingIndex +
                                                                                                                             1}
+
                                                                                                                         .
                                                                                                                         {subheadingIndex +
                                                                                                                             1}
+
                                                                                                                         .
                                                                                                                         {h4Index +
                                                                                                                             1}
@@ -1695,18 +1700,9 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                     {/* Title block */}
                     {title && (
                         <div className="text-center mb-6 border-b border-black pb-6">
-                            <h1
-                                className="text-[22px] font-bold leading-tight tracking-tight uppercase mb-3"
-                                style={{ fontFamily: "inherit" }}
-                            >
+                            <h1 className="text-[22px] font-sentient sentient-bold leading-tight tracking-tight uppercase mb-3">
                                 {title}
                             </h1>
-                            {/* Decorative rule under title */}
-                            {/* <div className="flex items-center justify-center gap-2 mt-3">
-                <div className="h-px w-16 bg-black" />
-                <div className="h-1.5 w-1.5 rounded-full bg-black" />
-                <div className="h-px w-16 bg-black" />
-              </div>*/}
                         </div>
                     )}
 
@@ -1756,7 +1752,7 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                             h1: ({ children }) => (
                                 <h1
                                     id={generateId(children)}
-                                    className="mt-10 mb-3 text-[17px] font-bold uppercase tracking-widest border-b border-black/30 pb-1 flex items-center gap-2 group"
+                                    className="mt-10 mb-3 text-[17px] font-sentient sentient-bold uppercase tracking-widest border-b border-black/30 pb-1 flex items-center gap-2 group"
                                 >
                                     {children}
                                     <Link
@@ -1768,7 +1764,7 @@ export const ThemedMarkdownPreview = memo(function ThemedMarkdownPreview({
                             h2: ({ children }) => (
                                 <h2
                                     id={generateId(children)}
-                                    className="mt-8 mb-2 text-[15px] font-bold uppercase tracking-wider flex items-center gap-2 group"
+                                    className="mt-8 mb-2 text-[15px] font-sentient sentient-bold uppercase tracking-wider flex items-center gap-2 group"
                                 >
                                     {children}
                                     <Link

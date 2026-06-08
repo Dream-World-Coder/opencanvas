@@ -155,35 +155,43 @@ router.put(
 router.get("/u/top/writers", async (req, res) => {
     try {
         const CACHE_KEY = "writers:top";
-
-        // cache hit
         const cached = cache.get(CACHE_KEY);
+
         if (cached) {
             return res
                 .status(200)
                 .json({ success: true, data: cached, fromCache: true });
         }
 
-        // cache miss -> now the aggregation runs
         const topWriters = await User.aggregate([
-            // at least 1 post published
-            { $match: { "stats.postsCount": { $gt: 0 } } },
-
-            // likes-per-post: virtual field
+            {
+                $lookup: {
+                    from: "posts",
+                    localField: "_id",
+                    foreignField: "authorId", // Updated to match schema
+                    pipeline: [
+                        { $match: { isPublic: true } },
+                        { $project: { likesCount: "$stats.likesCount" } }, // Updated to match schema
+                    ],
+                    as: "publicPosts",
+                },
+            },
+            { $match: { "publicPosts.0": { $exists: true } } },
+            {
+                $addFields: {
+                    publicPostsCount: { $size: "$publicPosts" },
+                    publicLikesCount: { $sum: "$publicPosts.likesCount" },
+                },
+            },
             {
                 $addFields: {
                     likesPerPost: {
-                        $divide: [
-                            "$stats.likesReceivedCount",
-                            "$stats.postsCount",
-                        ],
+                        $divide: ["$publicLikesCount", "$publicPostsCount"],
                     },
                 },
             },
-
             { $sort: { likesPerPost: -1 } },
             { $limit: 5 },
-
             {
                 $project: {
                     _id: 1,
@@ -191,7 +199,6 @@ router.get("/u/top/writers", async (req, res) => {
                     fullName: 1,
                     profilePicture: 1,
                     designation: 1,
-                    stats: 1,
                     likesPerPost: 1,
                 },
             },

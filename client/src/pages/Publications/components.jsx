@@ -9,13 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-    FileText,
-    ExternalLink,
-    Heart,
-    Bookmark,
-    MessageSquare,
-} from "lucide-react";
+import { FileText, ExternalLink } from "lucide-react";
 import { institutionBySlug } from "@/config/institutions";
 
 export default function PublicationCard({ publication }) {
@@ -53,7 +47,7 @@ export default function PublicationCard({ publication }) {
     });
 
     return (
-        <Card className="hover:bg-accent/10 transition-colors shadow-sm">
+        <Card className="hover:bg-accent/10 transition-colors shadow-none border-none dark:hover:bg-inherit">
             <Link to={`/publications/${institution}/${_id}`}>
                 <CardHeader className="pb-3">
                     <div className="flex justify-between items-start gap-4 mb-2">
@@ -63,7 +57,7 @@ export default function PublicationCard({ publication }) {
                                 borderColor: instConfig.color,
                                 color: instConfig.color,
                             }}
-                            className="whitespace-nowrap"
+                            className="whitespace-nowrap rounded-2xl font-light"
                         >
                             {instConfig.shortName || instConfig.displayName}
                         </Badge>
@@ -71,17 +65,17 @@ export default function PublicationCard({ publication }) {
                             {formattedDate}
                         </span>
                     </div>
-                    <CardTitle className="text-xl leading-tight hover:underline cursor-pointer">
+                    <CardTitle className="text-xl leading-tight cursor-pointer font-sentient capitalize">
                         {title}
                     </CardTitle>
-                    <p className="text-sm text-muted-foreground mt-2 font-medium">
+                    <p className="text-sm text-muted-foreground mt-2 font-mono tracking-tight">
                         {displayAuthors}
                         {authorSuffix}
                     </p>
                 </CardHeader>
 
                 <CardContent className="pb-4">
-                    <p className="text-sm text-foreground/80 line-clamp-3 leading-relaxed mb-4">
+                    <p className="text-sm text-foreground/80 line-clamp-3 leading-relaxed mb-4 font-sentient my-2.5">
                         {abstract || "No abstract available."}
                     </p>
 
@@ -101,20 +95,22 @@ export default function PublicationCard({ publication }) {
                 </CardContent>
             </Link>
 
-            <CardFooter className="pt-0 flex justify-between items-center border-t px-6 py-3 bg-muted/20">
+            <CardFooter className="pt-0 flex justify-between items-center border-y border-dashed px-6 py-1.5 bg-muted/20">
                 <div className="flex gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1.5 hover:text-foreground cursor-default transition-colors">
-                        <Heart className="w-4 h-4" />
-                        <span>{formatNumber(stats?.likesCount)}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 hover:text-foreground cursor-default transition-colors">
-                        <MessageSquare className="w-4 h-4" />
-                        <span>{formatNumber(stats?.commentsCount)}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 hover:text-foreground cursor-default transition-colors">
-                        <Bookmark className="w-4 h-4" />
-                        <span>{formatNumber(stats?.savesCount)}</span>
-                    </div>
+                    {[
+                        [stats?.viewsCount, "Views"],
+                        [stats?.likesCount, "Likes"],
+                        [stats?.savesCount, "Saves"],
+                    ].map((itm, idx) => (
+                        <div
+                            key={idx}
+                            className="flex items-center gap-1.5 hover:text-foreground cursor-default transition-colors"
+                        >
+                            <span>
+                                {formatNumber(itm[0])} {itm[1]}
+                            </span>
+                        </div>
+                    ))}
                 </div>
 
                 <div className="flex gap-2">
@@ -125,19 +121,19 @@ export default function PublicationCard({ publication }) {
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
-                                <ExternalLink className="w-4 h-4 mr-2" />
+                                <ExternalLink className="w-4 h-4 mr-0" />
                                 Source
                             </a>
                         </Button>
                     )}
                     {pdfUrl && (
-                        <Button variant="default" size="sm" asChild>
+                        <Button variant="ghost" size="sm" asChild>
                             <a
                                 href={pdfUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
-                                <FileText className="w-4 h-4 mr-2" />
+                                <FileText className="w-4 h-4 mr-0" />
                                 PDF
                             </a>
                         </Button>

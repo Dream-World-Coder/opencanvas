@@ -6,7 +6,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import Header from "@/components/Header/Header";
 import { usePublicationService } from "@/services/publicationService";
 import { institutionBySlug } from "@/config/institutions";
-import PublicationCard from "@/components/PublicationCard";
+import PublicationCard from "./components";
 import {
     LeftSideBar,
     RightSideBar,

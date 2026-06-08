@@ -163,7 +163,7 @@ const PublicationView = () => {
                         <div className="mb-10 mt-4 border-b border-neutral-200 dark:border-neutral-800 pb-8">
                             <Badge
                                 variant="outline"
-                                className="mb-4"
+                                className="mb-4 rounded-full font-light"
                                 style={{
                                     borderColor: instConfig.color,
                                     color: instConfig.color,
@@ -177,7 +177,7 @@ const PublicationView = () => {
                                 {pub.title}
                             </h1>
 
-                            <div className="text-muted-foreground font-medium mb-6 leading-relaxed">
+                            <div className="text-muted-foreground mb-6 leading-tight font-mono">
                                 {pub.authors.map((a, i) => (
                                     <span key={i}>
                                         <span className="text-foreground/80">
@@ -239,7 +239,10 @@ const PublicationView = () => {
 
                             <div className="flex gap-3">
                                 {pub.pdfUrl && (
-                                    <Button asChild>
+                                    <Button
+                                        asChild
+                                        className="bg-lime-600 dark:bg-lime-400 hover:bg-lime-600 dark:hover:bg-lime-400 rounded-full"
+                                    >
                                         <a
                                             href={pub.pdfUrl}
                                             target="_blank"
@@ -251,7 +254,11 @@ const PublicationView = () => {
                                     </Button>
                                 )}
                                 {pub.externalUrl && (
-                                    <Button variant="outline" asChild>
+                                    <Button
+                                        variant="outline"
+                                        asChild
+                                        className="rounded-full"
+                                    >
                                         <a
                                             href={pub.externalUrl}
                                             target="_blank"
@@ -268,7 +275,7 @@ const PublicationView = () => {
                         {/* Abstract */}
                         <article className="w-full max-w-full min-w-0 p-0 mb-16">
                             <h3 className="text-xl font-bold mb-4">Abstract</h3>
-                            <p className="text-lg leading-relaxed text-foreground/90 whitespace-pre-line mb-8">
+                            <p className="text-base leading-normal font-sentient text-foreground/90 whitespace-pre-line mb-8">
                                 {pub.abstract ||
                                     "No abstract available for this publication."}
                             </p>

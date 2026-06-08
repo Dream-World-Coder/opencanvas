@@ -13,7 +13,7 @@ import {
     LoadingSkeleton,
     EndOfFeed,
 } from "@/pages/Feed/components";
-import PublicationCard from "@/components/PublicationCard";
+import PublicationCard from "./components";
 import { institutions } from "@/config/institutions";
 import { Badge } from "@/components/ui/badge";
 
@@ -95,20 +95,21 @@ const PublicationsFeed = () => {
                             <div className="mb-6 overflow-x-auto pb-2 scrollbar-hide">
                                 <div className="flex gap-2 w-max">
                                     <Badge
-                                        variant="default"
-                                        className="px-3 py-1 text-sm cursor-default bg-lime-500 rounded-xl"
+                                        variant="outline"
+                                        className="px-3 py-1 text-sm cursor-default rounded-full shadow-none font-thin
+                                        border-lime-300 dark:border-lime-700 bg-lime-100 dark:bg-lime-800 dark:hover:bg-inherit"
                                     >
                                         All Institutions
                                     </Badge>
                                     {institutions.map((inst) => (
                                         <Link
                                             key={inst.slug}
-                                            to={`/publications/${inst.slug}`}
+                                            to={`/publications?inst=${inst.slug}`}
                                         >
                                             <Badge
                                                 variant="outline"
-                                                className="px-3 py-1 text-sm hover:bg-muted cursor-pointer transition-colors rounded-xl
-                                                border-lime-300 dark:border-lime-700 hover:bg-lime-100 dark:hover:bg-inherit"
+                                                className="px-3 py-1 text-sm hover:bg-muted cursor-pointer transition-colors rounded-full shadow-none
+                                                border-neutral-300 dark:border-neutral-700 hover:bg-lime-100 dark:hover:bg-inherit font-thin border-dashed"
                                                 style={{
                                                     color: isDark
                                                         ? "#fff"
