@@ -20,6 +20,7 @@ import ArticleFeed from "./pages/Feed/FeedPage";
 import HashScroll from "./components/HashHighlight";
 
 import "./services/fingerprintService";
+import Maintainance from "./pages/Others/Maintance";
 
 // Everything else is lazy - loaded only when the route is first visited
 const LoginPage = lazy(() => import("./pages/Auth/Login"));
@@ -63,7 +64,10 @@ const NotFoundPage = lazy(() => import("./pages/Others/404"));
 const queryClient = new QueryClient();
 
 export default function App() {
-    return (
+    const maintaince = true;
+    return maintaince ? (
+        <Maintainance />
+    ) : (
         <HelmetProvider>
             <QueryClientProvider client={queryClient}>
                 <Router>
