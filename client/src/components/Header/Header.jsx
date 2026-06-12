@@ -53,7 +53,7 @@ const Header = ({
     }
 
     let navLinks = [
-        { name: "Articles", href: "/articles" },
+        { name: "Posts", href: "/articles" },
         { name: "Publications", href: "/publications" },
         { name: "About", href: "/about" },
         { name: "Contact", href: "/contact" },

@@ -19,7 +19,7 @@ export default function ProfileHeader() {
     const { getNewPostId } = useDataService();
 
     const navLinks = [
-        { href: "/articles", label: "Articles" },
+        { href: "/articles", label: "Posts" },
         { href: "/publications", label: "Publications" },
         // { href: "/social", label: "Social" },
         { href: "/saved", label: "Saved" },

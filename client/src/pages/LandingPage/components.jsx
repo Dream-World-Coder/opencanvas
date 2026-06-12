@@ -63,7 +63,7 @@ export const Navbar = ({ bg }) => {
 
     let navLinks = [
         { name: "Publications", href: "/publications" },
-        { name: "Articles", href: "/articles" },
+        { name: "Posts", href: "/articles" },
         { name: "About", href: "/about" },
         { name: "Contact", href: "/contact" },
     ];
