@@ -391,10 +391,10 @@ Alternatively, use the provided shell scripts from the project root:
 
 ```bash
 # for macOS only, uses homebrew
-chmod +x scripts/start.sh scripts/stop.sh
+chmod +x _scripts/start.sh _scripts/stop.sh
 
-./scripts/start.sh   # Start both client and server & mongodb
-./scripts/stop.sh    # Stop all processes
+./_scripts/start.sh   # Start both client and server & mongodb
+./_scripts/stop.sh    # Stop all processes
 ```
 
 And for clusters instead of a single thread:
@@ -403,8 +403,8 @@ And for clusters instead of a single thread:
 # for macOS only, uses homebrew
 chmod +x cluster-start.sh cluster-stop.sh
 
-./scripts/cluster-start.sh   
-./scripts/cluster-stop.sh    
+./_scripts/cluster-start.sh   
+./_scripts/cluster-stop.sh    
 ```
 ---
 
@@ -468,11 +468,11 @@ This is a prototype just now. Lots of features are incomplete.
 
 ## Preview
 
-<img src="./images/feed.png" alt="articles feed page">
-<img src="./images/profile.png" alt="profile page">
-<img src="./images/profile-settings.png" alt="profile settings page">
-<img src="./images/md-prev.png" alt="markdown editor page">
-<img src="./images/about.png" alt="about page">
+<img src="./_images/feed.png" alt="articles feed page">
+<img src="./_images/profile.png" alt="profile page">
+<img src="./_images/profile-settings.png" alt="profile settings page">
+<img src="./_images/md-prev.png" alt="markdown editor page">
+<img src="./_images/about.png" alt="about page">
   
 ---
 

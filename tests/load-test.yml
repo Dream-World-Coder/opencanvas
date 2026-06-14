@@ -1,39 +1,67 @@
+# config:
+#   environments:
+#     local:
+#       target: "http://localhost:3000"
+#     prod:
+#       target: "https://opencanvas.onrender.com"
+
+#   phases:
+#     - duration: 30
+#       arrivalRate: 10
+#       name: "Warm up - filling cache"
+#     - duration: 60
+#       arrivalRate: 10
+#       rampTo: 100
+#       name: "Ramp up - scaling connections"
+#     - duration: 10
+#       arrivalRate: 500
+#       name: "Sudden spike - the viral event"
+
+#   variables:
+#     # Varies the limit to generate different cache keys (e.g., articles:c:l15)
+#     randomLimit:
+#       - "15"
+#       - "25"
+#       - "40"
+#       - "50"
+
+# scenarios:
+#   - name: "Main feed (Cache Hit heavy)"
+#     weight: 7
+#     flow:
+#       - get:
+#           url: "/articles"
+
+#   - name: "Custom limits (Cache Miss / DB Stress)"
+#     weight: 3
+#     flow:
+#       - get:
+#           url: "/articles?limit={{ randomLimit }}"
+
 config:
-  environments:
-    local:
-      target: "http://localhost:3000"
-    prod:
-      target: "https://opencanvas.onrender.com"
-
-  phases:
-    - duration: 30
-      arrivalRate: 10
-      name: "Warm up - filling cache"
-    - duration: 60
-      arrivalRate: 10
-      rampTo: 100
-      name: "Ramp up - scaling connections"
-    - duration: 10
-      arrivalRate: 500
-      name: "Sudden spike - the viral event"
-
-  variables:
-    # Varies the limit to generate different cache keys (e.g., articles:c:l15)
-    randomLimit:
-      - "15"
-      - "25"
-      - "40"
-      - "50"
+    environments:
+        local:
+            target: "http://localhost:3000"
+    phases:
+        - duration: 30
+          arrivalRate: 50
+          name: "DB stress - no cache possible"
 
 scenarios:
-  - name: "Main feed (Cache Hit heavy)"
-    weight: 7
-    flow:
-      - get:
-          url: "/articles"
+    - name: "True cache miss - unique limit per request"
+      weight: 5
+      flow:
+          - get:
+                url: "/articles?limit={{ $randomNumber(1, 50) }}"
 
-  - name: "Custom limits (Cache Miss / DB Stress)"
-    weight: 3
-    flow:
-      - get:
-          url: "/articles?limit={{ randomLimit }}"
+    - name: "Cursor pagination stress"
+      weight: 5
+      flow:
+          - get:
+                url: "/articles"
+                capture:
+                    - json: "$.nextCursor"
+                      as: "cursor"
+          - get:
+                url: "/articles?cursor={{ cursor }}"
+                ifTrue: "cursor"

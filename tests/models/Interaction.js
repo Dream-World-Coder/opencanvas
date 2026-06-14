@@ -2,26 +2,26 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const interactionSchema = new Schema(
-  {
-    userId: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-      index: true,
+    {
+        userId: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+            index: true,
+        },
+        targetId: { type: Schema.Types.ObjectId, required: true },
+        targetModel: {
+            type: String,
+            required: true,
+            enum: ["Post", "Collection", "Comment", "Publication"],
+        },
+        type: {
+            type: String,
+            required: true,
+            enum: ["like", "dislike", "save"],
+        },
     },
-    targetId: { type: Schema.Types.ObjectId, required: true },
-    targetModel: {
-      type: String,
-      required: true,
-      enum: ["Post", "Collection", "Comment"],
-    },
-    type: {
-      type: String,
-      required: true,
-      enum: ["like", "dislike", "save"],
-    },
-  },
-  { timestamps: true },
+    { timestamps: true },
 );
 
 // indexes

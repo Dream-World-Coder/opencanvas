@@ -96,7 +96,7 @@ router.get("/articles", async (req, res) => {
         const cacheKey = `articles:c${rawCursor}:l${limit}`;
 
         const cached = cache.get(cacheKey);
-        if (cached) {
+        if (cached && process.env.DISABLE_CACHE !== "1") {
             return res
                 .status(200)
                 .json({ success: true, ...cached, fromCache: true });

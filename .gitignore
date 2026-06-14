@@ -6,3 +6,5 @@ docs
 metrics
 ignore.png
 output.log
+node_modules
+_docs/
